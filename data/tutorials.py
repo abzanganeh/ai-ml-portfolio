@@ -8,61 +8,42 @@ TUTORIALS_DATA = [
         'category': 'NLP',
         'difficulty': 'intermediate',
         'duration': '45 min',
-        'author': 'Your Name',
+        'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': True,
         'template_path': 'tutorials/nlp/index.html',
         'published': True,
         'excerpt': 'Master NLP concepts through 8 interactive sections covering tokenization, sentiment analysis, and more.',
-        'tags': 'nlp, transformers, bert, gpt, attention, embeddings, sentiment-analysis'
+        'tags': 'nlp, text-processing, sentiment-analysis, language-models'
     },
     {
         'title': 'Naive Bayes Classification Guide',
-        'slug': 'naive-bayes-guide',
+        'slug': 'naive-bayes',
         'description': 'Master Naive Bayes classification with interactive weather prediction demo and comprehensive mathematical explanations.',
         'category': 'Machine Learning',
         'difficulty': 'intermediate',
         'duration': '35 min', 
-        'author': 'Your Name',
+        'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': True,
-        'template_path': 'tutorials/naive_bayes/index.html',
+        'template_path': 'tutorials/naive-bayes/index.html',
         'published': True,
         'excerpt': 'Learn Naive Bayes through interactive weather prediction examples, mathematical foundations, and real-world applications.',
         'tags': 'naive-bayes, classification, probability, machine-learning, bayes-theorem'
     },
     {
-        'title': 'Machine Learning Fundamentals - Chapter 1',
-        'slug': 'ml-fundamentals-ch1',
-        'description': 'Introduction to Machine Learning concepts, types, and applications.',
+        'title': 'Machine Learning Fundamentals',
+        'slug': 'ml-fundamentals',
+        'description': 'Complete hands-on course with Python implementations and real-world examples covering introduction, regression, and classification.',
         'category': 'Machine Learning',
         'difficulty': 'beginner',
-        'duration': '25 min',
-        'author': 'Your Name',
-        'has_dedicated_template': False,
-        'template_path': None,
+        'duration': '90 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/ml_fundamentals/index.html',
         'published': True,
-        'excerpt': 'Start your ML journey with fundamental concepts and core terminology.',
-        'content': '''
-        <h2>What is Machine Learning?</h2>
-        <p>Machine Learning is a subset of artificial intelligence that enables computers to learn and make decisions without being explicitly programmed...</p>
-        
-        <h3>Types of Machine Learning</h3>
-        <ul>
-            <li><strong>Supervised Learning:</strong> Learning with labeled examples</li>
-            <li><strong>Unsupervised Learning:</strong> Finding patterns in unlabeled data</li>
-            <li><strong>Reinforcement Learning:</strong> Learning through trial and error</li>
-        </ul>
-        
-        <h3>Key Applications</h3>
-        <p>Machine learning powers many modern applications including:</p>
-        <ul>
-            <li>Recommendation systems (Netflix, Spotify)</li>
-            <li>Image recognition and computer vision</li>
-            <li>Natural language processing</li>
-            <li>Fraud detection</li>
-            <li>Autonomous vehicles</li>
-        </ul>
-        '''
+        'excerpt': 'Complete ML fundamentals course with three comprehensive chapters covering introduction, regression, and classification.',
+        'tags': 'machine-learning, python, regression, classification, supervised-learning'
     },
+
     {
         'title': 'Decision Tree Regression',
         'slug': 'decision-tree-regression',
@@ -70,7 +51,7 @@ TUTORIALS_DATA = [
         'category': 'Machine Learning',
         'difficulty': 'intermediate',
         'duration': '30 min',
-        'author': 'Your Name',
+        'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': False,
         'template_path': None,
         'published': True,
@@ -115,7 +96,7 @@ TUTORIALS_DATA = [
         'category': 'Data Science',
         'difficulty': 'intermediate',
         'duration': '40 min',
-        'author': 'Your Name',
+        'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': False,
         'template_path': None,
         'published': True,

@@ -27,7 +27,7 @@ class Project:
         self.demo_url = demo_url
         self.category = category
         self.featured = featured
-        self.image_url = image_url or f"/static/images/projects/{id}.jpg"
+        self.image_url = image_url or "/static/images/logo.png"
     
     def to_dict(self):
         return {
@@ -42,6 +42,11 @@ class Project:
             'image_url': self.image_url,
             'url': f"/project/{self.id}"
         }
+    
+    @property
+    def name(self):
+        """Return the project name (using id for URL generation)"""
+        return self.id
 
 class BlogPost:
     def __init__(self, id, title, content, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5):
@@ -116,10 +121,9 @@ def populate_tutorials():
 
 # Initialize database
 with app.app_context():
-    # Force drop all tables and recreate
-    db.drop_all()
+    # Create tables if they don't exist
     db.create_all()
-    # Always populate with fresh data
+    # Always populate with fresh data for now
     populate_tutorials()
 
 # Helper function to load non-tutorial data
@@ -200,7 +204,7 @@ def project_detail(project_name):
     # Find project by name
     project = next((p for p in projects if p.name == project_name), None)
     if not project:
-        return render_template('errors/404.html'), 404
+        return render_template('404.html'), 404
     
     # Try to render the specific project template, fallback to generic
     try:
@@ -214,7 +218,7 @@ def project_detail_legacy(project_id):
     projects, blog_posts = load_projects_and_blog_data()
     project = next((p for p in projects if p.id == project_id), None)
     if not project:
-        return render_template('errors/404.html'), 404
+        return render_template('404.html'), 404
     return redirect(url_for('project_detail', project_name=project.name), code=301)
 
 # NEW DATABASE-POWERED TUTORIAL ROUTES
@@ -398,7 +402,7 @@ def internal_error(error):
 def inject_globals():
     """Inject global variables into all templates"""
     return {
-        'site_title': 'Alireza Barzin Zanganeh - AI/ML Portfolio',
+        'site_title': 'Alireza Barzin Zanganeh - ML/Data Science Portfolio',
         'current_year': datetime.now().year,
         'social_links': {
             'linkedin': 'https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126',
