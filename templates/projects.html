@@ -2,6 +2,10 @@
 
 {% block title %}Projects - {{ site_title }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/projects.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="projects-page">
     <div class="container">
@@ -33,7 +37,7 @@
                     <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy">
                     <div class="project-overlay">
                         <div class="project-actions">
-                            <a href="{{ url_for('project_detail', project_id=project.id) }}" 
+                            <a href="{{ url_for('project_detail', project_name=project.name) }}" 
                                class="btn btn-sm btn-primary">
                                 <i class="fas fa-eye"></i> View Details
                             </a>
@@ -85,200 +89,6 @@
         {% endif %}
     </div>
 </section>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.projects-page {
-    padding: var(--space-3xl) 0;
-}
-
-.projects-filters {
-    background: var(--bg-secondary);
-    padding: var(--space-2xl) 0;
-    margin-bottom: var(--space-2xl);
-    border-radius: var(--radius-lg);
-}
-
-.filter-controls h3 {
-    margin-bottom: var(--space-lg);
-    text-align: center;
-}
-
-.category-filters {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-}
-
-.filter-btn {
-    background: var(--bg-card);
-    border: 2px solid var(--border-light);
-    color: var(--text-secondary);
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--text-light);
-}
-
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--space-2xl);
-}
-
-.project-card {
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    transition: all var(--transition-normal);
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-xl);
-}
-
-.project-image {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-    background: var(--bg-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.project-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--transition-slow);
-}
-
-.project-card:hover .project-image img {
-    transform: scale(1.05);
-}
-
-.project-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity var(--transition-normal);
-}
-
-.project-card:hover .project-overlay {
-    opacity: 1;
-}
-
-.project-actions {
-    display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.project-content {
-    padding: var(--space-lg);
-}
-
-.project-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: var(--space-md);
-    gap: var(--space-md);
-}
-
-.project-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-    flex: 1;
-}
-
-.project-category {
-    background-color: var(--primary-color);
-    color: var(--text-light);
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.project-description {
-    color: var(--text-secondary);
-    margin-bottom: var(--space-lg);
-    line-height: 1.6;
-}
-
-.project-tech {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-sm);
-}
-
-.tech-tag {
-    background-color: var(--bg-tertiary);
-    color: var(--text-secondary);
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-}
-
-.tech-tag.more {
-    background-color: var(--accent-color);
-    color: var(--text-light);
-}
-
-.no-projects {
-    text-align: center;
-    padding: var(--space-3xl) 0;
-}
-
-.no-projects-content i {
-    font-size: 4rem;
-    color: var(--text-tertiary);
-    margin-bottom: var(--space-lg);
-}
-
-@media (max-width: 768px) {
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .category-filters {
-        justify-content: center;
-    }
-    
-    .project-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .project-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-}
-</style>
 {% endblock %}
 
 {% block extra_js %}

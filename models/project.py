@@ -14,6 +14,7 @@ class Project:
                  category: str = "General",
                  featured: bool = False,
                  image_url: str = None,
+                 name: str = None, 
                  created_at: Optional[datetime] = None,
                  status: str = "Completed",
                  challenges: List[str] = None,
@@ -45,6 +46,7 @@ class Project:
         self.id = id
         self.title = title
         self.description = description
+        self.name = name or id.lower().replace(' ', '_').replace('-', '_')
         self.technology_stack = technology_stack or []
         self.github_url = github_url
         self.demo_url = demo_url
@@ -63,6 +65,7 @@ class Project:
         """Convert project to dictionary for JSON serialization"""
         return {
             'id': self.id,
+            'name': self.name,
             'title': self.title,
             'description': self.description,
             'detailed_description': self.detailed_description,
@@ -78,7 +81,7 @@ class Project:
             'results': self.results,
             'team_size': self.team_size,
             'duration_months': self.duration_months,
-            'url': f"/project/{self.id}"
+            'url': f"/projects/{self.name}" 
         }
     
     def get_technology_categories(self) -> Dict[str, List[str]]:

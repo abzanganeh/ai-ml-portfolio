@@ -2,6 +2,10 @@
 
 {% block title %}Contact - {{ site_title }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/contact.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="contact-page">
     <div class="container">
@@ -15,7 +19,7 @@
         <div class="contact-content">
             <div class="contact-form-section">
                 <h2>Send a Message</h2>
-                <form method="POST" class="contact-form">
+                <form method="POST" class="contact-form" id="contact-form">
                     <div class="form-group">
                         <label for="name">Name *</label>
                         <input type="text" id="name" name="name" required>
@@ -33,7 +37,7 @@
                     
                     <div class="form-group">
                         <label for="message">Message *</label>
-                        <textarea id="message" name="message" rows="5" required></textarea>
+                        <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project or question..."></textarea>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">
@@ -58,7 +62,7 @@
                         <i class="fab fa-linkedin"></i>
                         <div>
                             <h3>LinkedIn</h3>
-                            <p><a href="{{ social_links.linkedin }}" target="_blank">Connect with me</a></p>
+                            <p><a href="{{ social_links.linkedin }}" target="_blank" rel="noopener">Connect with me</a></p>
                         </div>
                     </div>
                     
@@ -66,7 +70,7 @@
                         <i class="fab fa-github"></i>
                         <div>
                             <h3>GitHub</h3>
-                            <p><a href="{{ social_links.github }}" target="_blank">View my code</a></p>
+                            <p><a href="{{ social_links.github }}" target="_blank" rel="noopener">View my code</a></p>
                         </div>
                     </div>
                 </div>
@@ -87,112 +91,61 @@
 </section>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-.contact-page {
-    padding: var(--space-3xl) 0;
-}
-
-.contact-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-3xl);
-    margin-top: var(--space-2xl);
-}
-
-.contact-form {
-    background: var(--bg-card);
-    padding: var(--space-2xl);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-}
-
-.form-group {
-    margin-bottom: var(--space-lg);
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: var(--space-sm);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: var(--space-md);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    transition: border-color var(--transition-fast);
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
-.contact-info-section {
-    background: var(--bg-secondary);
-    padding: var(--space-2xl);
-    border-radius: var(--radius-lg);
-}
-
-.contact-info {
-    margin-bottom: var(--space-2xl);
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    margin-bottom: var(--space-xl);
-}
-
-.contact-item i {
-    font-size: 2rem;
-    color: var(--primary-color);
-    width: 50px;
-    text-align: center;
-}
-
-.contact-item h3 {
-    margin: 0 0 var(--space-xs) 0;
-    color: var(--text-primary);
-}
-
-.contact-item a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.contact-item a:hover {
-    text-decoration: underline;
-}
-
-.availability {
-    background: var(--bg-card);
-    padding: var(--space-lg);
-    border-radius: var(--radius-md);
-}
-
-.availability h3 {
-    margin-bottom: var(--space-md);
-    color: var(--primary-color);
-}
-
-@media (max-width: 768px) {
-    .contact-content {
-        grid-template-columns: 1fr;
-        gap: var(--space-2xl);
-    }
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contact-form');
     
-    .contact-form,
-    .contact-info-section {
-        padding: var(--space-lg);
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Add loading state
+            this.classList.add('loading');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Simulate form submission
+            setTimeout(() => {
+                this.classList.remove('loading');
+                
+                // Show success message
+                const successMessage = document.createElement('div');
+                successMessage.className = 'form-message success';
+                successMessage.innerHTML = '<i class="fas fa-check-circle"></i> Thank you! Your message has been sent successfully.';
+                
+                // Insert message at the top of the form
+                this.insertBefore(successMessage, this.firstChild);
+                
+                // Reset form
+                this.reset();
+                
+                // Remove success message after 5 seconds
+                setTimeout(() => {
+                    if (successMessage.parentNode) {
+                        successMessage.remove();
+                    }
+                }, 5000);
+                
+            }, 2000); // Simulate 2 second processing time
+        });
+        
+        // Real-time validation
+        const inputs = contactForm.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.style.borderColor = 'var(--error-color)';
+                } else if (this.type === 'email' && this.value && !this.validity.valid) {
+                    this.style.borderColor = 'var(--error-color)';
+                } else if (this.value.trim()) {
+                    this.style.borderColor = 'var(--success-color)';
+                } else {
+                    this.style.borderColor = 'var(--border-light)';
+                }
+            });
+        });
     }
-}
-</style>
+});
+</script>
 {% endblock %}

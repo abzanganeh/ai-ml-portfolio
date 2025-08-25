@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Guide to Naive Bayes - {{ site_title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/naive_bayes/naive_bayes.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="back-to-tutorials">
+        <a href="{{ url_for('tutorials') }}" class="back-link">← Back to Tutorials</a>
+    </div>
+
+    <h1>🧠 Complete Guide to Naive Bayes</h1>
+    
+    <h2>📚 What is Naive Bayes?</h2>
+    <p>Naive Bayes is a family of probabilistic algorithms based on applying Bayes' theorem with the "naive" assumption of conditional independence between every pair of features. Despite this strong assumption, it works surprisingly well for many real-world problems, especially text classification and spam filtering.</p>
+    
+    <h2>🔢 The Mathematical Foundation</h2>
+    <p>Bayes' theorem forms the core of this algorithm:</p>
+    
+    <div class="formula">
+        P(A|B) = P(B|A) × P(A) / P(B)
+    </div>
+    
+    <p>For classification, this becomes:</p>
+    
+    <div class="formula">
+        P(class|features) = P(features|class) × P(class) / P(features)
+    </div>
+    
+    <p>The "naive" assumption means we assume all features are independent:</p>
+    
+    <div class="formula">
+        P(x₁,x₂,...,xₙ|class) = P(x₁|class) × P(x₂|class) × ... × P(xₙ|class)
+    </div>
+    
+    <h2>📊 Simple Example: Weather Prediction</h2>
+    <div class="example-box">
+        <h3>Dataset: Will we play tennis based on weather?</h3>
+        <table id="weatherTable">
+            <tr>
+                <th>Day</th>
+                <th>Outlook</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Wind</th>
+                <th>Play Tennis?</th>
+            </tr>
+            <tr><td>1</td><td>Sunny</td><td>Hot</td><td>High</td><td>Weak</td><td>No</td></tr>
+            <tr><td>2</td><td>Sunny</td><td>Hot</td><td>High</td><td>Strong</td><td>No</td></tr>
+            <tr><td>3</td><td>Overcast</td><td>Hot</td><td>High</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>4</td><td>Rain</td><td>Mild</td><td>High</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>5</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>6</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Strong</td><td>No</td></tr>
+            <tr><td>7</td><td>Overcast</td><td>Cool</td><td>Normal</td><td>Strong</td><td>Yes</td></tr>
+            <tr><td>8</td><td>Sunny</td><td>Mild</td><td>High</td><td>Weak</td><td>No</td></tr>
+            <tr><td>9</td><td>Sunny</td><td>Cool</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>10</td><td>Rain</td><td>Mild</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>11</td><td>Sunny</td><td>Mild</td><td>Normal</td><td>Strong</td><td>Yes</td></tr>
+            <tr><td>12</td><td>Overcast</td><td>Mild</td><td>High</td><td>Strong</td><td>Yes</td></tr>
+            <tr><td>13</td><td>Overcast</td><td>Hot</td><td>Normal</td><td>Weak</td><td>Yes</td></tr>
+            <tr><td>14</td><td>Rain</td><td>Mild</td><td>High</td><td>Strong</td><td>No</td></tr>
+        </table>
+    </div>
+    
+    <h3>Step-by-Step Calculation</h3>
+    <p>Let's predict: <strong>Outlook=Sunny, Temperature=Cool, Humidity=High, Wind=Strong</strong></p>
+    
+    <div class="example-box">
+        <h4><span class="step-number">1</span>Prior Probabilities:</h4>
+        <p>P(Play=Yes) = 9/14 = <span class="highlight">0.643</span></p>
+        <p>P(Play=No) = 5/14 = <span class="highlight">0.357</span></p>
+        
+        <h4><span class="step-number">2</span>Likelihood Calculations:</h4>
+        <p><strong>For Play=Yes:</strong></p>
+        <ul>
+            <li>P(Outlook=Sunny|Yes) = 2/9 = 0.222</li>
+            <li>P(Temperature=Cool|Yes) = 3/9 = 0.333</li>
+            <li>P(Humidity=High|Yes) = 3/9 = 0.333</li>
+            <li>P(Wind=Strong|Yes) = 3/9 = 0.333</li>
+        </ul>
+        
+        <p><strong>For Play=No:</strong></p>
+        <ul>
+            <li>P(Outlook=Sunny|No) = 3/5 = 0.600</li>
+            <li>P(Temperature=Cool|No) = 1/5 = 0.200</li>
+            <li>P(Humidity=High|No) = 4/5 = 0.800</li>
+            <li>P(Wind=Strong|No) = 3/5 = 0.600</li>
+        </ul>
+        
+        <h4><span class="step-number">3</span>Final Calculation:</h4>
+        <p>P(Yes|features) ∝ 0.643 × 0.222 × 0.333 × 0.333 × 0.333 = <span class="highlight">0.0063</span></p>
+        <p>P(No|features) ∝ 0.357 × 0.600 × 0.200 × 0.800 × 0.600 = <span class="highlight">0.0206</span></p>
+        
+        <p><strong>Prediction: <span class="highlight">No (Don't play tennis)</span></strong></p>
+    </div>
+    
+    <h2>📈 Visualization of Feature Distributions</h2>
+    <div class="chart-container">
+        <canvas id="featureChart"></canvas>
+    </div>
+    
+    <h2>💻 Python Implementation</h2>
+    
+    <h3>From Scratch Implementation</h3>
+    <div class="code-block">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="keyword">class</span> NaiveBayesClassifier:
+    <span class="keyword">def</span> __init__(self):
+        self.class_probs = {}
+        self.feature_probs = defaultdict(<span class="keyword">lambda</span>: defaultdict(dict))
+        self.classes = []
+        
+    <span class="keyword">def</span> fit(self, X, y):
+        <span class="comment">"""Train the Naive Bayes classifier"""</span>
+        self.classes = np.unique(y)
+        n_samples = len(y)
+        
+        <span class="comment"># Calculate class probabilities</span>
+        <span class="keyword">for</span> cls <span class="keyword">in</span> self.classes:
+            self.class_probs[cls] = np.sum(y == cls) / n_samples
+        
+        <span class="comment"># Calculate feature probabilities</span>
+        <span class="keyword">for</span> feature_idx <span class="keyword">in</span> range(X.shape[<span class="number">1</span>]):
+            feature_values = np.unique(X[:, feature_idx])
+            
+            <span class="keyword">for</span> cls <span class="keyword">in</span> self.classes:
+                class_mask = (y == cls)
+                class_samples = X[class_mask]
+                
+                <span class="keyword">for</span> value <span class="keyword">in</span> feature_values:
+                    count = np.sum(class_samples[:, feature_idx] == value)
+                    <span class="comment"># Add Laplace smoothing</span>
+                    self.feature_probs[feature_idx][cls][value] = (
+                        (count + <span class="number">1</span>) / (np.sum(class_mask) + len(feature_values))
+                    )
+    
+    <span class="keyword">def</span> predict(self, X):
+        <span class="comment">"""Predict classes"""</span>
+        predictions = []
+        
+        <span class="keyword">for</span> sample <span class="keyword">in</span> X:
+            class_scores = {}
+            
+            <span class="keyword">for</span> cls <span class="keyword">in</span> self.classes:
+                <span class="comment"># Start with class prior</span>
+                score = self.class_probs[cls]
+                
+                <span class="comment"># Multiply by feature likelihoods</span>
+                <span class="keyword">for</span> feature_idx, feature_value <span class="keyword">in</span> enumerate(sample):
+                    <span class="keyword">if</span> feature_value <span class="keyword">in</span> self.feature_probs[feature_idx][cls]:
+                        score *= self.feature_probs[feature_idx][cls][feature_value]
+                
+                class_scores[cls] = score
+            
+            predictions.append(max(class_scores, key=class_scores.get))
+        
+        <span class="keyword">return</span> predictions
+
+<span class="comment"># Example usage</span>
+weather_data = [
+    [<span class="string">'Sunny'</span>, <span class="string">'Hot'</span>, <span class="string">'High'</span>, <span class="string">'Weak'</span>, <span class="string">'No'</span>],
+    [<span class="string">'Sunny'</span>, <span class="string">'Hot'</span>, <span class="string">'High'</span>, <span class="string">'Strong'</span>, <span class="string">'No'</span>],
+    <span class="comment"># ... more data</span>
+]
+
+X = np.array([row[:-<span class="number">1</span>] <span class="keyword">for</span> row <span class="keyword">in</span> weather_data])
+y = np.array([row[-<span class="number">1</span>] <span class="keyword">for</span> row <span class="keyword">in</span> weather_data])
+
+nb = NaiveBayesClassifier()
+nb.fit(X, y)
+    </div>
+    
+    <h2>🎯 Interactive Demo</h2>
+    <div class="interactive-demo">
+        <h3>🎾 Tennis Playing Predictor</h3>
+        <p>Select weather conditions to predict if tennis will be played:</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <label><strong>Outlook:</strong></label><br>
+                <select id="outlook">
+                    <option value="Sunny">☀️ Sunny</option>
+                    <option value="Overcast">☁️ Overcast</option>
+                    <option value="Rain">🌧️ Rain</option>
+                </select>
+            </div>
+            
+            <div class="feature-card">
+                <label><strong>Temperature:</strong></label><br>
+                <select id="temperature">
+                    <option value="Hot">🔥 Hot</option>
+                    <option value="Mild">🌡️ Mild</option>
+                    <option value="Cool">❄️ Cool</option>
+                </select>
+            </div>
+            
+            <div class="feature-card">
+                <label><strong>Humidity:</strong></label><br>
+                <select id="humidity">
+                    <option value="High">💧 High</option>
+                    <option value="Normal">💨 Normal</option>
+                </select>
+            </div>
+            
+            <div class="feature-card">
+                <label><strong>Wind:</strong></label><br>
+                <select id="wind">
+                    <option value="Weak">🍃 Weak</option>
+                    <option value="Strong">💨 Strong</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="makePrediction()">🔮 Predict Tennis Playing</button>
+        
+        <div id="predictionResult" class="prediction-result" style="display: none;"></div>
+    </div>
+    
+    <h2>📊 Performance Visualization</h2>
+    <div class="chart-container">
+        <canvas id="performanceChart"></canvas>
+    </div>
+    
+    <h2>🔍 Types of Naive Bayes</h2>
+    
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h3>1. Gaussian Naive Bayes</h3>
+            <p>Used for continuous features that follow a normal distribution.</p>
+            <div class="formula">
+                P(xᵢ|y) = (1/√(2πσ²)) × exp(-(xᵢ-μ)²/(2σ²))
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <h3>2. Multinomial Naive Bayes</h3>
+            <p>Used for discrete counts (e.g., word counts in text classification).</p>
+            <div class="formula">
+                P(xᵢ|y) = (Nᵧᵢ + α) / (Nᵧ + α×n)
+            </div>
+        </div>
+        
+        <div class="feature-card">
+            <h3>3. Bernoulli Naive Bayes</h3>
+            <p>Used for binary/boolean features.</p>
+            <div class="formula">
+                P(xᵢ|y) = P(i|y)×xᵢ + (1-P(i|y))×(1-xᵢ)
+            </div>
+        </div>
+    </div>
+    
+    <h2>✅ Advantages and Disadvantages</h2>
+    
+    <div class="advantages">
+        <h3>✅ Advantages:</h3>
+        <ul>
+            <li><strong>🚀 Simple and Fast:</strong> Easy to implement and computationally efficient</li>
+            <li><strong>📈 Good Performance:</strong> Works well with small datasets</li>
+            <li><strong>🛡️ No Overfitting:</strong> Less prone to overfitting, especially with small data</li>
+            <li><strong>🎯 Handles Multiple Classes:</strong> Naturally handles multi-class classification</li>
+            <li><strong>📊 Good Baseline:</strong> Excellent baseline for comparison with other algorithms</li>
+            <li><strong>🎲 Probabilistic Output:</strong> Provides probability estimates</li>
+        </ul>
+    </div>
+    
+    <div class="disadvantages">
+        <h3>❌ Disadvantages:</h3>
+        <ul>
+            <li><strong>🔗 Independence Assumption:</strong> Assumes features are independent (rarely true)</li>
+            <li><strong>🔍 Categorical Inputs:</strong> Requires Laplace smoothing for categorical inputs</li>
+            <li><strong>⚡ Limited Expressiveness:</strong> Cannot learn interactions between features</li>
+            <li><strong>📊 Skewed Data:</strong> Can be biased if training data is not representative</li>
+        </ul>
+    </div>
+    
+    <h2>🚀 Real-World Applications</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h4>📧 Email Spam Filtering</h4>
+            <p>Classic application using word frequencies to classify emails as spam or legitimate.</p>
+        </div>
+        <div class="feature-card">
+            <h4>📰 Text Classification</h4>
+            <p>News categorization, sentiment analysis, and document classification.</p>
+        </div>
+        <div class="feature-card">
+            <h4>⚕️ Medical Diagnosis</h4>
+            <p>Based on symptoms and test results to predict diseases.</p>
+        </div>
+        <div class="feature-card">
+            <h4>🌤️ Weather Prediction</h4>
+            <p>Based on atmospheric conditions and historical data.</p>
+        </div>
+        <div class="feature-card">
+            <h4>🎬 Recommendation Systems</h4>
+            <p>Content-based filtering for movies, books, and products.</p>
+        </div>
+        <div class="feature-card">
+            <h4>⚡ Real-time Predictions</h4>
+            <p>Due to its computational efficiency in production systems.</p>
+        </div>
+    </div>
+    
+    <h2>Tips for Better Performance</h2>
+    <div class="example-box">
+        <ol>
+            <li><span class="step-number">1</span><strong>Laplace Smoothing:</strong> Add small constant to avoid zero probabilities</li>
+            <li><span class="step-number">2</span><strong>Feature Selection:</strong> Remove highly correlated features</li>
+            <li><span class="step-number">3</span><strong>Data Preprocessing:</strong> Handle missing values and outliers</li>
+            <li><span class="step-number">4</span><strong>Cross-Validation:</strong> Use proper validation techniques</li>
+            <li><span class="step-number">5</span><strong>Feature Engineering:</strong> Create meaningful features from raw data</li>
+            <li><span class="step-number">6</span><strong>Ensemble Methods:</strong> Combine with other algorithms</li>
+        </ol>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Weather data for calculations
+const weatherData = [
+    ['Sunny', 'Hot', 'High', 'Weak', 'No'],
+    ['Sunny', 'Hot', 'High', 'Strong', 'No'],
+    ['Overcast', 'Hot', 'High', 'Weak', 'Yes'],
+    ['Rain', 'Mild', 'High', 'Weak', 'Yes'],
+    ['Rain', 'Cool', 'Normal', 'Weak', 'Yes'],
+    ['Rain', 'Cool', 'Normal', 'Strong', 'No'],
+    ['Overcast', 'Cool', 'Normal', 'Strong', 'Yes'],
+    ['Sunny', 'Mild', 'High', 'Weak', 'No'],
+    ['Sunny', 'Cool', 'Normal', 'Weak', 'Yes'],
+    ['Rain', 'Mild', 'Normal', 'Weak', 'Yes'],
+    ['Sunny', 'Mild', 'Normal', 'Strong', 'Yes'],
+    ['Overcast', 'Mild', 'High', 'Strong', 'Yes'],
+    ['Overcast', 'Hot', 'Normal', 'Weak', 'Yes'],
+    ['Rain', 'Mild', 'High', 'Strong', 'No']
+];
+
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Feature distribution chart
+    const ctx1 = document.getElementById('featureChart').getContext('2d');
+    
+    const yesData = weatherData.filter(row => row[4] === 'Yes');
+    const noData = weatherData.filter(row => row[4] === 'No');
+    
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Sunny', 'Overcast', 'Rain', 'Hot', 'Mild', 'Cool', 'High Humidity', 'Normal Humidity', 'Weak Wind', 'Strong Wind'],
+            datasets: [{
+                label: 'Play Tennis (Yes)',
+                data: [
+                    yesData.filter(row => row[0] === 'Sunny').length,
+                    yesData.filter(row => row[0] === 'Overcast').length,
+                    yesData.filter(row => row[0] === 'Rain').length,
+                    yesData.filter(row => row[1] === 'Hot').length,
+                    yesData.filter(row => row[1] === 'Mild').length,
+                    yesData.filter(row => row[1] === 'Cool').length,
+                    yesData.filter(row => row[2] === 'High').length,
+                    yesData.filter(row => row[2] === 'Normal').length,
+                    yesData.filter(row => row[3] === 'Weak').length,
+                    yesData.filter(row => row[3] === 'Strong').length
+                ],
+                backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 2
+            }, {
+                label: 'Don\'t Play Tennis (No)',
+                data: [
+                    noData.filter(row => row[0] === 'Sunny').length,
+                    noData.filter(row => row[0] === 'Overcast').length,
+                    noData.filter(row => row[0] === 'Rain').length,
+                    noData.filter(row => row[1] === 'Hot').length,
+                    noData.filter(row => row[1] === 'Mild').length,
+                    noData.filter(row => row[1] === 'Cool').length,
+                    noData.filter(row => row[2] === 'High').length,
+                    noData.filter(row => row[2] === 'Normal').length,
+                    noData.filter(row => row[3] === 'Weak').length,
+                    noData.filter(row => row[3] === 'Strong').length
+                ],
+                backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                borderColor: 'rgba(231, 76, 60, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Feature Distribution by Class'
+                }
+            }
+        }
+    });
+
+    // Performance comparison chart
+    const ctx2 = document.getElementById('performanceChart').getContext('2d');
+    
+    new Chart(ctx2, {
+        type: 'radar',
+        data: {
+            labels: ['Accuracy', 'Speed', 'Interpretability', 'Memory Usage', 'Scalability', 'Robustness'],
+            datasets: [{
+                label: 'Naive Bayes',
+                data: [75, 95, 90, 95, 85, 70],
+                backgroundColor: 'rgba(52, 152, 219, 0.3)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                borderWidth: 3
+            }, {
+                label: 'Random Forest',
+                data: [85, 70, 60, 65, 75, 85],
+                backgroundColor: 'rgba(46, 204, 113, 0.3)',
+                borderColor: 'rgba(46, 204, 113, 1)',
+                borderWidth: 3
+            }, {
+                label: 'SVM',
+                data: [80, 60, 50, 70, 65, 80],
+                backgroundColor: 'rgba(155, 89, 182, 0.3)',
+                borderColor: 'rgba(155, 89, 182, 1)',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Algorithm Performance Comparison'
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+// Interactive prediction function
+function makePrediction() {
+    const outlook = document.getElementById('outlook').value;
+    const temperature = document.getElementById('temperature').value;
+    const humidity = document.getElementById('humidity').value;
+    const wind = document.getElementById('wind').value;
+    
+    const totalSamples = weatherData.length;
+    const yesSamples = weatherData.filter(row => row[4] === 'Yes');
+    const noSamples = weatherData.filter(row => row[4] === 'No');
+    
+    // Prior probabilities
+    const pYes = yesSamples.length / totalSamples;
+    const pNo = noSamples.length / totalSamples;
+    
+    // Likelihood calculations with Laplace smoothing
+    const smoothing = 1;
+    const uniqueOutlook = 3, uniqueTemp = 3, uniqueHumidity = 2, uniqueWind = 2;
+    
+    // For Yes class
+    const pOutlookYes = (yesSamples.filter(row => row[0] === outlook).length + smoothing) / (yesSamples.length + smoothing * uniqueOutlook);
+    const pTempYes = (yesSamples.filter(row => row[1] === temperature).length + smoothing) / (yesSamples.length + smoothing * uniqueTemp);
+    const pHumidityYes = (yesSamples.filter(row => row[2] === humidity).length + smoothing) / (yesSamples.length + smoothing * uniqueHumidity);
+    const pWindYes = (yesSamples.filter(row => row[3] === wind).length + smoothing) / (yesSamples.length + smoothing * uniqueWind);
+    
+    // For No class
+    const pOutlookNo = (noSamples.filter(row => row[0] === outlook).length + smoothing) / (noSamples.length + smoothing * uniqueOutlook);
+    const pTempNo = (noSamples.filter(row => row[1] === temperature).length + smoothing) / (noSamples.length + smoothing * uniqueTemp);
+    const pHumidityNo = (noSamples.filter(row => row[2] === humidity).length + smoothing) / (noSamples.length + smoothing * uniqueHumidity);
+    const pWindNo = (noSamples.filter(row => row[3] === wind).length + smoothing) / (noSamples.length + smoothing * uniqueWind);
+    
+    // Calculate posterior probabilities
+    const scoreYes = pYes * pOutlookYes * pTempYes * pHumidityYes * pWindYes;
+    const scoreNo = pNo * pOutlookNo * pTempNo * pHumidityNo * pWindNo;
+    
+    // Normalize
+    const total = scoreYes + scoreNo;
+    const probYes = scoreYes / total;
+    const probNo = scoreNo / total;
+    
+    const prediction = probYes > probNo ? 'Yes' : 'No';
+    const confidence = Math.max(probYes, probNo);
+    
+    const resultDiv = document.getElementById('predictionResult');
+    resultDiv.style.display = 'block';
+    
+    const resultColor = prediction === 'Yes' ? '#28a745' : '#dc3545';
+    
+    resultDiv.innerHTML = `
+        <h4 style="color: ${resultColor};">Prediction Results:</h4>
+        <p><strong>Will play tennis: ${prediction}</strong></p>
+        <p>Confidence: <span class="highlight">${(confidence * 100).toFixed(1)}%</span></p>
+        <p>Probability of Yes: ${(probYes * 100).toFixed(1)}%</p>
+        <p>Probability of No: ${(probNo * 100).toFixed(1)}%</p>
+        <hr>
+        <p><strong>Detailed Calculation:</strong></p>
+        <p style="font-family: monospace; font-size: 12px;">
+            P(Yes|features) = ${scoreYes.toFixed(6)}
+        </p>
+        <p style="font-family: monospace; font-size: 12px;">
+            P(No|features) = ${scoreNo.toFixed(6)}
+        </p>
+    `;
+}
+</script>
+{% endblock %}

@@ -91,7 +91,7 @@
                     <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy">
                     <div class="project-overlay">
                         <div class="project-actions">
-                            <a href="{{ url_for('project_detail', project_id=project.id) }}" 
+                            <a href="{{ url_for('project_detail', project_name=project.name) }}" 
                                class="btn btn-sm btn-primary">
                                 <i class="fas fa-eye"></i> View Details
                             </a>
@@ -239,21 +239,21 @@
                 
                 <div class="tutorial-content">
                     <h3 class="tutorial-title">
-                        <a href="{{ url_for('tutorial_detail', tutorial_id=tutorial.id) }}">
+                        <a href="{{ url_for('tutorial_dedicated', slug=tutorial.slug) }}">
                             {{ tutorial.title }}
                         </a>
                     </h3>
                     <p class="tutorial-description">{{ tutorial.description }}</p>
                     
                     <div class="tutorial-tags">
-                        {% for tag in tutorial.tags[:3] %}
+                        {% for tag in tutorial.tags_list[:3] %}
                         <span class="tag">{{ tag }}</span>
                         {% endfor %}
                     </div>
                 </div>
                 
                 <div class="tutorial-footer">
-                    <a href="{{ url_for('tutorial_detail', tutorial_id=tutorial.id) }}" 
+                    <a href="{{ url_for('tutorial_dedicated', slug=tutorial.slug) }}">
                        class="tutorial-link">
                         Read Tutorial <i class="fas fa-arrow-right"></i>
                     </a>

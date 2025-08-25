@@ -3,13 +3,304 @@
 {% block title %}Complete Interactive NLP Course - {{ site_title }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/nlp/nlp.css') }}">
+<style>
+/* NLP Course Specific Styles */
+.nlp-course-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+.nlp-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+}
+
+.nlp-header h1 {
+    color: white;
+    margin-bottom: var(--space-md);
+}
+
+.progress-bar {
+    background: rgba(255,255,255,0.2);
+    height: 8px;
+    border-radius: 4px;
+    margin-top: var(--space-lg);
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: white;
+    height: 100%;
+    width: 12.5%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.course-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+    background: var(--bg-secondary);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+}
+
+.nav-btn {
+    background: white;
+    border: 2px solid #667eea;
+    color: #667eea;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+.nav-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+.nav-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.nlp-section {
+    display: none;
+    background: white;
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-lg);
+}
+
+.nlp-section.active {
+    display: block;
+}
+
+.nlp-section h2 {
+    color: #667eea;
+    border-bottom: 2px solid #e5e5f5;
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.nlp-section h3 {
+    color: #764ba2;
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-md);
+}
+
+.interactive-demo {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e5e5f5 100%);
+    border: 2px solid #667eea;
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+}
+
+.interactive-demo h4 {
+    color: #667eea;
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.demo-input {
+    width: 100%;
+    padding: var(--space-md);
+    border: 2px solid #ddd;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    margin-bottom: var(--space-md);
+}
+
+.demo-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.demo-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    transition: background var(--transition-fast);
+}
+
+.demo-btn:hover {
+    background: #5a6fd8;
+}
+
+.demo-output {
+    background: #eef2ff;
+    border: 2px solid #c7d2fe;
+    border-left: 5px solid #667eea;
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin-top: var(--space-md);
+    font-family: 'Courier New', monospace;
+    color: #1e40af;
+    white-space: pre-wrap;
+    min-height: 50px;
+}
+
+.formula-box {
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+    border: 2px solid #fb923c;
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    font-weight: 600;
+}
+
+.example-box {
+    background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%);
+    border: 2px solid #22c55e;
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.pros, .cons {
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+}
+
+.pros {
+    background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%);
+    border: 2px solid #22c55e;
+}
+
+.cons {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+}
+
+.architecture-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+    flex-wrap: wrap;
+}
+
+.layer {
+    background: #667eea;
+    color: white;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-align: center;
+}
+
+.arrow {
+    font-size: 1.5rem;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.quiz-container {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+.quiz-question {
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: #92400e;
+}
+
+.quiz-option {
+    background: white;
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin: var(--space-sm) 0;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.quiz-option:hover {
+    background: #fef3c7;
+}
+
+.quiz-option.correct {
+    background: #dcfce7;
+    border-color: #22c55e;
+    color: #166534;
+}
+
+.quiz-option.incorrect {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.attention-visualization {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin: var(--space-md) 0;
+}
+
+.attention-word {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+@media (max-width: 768px) {
+    .course-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-btn {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
+    }
+    
+    .pros-cons {
+        grid-template-columns: 1fr;
+    }
+    
+    .architecture-diagram {
+        flex-direction: column;
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-    <div class="back-to-tutorials">
-        <a href="{{ url_for('tutorials') }}">
+    <div class="back-to-tutorials" style="text-align: center; margin-bottom: var(--space-lg);">
+        <a href="{{ url_for('tutorials') }}" style="display: inline-flex; align-items: center; gap: var(--space-sm); color: var(--primary-color); text-decoration: none; font-weight: 500;">
             <i class="fas fa-arrow-left"></i> Back to Tutorials
         </a>
     </div>
@@ -40,7 +331,6 @@
     <!-- Introduction Section -->
     <div id="intro" class="nlp-section active">
         <h2>Welcome to the NLP Course!</h2>
-        <h2>Introduction to Natural Language Processing</h2>
         
         <p>Natural Language Processing (NLP) is a machine learning technology that gives computers the ability to interpret, manipulate, and comprehend human language. It involves reading, deciphering, understanding, and making sense of human languages.</p>
 
@@ -49,14 +339,14 @@
         <h3>Key Topics Covered</h3>
         <ul>
             <li>Text Representation Techniques</li>
-            <li>Word Embeddings</li>
+            <li>Word Embeddings (Word2Vec, GloVe, FastText)</li>
             <li>Sentiment Analysis</li>
             <li>Seq2Seq Models</li>
             <li>Transformers and Self-Attention</li>
             <li>Applications in Real-World Scenarios</li>
         </ul>
 
-        <h3>Who This Course is For</h3>
+        <h3> Who This Course is For</h3>
         <p>This course is designed for anyone interested in learning about NLP, from beginners to advanced practitioners. No prior experience with machine learning is required, but familiarity with Python is recommended.</p>
 
         <div class="interactive-demo">
@@ -64,13 +354,13 @@
             <p>Enter some text to see basic NLP preprocessing:</p>
             <input type="text" class="demo-input" id="nlpInput" placeholder="Enter your text here..." value="Hello! This is a GREAT example of NLP preprocessing.">
             <button class="demo-btn" onclick="preprocessText()">Process Text</button>
-            <div class="demo-output" id="nlpOutput"></div>
+            <div class="demo-output" id="nlpOutput">Your processed text will appear here...</div>
         </div>
 
-        <h3>Key Applications of NLP</h3>
+        <h3> Key Applications of NLP</h3>
         <div class="pros-cons">
             <div class="pros">
-                <h4>Communication</h4>
+                <h4> Communication</h4>
                 <ul>
                     <li>Spam Filters (Gmail)</li>
                     <li>Email Classification</li>
@@ -79,7 +369,7 @@
                 </ul>
             </div>
             <div class="cons">
-                <h4>Business Intelligence</h4>
+                <h4> Business Intelligence</h4>
                 <ul>
                     <li>Sentiment Analysis</li>
                     <li>Market Research</li>
@@ -109,7 +399,7 @@
             <h4>Bag of Words Demo</h4>
             <input type="text" class="demo-input" id="bowInput" placeholder="Enter sentences separated by | (e.g., I love NLP | NLP is amazing)" value="I love machine learning | Machine learning is powerful">
             <button class="demo-btn" onclick="demonstrateBOW()">Create BoW</button>
-            <div class="demo-output" id="bowOutput"></div>
+            <div class="demo-output" id="bowOutput">Your BoW representation will appear here...</div>
         </div>
 
         <div class="pros-cons">
@@ -135,7 +425,7 @@
         <h3>2. TF-IDF (Term Frequency-Inverse Document Frequency)</h3>
         <p>TF-IDF reflects the importance of a word in a document relative to a collection of documents.</p>
 
-        <div class="example-box">
+        <div class="formula-box">
             <strong>Formula:</strong><br>
             TF-IDF(t,d) = TF(t,d) × IDF(t)<br>
             Where:<br>
@@ -147,7 +437,7 @@
             <h4>TF-IDF Demo</h4>
             <input type="text" class="demo-input" id="tfidfInput" placeholder="Enter documents separated by |" value="The cat sat on the mat | The dog ran in the park | Cats and dogs are pets">
             <button class="demo-btn" onclick="demonstrateTFIDF()">Calculate TF-IDF</button>
-            <div class="demo-output" id="tfidfOutput"></div>
+            <div class="demo-output" id="tfidfOutput">TF-IDF calculations will appear here...</div>
         </div>
     </div>
 
@@ -180,7 +470,7 @@
             <input type="text" class="demo-input" id="word1" placeholder="First word" value="king">
             <input type="text" class="demo-input" id="word2" placeholder="Second word" value="queen">
             <button class="demo-btn" onclick="calculateWordSimilarity()">Calculate Similarity</button>
-            <div class="demo-output" id="similarityOutput"></div>
+            <div class="demo-output" id="similarityOutput">Similarity analysis will appear here...</div>
         </div>
 
         <h3>Word2Vec Variants</h3>
@@ -203,25 +493,6 @@
                     <li>Good for small datasets</li>
                 </ul>
             </div>
-        </div>
-
-        <h3>2. GloVe (Global Vectors)</h3>
-        <p>GloVe generates word vectors based on co-occurrence statistics in a large corpus.</p>
-
-        <div class="interactive-demo">
-            <h4>Co-occurrence Matrix Demo</h4>
-            <input type="text" class="demo-input" id="gloveInput" placeholder="Enter a sentence" value="The quick brown fox jumps over the lazy dog">
-            <button class="demo-btn" onclick="demonstrateCooccurrence()">Generate Co-occurrence</button>
-            <div class="demo-output" id="gloveOutput"></div>
-        </div>
-
-        <h3>3. FastText</h3>
-        <p>FastText extends Word2Vec by using subword representations (character n-grams), making it excellent for handling out-of-vocabulary words.</p>
-
-        <div class="example-box">
-            <strong>FastText Advantage:</strong><br>
-            Even if "unhappiness" wasn't in training data, FastText can understand it through subwords:<br>
-            "un-", "-happy-", "-ness", "unhappy", "happiness", etc.
         </div>
     </div>
 
@@ -297,7 +568,7 @@
         <p>Seq2Seq models are specialized neural network architectures designed to handle sequences as both input and output. They're perfect for tasks like translation, summarization, and chatbots.</p>
 
         <div class="architecture-diagram">
-            <h4>Seq2Seq Architecture</h4>
+            <h3>Seq2Seq Architecture</h3>
             <div class="layer">Encoder</div>
             <span class="arrow">→</span>
             <div class="layer">Context Vector</div>
@@ -600,6 +871,7 @@ Where:
             <p>You've completed the comprehensive NLP course! You now understand the fundamental concepts from basic text representation to advanced Transformer architectures. Keep practicing and exploring to master these powerful techniques!</p>
         </div>
     </div>
+    
 </div>
 {% endblock %}
 
@@ -634,6 +906,12 @@ function preprocessText() {
     const input = document.getElementById('nlpInput').value;
     const output = document.getElementById('nlpOutput');
     
+    if (!input.trim()) {
+        output.textContent = 'Please enter some text to process.';
+        return;
+    }
+    
+    // Simple preprocessing simulation
     const steps = [
         `Original: "${input}"`,
         `Lowercased: "${input.toLowerCase()}"`,
@@ -648,9 +926,15 @@ function demonstrateBOW() {
     const input = document.getElementById('bowInput').value;
     const output = document.getElementById('bowOutput');
     
+    if (!input.trim()) {
+        output.textContent = 'Please enter some documents separated by |';
+        return;
+    }
+    
     const documents = input.split('|').map(doc => doc.trim());
     const allWords = new Set();
     
+    // Collect all unique words
     documents.forEach(doc => {
         const words = doc.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
         words.forEach(word => allWords.add(word));
@@ -658,7 +942,8 @@ function demonstrateBOW() {
     
     const vocabulary = Array.from(allWords).sort();
     
-    let result = '<strong>Vocabulary:</strong> [' + vocabulary.join(', ') + ']<br><br>';
+    // Create BoW vectors
+    let result = `<strong>Vocabulary:</strong> [${vocabulary.join(', ')}]<br><br>`;
     
     documents.forEach((doc, i) => {
         const words = doc.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
@@ -674,9 +959,15 @@ function demonstrateTFIDF() {
     const input = document.getElementById('tfidfInput').value;
     const output = document.getElementById('tfidfOutput');
     
+    if (!input.trim()) {
+        output.textContent = 'Please enter some documents separated by |';
+        return;
+    }
+    
     const documents = input.split('|').map(doc => doc.trim());
     const allWords = new Set();
     
+    // Collect all unique words
     documents.forEach(doc => {
         const words = doc.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
         words.forEach(word => allWords.add(word));
@@ -716,6 +1007,12 @@ function calculateWordSimilarity() {
     const word2 = document.getElementById('word2').value.toLowerCase();
     const output = document.getElementById('similarityOutput');
     
+    if (!word1 || !word2) {
+        output.textContent = 'Please enter both words.';
+        return;
+    }
+    
+    // Simulated similarity based on conceptual relationships
     const similarities = {
         'king,queen': 0.85, 'queen,king': 0.85,
         'man,woman': 0.75, 'woman,man': 0.75,
@@ -726,7 +1023,7 @@ function calculateWordSimilarity() {
     };
     
     const key = `${word1},${word2}`;
-    const similarity = similarities[key] || (Math.random() * 0.5 + 0.2);
+    const similarity = similarities[key] || (Math.random() * 0.5 + 0.2); // Random similarity for demo
     
     output.innerHTML = `
         <strong>Similarity Analysis:</strong><br>
@@ -737,53 +1034,16 @@ function calculateWordSimilarity() {
     `;
 }
 
-function demonstrateCooccurrence() {
-    const input = document.getElementById('gloveInput').value;
-    const output = document.getElementById('gloveOutput');
-    
-    const words = input.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
-    const windowSize = 2;
-    const cooccurrence = {};
-    
-    words.forEach(word => {
-        cooccurrence[word] = {};
-        words.forEach(otherWord => {
-            cooccurrence[word][otherWord] = 0;
-        });
-    });
-    
-    for (let i = 0; i < words.length; i++) {
-        for (let j = Math.max(0, i - windowSize); j <= Math.min(words.length - 1, i + windowSize); j++) {
-            if (i !== j) {
-                cooccurrence[words[i]][words[j]]++;
-            }
-        }
-    }
-    
-    let result = '<strong>Co-occurrence Matrix (window size: 2):</strong><br><br>';
-    result += '<table border="1" style="border-collapse: collapse; margin: 10px 0;"><tr><th></th>';
-    
-    words.forEach(word => {
-        result += `<th>${word}</th>`;
-    });
-    result += '</tr>';
-    
-    words.forEach(word1 => {
-        result += `<tr><th>${word1}</th>`;
-        words.forEach(word2 => {
-            result += `<td style="padding: 5px; text-align: center;">${cooccurrence[word1][word2]}</td>`;
-        });
-        result += '</tr>';
-    });
-    result += '</table>';
-    
-    output.innerHTML = result;
-}
-
 function analyzeSentiment() {
     const input = document.getElementById('sentimentInput').value;
     const output = document.getElementById('sentimentOutput');
     
+    if (!input.trim()) {
+        output.textContent = 'Please enter some text to analyze.';
+        return;
+    }
+    
+    // Simple rule-based sentiment analysis for demo
     const positiveWords = ['love', 'amazing', 'great', 'excellent', 'wonderful', 'fantastic', 'good', 'perfect', 'awesome', 'brilliant'];
     const negativeWords = ['hate', 'terrible', 'awful', 'bad', 'horrible', 'disgusting', 'worst', 'disappointing', 'poor', 'useless'];
     
@@ -797,19 +1057,23 @@ function analyzeSentiment() {
         if (negativeWords.includes(word)) negativeScore++;
     });
     
-    let sentiment, confidence;
+    let sentiment, confidence, emoji;
     if (positiveScore > negativeScore) {
         sentiment = 'Positive';
         confidence = ((positiveScore / (positiveScore + negativeScore + 1)) * 100).toFixed(1);
+        emoji = '😊';
     } else if (negativeScore > positiveScore) {
         sentiment = 'Negative';
         confidence = ((negativeScore / (positiveScore + negativeScore + 1)) * 100).toFixed(1);
+        emoji = '😞';
     } else {
         sentiment = 'Neutral';
         confidence = '50.0';
+        emoji = '😐';
     }
     
     output.innerHTML = `
+        <div style="text-align: center; font-size: 2em; margin: 10px 0;">${emoji}</div>
         <strong>Sentiment:</strong> ${sentiment}<br>
         <strong>Confidence:</strong> ${confidence}%<br>
         <strong>Analysis:</strong><br>
@@ -824,15 +1088,40 @@ function demonstrateTranslation() {
     const targetLang = document.getElementById('targetLang').value;
     const output = document.getElementById('translateOutput');
     
+    // Simple mock translations for demo
     const translations = {
         'spanish': {
-            'hello': 'hola', 'how': 'cómo', 'are': 'estás', 'you': 'tú', 'today': 'hoy'
+            'hello': 'hola',
+            'how': 'cómo',
+            'are': 'estás',
+            'you': 'tú',
+            'today': 'hoy',
+            'good': 'bueno',
+            'morning': 'mañana',
+            'thank': 'gracias',
+            'please': 'por favor'
         },
         'french': {
-            'hello': 'bonjour', 'how': 'comment', 'are': 'êtes', 'you': 'vous', 'today': 'aujourd\'hui'
+            'hello': 'bonjour',
+            'how': 'comment',
+            'are': 'êtes',
+            'you': 'vous',
+            'today': 'aujourd\'hui',
+            'good': 'bon',
+            'morning': 'matin',
+            'thank': 'merci',
+            'please': 's\'il vous plaît'
         },
         'german': {
-            'hello': 'hallo', 'how': 'wie', 'are': 'sind', 'you': 'sie', 'today': 'heute'
+            'hello': 'hallo',
+            'how': 'wie',
+            'are': 'sind',
+            'you': 'sie',
+            'today': 'heute',
+            'good': 'gut',
+            'morning': 'morgen',
+            'thank': 'danke',
+            'please': 'bitte'
         }
     };
     
@@ -907,17 +1196,21 @@ function visualizeAttention() {
     const words = input.split(/\s+/);
     if (words.length === 0) return;
     
+    // Simple attention simulation - word focuses most on nearby words
     let visualization = '<div class="attention-visualization">';
     
     words.forEach((word, i) => {
+        // Generate random attention weights favoring nearby words
         const weights = words.map((_, j) => {
             const distance = Math.abs(i - j);
             return Math.max(0.1, 1 - distance * 0.3 + Math.random() * 0.2);
         });
         
+        // Normalize weights
         const sum = weights.reduce((a, b) => a + b, 0);
         const normalizedWeights = weights.map(w => w / sum);
         
+        // Find max weight for color intensity
         const maxWeight = Math.max(...normalizedWeights);
         const intensity = Math.floor((normalizedWeights[i] / maxWeight) * 255);
         const color = `rgb(${255-intensity}, ${255-intensity}, 255)`;
@@ -987,6 +1280,7 @@ function summarizeText() {
     const input = document.getElementById('summaryInput').value;
     const output = document.getElementById('summaryOutput');
     
+    // Simple extractive summarization simulation
     const sentences = input.split(/[.!?]+/).filter(s => s.trim().length > 0);
     
     if (sentences.length <= 2) {
@@ -994,10 +1288,11 @@ function summarizeText() {
         return;
     }
     
+    // Score sentences based on keyword frequency (simplified)
     const words = input.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
     const wordFreq = {};
     words.forEach(word => {
-        if (word.length > 3) {
+        if (word.length > 3) { // Ignore short words
             wordFreq[word] = (wordFreq[word] || 0) + 1;
         }
     });
@@ -1008,6 +1303,7 @@ function summarizeText() {
         return { sentence: sentence.trim() + '.', score: score / sentWords.length };
     });
     
+    // Take top 2 sentences
     const topSentences = sentenceScores
         .sort((a, b) => b.score - a.score)
         .slice(0, 2)
@@ -1024,6 +1320,7 @@ function performNER() {
     const input = document.getElementById('nerInput').value;
     const output = document.getElementById('nerOutput');
     
+    // Simple named entity recognition patterns
     const patterns = [
         { regex: /\b[A-Z][a-z]+ Inc\.\b/g, type: 'ORGANIZATION', color: '#ff6b6b' },
         { regex: /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g, type: 'PERSON', color: '#4ecdc4' },
@@ -1066,10 +1363,13 @@ function answerQuestion() {
     const question = document.getElementById('qaQuestion').value;
     const output = document.getElementById('qaOutput');
     
+    // Simple keyword-based question answering simulation
+    const contextLower = context.toLowerCase();
     const questionLower = question.toLowerCase();
     
     let answer = "I couldn't find a specific answer in the context.";
     
+    // Simple pattern matching for demo
     if (questionLower.includes('when') && questionLower.includes('introduced')) {
         const yearMatch = context.match(/\b(19|20)\d{2}\b/);
         if (yearMatch) {
@@ -1081,6 +1381,11 @@ function answerQuestion() {
         if (relevantSentence) {
             answer = relevantSentence.trim() + '.';
         }
+    } else if (questionLower.includes('used for') || questionLower.includes('tasks')) {
+        const tasks = context.match(/(?:tasks such as|for tasks|including) ([^.]+)/i);
+        if (tasks) {
+            answer = `Transformers are used for ${tasks[1]}.`;
+        }
     }
     
     output.innerHTML = `
@@ -1091,10 +1396,12 @@ function answerQuestion() {
 }
 
 function checkAnswer(element, isCorrect) {
+    // Store original text if not already stored
     if (!element.dataset.originalText) {
         element.dataset.originalText = element.textContent.trim();
     }
     
+    // Remove previous selections and reset text
     element.parentNode.querySelectorAll('.quiz-option').forEach(option => {
         option.classList.remove('correct', 'incorrect');
         if (option.dataset.originalText) {
@@ -1102,6 +1409,7 @@ function checkAnswer(element, isCorrect) {
         }
     });
     
+    // Mark the selected answer
     if (isCorrect) {
         element.classList.add('correct');
         element.textContent = element.dataset.originalText + ' ✅ Correct!';
@@ -1109,6 +1417,7 @@ function checkAnswer(element, isCorrect) {
         element.classList.add('incorrect');
         element.textContent = element.dataset.originalText + ' ❌ Incorrect';
         
+        // Show correct answer
         const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
             .find(option => {
                 const onclickStr = option.getAttribute('onclick') || '';
@@ -1121,12 +1430,32 @@ function checkAnswer(element, isCorrect) {
     }
 }
 
-// Initialize on page load
+// Initialize quiz options on page load
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.quiz-option').forEach(option => {
         option.dataset.originalText = option.textContent.trim();
     });
     
+    // Add keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight') {
+            const currentIndex = sections.indexOf(currentSection);
+            if (currentIndex < sections.length - 1) {
+                const nextSection = sections[currentIndex + 1];
+                showSection(nextSection);
+                document.querySelector(`button[onclick="showSection('${nextSection}')"]`).classList.add('active');
+            }
+        } else if (e.key === 'ArrowLeft') {
+            const currentIndex = sections.indexOf(currentSection);
+            if (currentIndex > 0) {
+                const prevSection = sections[currentIndex - 1];
+                showSection(prevSection);
+                document.querySelector(`button[onclick="showSection('${prevSection}')"]`).classList.add('active');
+            }
+        }
+    });
+    
+    // Add Enter key support for demo inputs
     const demoInputs = document.querySelectorAll('.demo-input');
     demoInputs.forEach(input => {
         input.addEventListener('keypress', function(e) {
