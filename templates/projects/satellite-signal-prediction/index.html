@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/satellite-signal-prediction/satellite-signal-prediction.css') }}">
+{% endblock %}
+
+{% block content %}
+
+
+<div class="satellite-project">
+    <!-- Project Hero Section -
+    <section class="project-hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="project-title">{{ project.title }}</h1>
+                <p class="project-subtitle">{{ project.description }}</p>
+                
+                <div class="project-meta">
+                    <span class="category-badge">{{ project.category }}</span>
+                    <span class="status-badge">{{ project.status or 'Completed' }}</span>
+                </div>
+
+                <div class="hero-actions">
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-code"></i> View Repository
+                    </a>
+                    {% endif %}
+                    <a href="#technical-overview" class="btn btn-outline">
+                        <i class="fas fa-chart-line"></i> See Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Overview -->
+    <section class="project-overview">
+        <div class="container">
+            <div class="overview-grid">
+                <!-- Technology Stack -->
+                <div class="overview-card">
+                    <h3><i class="fas fa-satellite"></i> Technology Stack</h3>
+                    <div class="tech-stack">
+                        {% for tech in project.technology_list %}
+                        <span class="tech-badge">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Model Performance -->
+                <div class="overview-card">
+                    <h3><i class="fas fa-chart-bar"></i> Model Performance</h3>
+                    <div class="metrics-grid">
+                        {% for metric, value in project.results_dict.items() %}
+                        <div class="metric">
+                            <div class="metric-value">{{ value }}</div>
+                            <div class="metric-label">{{ metric.replace('_', ' ').title() }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Overview -->
+    <section id="technical-overview" class="technical-section">
+        <div class="container">
+            <h2>Technical Implementation</h2>
+            
+            <div class="implementation-grid">
+                <!-- Data Pipeline -->
+                <div class="implementation-card">
+                    <div class="card-header">
+                        <i class="fas fa-cloud"></i>
+                        <h3>Data Collection</h3>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Real-time weather data via OpenWeatherMap API</li>
+                            <li>Historical data from Open-Meteo</li>
+                            <li>Global coverage: 10 diverse climate locations</li>
+                            <li>Features: temperature, humidity, pressure, rain, wind</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Signal Simulation -->
+                <div class="implementation-card">
+                    <div class="card-header">
+                        <i class="fas fa-satellite-dish"></i>
+                        <h3>Signal Simulation</h3>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Physics-based attenuation models</li>
+                            <li>Rain rate impact on signal strength</li>
+                            <li>Atmospheric conditions modeling</li>
+                            <li>Time-series feature engineering</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Model Training -->
+                <div class="implementation-card">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i>
+                        <h3>ML Pipeline</h3>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Multiple regression approaches</li>
+                            <li>XGBoost & Random Forest models</li>
+                            <li>SHAP for model interpretability</li>
+                            <li>Hyperparameter optimization</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Evaluation -->
+                <div class="implementation-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Model Evaluation</h3>
+                    </div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Cross-validation across locations</li>
+                            <li>Residual analysis and diagnostics</li>
+                            <li>Feature importance analysis</li>
+                            <li>Automated reporting pipeline</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weather Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2>Key Weather Features</h2>
+            <div class="features-showcase">
+                <div class="feature-item">
+                    <i class="fas fa-cloud-rain"></i>
+                    <h4>Rain Rate</h4>
+                    <p>Primary factor affecting signal attenuation through precipitation scattering</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-thermometer-half"></i>
+                    <h4>Temperature</h4>
+                    <p>Influences atmospheric refraction and signal propagation paths</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-tint"></i>
+                    <h4>Humidity</h4>
+                    <p>Water vapor absorption impacts signal strength, especially at higher frequencies</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-compress-arrows-alt"></i>
+                    <h4>Pressure</h4>
+                    <p>Atmospheric pressure variations affect signal refractive index</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-wind"></i>
+                    <h4>Wind Speed</h4>
+                    <p>Correlates with atmospheric turbulence and signal stability</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-cloud"></i>
+                    <h4>Cloud Cover</h4>
+                    <p>Indicator of precipitation potential and atmospheric conditions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Coverage Map -->
+    <section class="coverage-section">
+        <div class="container">
+            <h2>Global Data Coverage</h2>
+            <div class="coverage-info">
+                <p>Weather data collected from diverse global locations to ensure model generalization across different climates and atmospheric conditions.</p>
+                
+                <div class="locations-grid">
+                    <div class="location-group">
+                        <h4>North America</h4>
+                        <ul>
+                            <li>Seattle, WA</li>
+                            <li>Chicago, IL</li>
+                            <li>Phoenix, AZ</li>
+                            <li>Miami, FL</li>
+                            <li>Denver, CO</li>
+                            <li>San Francisco, CA</li>
+                            <li>New York, NY</li>
+                        </ul>
+                    </div>
+                    <div class="location-group">
+                        <h4>International</h4>
+                        <ul>
+                            <li>London, UK</li>
+                            <li>Tokyo, Japan</li>
+                            <li>Sydney, Australia</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Challenges -->
+    <section class="challenges-section">
+        <div class="container">
+            <h2>Technical Challenges & Solutions</h2>
+            <div class="challenges-grid">
+                {% for challenge in project.challenges_list %}
+                <div class="challenge-card">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <p>{{ challenge }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Impact -->
+    <section class="business-section">
+        <div class="container">
+            <h2>Business Applications</h2>
+            <div class="business-grid">
+                <div class="business-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Service Quality Maintenance</h3>
+                    <p>Proactive monitoring helps maintain consistent satellite internet service during adverse weather conditions.</p>
+                </div>
+                <div class="business-card">
+                    <i class="fas fa-bell"></i>
+                    <h3>Customer Notifications</h3>
+                    <p>Early warning system for potential service disruptions allows customers to plan accordingly.</p>
+                </div>
+                <div class="business-card">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Resource Optimization</h3>
+                    <p>Dynamic power allocation and resource management based on predicted signal conditions.</p>
+                </div>
+                <div class="business-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Reduced Downtime</h3>
+                    <p>Predictive maintenance and proactive adjustments minimize service interruptions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Navigation -->
+    <section class="project-nav">
+        <div class="container">
+            <div class="nav-actions">
+                <a href="{{ url_for('projects') }}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Back to Projects
+                </a>
+                {% if project.github_url %}
+                <a href="{{ project.github_url }}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> View Source Code
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

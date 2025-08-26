@@ -4,7 +4,7 @@
 /* ===== CSS VARIABLES ===== */
 :root {
   /* Primary Color Scheme */
-  --primary-color: #6366f1;
+  --primary-color: #9ea0f7;
   --primary-light: #818cf8;
   --primary-dark: #4f46e5;
   --secondary-color: #8b5cf6;
@@ -82,7 +82,7 @@ html {
 
 body {
   font-family: var(--font-family);
-  line-height: 1.6;
+  line-height: 1.2;
   color: var(--text-primary);
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   min-height: 100vh;
@@ -1877,4 +1877,103 @@ img.profile-image {
   text-align: center;
   color: var(--text-secondary);
   padding: var(--space-lg);
+}
+
+/* Project Card Overlay Styles */
+.project-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.project-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card:hover .project-overlay {
+  opacity: 1;
+}
+
+.project-overlay .btn {
+  transform: translateY(10px);
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-overlay .btn {
+  transform: translateY(0);
+}
+
+/* Technology Tags - Fixed Display */
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tech-tag {
+  background: var(--primary-color, #6c63ff);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.tech-tag.more {
+  background: var(--secondary-color, #64748b);
+  opacity: 0.8;
+}
+
+/* Project Actions */
+.project-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.project-actions .btn {
+  flex: 1;
+  text-align: center;
+  min-width: 120px;
+}
+
+/* Featured Badge */
+.featured-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #f59e0b;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .project-actions {
+      flex-direction: column;
+  }
+  
+  .project-actions .btn {
+      flex: none;
+  }
+  
+  .project-overlay {
+      opacity: 1; /* Always show on mobile */
+      background: rgba(0, 0, 0, 0.5);
+  }
 }

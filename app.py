@@ -6,7 +6,9 @@ import os
 # Database imports
 from flask_sqlalchemy import SQLAlchemy
 from models.tutorial import db, Tutorial
+from models.project import Project  
 from data.tutorials import TUTORIALS_DATA
+from data.projects import PROJECTS_DATA 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
@@ -16,37 +18,6 @@ app.config['DEBUG'] = True
 
 # Initialize database
 db.init_app(app)
-
-class Project:
-    def __init__(self, id, title, description, technology_stack, github_url=None, demo_url=None, category="General", featured=False, image_url=None):
-        self.id = id
-        self.title = title
-        self.description = description
-        self.technology_stack = technology_stack
-        self.github_url = github_url
-        self.demo_url = demo_url
-        self.category = category
-        self.featured = featured
-        self.image_url = image_url or "/static/images/logo.png"
-    
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'title': self.title,
-            'description': self.description,
-            'technology_stack': self.technology_stack,
-            'github_url': self.github_url,
-            'demo_url': self.demo_url,
-            'category': self.category,
-            'featured': self.featured,
-            'image_url': self.image_url,
-            'url': f"/project/{self.id}"
-        }
-    
-    @property
-    def name(self):
-        """Return the project name (using id for URL generation)"""
-        return self.id
 
 class BlogPost:
     def __init__(self, id, title, content, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5):
@@ -93,7 +64,7 @@ class BlogPost:
 def populate_tutorials():
     """Populate database with tutorial data from data/tutorials.py"""
     with app.app_context():
-        # Clear existing tutorials
+        
         Tutorial.query.delete()
         
         # Add tutorials from TUTORIALS_DATA
@@ -119,39 +90,48 @@ def populate_tutorials():
         db.session.commit()
         print(f"Added {len(TUTORIALS_DATA)} tutorials to database")
 
+
+def populate_projects():
+    """Populate database with project data from data/projects.py"""
+    with app.app_context():
+        # Clear existing projects
+        Project.query.delete()
+        
+        # Add projects from PROJECTS_DATA
+        for project_data in PROJECTS_DATA:
+            project = Project(
+                name=project_data['name'],  # This is the main identifier now
+                title=project_data['title'],
+                description=project_data['description'],
+                category=project_data['category'],
+                technology_stack=json.dumps(project_data['technology_stack']),
+                challenges=json.dumps(project_data.get('challenges', [])),
+                results=json.dumps(project_data.get('results', {})),
+                github_url=project_data.get('github_url'),
+                demo_url=project_data.get('demo_url'),
+                featured=project_data.get('featured', False),
+                published=project_data.get('published', True),
+                image_url=project_data.get('image_url'),
+                has_dedicated_template=project_data.get('has_dedicated_template', False),
+                template_path=project_data.get('template_path')
+            )
+            db.session.add(project)
+        
+        db.session.commit()
+        print(f"Added {len(PROJECTS_DATA)} projects to database")
+
 # Initialize database
 with app.app_context():
     # Create tables if they don't exist
+    # db.drop_all()
     db.create_all()
     # Always populate with fresh data for now
     populate_tutorials()
+    populate_projects() 
 
 # Helper function to load non-tutorial data
-def load_projects_and_blog_data():
-    """Load projects and blog posts data (keeping your existing data)"""
-    projects = [
-        Project(
-            id="titanic-survival",
-            title="Titanic Survival Prediction",
-            description="Advanced ML ensemble methods for survival prediction",
-            technology_stack=["Python", "Scikit-learn", "Pandas", "Flask"],
-            github_url="https://github.com/abzanganeh/titanic-project",
-            demo_url="/demos/titanic",
-            category="Machine Learning",
-            featured=True
-        ),
-        Project(
-            id="neural-networks-implementation",
-            title="Custom Neural Network Implementation",
-            description="Building neural networks from scratch with Python",
-            technology_stack=["Python", "NumPy", "Matplotlib", "TensorFlow"],
-            github_url="https://github.com/abzanganeh/neural-networks",
-            demo_url="/demos/neural-network",
-            category="Deep Learning",
-            featured=True
-        )
-    ]
-    
+def load_blog_data():
+    """Load blog posts data (keeping your existing blog data)"""
     blog_posts = [
         BlogPost(
             id="transformer-architecture",
@@ -164,15 +144,17 @@ def load_projects_and_blog_data():
         )
     ]
     
-    return projects, blog_posts
+    return blog_posts
 
 # Routes
 @app.route('/')
 def index():
     """Main portfolio homepage"""
-    projects, blog_posts = load_projects_and_blog_data()
-    featured_projects = [p for p in projects if p.featured]
+    blog_posts = load_blog_data()
     featured_posts = [p for p in blog_posts if p.featured and p.published]
+    
+    # Get featured projects from database
+    featured_projects = Project.query.filter_by(featured=True, published=True).all()
     
     # Get recent tutorials from database
     recent_tutorials = Tutorial.query.filter_by(published=True).limit(3).all()
@@ -187,38 +169,41 @@ def about():
     """About page with detailed information"""
     return render_template('about.html')
 
-@app.route('/projects')
+@app.route('/projects/')  
 def projects():
     """Projects showcase page"""
-    projects, blog_posts = load_projects_and_blog_data()
-    categories = list(set(p.category for p in projects))
+    projects_list = Project.query.filter_by(published=True).all()
+    categories = db.session.query(Project.category).distinct().all()
+    categories = [cat[0] for cat in categories]
     return render_template('projects.html', 
-                         projects=projects, 
+                         projects=projects_list, 
                          categories=categories)
 
-@app.route('/projects/<project_name>')
+@app.route('/projects/<project_name>/')  
 def project_detail(project_name):
     """Individual project detail page"""
-    projects, blog_posts = load_projects_and_blog_data()
-    
-    # Find project by name
-    project = next((p for p in projects if p.name == project_name), None)
+    # Find project by name in database
+    project = Project.query.filter_by(name=project_name, published=True).first()
     if not project:
-        return render_template('404.html'), 404
+        abort(404)
     
-    # Try to render the specific project template, fallback to generic
-    try:
-        return render_template(f'projects/{project_name}/{project_name}.html', project=project)
-    except:
+    if project.has_dedicated_template:
+        # Try to render the dedicated template
+        try:
+            return render_template(project.template_path, project=project)
+        except:
+            # Fallback to generic template if dedicated template not found
+            return render_template('project_detail.html', project=project)
+    else:
+        # Use generic template
         return render_template('project_detail.html', project=project)
 
 @app.route('/project/<project_id>')
 def project_detail_legacy(project_id):
     """Legacy redirect for old project URLs"""
-    projects, blog_posts = load_projects_and_blog_data()
-    project = next((p for p in projects if p.id == project_id), None)
+    project = Project.query.filter_by(name=project_id, published=True).first()
     if not project:
-        return render_template('404.html'), 404
+        abort(404)
     return redirect(url_for('project_detail', project_name=project.name), code=301)
 
 # NEW DATABASE-POWERED TUTORIAL ROUTES
@@ -297,7 +282,7 @@ def ml_fundamentals_chapter3():
 @app.route('/blog')
 def blog():
     """Blog listing page"""
-    projects, blog_posts = load_projects_and_blog_data()
+    blog_posts = load_blog_data()
     published_posts = [p for p in blog_posts if p.published]
     categories = list(set(p.category for p in published_posts))
     featured_posts = [p for p in published_posts if p.featured]
@@ -311,7 +296,7 @@ def blog():
 @app.route('/blog/<slug>')
 def blog_post(slug):
     """Individual blog post page"""
-    projects, blog_posts = load_projects_and_blog_data()
+    blog_posts = load_blog_data()
     post = next((p for p in blog_posts if p.slug == slug and p.published), None)
     if not post:
         return render_template('404.html'), 404
@@ -354,7 +339,7 @@ def contact():
 def search():
     """Search API for tutorials, projects, and blog posts"""
     query = request.args.get('q', '').lower()
-    projects, blog_posts = load_projects_and_blog_data()
+    blog_posts = load_blog_data()
     
     # Search tutorials from database
     tutorials_list = Tutorial.query.filter_by(published=True).all()
@@ -363,8 +348,10 @@ def search():
         if query in t.title.lower() or query in t.description.lower()
     ]
     
+    # Search projects from database
+    projects_list = Project.query.filter_by(published=True).all()
     matching_projects = [
-        p for p in projects 
+        p for p in projects_list 
         if query in p.title.lower() or query in p.description.lower()
     ]
     
@@ -387,6 +374,13 @@ def api_tutorials():
     tutorials_list = Tutorial.query.filter_by(published=True).all()
     tutorials_data = [tutorial.to_dict() for tutorial in tutorials_list]
     return jsonify(tutorials_data)
+
+@app.route('/api/projects/')  
+def api_projects():
+    """API endpoint returning project data as JSON"""
+    projects_list = Project.query.filter_by(published=True).all()
+    projects_data = [project.to_dict() for project in projects_list]
+    return jsonify(projects_data)
 
 # Error handlers
 @app.errorhandler(404)

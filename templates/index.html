@@ -1,339 +1,153 @@
 {% extends "base.html" %}
 
-{% block title %}{{ site_title }} - ML Engineer & Data Scientist{% endblock %}
-
-{% block meta_description %}Alireza Barzin Zanganeh - Professional ML Engineer specializing in Machine Learning, Deep Learning, and Data Science. Explore my portfolio of projects and tutorials.{% endblock %}
-
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-container">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    <span class="hero-greeting">Hello, I'm</span>
-                    <span class="hero-name">Alireza Barzin Zanganeh</span>
-                </h1>
-                <h2 class="hero-subtitle">ML Engineer & Data Scientist</h2>
-                <p class="hero-description">
-                    Passionate about creating intelligent solutions through machine learning, 
-                    deep learning, and data science. I build scalable AI systems that solve 
-                    real-world problems and drive business value.
-                </p>
-                
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">{{ featured_projects|length }}+</span>
-                        <span class="stat-label">Featured Projects</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">{{ recent_tutorials|length }}+</span>
-                        <span class="stat-label">Tutorials</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">5+</span>
-                        <span class="stat-label">Years Experience</span>
-                    </div>
-                </div>
-                
+<div class="homepage">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Machine Learning & Data Science Portfolio</h1>
+                <p class="hero-subtitle">Transforming data into insights through advanced analytics and machine learning</p>
                 <div class="hero-actions">
-                    <a href="{{ url_for('projects') }}" class="btn btn-primary">
-                        <i class="fas fa-code"></i> View Projects
-                    </a>
-                    <a href="{{ url_for('contact') }}" class="btn btn-outline">
-                        <i class="fas fa-envelope"></i> Get In Touch
-                    </a>
+                    <a href="{{ url_for('projects') }}" class="btn btn-primary">View My Projects</a>
+                    <a href="{{ url_for('about') }}" class="btn btn-outline">Learn About Me</a>
                 </div>
             </div>
-            
-            <div class="hero-image">
-                <div class="image-container">
-                    <img src="{{ url_for('static', filename='images/my_photo.png') }}" 
-                         alt="Alireza Barzin Zanganeh" class="profile-image">
-                    <div class="image-overlay">
-                        <div class="tech-icons">
-                            <i class="fab fa-python" title="Python"></i>
-                            <i class="fas fa-brain" title="Machine Learning"></i>
-                            <i class="fas fa-chart-line" title="Data Science"></i>
-                            <i class="fas fa-chart-line" title="Data Science"></i>
+        </div>
+    </section>
+
+    <!-- Featured Projects -->
+    <section class="featured-projects">
+        <div class="container">
+            <h2 class="section-title">Featured Projects</h2>
+            <div class="projects-grid">
+                {% for project in featured_projects %}
+                <div class="project-card featured">
+                    {% if project.default_image_url %}
+                    <div class="project-image">
+                        <img src="{{ project.default_image_url }}" alt="{{ project.title }}" />
+                        <div class="project-overlay">
+                            <a href="{{ project.url }}" class="btn btn-primary">View Project</a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Animated Background -->
-    <div class="hero-background">
-        <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-        </div>
-    </div>
-</section>
+                    {% endif %}
+                    
+                    <div class="project-content">
+                        <h3 class="project-title">{{ project.title }}</h3>
+                        <p class="project-description">{{ project.description }}</p>
+                        
+                        <div class="project-meta">
+                            <span class="project-category">{{ project.category }}</span>
+                        </div>
 
-<!-- Featured Projects Section -->
-<section class="featured-projects">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Projects</h2>
-            <p class="section-subtitle">
-                Showcasing my latest work in machine learning, data science, and analytics
-            </p>
-        </div>
-        
-        <div class="projects-grid">
-            {% for project in featured_projects %}
-            <div class="project-card" data-category="{{ project.category }}">
-                <div class="project-image">
-                    <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy">
-                    <div class="project-overlay">
+                        <!-- Fixed Technology Stack Display -->
+                        {% if project.technology_list %}
+                        <div class="project-tech">
+                            {% for tech in project.technology_list[:4] %}
+                            <span class="tech-tag">{{ tech }}</span>
+                            {% endfor %}
+                            {% if project.technology_list|length > 4 %}
+                            <span class="tech-tag more">+{{ project.technology_list|length - 4 }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Project Actions -->
                         <div class="project-actions">
-                            <a href="{{ url_for('project_detail', project_name=project.name) }}" 
-                               class="btn btn-sm btn-primary">
+                            <a href="{{ project.url }}" class="btn btn-primary">
                                 <i class="fas fa-eye"></i> View Details
                             </a>
                             {% if project.github_url %}
-                            <a href="{{ project.github_url }}" target="_blank" 
-                               class="btn btn-sm btn-outline">
-                                <i class="fab fa-github"></i> Code
-                            </a>
-                            {% endif %}
-                            {% if project.demo_url %}
-                            <a href="{{ project.demo_url }}" target="_blank" 
-                               class="btn btn-sm btn-accent">
-                                <i class="fas fa-external-link-alt"></i> Demo
+                            <a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">
+                                <i class="fas fa-code"></i> Code
                             </a>
                             {% endif %}
                         </div>
                     </div>
                 </div>
-                
-                <div class="project-content">
-                    <div class="project-header">
-                        <h3 class="project-title">{{ project.title }}</h3>
-                        <span class="project-category">{{ project.category }}</span>
-                    </div>
-                    
-                    <p class="project-description">{{ project.description }}</p>
-                    
-                    <div class="project-tech">
-                        {% for tech in project.technology_stack[:4] %}
-                        <span class="tech-tag">{{ tech }}</span>
-                        {% endfor %}
-                        {% if project.technology_stack|length > 4 %}
-                        <span class="tech-tag more">+{{ project.technology_stack|length - 4 }}</span>
-                        {% endif %}
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            
+            <div class="section-footer">
+                <a href="{{ url_for('projects') }}" class="btn btn-outline">View All Projects</a>
+            </div>
         </div>
-        
-        <div class="section-footer">
-            <a href="{{ url_for('projects') }}" class="btn btn-outline">
-                <i class="fas fa-arrow-right"></i> View All Projects
-            </a>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- Skills Preview Section -->
-<section class="skills-preview">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Technical Expertise</h2>
-            <p class="section-subtitle">
-                Core technologies and methodologies I use to build intelligent solutions
-            </p>
-        </div>
-        
-        <div class="skills-grid">
-            <div class="skill-category">
-                <div class="skill-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h3>Machine Learning</h3>
-                <p>Supervised & unsupervised learning, ensemble methods, feature engineering</p>
-                <div class="skill-tags">
-                    <span>Scikit-learn</span>
-                    <span>XGBoost</span>
-                    <span>Random Forest</span>
-                </div>
-            </div>
-            
-            <div class="skill-category">
-                <div class="skill-icon">
-                    <i class="fas fa-network-wired"></i>
-                </div>
-                <h3>Deep Learning</h3>
-                <p>Neural networks, CNNs, RNNs, transformers, and custom architectures</p>
-                <div class="skill-tags">
-                    <span>TensorFlow</span>
-                    <span>PyTorch</span>
-                    <span>Keras</span>
-                </div>
-            </div>
-            
-            <div class="skill-category">
-                <div class="skill-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Data Science</h3>
-                <p>Statistical analysis, data visualization, and predictive modeling</p>
-                <div class="skill-tags">
-                    <span>Pandas</span>
-                    <span>NumPy</span>
-                    <span>Matplotlib</span>
-                </div>
-            </div>
-            
-            <div class="skill-category">
-                <div class="skill-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <h3>Programming</h3>
-                <p>Full-stack development with focus on Python and web technologies</p>
-                <div class="skill-tags">
-                    <span>Python</span>
-                    <span>Flask</span>
-                    <span>JavaScript</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section-footer">
-            <a href="{{ url_for('skills') }}" class="btn btn-outline">
-                <i class="fas fa-arrow-right"></i> View All Skills
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- Recent Tutorials Section -->
-<section class="recent-tutorials">
-    <div class="container">
-        <div class="section-header">
+    <!-- Recent Tutorials -->
+    <section class="recent-tutorials">
+        <div class="container">
             <h2 class="section-title">Latest Tutorials</h2>
-            <p class="section-subtitle">
-                Educational content to help you master machine learning and data science
-            </p>
-        </div>
-        
-        <div class="tutorials-grid">
-            {% for tutorial in recent_tutorials %}
-            <div class="tutorial-card">
-                <div class="tutorial-header">
-                    <div class="tutorial-meta">
-                        <span class="tutorial-category">{{ tutorial.category }}</span>
-                        <span class="tutorial-difficulty difficulty-{{ tutorial.difficulty.lower() }}">
-                            {{ tutorial.difficulty }}
-                        </span>
-                    </div>
-                    <div class="tutorial-time">
-                        <i class="fas fa-clock"></i> {{ tutorial.estimated_read_time }} min read
-                    </div>
-                </div>
-                
-                <div class="tutorial-content">
-                    <h3 class="tutorial-title">
-                        <a href="{{ url_for('tutorial_dedicated', slug=tutorial.slug) }}">
-                            {{ tutorial.title }}
-                        </a>
-                    </h3>
-                    <p class="tutorial-description">{{ tutorial.description }}</p>
-                    
-                    <div class="tutorial-tags">
-                        {% for tag in tutorial.tags_list[:3] %}
-                        <span class="tag">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <div class="tutorial-footer">
-                    <a href="{{ url_for('tutorial_dedicated', slug=tutorial.slug) }}">
-                        Read Tutorial <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="section-footer">
-            <a href="{{ url_for('tutorials') }}" class="btn btn-outline">
-                <i class="fas fa-arrow-right"></i> View All Tutorials
-            </a>
-        </div>
-    </div>
-</section>
+            <div class="tutorials-grid">
+                {% for tutorial in recent_tutorials %}
+                <div class="tutorial-card">
+                    <div class="tutorial-content">
+                        <h3 class="tutorial-title">{{ tutorial.title }}</h3>
+                        <p class="tutorial-description">{{ tutorial.description }}</p>
+                        
+                        <div class="tutorial-meta">
+                            <span class="tutorial-category">{{ tutorial.category }}</span>
+                            <span class="tutorial-difficulty">{{ tutorial.difficulty }}</span>
+                            <span class="tutorial-duration">{{ tutorial.duration }}</span>
+                        </div>
 
-<!-- Call to Action Section -->
-<section class="cta">
-    <div class="container">
-        <div class="cta-content">
-            <h2 class="cta-title">Ready to Collaborate?</h2>
-            <p class="cta-description">
-                I'm always interested in discussing new opportunities, innovative projects, 
-                and ways to apply ML to solve complex problems.
-            </p>
-            <div class="cta-actions">
-                <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-envelope"></i> Let's Connect
-                </a>
-                <a href="{{ social_links.linkedin }}" target="_blank" class="btn btn-outline btn-lg">
-                    <i class="fab fa-linkedin"></i> LinkedIn
-                </a>
+                        <div class="tutorial-actions">
+                            <a href="{{ tutorial.url }}" class="btn btn-primary">
+                                <i class="fas fa-play"></i> Start Tutorial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="section-footer">
+                <a href="{{ url_for('tutorials') }}" class="btn btn-outline">View All Tutorials</a>
             </div>
         </div>
-    </div>
-</section>
-{% endblock %}
+    </section>
 
-{% block extra_js %}
-<script>
-// Hero animations and interactions
-document.addEventListener('DOMContentLoaded', function() {
-    // Animated typing effect for hero title
-    const heroName = document.querySelector('.hero-name');
-    if (heroName) {
-        heroName.style.opacity = '0';
-        setTimeout(() => {
-            heroName.style.opacity = '1';
-            heroName.classList.add('typing-animation');
-        }, 500);
-    }
-    
-    // Intersection Observer for animations
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-            }
-        });
-    }, observerOptions);
-    
-    // Observe all sections
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-    });
-    
-    // Project card hover effects
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-});
-</script>
+    <!-- Blog Posts (if any) -->
+    {% if featured_posts %}
+    <section class="featured-posts">
+        <div class="container">
+            <h2 class="section-title">Latest Insights</h2>
+            <div class="posts-grid">
+                {% for post in featured_posts %}
+                <div class="post-card">
+                    <div class="post-content">
+                        <h3 class="post-title">{{ post.title }}</h3>
+                        <p class="post-excerpt">{{ post.excerpt }}</p>
+                        
+                        <div class="post-meta">
+                            <span class="post-category">{{ post.category }}</span>
+                            <span class="post-read-time">{{ post.read_time }} min read</span>
+                        </div>
+
+                        <div class="post-actions">
+                            <a href="{{ post.url }}" class="btn btn-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="section-footer">
+                <a href="{{ url_for('blog') }}" class="btn btn-outline">View All Posts</a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Call to Action -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Collaborate?</h2>
+                <p>Let's discuss how machine learning and data science can drive your next project forward.</p>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Get In Touch</a>
+            </div>
+        </div>
+    </section>
+</div>
 {% endblock %}

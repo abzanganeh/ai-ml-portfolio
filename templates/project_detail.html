@@ -1,99 +1,128 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.title }} - {{ site_title }}{% endblock %}
-
-{% block body_class %}project-detail{% endblock %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/projects/projects.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="back-to-projects">
-        <a href="{{ url_for('projects') }}">
+<div class="container project-detail">
+    <!-- Project Header -->
+    <div class="project-header">
+        <div class="project-header-content">
+            <div class="project-info">
+                <h1 class="project-title">{{ project.title }}</h1>
+                <p class="project-description">{{ project.description }}</p>
+                
+                <div class="project-meta">
+                    <span class="project-category">{{ project.category }}</span>
+                    {% if project.status %}
+                    <span class="project-status">{{ project.status }}</span>
+                    {% endif %}
+                    {% if project.duration_months %}
+                    <span class="project-duration">{{ project.duration_months }} months</span>
+                    {% endif %}
+                </div>
+                
+                <div class="project-links">
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">
+                        <i class="fas fa-code"></i> View Code
+                    </a>
+                    {% endif %}
+                    {% if project.demo_url %}
+                    <a href="{{ project.demo_url }}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Live Demo
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if project.default_image_url %}
+            <div class="project-image">
+                <img src="{{ project.default_image_url }}" alt="{{ project.title }}" />
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Project Content -->
+    <div class="project-content">
+        <div class="content-grid">
+            <!-- Technology Stack -->
+            {% if project.technology_list %}
+            <div class="content-section">
+                <h3><i class="fas fa-tools"></i> Technology Stack</h3>
+                <div class="tech-stack">
+                    {% for tech in project.technology_list %}
+                    <span class="tech-badge">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Key Results -->
+            {% if project.results_dict %}
+            <div class="content-section">
+                <h3><i class="fas fa-chart-line"></i> Key Results</h3>
+                <div class="results-grid">
+                    {% for metric, value in project.results_dict.items() %}
+                    <div class="result-item">
+                        <div class="result-value">{{ value }}</div>
+                        <div class="result-label">{{ metric.replace('_', ' ').title() }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Challenges & Solutions -->
+            {% if project.challenges_list %}
+            <div class="content-section">
+                <h3><i class="fas fa-puzzle-piece"></i> Challenges & Solutions</h3>
+                <ul class="challenges-list">
+                    {% for challenge in project.challenges_list %}
+                    <li>{{ challenge }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Detailed Description -->
+            {% if project.detailed_description %}
+            <div class="content-section full-width">
+                <h3><i class="fas fa-info-circle"></i> Project Details</h3>
+                <div class="detailed-description">
+                    {{ project.detailed_description|safe }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Project Stats -->
+            <div class="content-section">
+                <h3><i class="fas fa-users"></i> Project Stats</h3>
+                <div class="stats-grid">
+                    {% if project.team_size %}
+                    <div class="stat-item">
+                        <div class="stat-value">{{ project.team_size }}</div>
+                        <div class="stat-label">Team {% if project.team_size == 1 %}Member{% else %}Members{% endif %}</div>
+                    </div>
+                    {% endif %}
+                    {% if project.duration_months %}
+                    <div class="stat-item">
+                        <div class="stat-value">{{ project.duration_months }}</div>
+                        <div class="stat-label">{% if project.duration_months == 1 %}Month{% else %}Months{% endif %}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="back-navigation">
+        <a href="{{ url_for('projects') }}" class="btn btn-outline">
             <i class="fas fa-arrow-left"></i> Back to Projects
         </a>
     </div>
 </div>
-
-<!-- Project Header -->
-<header class="project-header">
-    <div class="container">
-        <div class="project-header-content">
-            <span class="project-category">{{ project.category }}</span>
-            
-            <h1>{{ project.title }}</h1>
-            <p class="project-excerpt">{{ project.description }}</p>
-            
-            <div class="project-actions">
-                {% if project.github_url %}
-                <a href="{{ project.github_url }}" target="_blank" class="btn btn-outline">
-                    <i class="fab fa-github"></i> View Code
-                </a>
-                {% endif %}
-                {% if project.demo_url %}
-                <a href="{{ project.demo_url }}" target="_blank" class="btn btn-primary">
-                    <i class="fas fa-external-link-alt"></i> Live Demo
-                </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</header>
-
-<!-- Project Content -->
-<article class="project-content-wrapper">
-    <div class="project-content">
-        <div class="project-details">
-            <div class="project-image">
-                <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy">
-            </div>
-            
-            <h2>Project Overview</h2>
-            <p>{{ project.detailed_description or project.description }}</p>
-            
-            {% if project.challenges %}
-            <h3>Challenges Faced</h3>
-            <ul>
-                {% for challenge in project.challenges %}
-                <li>{{ challenge }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            
-            <h3>Technology Stack</h3>
-            <div class="tech-stack">
-                {% for tech in project.technology_stack %}
-                <span class="tech-badge">{{ tech }}</span>
-                {% endfor %}
-            </div>
-            
-            {% if project.results %}
-            <h3>Results & Impact</h3>
-            <ul>
-                {% for metric, value in project.results.items() %}
-                <li><strong>{{ metric }}:</strong> {{ value }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            
-            <h3>Key Features</h3>
-            <ul>
-                <li>Advanced machine learning implementation</li>
-                <li>Scalable and efficient architecture</li>
-                <li>User-friendly interface</li>
-                <li>Comprehensive testing and validation</li>
-            </ul>
-            
-            {% if project.status != "Completed" %}
-            <h3>Project Status</h3>
-            <p><strong>Current Status:</strong> {{ project.status }}</p>
-            {% if project.status == "In Progress" %}
-            <p>This project is actively being developed. Check back for updates!</p>
-            {% endif %}
-            {% endif %}
-        </div>
-    </div>
-</article>
 {% endblock %}
