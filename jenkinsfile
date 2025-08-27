@@ -1,0 +1,184 @@
+pipeline {
+    agent any
+    
+    environment {
+        FLASK_APP_DIR = '/home/ubuntu/flask_ml_website'
+        VENV_DIR = '/home/ubuntu/flask_ml_website/flask_env'
+        SERVICE_NAME = 'flask-ml'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out code from GitHub...'
+                checkout scm
+            }
+        }
+        
+        stage('Backup Current Version') {
+            steps {
+                echo 'Creating backup of current deployment...'
+                script {
+                    sh """
+                        if [ -d "${FLASK_APP_DIR}" ]; then
+                            sudo cp -r ${FLASK_APP_DIR} ${FLASK_APP_DIR}_backup_\$(date +%Y%m%d_%H%M%S)
+                        fi
+                    """
+                }
+            }
+        }
+        
+        stage('Stop Flask Service') {
+            steps {
+                echo 'Stopping Flask service...'
+                sh "sudo systemctl stop ${SERVICE_NAME} || true"
+            }
+        }
+        
+        stage('Update Application Code') {
+            steps {
+                echo 'Updating application files...'
+                sh """
+                    # Remove old files except virtual environment and database
+                    sudo find ${FLASK_APP_DIR} -mindepth 1 -maxdepth 1 ! -name 'flask_env' ! -name '*.db' ! -name '*_backup_*' -exec rm -rf {} + || true
+                    
+                    # Copy new files
+                    sudo cp -r \${WORKSPACE}/* ${FLASK_APP_DIR}/
+                    sudo chown -R ubuntu:www-data ${FLASK_APP_DIR}
+                    sudo chmod -R 755 ${FLASK_APP_DIR}
+                """
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing Python dependencies...'
+                sh """
+                    cd ${FLASK_APP_DIR}
+                    source ${VENV_DIR}/bin/activate
+                    pip install -r requirements.txt
+                """
+            }
+        }
+        
+        stage('Database Migration') {
+            steps {
+                echo 'Running database migrations...'
+                sh """
+                    cd ${FLASK_APP_DIR}
+                    source ${VENV_DIR}/bin/activate
+                    python3 -c "
+from app import app, db
+with app.app_context():
+    try:
+        db.create_all()
+        print('Database migration completed successfully')
+    except Exception as e:
+        print(f'Database migration error: {e}')
+        raise
+"
+                """
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                echo 'Running application tests...'
+                script {
+                    sh """
+                        cd ${FLASK_APP_DIR}
+                        source ${VENV_DIR}/bin/activate
+                        python3 -c "
+import sys
+sys.path.insert(0, '.')
+try:
+    from app import app
+    with app.test_client() as client:
+        response = client.get('/')
+        if response.status_code == 200:
+            print('Basic health check passed')
+        else:
+            print(f'Health check failed with status: {response.status_code}')
+            sys.exit(1)
+except Exception as e:
+    print(f'Test failed: {e}')
+    sys.exit(1)
+"
+                    """
+                }
+            }
+        }
+        
+        stage('Start Flask Service') {
+            steps {
+                echo 'Starting Flask service...'
+                sh """
+                    sudo systemctl start ${SERVICE_NAME}
+                    sudo systemctl enable ${SERVICE_NAME}
+                    sleep 5
+                    sudo systemctl status ${SERVICE_NAME}
+                """
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                echo 'Verifying deployment...'
+                script {
+                    sh """
+                        # Wait for service to be fully ready
+                        sleep 10
+                        
+                        # Check if socket file exists
+                        if [ -S "${FLASK_APP_DIR}/flask-ml.sock" ]; then
+                            echo "Flask socket file exists"
+                        else
+                            echo "Warning: Flask socket file not found"
+                        fi
+                        
+                        # Check service status
+                        if sudo systemctl is-active --quiet ${SERVICE_NAME}; then
+                            echo "Flask service is running"
+                        else
+                            echo "ERROR: Flask service is not running"
+                            sudo journalctl -u ${SERVICE_NAME} --no-pager -n 20
+                            exit 1
+                        fi
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Deployment completed successfully!'
+            // Optional: Send success notification
+        }
+        failure {
+            echo 'Deployment failed!'
+            script {
+                // Attempt to restart the service with the backup
+                sh """
+                    echo 'Attempting to rollback...'
+                    LATEST_BACKUP=\$(ls -td ${FLASK_APP_DIR}_backup_* 2>/dev/null | head -1)
+                    if [ ! -z "\$LATEST_BACKUP" ]; then
+                        echo "Rolling back to: \$LATEST_BACKUP"
+                        sudo systemctl stop ${SERVICE_NAME} || true
+                        sudo rm -rf ${FLASK_APP_DIR}
+                        sudo mv "\$LATEST_BACKUP" ${FLASK_APP_DIR}
+                        sudo systemctl start ${SERVICE_NAME}
+                    fi
+                """
+            }
+            // Optional: Send failure notification
+        }
+        always {
+            // Clean up old backups (keep only last 3)
+            sh """
+                cd /home/ubuntu
+                ls -td ${FLASK_APP_DIR}_backup_* 2>/dev/null | tail -n +4 | xargs -r sudo rm -rf
+            """
+        }
+    }
+}
