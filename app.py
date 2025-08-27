@@ -20,7 +20,7 @@ app.config['DEBUG'] = True
 db.init_app(app)
 
 class BlogPost:
-    def __init__(self, id, title, content, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5):
+    def __init__(self, id, title, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5, content=None, content_file=None, image_url=None):
         self.id = id
         self.title = title
         self.content = content
@@ -34,7 +34,19 @@ class BlogPost:
         self.read_time = read_time
         self.slug = self._generate_slug()
         self.meta_description = excerpt[:160]
-    
+        if content_file:
+            self.content = self.load_content_from_file(content_file)
+        
+    def load_content_from_file(self, content_file):
+        """Load article content from HTML file"""
+        content_path = os.path.join('content', 'blog', content_file)
+        try:
+            with open(content_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            return "<p>Content not found</p>"
+
+
     def _generate_slug(self):
         import re
         slug = self.title.lower()
@@ -131,20 +143,15 @@ with app.app_context():
 
 # Helper function to load non-tutorial data
 def load_blog_data():
-    """Load blog posts data (keeping your existing blog data)"""
-    blog_posts = [
-        BlogPost(
-            id="transformer-architecture",
-            title="Understanding Transformer Architecture",
-            content="<p>Deep dive into the architecture that powers modern NLP models...</p>",
-            excerpt="Learn about the attention mechanism and transformer architecture",
-            category="Deep Learning",
-            tags=["transformers", "attention", "nlp"],
-            featured=True
-        )
-    ]
+    """Load blog posts data from configuration and content files"""
+    from data.blog import BLOG_POSTS_DATA
+    
+    blog_posts = []
+    for post_data in BLOG_POSTS_DATA:
+        blog_posts.append(BlogPost(**post_data))
     
     return blog_posts
+
 
 # Routes
 @app.route('/')
@@ -306,6 +313,12 @@ def blog_post(slug):
     return render_template('blog_post.html', 
                          post=post, 
                          related_posts=related_posts)
+
+@app.route('/blog/category/<category>')
+def blog_category(category):
+    blog_posts = load_blog_data()
+    filtered_posts = [p for p in blog_posts if p.category == category and p.published]
+    return render_template('blog.html', posts=filtered_posts, selected_category=category)
 
 @app.route('/skills')
 def skills():

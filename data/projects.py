@@ -22,7 +22,7 @@ PROJECTS_DATA = [
         'github_url': 'https://github.com/abzanganeh/titanic-survival',
         'demo_url': None,
         'featured': True,
-        'image_url': '/static/images/projects/titanic-survival.jpg',
+        'image_url': '/static/images/projects/titanic-survival.png',
         'has_dedicated_template': True,
         'template_path': 'projects/titanic-survival/index.html',
         'published': True

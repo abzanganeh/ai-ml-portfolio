@@ -8,8 +8,9 @@ This website serves as a comprehensive portfolio for machine learning and data s
 
 - **Interactive Project Demos**: Real-time ML predictions and visualizations
 - **Educational Tutorials**: Step-by-step guides with interactive components
+- **Technical Blog**: In-depth articles on machine learning and data science topics
 - **Professional Presentation**: Clean, responsive design with modern UI/UX
-- **Content Management**: Database-driven system for easy content updates
+- **Content Management**: Database-driven system with hybrid file-based blog storage
 
 ## Features
 
@@ -24,6 +25,12 @@ This website serves as a comprehensive portfolio for machine learning and data s
 - **Naive Bayes Classification**: Interactive weather prediction demo
 - **ML Fundamentals**: Multi-chapter machine learning course
 - **Decision Trees & Feature Engineering**: Educational content with examples
+
+### Blog System
+- **Understanding Transformer Architecture**: Technical deep-dive into neural network architecture
+- **File-Based Content Management**: HTML content stored separately from metadata
+- **Category Filtering**: Organize articles by topic (Deep Learning, Machine Learning, etc.)
+- **Professional Layout**: Clean article presentation with metadata and navigation
 
 ### Technical Architecture
 - **Flask Backend**: Python web framework with SQLAlchemy ORM
@@ -95,16 +102,29 @@ flask_portfolio/
 │   └── project.py
 ├── data/                       # Configuration files
 │   ├── tutorials.py
-│   └── projects.py
+│   ├── projects.py
+│   └── blog.py                 # Blog metadata configuration
+├── content/                    # File-based content storage
+│   └── blog/                   # Blog article HTML files
+│       └── transformer-architecture.html
 ├── templates/                  # HTML templates
 │   ├── base.html
 │   ├── index.html
+│   ├── about.html              # Professional background page
+│   ├── contact.html            # Contact form
+│   ├── blog.html               # Blog listing page
+│   ├── blog_post.html          # Individual blog post page
 │   ├── projects/               # Project-specific templates
 │   └── tutorials/              # Tutorial-specific templates
 ├── static/                     # Static assets
 │   ├── css/                    # Stylesheets
+│   │   ├── main.css            # Global styles with CSS custom properties
+│   │   ├── blog.css            # Blog-specific styles
+│   │   └── projects/           # Project-specific CSS
 │   ├── js/                     # JavaScript files
 │   └── images/                 # Images and media
+│       ├── projects/           # Project thumbnails
+│       └── blog/               # Blog post images
 └── flask_venv/                 # Virtual environment
 ```
 
@@ -136,7 +156,32 @@ flask_portfolio/
 
 1. **Update configuration** in `data/tutorials.py`
 2. **Create template and CSS files** (if interactive)
-3. **Restart the application**
+### Adding New Blog Posts
+
+1. **Create content file** in `content/blog/`:
+   ```bash
+   touch content/blog/your-article-slug.html
+   ```
+
+2. **Write article content** in HTML format in the content file
+
+3. **Update configuration** in `data/blog.py`:
+   ```python
+   {
+       'id': 'your-article-slug',
+       'title': 'Your Article Title',
+       'excerpt': 'Brief description...',
+       'category': 'Machine Learning',
+       'tags': ['tag1', 'tag2'],
+       'featured': False,
+       'content_file': 'your-article-slug.html',
+       'image_url': '/static/images/blog/your-article.jpg'
+   }
+   ```
+
+4. **Add article image**: `static/images/blog/your-article.jpg`
+
+5. **Restart the application**
 
 ## Features in Detail
 
