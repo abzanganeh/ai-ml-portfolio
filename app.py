@@ -34,9 +34,21 @@ class BlogPost:
         self.read_time = read_time
         self.slug = self._generate_slug()
         self.meta_description = excerpt[:160]
+        self.image_url = self._get_image_url(image_url)
         if content_file:
             self.content = self.load_content_from_file(content_file)
         
+    def _get_image_url(self, image_url):
+        """Get image URL with fallback to default_image.png"""
+        if image_url:
+            # Check if the specific image file exists
+            image_path = os.path.join('static', image_url.lstrip('/static/'))
+            if os.path.exists(image_path):
+                return image_url
+        
+        # Fall back to default image
+        return '/static/images/blog/default_image.png'
+    
     def load_content_from_file(self, content_file):
         """Load article content from HTML file"""
         content_path = os.path.join('content', 'blog', content_file)

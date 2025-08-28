@@ -52,7 +52,7 @@ class BlogPost:
         self.created_at = created_at or datetime.now()
         self.updated_at = updated_at or datetime.now()
         self.read_time = read_time
-        self.image_url = image_url or f"/static/images/blog/default_image.png"
+        self.image_url = image_url or f"/static/images/blog/{id}.png"
         self.meta_description = meta_description or excerpt[:160]
         self.slug = slug or self._generate_slug()
     
