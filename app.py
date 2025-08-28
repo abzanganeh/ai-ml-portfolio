@@ -42,7 +42,12 @@ class BlogPost:
         """Get image URL with fallback to default_image.png"""
         if image_url:
             # Check if the specific image file exists
-            image_path = os.path.join('static', image_url.lstrip('/static/'))
+            # Remove leading slash and 'static/' properly
+            if image_url.startswith('/static/'):
+                image_path = image_url[1:]  # Remove leading slash
+            else:
+                image_path = os.path.join('static', image_url)
+            
             if os.path.exists(image_path):
                 return image_url
         
