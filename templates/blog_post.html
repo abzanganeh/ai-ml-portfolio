@@ -24,7 +24,7 @@
 <!-- Post Header -->
 <header class="blog-post-header">
     <div class="container">
-        <div class="post-header-content" style="background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.75)), url('{{ post.image_url }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="post-header-content" data-bg-image="{{ post.image_url }}">
             <a href="{{ url_for('blog_category', category=post.category) }}" class="post-category-link">
                 {{ post.category }}
             </a>
@@ -145,6 +145,15 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Set dynamic background image with gradient overlay
+    const headerContent = document.querySelector('.post-header-content');
+    if (headerContent) {
+        const bgImage = headerContent.getAttribute('data-bg-image');
+        if (bgImage) {
+            headerContent.style.backgroundImage = `linear-gradient(rgba(167, 218, 248, 0.85), rgba(240, 236, 255, 0.75)), url('${bgImage}')`;
+        }
+    }
+    
     // Smooth scrolling for internal links
     const internalLinks = document.querySelectorAll('a[href^="#"]');
     internalLinks.forEach(link => {
