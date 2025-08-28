@@ -52,6 +52,13 @@ This website serves as a comprehensive portfolio for machine learning and data s
 - **Chart.js** - Data visualizations
 - **Font Awesome** - Icon library
 
+### Production Infrastructure
+- **AWS Lightsail** - Cloud hosting platform
+- **Nginx** - Web server and reverse proxy
+- **Gunicorn** - Python WSGI HTTP server
+- **Let's Encrypt** - SSL certificate management
+- **Systemd** - Process management and auto-restart
+
 ### Development Tools
 - **Virtual Environment** - Isolated Python environment
 - **Git** - Version control
@@ -64,7 +71,7 @@ This website serves as a comprehensive portfolio for machine learning and data s
 - Git
 - Virtual environment tool (venv)
 
-### Installation Steps
+### Local Development Setup
 
 1. **Clone the repository**
    ```bash
@@ -91,11 +98,76 @@ This website serves as a comprehensive portfolio for machine learning and data s
 5. **Access the website**
    Open your browser and navigate to `http://localhost:8000`
 
+### Production Deployment
+
+The website is deployed using a production-ready setup with the following components:
+
+#### Server Configuration
+- **Platform**: AWS Lightsail (512MB instance with static IP)
+- **OS**: Ubuntu 22.04 LTS
+- **Domain**: zanganehai.com / www.zanganehai.com
+- **SSL**: Let's Encrypt certificates with automatic renewal
+
+#### Application Stack
+```bash
+# Flask application served via Gunicorn
+/home/ubuntu/flask_ml_website/flask_env/bin/gunicorn --workers 1 --bind unix:flask-ml.sock app:app
+
+# Nginx reverse proxy configuration
+server {
+    listen 443 ssl http2;
+    server_name www.zanganehai.com;
+    
+    location / {
+        proxy_pass http://unix:/home/ubuntu/flask_ml_website/flask-ml.sock;
+        # ... additional proxy headers
+    }
+}
+```
+
+#### Process Management
+- **Systemd service**: `flask-ml.service` for automatic application startup
+- **Service monitoring**: Automatic restart on failure
+- **Memory optimization**: Single Gunicorn worker for resource efficiency
+
+## Deployment
+
+### Automated Deployment Setup
+
+The website uses GitHub webhooks for automatic deployment:
+
+1. **Push changes** to the main branch
+2. **GitHub triggers** webhook: `http://44.237.64.83:9000/deploy`
+3. **Server automatically**:
+   - Pulls latest code
+   - Restarts Flask service
+   - Updates live website
+
+### Testing the Deployment
+
+1. Make a small change to any file
+2. Commit and push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Test deployment"
+   git push origin main
+   ```
+3. Check the live website at [zanganehai.com](https://www.zanganehai.com)
+
+### Manual Deployment (if needed)
+
+```bash
+cd /home/ubuntu/flask_ml_website
+git pull
+sudo systemctl restart flask-ml
+```
+
 ## Project Structure
 
 ```
 flask_portfolio/
 ├── app.py                      # Main Flask application
+├── deploy.py                   # Deployment webhook service
 ├── requirements.txt            # Python dependencies
 ├── models/                     # Database models
 │   ├── tutorial.py
@@ -128,6 +200,46 @@ flask_portfolio/
 └── flask_venv/                 # Virtual environment
 ```
 
+## System Configuration Files
+
+### Flask Application Service
+```ini
+# /etc/systemd/system/flask-ml.service
+[Unit]
+Description=Gunicorn instance to serve Flask ML Website
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/flask_ml_website
+Environment="PATH=/home/ubuntu/flask_ml_website/flask_env/bin"
+ExecStartPre=/bin/rm -f /home/ubuntu/flask_ml_website/flask-ml.sock
+ExecStart=/home/ubuntu/flask_ml_website/flask_env/bin/gunicorn --workers 1 --bind unix:flask-ml.sock -m 007 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Deployment Webhook Service
+```ini
+# /etc/systemd/system/deploy-webhook.service
+[Unit]
+Description=Deployment Webhook Service
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/home/ubuntu/flask_ml_website/flask_env/bin/python /home/ubuntu/deploy.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Content Management
 
 ### Adding New Projects
@@ -150,12 +262,14 @@ flask_portfolio/
 
 3. **Add project image**: `static/images/projects/your-project.jpg`
 
-4. **Restart the application** to reload the database
+4. **Push to GitHub** - automatic deployment will update the live site
 
 ### Adding New Tutorials
 
 1. **Update configuration** in `data/tutorials.py`
 2. **Create template and CSS files** (if interactive)
+3. **Push changes** for automatic deployment
+
 ### Adding New Blog Posts
 
 1. **Create content file** in `content/blog/`:
@@ -181,7 +295,7 @@ flask_portfolio/
 
 4. **Add article image**: `static/images/blog/your-article.jpg`
 
-5. **Restart the application**
+5. **Push to GitHub** - automatic deployment will update the live site
 
 ## Features in Detail
 
@@ -207,21 +321,137 @@ flask_portfolio/
 
 ### Local Development
 1. Make changes to code/templates
-2. Restart Flask app if needed (for database changes)
-3. Test functionality across different screen sizes
-4. Commit changes to version control
+2. Test functionality locally
+3. Commit and push changes to GitHub
+4. **Automatic deployment** triggers via webhook
+5. Verify changes on live site
 
-### Adding Content
-1. Update configuration files (`data/tutorials.py` or `data/projects.py`)
-2. Create any necessary template/CSS files
-3. Add images to appropriate directories
-4. Delete existing database file if schema changed: `rm tutorials.db`
-5. Restart application to repopulate database
+### Production Deployment Process
+1. **Push to main branch** on GitHub
+2. **GitHub webhook** automatically triggers deployment
+3. **Server pulls latest code** and restarts Flask service
+4. **Website updates** within seconds
+5. **No manual intervention** required
 
 ### Database Management
 - **Development**: Delete `tutorials.db` to reset database
 - **Schema Changes**: Modify model files and restart application
-- **Production**: Use Flask-Migrate for database evolution
+- **Production**: Database recreated automatically on deployment
+
+## Monitoring & Maintenance
+
+### Service Status Monitoring
+```bash
+# Check Flask application
+sudo systemctl status flask-ml
+
+# Check deployment webhook
+sudo systemctl status deploy-webhook
+
+# Check Nginx
+sudo systemctl status nginx
+
+# Monitor system resources
+htop
+free -h
+```
+
+### Log Monitoring
+```bash
+# Flask application logs
+sudo journalctl -u flask-ml -f
+
+# Deployment webhook logs
+sudo journalctl -u deploy-webhook -f
+
+# Nginx access logs
+sudo tail -f /var/log/nginx/access.log
+
+# Nginx error logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+### SSL Certificate Management
+```bash
+# Check certificate status
+sudo certbot certificates
+
+# Renew certificates (automatic via cron)
+sudo certbot renew --force-renewal
+```
+
+## Security Considerations
+
+### Firewall Configuration
+- **Port 22**: SSH access
+- **Port 80**: HTTP (redirects to HTTPS)
+- **Port 443**: HTTPS
+- **Port 9000**: Webhook endpoint (HTTP)
+
+### SSL/TLS Security
+- **Let's Encrypt certificates** for HTTPS
+- **Automatic HTTP to HTTPS redirects**
+- **Security headers** configured in Nginx
+- **SSL protocols**: TLSv1.2 and TLSv1.3 only
+
+### Access Control
+- **Webhook endpoint**: Basic request validation
+- **Server access**: SSH key-based authentication
+- **File permissions**: Restricted to ubuntu user and www-data group
+
+## Performance Metrics
+
+### Resource Utilization
+- **Memory Usage**: ~145MB total (Flask: 127MB + Webhook: 18MB)
+- **CPU Usage**: Minimal during normal operation
+- **Storage**: ~500MB including virtual environment and logs
+- **Network**: HTTPS with gzip compression enabled
+
+### Response Performance
+- **Average page load**: <2 seconds
+- **Static assets**: Cached with long expiry headers
+- **Database queries**: Optimized with proper indexing
+- **SSL handshake**: Modern cipher suites for fast encryption
+
+## Troubleshooting
+
+### Common Issues
+
+#### Website Not Accessible
+```bash
+# Check services
+sudo systemctl status flask-ml nginx
+
+# Check DNS resolution
+nslookup zanganehai.com
+nslookup www.zanganehai.com
+
+# Check SSL certificates
+sudo certbot certificates
+```
+
+#### Deployment Failures
+```bash
+# Check webhook service
+sudo systemctl status deploy-webhook
+sudo journalctl -u deploy-webhook -n 20
+
+# Test manual deployment
+cd /home/ubuntu/flask_ml_website
+git pull
+sudo systemctl restart flask-ml
+```
+
+#### Memory Issues
+```bash
+# Monitor memory usage
+free -h
+htop
+
+# Restart services if needed
+sudo systemctl restart flask-ml
+sudo systemctl restart deploy-webhook
+```
 
 ## Customization
 
@@ -235,27 +465,29 @@ flask_portfolio/
 - **Interactive features**: Add JavaScript in template `extra_js` blocks
 - **External APIs**: Integrate in template or route handlers
 
-## Deployment Considerations
+## Deployment History & Architecture Decisions
 
-### Production Setup
-- Use production WSGI server (Gunicorn, uWSGI)
-- Configure environment variables
-- Use PostgreSQL or MySQL for production database
-- Set up static file serving (nginx)
-- Enable HTTPS and security headers
+### Infrastructure Evolution
+1. **Initial Setup**: Basic Flask development server
+2. **Production Migration**: Gunicorn + Nginx reverse proxy
+3. **SSL Implementation**: Let's Encrypt certificate automation
+4. **CI/CD Integration**: GitHub webhook deployment system
+5. **Resource Optimization**: Single worker configuration for memory efficiency
 
-### Environment Variables
-- `SECRET_KEY`: Flask secret key for sessions
-- `DATABASE_URL`: Production database connection string
-- `DEBUG`: Set to `False` for production
+### Performance Optimizations Made
+- **Reduced Gunicorn workers** from 3 to 1 (memory constraint optimization)
+- **Eliminated Jenkins CI/CD** in favor of lightweight webhook approach
+- **Static IP attachment** to prevent DNS/SSL certificate issues
+- **Systemd service management** for reliable process monitoring
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Test thoroughly locally
 5. Submit a pull request
+6. **Automatic deployment** will occur on merge to main branch
 
 ## License
 
@@ -265,13 +497,17 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Alireza Barzin Zanganeh**  
 ML Engineer & Data Scientist  
-- GitHub: [abzanganeh](https://github.com/abzanganeh)
-- LinkedIn: [linkedin.com/in/alireza-barzin-zanganeh](https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126)
-- Email: alireza@zanganehai.com
+- **Website**: [zanganehai.com](https://www.zanganehai.com)
+- **GitHub**: [abzanganeh](https://github.com/abzanganeh)
+- **LinkedIn**: [linkedin.com/in/alireza-barzin-zanganeh](https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126)
+- **Email**: alireza@zanganehai.com
 
 ## Acknowledgments
 
 - Flask community for excellent documentation
-- Chart.js for visualization capabilities
+- Chart.js for visualization capabilities  
 - Font Awesome for iconography
+- AWS Lightsail for reliable cloud hosting
+- Let's Encrypt for free SSL certificate automation
+- GitHub for integrated CI/CD capabilities
 - Modern CSS techniques and responsive design patterns
