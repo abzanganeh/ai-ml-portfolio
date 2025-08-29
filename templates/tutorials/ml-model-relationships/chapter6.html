@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6: Gradient Boosting Mastery - ML Model Relationships</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/ml-model-relationships.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/nlp/nlp.css') }}">
+    <style>
+        /* Chapter 6 Specific Styles */
+        .boosting-demo {
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+            border: 2px solid #ea580c;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .boosting-demo::before {
+            content: "Sequential Learning Demo";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #ea580c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .sequential-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .boosting-round {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 80px 1fr 120px;
+            gap: 1rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .boosting-round:hover {
+            transform: translateX(10px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .round-number {
+            background: linear-gradient(135deg, #ea580c, #dc2626);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .round-details {
+            flex: 1;
+        }
+        
+        .round-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .round-description {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .round-metrics {
+            text-align: right;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+        
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ea580c;
+        }
+        
+        .residual-visualization {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .residual-bar {
+            background: #ef4444;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 20px;
+        }
+        
+        .residual-bar:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .residual-bar.small {
+            background: #22c55e;
+        }
+        
+        .loss-chart {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+        
+        .loss-progression {
+            height: 200px;
+            background: linear-gradient(to bottom, transparent 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            position: relative;
+            margin: 1rem 0;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .loss-curve {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: end;
+            padding: 10px;
+        }
+        
+        .loss-point {
+            flex: 1;
+            background: #ea580c;
+            margin: 0 1px;
+            border-radius: 2px 2px 0 0;
+            transition: all 0.3s ease;
+        }
+        
+        .loss-point:hover {
+            background: #dc2626;
+        }
+        
+        .learning-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .learning-control {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .learning-control label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .learning-control input[type="range"] {
+            width: 100%;
+            margin: 0.5rem 0;
+        }
+        
+        .control-value {
+            display: inline-block;
+            background: #ea580c;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        
+        .weak-learner-demo {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            border: 2px solid #a855f7;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .learner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .weak-learner {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .weak-learner:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .weak-learner.selected {
+            border-color: #a855f7;
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+        }
+        
+        .learner-accuracy {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #7c3aed;
+            margin: 0.5rem 0;
+        }
+        
+        .gradient-explanation {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .math-formula {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .comparison-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .rf-card {
+            border-left: 4px solid #22c55e;
+        }
+        
+        .gb-card {
+            border-left: 4px solid #ea580c;
+        }
+        
+        @media (max-width: 768px) {
+            .boosting-round {
+                grid-template-columns: 60px 1fr;
+                gap: 0.5rem;
+            }
+            
+            .round-metrics {
+                grid-column: 1 / -1;
+                text-align: left;
+                margin-top: 1rem;
+            }
+            
+            .learning-controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/ml-model-relationships" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>ML Model Relationships</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <!-- Tutorial Header -->
+        <div class="nlp-header">
+            <h1>Chapter 6: Gradient Boosting Mastery</h1>
+            <p>Master sequential learning through interactive gradient boosting demonstrations and residual analysis</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+        </div>
+
+        <!-- Course Navigation -->
+        <div class="course-nav">
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter1'">Chapter 1</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter2'">Chapter 2</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter3'">Chapter 3</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter4'">Chapter 4</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter5'">Chapter 5</button>
+            <button class="nav-btn active" onclick="window.location.href='/tutorials/ml-model-relationships/chapter6'">Chapter 6</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter7'">Chapter 7</button>
+            <button class="nav-btn" onclick="window.location.href='/tutorials/ml-model-relationships/chapter8'">Chapter 8</button>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container chapter1-container">
+
+                <div class="progress-tracker">
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot completed"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
+
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('overview')">Overview</button>
+                    <button onclick="showSection('sequential')">Sequential Learning</button>
+                    <button onclick="showSection('residuals')">Residual Analysis</button>
+                    <button onclick="showSection('comparison')">vs Random Forest</button>
+                    <button onclick="showSection('quiz')">Quiz</button>
+                </div>
+
+                <!-- Overview Section -->
+                <div id="overview" class="content-section active">
+                    <h2>Gradient Boosting: Learning from Mistakes</h2>
+                    <p>
+                        Unlike Random Forest which trains trees independently, Gradient Boosting trains them 
+                        sequentially, with each new tree focused on correcting the errors of previous trees.
+                    </p>
+                    
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <img src="/static/images/tutorials/ml-model-relationships/chapter6/sequential-learning.png" 
+                             alt="Sequential learning visualization showing how gradient boosting models learn from previous mistakes"
+                             style="width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
+                    </div>
+                    
+                    <div class="azbn-card">
+                        <h3>The Core Principle</h3>
+                        <p>Gradient Boosting follows a simple but powerful strategy:</p>
+                        
+                        <div class="math-formula">
+                            F<sub>m</sub>(x) = F<sub>m-1</sub>(x) + α × h<sub>m</sub>(x)
+                        </div>
+                        
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>F<sub>m</sub>(x)</strong> = Current ensemble prediction</li>
+                            <li><strong>F<sub>m-1</sub>(x)</strong> = Previous ensemble prediction</li>
+                            <li><strong>α</strong> = Learning rate (how much to trust the new model)</li>
+                            <li><strong>h<sub>m</sub>(x)</strong> = New weak learner trained on residuals</li>
+                        </ul>
+                    </div>
+
+                    <div class="boosting-demo">
+                        <h4>Interactive Gradient Boosting Overview</h4>
+                        <p>Watch how prediction accuracy improves with each boosting round:</p>
+                        
+                        <div class="learning-controls">
+                            <div class="learning-control">
+                                <label for="overview-rounds">Boosting Rounds:</label>
+                                <input type="range" id="overview-rounds" min="1" max="20" value="1" oninput="updateOverviewDemo()">
+                                <span class="control-value" id="overview-rounds-value">1</span>
+                            </div>
+                            
+                            <div class="learning-control">
+                                <label for="overview-learning-rate">Learning Rate:</label>
+                                <input type="range" id="overview-learning-rate" min="0.1" max="1.0" value="0.3" step="0.1" oninput="updateOverviewDemo()">
+                                <span class="control-value" id="overview-learning-rate-value">0.3</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 1.8rem; font-weight: bold; color: #ea580c;" id="current-error">0.35</div>
+                                <div style="font-size: 0.9rem; color: #64748b;" id="rf-description">Good stability</div>
+                            </div>
+                            
+                            <div style="text-align: center; background: #fff7ed; padding: 1.5rem; border-radius: 8px;">
+                                <h5>Gradient Boosting</h5>
+                                <div style="font-size: 2rem; font-weight: bold; color: #ea580c; margin: 0.5rem 0;" id="gb-score">0.91</div>
+                                <div style="font-size: 0.9rem; color: #64748b;" id="gb-description">Higher accuracy</div>
+                            </div>
+                        </div>
+                        
+                        <div id="comparison-explanation" style="background: #f8fafc; padding: 1rem; border-radius: 8px;">
+                            <p><strong>Tabular Data:</strong> Gradient Boosting typically performs better on structured data due to its sequential learning approach that can capture complex patterns.</p>
+                        </div>
+                    </div>
+
+                    <div class="boosting-demo">
+                        <h4>Hyperparameter Impact Comparison</h4>
+                        <p>See how key parameters affect each algorithm:</p>
+                        
+                        <div class="learning-controls">
+                            <div class="learning-control">
+                                <label for="n-estimators">Number of Trees/Estimators:</label>
+                                <input type="range" id="n-estimators" min="10" max="500" value="100" oninput="updateHyperparameterComparison()">
+                                <span class="control-value" id="n-estimators-value">100</span>
+                            </div>
+                            
+                            <div class="learning-control">
+                                <label for="learning-rate-comp">Learning Rate (GB only):</label>
+                                <input type="range" id="learning-rate-comp" min="0.01" max="0.3" value="0.1" step="0.01" oninput="updateHyperparameterComparison()">
+                                <span class="control-value" id="learning-rate-comp-value">0.1</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 1.5rem 0;">
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Training Time</div>
+                                <div style="color: #22c55e; font-weight: bold;" id="rf-time">2.3s</div>
+                                <div style="color: #ea580c; font-weight: bold;" id="gb-time">5.7s</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">RF vs GB</div>
+                            </div>
+                            
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Memory Usage</div>
+                                <div style="color: #22c55e; font-weight: bold;" id="rf-memory">156MB</div>
+                                <div style="color: #ea580c; font-weight: bold;" id="gb-memory">89MB</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">RF vs GB</div>
+                            </div>
+                            
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Overfitting Risk</div>
+                                <div style="color: #22c55e; font-weight: bold;" id="rf-overfit">Low</div>
+                                <div style="color: #ea580c; font-weight: bold;" id="gb-overfit">Medium</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">RF vs GB</div>
+                            </div>
+                            
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-weight: bold; margin-bottom: 0.5rem;">Tuning Difficulty</div>
+                                <div style="color: #22c55e; font-weight: bold;" id="rf-tuning">Easy</div>
+                                <div style="color: #ea580c; font-weight: bold;" id="gb-tuning">Hard</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">RF vs GB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 6 Quiz</h2>
+                    <p>Test your understanding of gradient boosting:</p>
+
+                    <div class="quiz-section">
+                        <div class="quiz-question">
+                            <h4>Question 1: How does gradient boosting differ from random forest in training approach?</h4>
+                            <button class="quiz-option" onclick="selectAnswer(1, 'a', true)">Gradient boosting trains models sequentially, each learning from previous errors</button>
+                            <button class="quiz-option" onclick="selectAnswer(1, 'b', false)">Gradient boosting uses more data than random forest</button>
+                            <button class="quiz-option" onclick="selectAnswer(1, 'c', false)">Gradient boosting only works with decision trees</button>
+                            <button class="quiz-option" onclick="selectAnswer(1, 'd', false)">Gradient boosting requires less computational power</button>
+                            <div id="q1-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+                                <strong>Correct!</strong> The key difference is sequential vs parallel training. Gradient boosting builds models one after another, with each new model specifically trained to correct the residual errors of the ensemble so far.
+                            </div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <h4>Question 2: What are residuals in the context of gradient boosting?</h4>
+                            <button class="quiz-option" onclick="selectAnswer(2, 'a', false)">The final predictions of the model</button>
+                            <button class="quiz-option" onclick="selectAnswer(2, 'b', true)">The differences between actual values and current ensemble predictions</button>
+                            <button class="quiz-option" onclick="selectAnswer(2, 'c', false)">The weights assigned to each weak learner</button>
+                            <button class="quiz-option" onclick="selectAnswer(2, 'd', false)">The learning rate parameter</button>
+                            <div id="q2-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+                                <strong>Exactly!</strong> Residuals are the errors - what the current ensemble gets wrong. Each new weak learner is trained to predict these residuals, effectively learning to fix the ensemble's mistakes.
+                            </div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <h4>Question 3: When might you choose random forest over gradient boosting?</h4>
+                            <button class="quiz-option" onclick="selectAnswer(3, 'a', false)">When you need the highest possible accuracy</button>
+                            <button class="quiz-option" onclick="selectAnswer(3, 'b', true)">When you want a stable, robust model with less risk of overfitting</button>
+                            <button class="quiz-option" onclick="selectAnswer(3, 'c', false)">When you have very small datasets</button>
+                            <button class="quiz-option" onclick="selectAnswer(3, 'd', false)">When you need faster prediction times</button>
+                            <div id="q3-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+                                <strong>Perfect!</strong> Random Forest is more stable and less prone to overfitting because it averages independent predictions. Gradient boosting can achieve higher accuracy but requires more careful tuning and is more sensitive to outliers and overfitting.
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin: 2rem 0;">
+                            <button onclick="submitQuiz()" class="azbn-btn">Submit Quiz</button>
+                            <div id="quiz-results" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let quizAnswers = {};
+        let currentWeakLearner = 'stump';
+        
+        // Section Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionName).classList.add('active');
+            
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Overview Demo
+        function updateOverviewDemo() {
+            const rounds = parseInt(document.getElementById('overview-rounds').value);
+            const learningRate = parseFloat(document.getElementById('overview-learning-rate').value);
+            
+            document.getElementById('overview-rounds-value').textContent = rounds;
+            document.getElementById('overview-learning-rate-value').textContent = learningRate;
+            
+            const baseError = 0.45;
+            const currentError = Math.max(0.05, baseError * Math.pow(0.85, rounds * learningRate));
+            const improvement = Math.round((baseError - currentError) / baseError * 100);
+            
+            document.getElementById('current-error').textContent = currentError.toFixed(2);
+            document.getElementById('improvement').textContent = `-${improvement}%`;
+            document.getElementById('models-used').textContent = rounds;
+            
+            const explanation = document.getElementById('overview-explanation');
+            if (rounds === 1) {
+                explanation.innerHTML = '<h5>Round 1: Initial Model</h5><p>First weak learner makes basic predictions. Error is high but we\'re just getting started!</p>';
+            } else if (rounds <= 5) {
+                explanation.innerHTML = `<h5>Round ${rounds}: Early Learning</h5><p>Each model is learning from previous mistakes. Error reduction is most dramatic in early rounds.</p>`;
+            } else if (rounds <= 10) {
+                explanation.innerHTML = `<h5>Round ${rounds}: Steady Improvement</h5><p>The ensemble is becoming more sophisticated. Error reduction continues but at a slower pace.</p>`;
+            } else {
+                explanation.innerHTML = `<h5>Round ${rounds}: Diminishing Returns</h5><p>Most easy patterns have been learned. Further improvements require more rounds and careful tuning.</p>`;
+            }
+        }
+
+        // Sequential Learning Demo
+        function updateSequentialDemo() {
+            const rounds = parseInt(document.getElementById('sequential-rounds').value);
+            const learnerType = document.getElementById('weak-learner-type').value;
+            
+            document.getElementById('sequential-rounds-value').textContent = rounds;
+            
+            const container = document.getElementById('sequential-flow');
+            let html = '';
+            
+            for (let i = 1; i <= rounds; i++) {
+                const error = Math.max(0.05, 0.4 * Math.pow(0.8, i - 1));
+                const improvement = i === 1 ? 0 : Math.round((0.4 - error) / 0.4 * 100);
+                
+                let description = '';
+                if (i === 1) {
+                    description = 'Initial model trained on original target values';
+                } else {
+                    description = `Model trained on residuals from previous ${i-1} models`;
+                }
+                
+                html += `
+                    <div class="boosting-round">
+                        <div class="round-number">${i}</div>
+                        <div class="round-details">
+                            <div class="round-title">Round ${i}: ${learnerType.charAt(0).toUpperCase() + learnerType.slice(1)}</div>
+                            <div class="round-description">${description}</div>
+                        </div>
+                        <div class="round-metrics">
+                            <div class="metric-label">Error</div>
+                            <div class="metric-value">${(error * 100).toFixed(0)}%</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Weak Learner Selection
+        function selectWeakLearner(type) {
+            document.querySelectorAll('.weak-learner').forEach(learner => learner.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            currentWeakLearner = type;
+            
+            const explanation = document.getElementById('weak-learner-explanation');
+            const descriptions = {
+                stump: {
+                    title: 'Decision Stumps',
+                    text: 'Simple one-level decision trees that make a single split. They\'re weak individually but powerful when combined through boosting. Each stump slightly improves overall predictions.'
+                },
+                shallow: {
+                    title: 'Shallow Trees',
+                    text: 'Trees with depth 2-6 can capture feature interactions while remaining simple. They provide more expressive power than stumps while still being "weak" enough for effective boosting.'
+                },
+                linear: {
+                    title: 'Linear Models',
+                    text: 'Simple linear regression models that fit straight lines through the residuals. Fast to train and interpretable, though may require more boosting rounds to achieve good performance.'
+                }
+            };
+            
+            explanation.innerHTML = `<h5>${descriptions[type].title}</h5><p>${descriptions[type].text}</p>`;
+        }
+
+        // Residual Visualization
+        function updateResidualVisualization() {
+            const round = parseInt(document.getElementById('residual-round').value);
+            document.getElementById('residual-round-value').textContent = round;
+            
+            const container = document.getElementById('residual-bars');
+            let html = '';
+            
+            let largeResiduals = 10;
+            let smallResiduals = 0;
+            let avgResidual = 0.42;
+            
+            // Simulate residual reduction
+            if (round > 0) {
+                largeResiduals = Math.max(0, 10 - round * 1.2);
+                smallResiduals = Math.min(10, round * 0.8);
+                avgResidual = Math.max(0.05, 0.42 * Math.pow(0.85, round));
+            }
+            
+            for (let i = 0; i < 10; i++) {
+                let height = Math.random() * 60 + 20;
+                if (round > 0) {
+                    height = height * Math.pow(0.9, round) + Math.random() * 20;
+                }
+                
+                const isSmall = height < 30;
+                const value = Math.round(height);
+                
+                html += `<div class="residual-bar ${isSmall ? 'small' : ''}" style="height: ${height}px;">${value}</div>`;
+            }
+            
+            container.innerHTML = html;
+            
+            document.getElementById('large-residuals').textContent = Math.round(largeResiduals);
+            document.getElementById('small-residuals').textContent = Math.round(smallResiduals);
+            document.getElementById('avg-residual').textContent = avgResidual.toFixed(2);
+            
+            const explanation = document.getElementById('residual-explanation');
+            if (round === 0) {
+                explanation.innerHTML = '<h5>Round 0: Initial Residuals</h5><p>Starting with large residuals everywhere. Each subsequent model will focus on reducing these errors.</p>';
+            } else if (round <= 5) {
+                explanation.innerHTML = `<h5>Round ${round}: Active Learning</h5><p>Models are actively reducing residuals. Notice how the largest errors are getting smaller with each round.</p>`;
+            } else {
+                explanation.innerHTML = `<h5>Round ${round}: Fine-tuning</h5><p>Most large residuals have been addressed. The ensemble is now fine-tuning smaller errors for incremental improvements.</p>`;
+            }
+            
+            // Update loss curve
+            updateLossCurve(round);
+        }
+
+        // Loss Curve Update
+        function updateLossCurve(maxRound) {
+            const container = document.getElementById('loss-curve');
+            let html = '';
+            
+            for (let i = 0; i < 20; i++) {
+                let height = 0;
+                if (i <= maxRound) {
+                    height = Math.max(10, 180 * Math.pow(0.9, i));
+                }
+                html += `<div class="loss-point" style="height: ${height}px;"></div>`;
+            }
+            
+            container.innerHTML = html;
+            
+            if (maxRound > 0) {
+                const currentLoss = 0.65 * Math.pow(0.9, maxRound);
+                const reduction = Math.round((1 - currentLoss / 0.65) * 100);
+                
+                document.getElementById('current-loss').textContent = currentLoss.toFixed(2);
+                document.getElementById('loss-reduction').textContent = `${reduction}%`;
+                document.getElementById('convergence').textContent = maxRound < 5 ? 'Fast' : maxRound < 10 ? 'Medium' : 'Slow';
+            }
+        }
+
+        // Performance Comparison
+        function updatePerformanceComparison() {
+            const problemType = document.getElementById('problem-type').value;
+            
+            const scenarios = {
+                tabular: { rf: 0.87, gb: 0.91, desc: 'Gradient Boosting typically performs better on structured data due to its sequential learning approach that can capture complex patterns.' },
+                noisy: { rf: 0.84, gb: 0.79, desc: 'Random Forest is more robust to noisy data because averaging reduces the impact of outliers and noise.' },
+                large: { rf: 0.89, gb: 0.88, desc: 'With large datasets, Random Forest can be parallelized more easily and is less prone to overfitting.' },
+                small: { rf: 0.78, gb: 0.82, desc: 'On small datasets, Gradient Boosting\'s sequential learning can extract more signal, but overfitting risk increases.' },
+                linear: { rf: 0.81, gb: 0.83, desc: 'For linear patterns, both ensemble methods are overkill, but Gradient Boosting handles bias reduction better.' }
+            };
+            
+            const scenario = scenarios[problemType];
+            document.getElementById('rf-score').textContent = scenario.rf.toFixed(2);
+            document.getElementById('gb-score').textContent = scenario.gb.toFixed(2);
+            
+            document.getElementById('rf-description').textContent = scenario.rf > scenario.gb ? 'Better choice' : 'Good alternative';
+            document.getElementById('gb-description').textContent = scenario.gb > scenario.rf ? 'Better choice' : 'Good alternative';
+            
+            document.getElementById('comparison-explanation').innerHTML = `<p><strong>${problemType.charAt(0).toUpperCase() + problemType.slice(1)}:</strong> ${scenario.desc}</p>`;
+        }
+
+        // Hyperparameter Comparison
+        function updateHyperparameterComparison() {
+            const nEstimators = parseInt(document.getElementById('n-estimators').value);
+            const learningRate = parseFloat(document.getElementById('learning-rate-comp').value);
+            
+            document.getElementById('n-estimators-value').textContent = nEstimators;
+            document.getElementById('learning-rate-comp-value').textContent = learningRate.toFixed(2);
+            
+            // Simulate training times
+            const rfTime = (nEstimators * 0.02 + 1).toFixed(1) + 's';
+            const gbTime = (nEstimators * 0.05 / learningRate + 2).toFixed(1) + 's';
+            
+            // Simulate memory usage
+            const rfMemory = Math.round(nEstimators * 1.5 + 50) + 'MB';
+            const gbMemory = Math.round(nEstimators * 0.8 + 30) + 'MB';
+            
+            // Risk levels based on parameters
+            const rfOverfit = nEstimators > 200 ? 'Medium' : 'Low';
+            const gbOverfit = learningRate > 0.2 || nEstimators > 300 ? 'High' : 'Medium';
+            
+            const rfTuning = 'Easy';
+            const gbTuning = learningRate < 0.05 || learningRate > 0.2 ? 'Hard' : 'Medium';
+            
+            document.getElementById('rf-time').textContent = rfTime;
+            document.getElementById('gb-time').textContent = gbTime;
+            document.getElementById('rf-memory').textContent = rfMemory;
+            document.getElementById('gb-memory').textContent = gbMemory;
+            document.getElementById('rf-overfit').textContent = rfOverfit;
+            document.getElementById('gb-overfit').textContent = gbOverfit;
+            document.getElementById('rf-tuning').textContent = rfTuning;
+            document.getElementById('gb-tuning').textContent = gbTuning;
+        }
+
+        // Quiz Functions
+        function selectAnswer(questionNum, option, isCorrect) {
+            const question = event.target.closest('.quiz-question');
+            question.querySelectorAll('.quiz-option').forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            event.target.classList.add('selected');
+            quizAnswers[questionNum] = { option, isCorrect };
+        }
+
+        function submitQuiz() {
+            const totalQuestions = 3;
+            let correctAnswers = 0;
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                const question = document.querySelector(`.quiz-question:nth-child(${i})`);
+                const selectedBtn = question.querySelector('.quiz-option.selected');
+                
+                if (quizAnswers[i]) {
+                    if (quizAnswers[i].isCorrect) {
+                        selectedBtn.classList.add('correct');
+                        correctAnswers++;
+                        document.getElementById(`q${i}-explanation`).style.display = 'block';
+                    } else {
+                        selectedBtn.classList.add('incorrect');
+                        const correctBtn = question.querySelector('.quiz-option[onclick*="true"]');
+                        if (correctBtn) correctBtn.classList.add('correct');
+                    }
+                }
+            }
+            
+            const score = Math.round((correctAnswers / totalQuestions) * 100);
+            const results = document.getElementById('quiz-results');
+            
+            let message = `Score: ${correctAnswers}/${totalQuestions} (${score}%)`;
+            if (score >= 80) {
+                message += '<br>Outstanding! You understand gradient boosting and are ready for XGBoost optimization!';
+            } else if (score >= 60) {
+                message += '<br>Good progress! Review sequential learning and residual concepts.';
+            } else {
+                message += '<br>Keep studying! Focus on understanding how gradient boosting learns from errors.';
+            }
+            
+            results.innerHTML = message;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateOverviewDemo();
+            updateSequentialDemo();
+            updateResidualVisualization();
+            updatePerformanceComparison();
+            updateHyperparameterComparison();
+        });
+    </script>
+</body>
+</html>64748b;">Current Error</div>
+                            </div>
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 1.8rem; font-weight: bold; color: #22c55e;" id="improvement">-15%</div>
+                                <div style="font-size: 0.9rem; color: #64748b;">Improvement</div>
+                            </div>
+                            <div style="text-align: center; background: white; padding: 1rem; border-radius: 8px;">
+                                <div style="font-size: 1.8rem; font-weight: bold; color: #3b82f6;" id="models-used">1</div>
+                                <div style="font-size: 0.9rem; color: #64748b;">Models Used</div>
+                            </div>
+                        </div>
+                        
+                        <div id="overview-explanation" style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h5>Round 1: Initial Model</h5>
+                            <p>First weak learner makes basic predictions. Error is high but we're just getting started!</p>
+                        </div>
+                    </div>
+
+                    <div class="gradient-explanation">
+                        <h4>Why "Gradient" Boosting?</h4>
+                        <p>The name comes from gradient descent optimization:</p>
+                        <ul>
+                            <li><strong>Gradient:</strong> Direction of steepest increase in loss function</li>
+                            <li><strong>Negative Gradient:</strong> Direction to minimize loss (residuals)</li>
+                            <li><strong>Each model:</strong> Trained to predict negative gradients (residuals)</li>
+                            <li><strong>Result:</strong> Ensemble moves in direction that minimizes loss</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sequential Learning Section -->
+                <div id="sequential" class="content-section">
+                    <h2>Sequential Learning in Action</h2>
+                    <p>
+                        Watch how gradient boosting builds models step-by-step, with each model 
+                        learning from the mistakes of all previous models.
+                    </p>
+
+                    <div class="boosting-demo">
+                        <h4>Step-by-Step Boosting Process</h4>
+                        <p>Control the learning process and see how each round improves predictions:</p>
+                        
+                        <div class="learning-controls">
+                            <div class="learning-control">
+                                <label for="sequential-rounds">Current Round:</label>
+                                <input type="range" id="sequential-rounds" min="1" max="10" value="1" oninput="updateSequentialDemo()">
+                                <span class="control-value" id="sequential-rounds-value">1</span>
+                            </div>
+                            
+                            <div class="learning-control">
+                                <label for="weak-learner-type">Weak Learner Type:</label>
+                                <select id="weak-learner-type" onchange="updateSequentialDemo()" style="width: 100%; padding: 0.5rem; border-radius: 4px;">
+                                    <option value="stumps">Decision Stumps</option>
+                                    <option value="shallow">Shallow Trees</option>
+                                    <option value="linear">Linear Models</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="sequential-flow" id="sequential-flow">
+                            <!-- Sequential rounds will be generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="weak-learner-demo">
+                        <h4>Weak Learners: The Building Blocks</h4>
+                        <p>Gradient boosting typically uses simple "weak" learners. Click to see different types:</p>
+                        
+                        <div class="learner-grid">
+                            <div class="weak-learner selected" onclick="selectWeakLearner('stump')">
+                                <h5>Decision Stump</h5>
+                                <div class="learner-accuracy">55%</div>
+                                <p>Single split tree</p>
+                                <p style="font-size: 0.8rem; color: #64748b;">Most common choice</p>
+                            </div>
+                            
+                            <div class="weak-learner" onclick="selectWeakLearner('shallow')">
+                                <h5>Shallow Tree</h5>
+                                <div class="learner-accuracy">62%</div>
+                                <p>Depth 2-6 tree</p>
+                                <p style="font-size: 0.8rem; color: #64748b;">Good for interactions</p>
+                            </div>
+                            
+                            <div class="weak-learner" onclick="selectWeakLearner('linear')">
+                                <h5>Linear Model</h5>
+                                <div class="learner-accuracy">58%</div>
+                                <p>Simple linear regression</p>
+                                <p style="font-size: 0.8rem; color: #64748b;">Fast and interpretable</p>
+                            </div>
+                        </div>
+                        
+                        <div id="weak-learner-explanation" style="background: white; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <h5>Decision Stumps</h5>
+                            <p>Simple one-level decision trees that make a single split. They're weak individually but powerful when combined through boosting. Each stump slightly improves overall predictions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Residuals Section -->
+                <div id="residuals" class="content-section">
+                    <h2>Residual Analysis: Learning from Errors</h2>
+                    <p>
+                        The key to gradient boosting's success is its focus on residuals - 
+                        the differences between actual and predicted values.
+                    </p>
+
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <img src="/static/images/tutorials/ml-model-relationships/chapter6/loss-function-progression.png" 
+                             alt="Loss function progression chart showing decreasing error across boosting iterations"
+                             style="width: 100%; max-width: 700px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);">
+                    </div>
+
+                    <div class="boosting-demo">
+                        <h4>Interactive Residual Visualization</h4>
+                        <p>See how residuals shrink as more models are added:</p>
+                        
+                        <div style="margin: 1.5rem 0;">
+                            <label for="residual-round">Boosting Round:</label>
+                            <input type="range" id="residual-round" min="0" max="15" value="0" oninput="updateResidualVisualization()">
+                            <span class="control-value" id="residual-round-value">0</span>
+                        </div>
+                        
+                        <div class="residual-visualization" id="residual-bars">
+                            <!-- Residual bars will be generated by JavaScript -->
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div style="text-align: center; background: white; padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #ef4444;" id="large-residuals">10</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">Large Errors</div>
+                            </div>
+                            <div style="text-align: center; background: white; padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #22c55e;" id="small-residuals">0</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">Small Errors</div>
+                            </div>
+                            <div style="text-align: center; background: white; padding: 0.75rem; border-radius: 6px;">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #3b82f6;" id="avg-residual">0.42</div>
+                                <div style="font-size: 0.8rem; color: #64748b;">Avg Error</div>
+                            </div>
+                        </div>
+                        
+                        <div id="residual-explanation" style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h5>Round 0: Initial Residuals</h5>
+                            <p>Starting with large residuals everywhere. Each subsequent model will focus on reducing these errors.</p>
+                        </div>
+                    </div>
+
+                    <div class="loss-chart">
+                        <h4>Loss Function Progression</h4>
+                        <p>Watch how the loss decreases with each boosting iteration:</p>
+                        
+                        <div class="loss-progression">
+                            <div class="loss-curve" id="loss-curve">
+                                <!-- Loss points will be generated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                            <span style="font-size: 0.9rem; color: #64748b;">Round 1</span>
+                            <span style="font-size: 0.9rem; color: #64748b;">Round 20</span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.4rem; font-weight: bold; color: #ea580c;" id="current-loss">0.65</div>
+                                <div style="font-size: 0.9rem; color: #64748b;">Current Loss</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.4rem; font-weight: bold; color: #22c55e;" id="loss-reduction">35%</div>
+                                <div style="font-size: 0.9rem; color: #64748b;">Reduction</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.4rem; font-weight: bold; color: #3b82f6;" id="convergence">Fast</div>
+                                <div style="font-size: 0.9rem; color: #64748b;">Convergence</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Section -->
+                <div id="comparison" class="content-section">
+                    <h2>Random Forest vs Gradient Boosting</h2>
+                    <p>
+                        Understanding the key differences helps you choose the right ensemble method 
+                        for your specific problem.
+                    </p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-card rf-card">
+                            <h4>Random Forest (Bagging)</h4>
+                            <h5>Training Strategy</h5>
+                            <ul>
+                                <li>Parallel independent training</li>
+                                <li>Bootstrap sampling</li>
+                                <li>Feature randomness</li>
+                                <li>Deep trees (high variance)</li>
+                            </ul>
+                            
+                            <h5>Strengths</h5>
+                            <ul>
+                                <li>Less prone to overfitting</li>
+                                <li>Stable and robust</li>
+                                <li>Can be parallelized</li>
+                                <li>Good default choice</li>
+                            </ul>
+                            
+                            <h5>Best For</h5>
+                            <ul>
+                                <li>When you want stability</li>
+                                <li>Large datasets</li>
+                                <li>Quick, robust results</li>
+                                <li>Parallel processing available</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="comparison-card gb-card">
+                            <h4>Gradient Boosting</h4>
+                            <h5>Training Strategy</h5>
+                            <ul>
+                                <li>Sequential adaptive training</li>
+                                <li>Focus on residuals</li>
+                                <li>Learning rate control</li>
+                                <li>Weak learners (low variance)</li>
+                            </ul>
+                            
+                            <h5>Strengths</h5>
+                            <ul>
+                                <li>Often higher accuracy</li>
+                                <li>Flexible loss functions</li>
+                                <li>Handles bias well</li>
+                                <li>Feature importance</li>
+                            </ul>
+                            
+                            <h5>Best For</h5>
+                            <ul>
+                                <li>Maximum predictive performance</li>
+                                <li>Competitions</li>
+                                <li>When you can tune carefully</li>
+                                <li>Structured/tabular data</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="azbn-card">
+                        <h3>Performance Comparison on Different Problem Types</h3>
+                        
+                        <div style="margin: 1.5rem 0;">
+                            <label for="problem-type">Problem Type:</label>
+                            <select id="problem-type" onchange="updatePerformanceComparison()" style="width: 200px; padding: 0.5rem; border-radius: 4px; margin-left: 1rem;">
+                                <option value="tabular">Tabular Data</option>
+                                <option value="noisy">Noisy Data</option>
+                                <option value="large">Large Dataset</option>
+                                <option value="small">Small Dataset</option>
+                                <option value="linear">Linear Patterns</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1rem 0;">
+                            <div style="text-align: center; background: #f0fdf4; padding: 1.5rem; border-radius: 8px;">
+                                <h5>Random Forest</h5>
+                                <div style="font-size: 2rem; font-weight: bold; color: #22c55e; margin: 0.5rem 0;" id="rf-score">0.87</div>
+                                <div style="font-size: 0.9rem; color: #

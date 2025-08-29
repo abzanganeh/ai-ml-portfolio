@@ -43,7 +43,20 @@ TUTORIALS_DATA = [
         'excerpt': 'Complete ML fundamentals course with three comprehensive chapters covering introduction, regression, and classification.',
         'tags': 'machine-learning, python, regression, classification, supervised-learning'
     },
-
+    {
+    'title': 'Understanding ML Model Relationships: From Basic Models to Ensemble Methods',
+    'slug': 'ml-model-relationships',
+    'description': 'Interactive guide to understanding how different ML techniques connect, from basic models through regularization to ensemble methods like Random Forest and XGBoost',
+    'category': 'Machine Learning',
+    'difficulty': 'intermediate',
+    'duration': '90 min',
+    'author': 'Alireza Barzin Zanganeh',
+    'has_dedicated_template': True,
+    'template_path': 'tutorials/ml-model-relationships/index.html',
+    'published': True,
+    'excerpt': 'Master the relationships between ML algorithms through 8 interactive chapters covering the journey from linear models to advanced ensemble methods.',
+    'tags': 'ensemble-methods, random-forest, xgboost, gradient-boosting, bagging, regularization, model-selection'
+    },
     {
         'title': 'Decision Tree Regression',
         'slug': 'decision-tree-regression',
@@ -148,3 +161,5 @@ def get_tutorial_categories():
     for tutorial in TUTORIALS_DATA:
         categories.add(tutorial['category'])
     return sorted(list(categories))
+
+

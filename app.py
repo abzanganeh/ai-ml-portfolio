@@ -303,6 +303,21 @@ def ml_fundamentals_chapter3():
     """ML Fundamentals Chapter 3: Unsupervised Learning"""
     return render_template('tutorials/ml_fundamentals/chapter3.html')
 
+# ML Model Relationships tutorial chapter routes
+@app.route('/tutorials/ml-model-relationships/chapter<int:chapter_num>')
+def ml_relationships_chapter(chapter_num):
+    """ML Model Relationships tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 8:
+        abort(404)
+    
+    template_path = f'tutorials/ml-model-relationships/chapter{chapter_num}.html'
+    
+    # Check if template exists, otherwise 404
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
 @app.route('/blog')
 def blog():
     """Blog listing page"""
