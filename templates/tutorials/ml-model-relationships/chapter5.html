@@ -6,268 +6,10 @@
     <title>Chapter 5: Random Forest Deep Dive - ML Model Relationships</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/ml-model-relationships.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/chapter5.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/nlp/nlp.css') }}">
-    <style>
-        /* Chapter 5 Specific Styles */
-        .forest-demo {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border: 2px solid #22c55e;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            position: relative;
-        }
-        
-        .forest-demo::before {
-            content: "Random Forest Builder";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: #22c55e;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .tree-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .tree-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .tree-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        
-        .tree-card.selected {
-            border-color: #22c55e;
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-        }
-        
-        .tree-icon {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .tree-prediction {
-            font-weight: bold;
-            color: #15803d;
-        }
-        
-        .tree-confidence {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-        
-        .forest-controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .control-group {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .control-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #374151;
-        }
-        
-        .control-group input[type="range"] {
-            width: 100%;
-            margin: 0.5rem 0;
-        }
-        
-        .control-value {
-            display: inline-block;
-            background: #22c55e;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-left: 0.5rem;
-        }
-        
-        .bootstrap-visualization {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .bootstrap-sample {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .sample-data {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.25rem;
-            margin: 0.5rem 0;
-        }
-        
-        .data-point {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .feature-importance-chart {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin: 2rem 0;
-        }
-        
-        .importance-bars {
-            margin: 1rem 0;
-        }
-        
-        .importance-bar {
-            display: flex;
-            align-items: center;
-            margin: 0.5rem 0;
-        }
-        
-        .bar-label {
-            width: 100px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #374151;
-        }
-        
-        .bar-fill {
-            flex: 1;
-            height: 25px;
-            background: linear-gradient(90deg, #22c55e, #16a34a);
-            border-radius: 4px;
-            position: relative;
-            margin: 0 1rem;
-            transition: width 0.3s ease;
-        }
-        
-        .bar-value {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .oob-section {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-left: 4px solid #f59e0b;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .performance-comparison {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .perf-metric {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .metric-title {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-bottom: 0.5rem;
-        }
-        
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #1e40af;
-        }
-        
-        .hyperparameter-tuner {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .param-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .param-control {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        @media (max-width: 768px) {
-            .tree-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 0.5rem;
-            }
-            
-            .forest-controls {
-                grid-template-columns: 1fr;
-            }
-            
-            .bootstrap-visualization {
-                grid-template-columns: 1fr;
-            }
-            
-            .performance-comparison {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/chapter5.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -318,9 +60,6 @@
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
                 </div>
 
                 <div class="section-nav">
@@ -697,326 +436,47 @@
                     <h2>Chapter 5 Quiz</h2>
                     <p>Test your understanding of Random Forest:</p>
 
-                    <div class="quiz-section">
-                        <div class="quiz-question">
+                    <div class="enhanced-quiz-container" data-quiz-id="chapter5-quiz1">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 1: What are the three key components that make Random Forest effective?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'a', true)">Bagging + Decision Trees + Feature Randomness</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'b', false)">Boosting + Linear Models + Regularization</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'c', false)">Deep Trees + Large Dataset + Cross-validation</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'd', false)">Pruning + Ensemble + Feature Selection</button>
-                            <div id="q1-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Correct!</strong> Random Forest combines bagging (bootstrap aggregating), decision trees as base learners, and feature randomness at each split to create diverse, accurate models.
-                            </div>
                         </div>
-
-                        <div class="quiz-question">
+                        <div class="enhanced-quiz-option" data-correct="true">Bagging + Decision Trees + Feature Randomness</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Boosting + Linear Models + Regularization</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Deep Trees + Large Dataset + Cross-validation</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Pruning + Ensemble + Feature Selection</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Correct!</strong> Random Forest combines bagging (bootstrap aggregating), decision trees as base learners, and feature randomness at each split to create diverse, accurate models.
+                        </div>
+                     </div>
+                     
+                     <div class="enhanced-quiz-container" data-quiz-id="chapter5-quiz2">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 2: What is the Out-of-Bag (OOB) error?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'a', false)">Error on the training data</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'b', true)">Validation error estimated using samples not in bootstrap samples</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'c', false)">Error when trees disagree</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'd', false)">Error from using too few trees</button>
-                            <div id="q2-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Exactly!</strong> OOB error uses the ~37% of samples left out of each bootstrap sample as a validation set, providing a free estimate of model performance without needing separate validation data.
-                            </div>
                         </div>
-
-                        <div class="quiz-question">
+                        <div class="enhanced-quiz-option" data-correct="false">Error on the training data</div>
+                        <div class="enhanced-quiz-option" data-correct="true">Validation error estimated using samples not in bootstrap samples</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Error when trees disagree</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Error from using too few trees</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Exactly!</strong> OOB error uses the ~37% of samples left out of each bootstrap sample as a validation set, providing a free estimate of model performance without needing separate validation data.
+                        </div>
+                     </div>
+                     
+                     <div class="enhanced-quiz-container" data-quiz-id="chapter5-quiz3">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 3: When might Random Forest NOT be the best choice?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'a', false)">When you have missing data</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'b', false)">When you have mixed data types</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'c', true)">When you need very fast predictions and have simple linear relationships</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'd', false)">When you have a small dataset</button>
-                            <div id="q3-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Perfect!</strong> Random Forest is overkill for simple linear relationships and can be slow for predictions. A simple linear model would be faster and just as accurate for linear patterns.
-                            </div>
                         </div>
-
-                        <div style="text-align: center; margin: 2rem 0;">
-                            <button onclick="submitQuiz()" class="azbn-btn">Submit Quiz</button>
-                            <div id="quiz-results" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                        <div class="enhanced-quiz-option" data-correct="false">When you have missing data</div>
+                        <div class="enhanced-quiz-option" data-correct="false">When you have mixed data types</div>
+                        <div class="enhanced-quiz-option" data-correct="true">When you need very fast predictions and have simple linear relationships</div>
+                        <div class="enhanced-quiz-option" data-correct="false">When you have a small dataset</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Perfect!</strong> Random Forest is overkill for simple linear relationships and can be slow for predictions. A simple linear model would be faster and just as accurate for linear patterns.
                         </div>
+                     </div>
                     </div>
-                </div>
-
-
             </div>
         </section>
     </main>
-
-    <script>
-        let quizAnswers = {};
-        let forestTrees = [];
-        
-        // Section Navigation
-        function showSection(sectionName) {
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionName).classList.add('active');
-            
-            document.querySelectorAll('.section-nav button').forEach(button => {
-                button.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        // Quick Demo Functions
-        function updateQuickDemo() {
-            const numTrees = parseInt(document.getElementById('demo-trees').value);
-            document.getElementById('demo-trees-value').textContent = numTrees;
-            
-            const container = document.getElementById('demo-tree-grid');
-            let html = '';
-            
-            const predictions = ['A', 'B'];
-            let votesA = 0, votesB = 0;
-            
-            for (let i = 0; i < numTrees; i++) {
-                const pred = predictions[Math.floor(Math.random() * predictions.length)];
-                const conf = Math.floor(Math.random() * 30) + 60; // 60-90%
-                
-                if (pred === 'A') votesA++; else votesB++;
-                
-                html += `
-                    <div class="tree-card">
-                        <span class="tree-icon">🌳</span>
-                        <div class="tree-prediction">${pred}</div>
-                        <div class="tree-confidence">${conf}%</div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-            
-            const finalPred = votesA > votesB ? 'Class A' : 'Class B';
-            const finalConf = Math.round(Math.max(votesA, votesB) / numTrees * 100);
-            const voteBreakdown = votesA > votesB ? `${votesA}/${numTrees} votes` : `${votesB}/${numTrees} votes`;
-            
-            document.getElementById('forest-prediction').textContent = finalPred;
-            document.getElementById('forest-confidence').textContent = `Confidence: ${finalConf}% (${voteBreakdown})`;
-        }
-
-        // Forest Construction
-        function updateForestConstruction() {
-            const nTrees = parseInt(document.getElementById('n-trees').value);
-            const maxDepth = parseInt(document.getElementById('max-depth').value);
-            const maxFeatures = parseInt(document.getElementById('max-features').value);
-            const minSamples = parseInt(document.getElementById('min-samples').value);
-            
-            // Update display values
-            document.getElementById('n-trees-value').textContent = nTrees;
-            document.getElementById('max-depth-value').textContent = maxDepth;
-            document.getElementById('max-features-value').textContent = maxFeatures;
-            document.getElementById('min-samples-value').textContent = minSamples;
-            
-            // Simulate performance metrics
-            const baseTrainAcc = 0.85;
-            const treeComplexity = (maxDepth / 20) + (1 / (minSamples + 1));
-            const trainAcc = Math.min(0.99, baseTrainAcc + (treeComplexity * 0.1) + (nTrees * 0.001));
-            
-            const diversityFactor = Math.min(1, Math.sqrt(nTrees) / 10);
-            const featureRandomness = (10 - maxFeatures) / 10;
-            const valAcc = trainAcc - (treeComplexity * 0.05) + (diversityFactor * 0.03) + (featureRandomness * 0.02);
-            
-            const overfitScore = Math.max(0, trainAcc - valAcc);
-            const trainTime = (nTrees * 0.05) + (maxDepth * 0.1) + 0.5;
-            
-            document.getElementById('train-acc').textContent = trainAcc.toFixed(2);
-            document.getElementById('val-acc').textContent = Math.max(0.6, valAcc).toFixed(2);
-            document.getElementById('overfit-score').textContent = overfitScore.toFixed(2);
-            document.getElementById('train-time').textContent = trainTime.toFixed(1) + 's';
-            
-            // Update analysis
-            let analysis = '';
-            if (overfitScore > 0.15) {
-                analysis = 'High overfitting detected. Consider reducing max_depth or increasing min_samples_leaf.';
-            } else if (overfitScore < 0.05) {
-                analysis = 'Good balance between bias and variance. This configuration looks promising.';
-            } else {
-                analysis = 'Moderate overfitting. The model is learning well but could benefit from some regularization.';
-            }
-            
-            if (trainTime > 10) {
-                analysis += ' Training time is quite high - consider reducing n_trees for faster training.';
-            }
-            
-            document.getElementById('config-analysis').textContent = analysis;
-        }
-
-        // Bootstrap Sampling
-        function generateBootstrapSamples() {
-            const container = document.getElementById('bootstrap-samples');
-            const originalData = Array.from({length: 20}, (_, i) => i + 1);
-            const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#8b5cf6'];
-            
-            let html = '';
-            let totalUnique = 0;
-            let totalSamples = 0;
-            
-            for (let i = 0; i < 5; i++) {
-                // Generate bootstrap sample
-                const sample = [];
-                const used = new Set();
-                
-                for (let j = 0; j < 16; j++) {
-                    const idx = Math.floor(Math.random() * originalData.length);
-                    const value = originalData[idx];
-                    sample.push(value);
-                    used.add(value);
-                    totalSamples++;
-                }
-                
-                totalUnique += used.size;
-                
-                html += `
-                    <div class="bootstrap-sample">
-                        <h6>Sample ${i + 1}</h6>
-                        <div class="sample-data">
-                `;
-                
-                sample.forEach(val => {
-                    const colorIndex = (val - 1) % colors.length;
-                    html += `<div class="data-point" style="background: ${colors[colorIndex]}">${val}</div>`;
-                });
-                
-                html += `
-                        </div>
-                        <div style="font-size: 0.8rem; margin-top: 0.5rem;">
-                            Unique: ${used.size}/20
-                        </div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-            
-            // Update statistics
-            const avgUnique = Math.round(totalUnique / 5);
-            const avgDuplicates = 16 - avgUnique;
-            const diversity = (avgUnique / 20).toFixed(2);
-            
-            document.getElementById('unique-samples').textContent = `${Math.round(avgUnique/16*100)}%`;
-            document.getElementById('duplicate-samples').textContent = `${Math.round(avgDuplicates/16*100)}%`;
-            document.getElementById('diversity-metric').textContent = diversity;
-        }
-
-        // Feature Importance
-        function updateFeatureImportance() {
-            const nTrees = parseInt(document.getElementById('importance-trees').value);
-            document.getElementById('importance-trees-value').textContent = nTrees;
-            
-            const features = ['Age', 'Income', 'Education', 'Experience', 'Location'];
-            const baseImportances = [0.35, 0.28, 0.18, 0.12, 0.07];
-            
-            // Simulate how more trees stabilize importance estimates
-            const stability = Math.min(1, nTrees / 100);
-            const noise = (1 - stability) * 0.3;
-            
-            const container = document.getElementById('importance-bars');
-            let html = '';
-            
-            features.forEach((feature, i) => {
-                const importance = baseImportances[i] + ((Math.random() - 0.5) * noise);
-                const percentage = Math.max(0, importance * 100);
-                
-                html += `
-                    <div class="importance-bar">
-                        <div class="bar-label">${feature}</div>
-                        <div class="bar-fill" style="width: ${percentage}%;">
-                            <div class="bar-value">${percentage.toFixed(1)}%</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        // Hyperparameter Analysis
-        function updateHyperparameterAnalysis() {
-            const nTrees = parseInt(document.getElementById('tune-trees').value);
-            const maxDepth = parseInt(document.getElementById('tune-depth').value);
-            const maxFeatures = parseInt(document.getElementById('tune-features').value);
-            
-            document.getElementById('tune-trees-value').textContent = nTrees;
-            document.getElementById('tune-depth-value').textContent = maxDepth;
-            document.getElementById('tune-features-value').textContent = maxFeatures;
-            
-            // Simulate performance metrics
-            const complexity = (maxDepth / 25) + (maxFeatures / 10);
-            const diversity = Math.min(1, nTrees / 100) * (1 - maxFeatures / 10);
-            
-            const accuracy = 0.75 + (complexity * 0.1) + (diversity * 0.1);
-            const precision = accuracy - 0.02;
-            const recall = accuracy + 0.02;
-            const f1 = 2 * (precision * recall) / (precision + recall);
-            
-            const trainTime = (nTrees * 0.02) + (maxDepth * 0.15) + (maxFeatures * 0.1) + 1;
-            const memory = Math.round((nTrees * 2) + (maxDepth * 5) + 50);
-            
-            document.getElementById('tune-accuracy').textContent = Math.min(0.95, accuracy).toFixed(2);
-            document.getElementById('tune-precision').textContent = Math.min(0.95, precision).toFixed(2);
-            document.getElementById('tune-recall').textContent = Math.min(0.95, recall).toFixed(2);
-            document.getElementById('tune-f1').textContent = Math.min(0.95, f1).toFixed(2);
-            document.getElementById('tune-time').textContent = trainTime.toFixed(1) + 's';
-            document.getElementById('tune-memory').textContent = memory + 'MB';
-        }
-
-        // Quiz Functions
-        function selectAnswer(questionNum, option, isCorrect) {
-            const question = event.target.closest('.quiz-question');
-            question.querySelectorAll('.quiz-option').forEach(btn => {
-                btn.classList.remove('selected', 'correct', 'incorrect');
-            });
-            
-            event.target.classList.add('selected');
-            quizAnswers[questionNum] = { option, isCorrect };
-        }
-
-        function submitQuiz() {
-            const totalQuestions = 3;
-            let correctAnswers = 0;
-            
-            for (let i = 1; i <= totalQuestions; i++) {
-                const question = document.querySelector(`.quiz-question:nth-child(${i})`);
-                const selectedBtn = question.querySelector('.quiz-option.selected');
-                
-                if (quizAnswers[i]) {
-                    if (quizAnswers[i].isCorrect) {
-                        selectedBtn.classList.add('correct');
-                        correctAnswers++;
-                        document.getElementById(`q${i}-explanation`).style.display = 'block';
-                    } else {
-                        selectedBtn.classList.add('incorrect');
-                        const correctBtn = question.querySelector('.quiz-option[onclick*="true"]');
-                        if (correctBtn) correctBtn.classList.add('correct');
-                    }
-                }
-            }
-            
-            const score = Math.round((correctAnswers / totalQuestions) * 100);
-            const results = document.getElementById('quiz-results');
-            
-            let message = `Score: ${correctAnswers}/${totalQuestions} (${score}%)`;
-            if (score >= 80) {
-                message += '<br>Excellent! You understand Random Forest deeply and are ready for gradient boosting!';
-            } else if (score >= 60) {
-                message += '<br>Good progress! Review the key components and OOB error concept.';
-            } else {
-                message += '<br>Keep studying! Focus on understanding what makes Random Forest unique.';
-            }
-            
-            results.innerHTML = message;
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateQuickDemo();
-            updateForestConstruction();
-            generateBootstrapSamples();
-            updateFeatureImportance();
-            updateHyperparameterAnalysis();
-        });
-    </script>
 </body>
 </html>

@@ -6,377 +6,11 @@
     <title>Chapter 8: Putting It All Together - ML Model Relationships</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/ml-model-relationships.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/chapter8.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/nlp/nlp.css') }}">
-    <style>
-        /* Chapter 8 Specific Styles */
-        .integration-header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-            color: white;
-        }
-        
-        .integration-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                rgba(255,255,255,0.1) 0px,
-                rgba(255,255,255,0.1) 2px,
-                transparent 2px,
-                transparent 15px
-            );
-            animation: integrationShine 4s linear infinite;
-        }
-        
-        @keyframes integrationShine {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        .integration-header h2 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-            color: white !important;
-        }
-        
-        .integration-header p {
-            font-size: 1.2em;
-            position: relative;
-            z-index: 1;
-            opacity: 0.9;
-            color: white !important;
-        }
-        
-        .puzzle-icon {
-            font-size: 2em;
-            margin-bottom: 15px;
-            animation: puzzleFloat 3s ease-in-out infinite;
-        }
-        
-        @keyframes puzzleFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); }
-        }
-        
-        .decision-tree-demo {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px solid #0ea5e9;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            position: relative;
-        }
-        
-        .decision-tree-demo::before {
-            content: "Algorithm Selection Decision Tree";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: #0ea5e9;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .decision-tree {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 2rem 0;
-        }
-        
-        .decision-node {
-            background: white;
-            border: 2px solid #0ea5e9;
-            border-radius: 12px;
-            padding: 1rem;
-            margin: 0.5rem;
-            text-align: center;
-            min-width: 200px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .decision-node:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
-        }
-        
-        .decision-node.active {
-            background: #0ea5e9;
-            color: white;
-        }
-        
-        .decision-branches {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin: 1rem 0;
-        }
-        
-        .algorithm-recommendation {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        
-        .performance-dashboard {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .comparison-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .algorithm-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .algorithm-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .algorithm-card.best-choice {
-            border-color: #10b981;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
-        }
-        
-        .algorithm-card.best-choice::before {
-            content: "⭐";
-            position: absolute;
-            top: -10px;
-            right: 15px;
-            background: #10b981;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-        
-        .algorithm-card h4 {
-            color: #2c3e50 !important;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .performance-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .perf-metric {
-            text-align: center;
-            padding: 0.75rem;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .perf-value {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #4f46e5;
-        }
-        
-        .perf-value.excellent {
-            color: #10b981;
-        }
-        
-        .perf-value.good {
-            color: #0ea5e9;
-        }
-        
-        .perf-value.fair {
-            color: #f59e0b;
-        }
-        
-        .perf-value.poor {
-            color: #ef4444;
-        }
-        
-        .perf-label {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 5px;
-        }
-        
-        .case-study-showcase {
-            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
-            border: 2px solid #a855f7;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .case-studies {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .case-study {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .case-study:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-        
-        .case-study.selected {
-            border: 2px solid #a855f7;
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.1));
-        }
-        
-        .case-study h5 {
-            color: #2c3e50 !important;
-            margin-bottom: 1rem;
-        }
-        
-        .implementation-guide {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .implementation-steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .implementation-step {
-            background: white;
-            border-radius: 8px;
-            padding: 1.25rem;
-            border-left: 4px solid #4f46e5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .step-number {
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            background: #4f46e5;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .final-checklist {
-            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .checklist-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .checklist-item {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            border: 1px solid #10b981;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .checklist-item:hover {
-            background: #f0fdf4;
-        }
-        
-        .checklist-item.checked {
-            background: #10b981;
-            color: white;
-        }
-        
-        .checklist-item.checked::before {
-            content: "✓ ";
-            font-weight: bold;
-        }
-        
-        @media (max-width: 768px) {
-            .comparison-matrix {
-                grid-template-columns: 1fr;
-            }
-            
-            .performance-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .decision-branches {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .implementation-steps {
-                grid-template-columns: 1fr;
-            }
-            
-            .integration-header h2 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/chapter8.js') }}"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
@@ -422,9 +56,6 @@
             <div class="azbn-container chapter1-container">
 
                 <div class="progress-tracker">
-                    <div class="progress-dot completed"></div>
-                    <div class="progress-dot completed"></div>
-                    <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
@@ -636,280 +267,288 @@
                         </div>
                     </div>
                 </div>
+<!-- Implementation Guide Section -->
+<div id="implementation" class="content-section">
+    <h2>Implementation Guide</h2>
+    <p>Step-by-step guide to implementing your chosen algorithm in production:</p>
 
-                <!-- Implementation Guide Section -->
-                <div id="implementation" class="content-section">
-                    <h2>Implementation Guide</h2>
-                    <p>Step-by-step guide to implementing your chosen algorithm in production:</p>
+    <div class="implementation-guide">
+        <h4>From Prototype to Production</h4>
+        <div class="implementation-steps">
+            <div class="implementation-step">
+                <div class="step-number">1</div>
+                <h5>Data Preparation</h5>
+                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Clean and validate data</li>
+                    <li>Handle missing values</li>
+                    <li>Feature engineering</li>
+                    <li>Train/validation/test split</li>
+                </ul>
+            </div>
+            
+            <div class="implementation-step">
+                <div class="step-number">2</div>
+                <h5>Algorithm Selection</h5>
+                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Use decision tree framework</li>
+                    <li>Consider constraints</li>
+                    <li>Baseline with simple model</li>
+                    <li>Test multiple candidates</li>
+                </ul>
+            </div>
+            
+            <div class="implementation-step">
+                <div class="step-number">3</div>
+                <h5>Hyperparameter Tuning</h5>
+                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Cross-validation setup</li>
+                    <li>Grid/random search</li>
+                    <li>Bayesian optimization</li>
+                    <li>Early stopping</li>
+                </ul>
+            </div>
+            
+            <div class="implementation-step">
+                <div class="step-number">4</div>
+                <h5>Model Validation</h5>
+                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
+                    <li>Multiple metrics evaluation</li>
+                    <li>Cross-validation</li>
+                    <li>Out-of-time testing</li>
+                    <li>Feature importance analysis</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="implementation-guide">
-                        <h4>From Prototype to Production</h4>
-                        <div class="implementation-steps">
-                            <div class="implementation-step">
-                                <div class="step-number">1</div>
-                                <h5>Data Preparation</h5>
-                                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
-                                    <li>Clean and validate data</li>
-                                    <li>Handle missing values</li>
-                                    <li>Feature engineering</li>
-                                    <li>Train/validation/test split</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="implementation-step">
-                                <div class="step-number">2</div>
-                                <h5>Algorithm Selection</h5>
-                                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
-                                    <li>Use decision tree framework</li>
-                                    <li>Consider constraints</li>
-                                    <li>Baseline with simple model</li>
-                                    <li>Test multiple candidates</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="implementation-step">
-                                <div class="step-number">3</div>
-                                <h5>Hyperparameter Tuning</h5>
-                                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
-                                    <li>Cross-validation setup</li>
-                                    <li>Grid/random search</li>
-                                    <li>Bayesian optimization</li>
-                                    <li>Early stopping</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="implementation-step">
-                                <div class="step-number">4</div>
-                                <h5>Model Validation</h5>
-                                <ul style="margin: 0.5rem 0; padding-left: 1rem;">
-                                    <li>Multiple metrics evaluation</li>
-                                    <li>Cross-validation</li>
-                                    <li>Out-of-time testing</li>
-                                    <li>Feature importance analysis</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="implementation-step">
-                                        <!-- Quiz Section -->
-                <div id="quiz" class="content-section">
-                    <h2>Chapter 8: Final Mastery Quiz</h2>
-                    <p>Test your complete understanding of ML model relationships and selection:</p>
+<!-- Quiz Section -->
+<div id="quiz" class="content-section">
+    <h2>Chapter 8: Final Mastery Quiz</h2>
+    <p>Test your complete understanding of ML model relationships and selection:</p>
 
-                    <div class="azbn-card">
-                        <h3>Question 1: Algorithm Selection for Production System</h3>
-                        <p>You have a tabular dataset with 100K rows, mixed data types, and need maximum accuracy for a production system. Which algorithm should you choose?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> Linear Regression - too simple for complex patterns</p>
-                            <p><strong>B)</strong> Decision Tree - likely to overfit without ensembling</p>
-                            <p><strong>C)</strong> Random Forest - good but XGBoost typically achieves higher accuracy</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>D) XGBoost ✓</strong> - optimal for large tabular data with mixed types and accuracy requirements</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> XGBoost is ideal for this scenario: it excels on tabular data, handles mixed data types automatically, includes built-in regularization, and typically achieves the highest accuracy on structured data problems.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz1">
+        <div class="enhanced-quiz-question">
+            <h4>Question 1: Algorithm Selection for Production System</h4>
+            <p>You have a tabular dataset with 100K rows, mixed data types, and need maximum accuracy for a production system. Which algorithm should you choose?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">Linear Regression - too simple for complex patterns</div>
+        <div class="enhanced-quiz-option" data-correct="false">Decision Tree - likely to overfit without ensembling</div>
+        <div class="enhanced-quiz-option" data-correct="false">Random Forest - good but XGBoost typically achieves higher accuracy</div>
+        <div class="enhanced-quiz-option" data-correct="true">XGBoost - optimal for large tabular data with mixed types and accuracy requirements</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Correct!</strong> XGBoost is ideal for this scenario: it excels on tabular data, handles mixed data types automatically, includes built-in regularization, and typically achieves the highest accuracy on structured data problems.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 2: Medical Diagnosis System Requirements</h3>
-                        <p>For a medical diagnosis system where doctors need to understand the decision process, which approach is most appropriate?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> XGBoost with default settings</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) Decision Tree or shallow Random Forest ✓</strong> - with feature importance analysis</p>
-                            <p><strong>C)</strong> Deep Gradient Boosting with 1000+ trees</p>
-                            <p><strong>D)</strong> Highly regularized linear model only</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Medical applications require interpretability. Decision Trees provide clear decision paths, and shallow Random Forests offer both interpretability and improved robustness while maintaining explainable feature importance.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz2">
+        <div class="enhanced-quiz-question">
+            <h4>Question 2: Medical Diagnosis System Requirements</h4>
+            <p>For a medical diagnosis system where doctors need to understand the decision process, which approach is most appropriate?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">XGBoost with default settings</div>
+        <div class="enhanced-quiz-option" data-correct="true">Decision Tree or shallow Random Forest - with feature importance analysis</div>
+        <div class="enhanced-quiz-option" data-correct="false">Deep Gradient Boosting with 1000+ trees</div>
+        <div class="enhanced-quiz-option" data-correct="false">Highly regularized linear model only</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Exactly!</strong> Medical applications require interpretability. Decision Trees provide clear decision paths, and shallow Random Forests offer both interpretability and improved robustness while maintaining explainable feature importance.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 3: Random Forest vs Gradient Boosting Trade-off</h3>
-                        <p>What is the most important factor when choosing between Random Forest and Gradient Boosting?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> Random Forest is always better for large datasets</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) Trade-off between accuracy needs and overfitting risk/tuning complexity ✓</strong></p>
-                            <p><strong>C)</strong> Gradient Boosting is always more accurate</p>
-                            <p><strong>D)</strong> Random Forest only works with numerical data</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> The key trade-off is accuracy vs complexity: Gradient Boosting can achieve higher accuracy but requires more careful tuning and has higher overfitting risk. Random Forest is more robust and stable with minimal tuning.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz3">
+        <div class="enhanced-quiz-question">
+            <h4>Question 3: Random Forest vs Gradient Boosting Trade-off</h4>
+            <p>What is the most important factor when choosing between Random Forest and Gradient Boosting?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">Random Forest is always better for large datasets</div>
+        <div class="enhanced-quiz-option" data-correct="true">Trade-off between accuracy needs and overfitting risk/tuning complexity</div>
+        <div class="enhanced-quiz-option" data-correct="false">Gradient Boosting is always more accurate</div>
+        <div class="enhanced-quiz-option" data-correct="false">Random Forest only works with numerical data</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Perfect!</strong> The key trade-off is accuracy vs complexity: Gradient Boosting can achieve higher accuracy but requires more careful tuning and has higher overfitting risk. Random Forest is more robust and stable with minimal tuning.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 4: Evolution of Ensemble Methods</h3>
-                        <p>Which sequence best represents the evolution from simple to advanced ensemble methods?</p>
-                        <div style="margin: 1rem 0;">
-                            <p style="color: #10b981; font-weight: bold;"><strong>A) Linear Models → Decision Trees → Random Forest → Gradient Boosting → XGBoost ✓</strong></p>
-                            <p><strong>B)</strong> Decision Trees → Linear Models → XGBoost → Random Forest</p>
-                            <p><strong>C)</strong> XGBoost → Gradient Boosting → Random Forest → Decision Trees</p>
-                            <p><strong>D)</strong> Random Forest → Decision Trees → Linear Models → XGBoost</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> This sequence shows the natural progression: starting with simple linear models, moving to single decision trees, then parallel ensembles (Random Forest), sequential ensembles (Gradient Boosting), and finally optimized implementations (XGBoost).
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz4">
+        <div class="enhanced-quiz-question">
+            <h4>Question 4: Evolution of Ensemble Methods</h4>
+            <p>Which sequence best represents the evolution from simple to advanced ensemble methods?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="true">Linear Models → Decision Trees → Random Forest → Gradient Boosting → XGBoost</div>
+        <div class="enhanced-quiz-option" data-correct="false">Decision Trees → Linear Models → XGBoost → Random Forest</div>
+        <div class="enhanced-quiz-option" data-correct="false">XGBoost → Gradient Boosting → Random Forest → Decision Trees</div>
+        <div class="enhanced-quiz-option" data-correct="false">Random Forest → Decision Trees → Linear Models → XGBoost</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Excellent!</strong> This sequence shows the natural progression: starting with simple linear models, moving to single decision trees, then parallel ensembles (Random Forest), sequential ensembles (Gradient Boosting), and finally optimized implementations (XGBoost).
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 5: Bias-Variance Trade-off Understanding</h3>
-                        <p>Which statement best describes the bias-variance trade-off in the algorithms we studied?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> All algorithms have the same bias-variance characteristics</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) Linear models have high bias/low variance, decision trees have low bias/high variance ✓</strong></p>
-                            <p><strong>C)</strong> Ensemble methods always increase both bias and variance</p>
-                            <p><strong>D)</strong> XGBoost eliminates the bias-variance trade-off completely</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Linear models are consistent but potentially too simple (high bias, low variance), while decision trees are flexible but unstable (low bias, high variance). Ensemble methods help balance this trade-off.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz5">
+        <div class="enhanced-quiz-question">
+            <h4>Question 5: Bias-Variance Trade-off Understanding</h4>
+            <p>Which statement best describes the bias-variance trade-off in the algorithms we studied?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">All algorithms have the same bias-variance characteristics</div>
+        <div class="enhanced-quiz-option" data-correct="true">Linear models have high bias/low variance, decision trees have low bias/high variance</div>
+        <div class="enhanced-quiz-option" data-correct="false">Ensemble methods always increase both bias and variance</div>
+        <div class="enhanced-quiz-option" data-correct="false">XGBoost eliminates the bias-variance trade-off completely</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Correct!</strong> Linear models are consistent but potentially too simple (high bias, low variance), while decision trees are flexible but unstable (low bias, high variance). Ensemble methods help balance this trade-off.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 6: Regularization Purpose</h3>
-                        <p>What is the primary purpose of L1 and L2 regularization in machine learning?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> To make models train faster</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) To prevent overfitting by penalizing model complexity ✓</strong></p>
-                            <p><strong>C)</strong> To increase model accuracy on training data</p>
-                            <p><strong>D)</strong> To make models more interpretable</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Regularization techniques like L1 (Lasso) and L2 (Ridge) add penalties to the loss function to prevent the model from becoming too complex and overfitting to the training data.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz6">
+        <div class="enhanced-quiz-question">
+            <h4>Question 6: Regularization Purpose</h4>
+            <p>What is the primary purpose of L1 and L2 regularization in machine learning?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">To make models train faster</div>
+        <div class="enhanced-quiz-option" data-correct="true">To prevent overfitting by penalizing model complexity</div>
+        <div class="enhanced-quiz-option" data-correct="false">To increase model accuracy on training data</div>
+        <div class="enhanced-quiz-option" data-correct="false">To make models more interpretable</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Right!</strong> Regularization techniques like L1 (Lasso) and L2 (Ridge) add penalties to the loss function to prevent the model from becoming too complex and overfitting to the training data.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 7: Ensemble Method Advantages</h3>
-                        <p>Why do ensemble methods typically outperform single models?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> They always use more data</p>
-                            <p><strong>B)</strong> They are faster to train</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>C) They combine multiple perspectives to reduce individual model weaknesses ✓</strong></p>
-                            <p><strong>D)</strong> They require less hyperparameter tuning</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Ensemble methods work by combining multiple models that may make different errors, thereby reducing the impact of individual model weaknesses and improving overall performance.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz7">
+        <div class="enhanced-quiz-question">
+            <h4>Question 7: Ensemble Method Advantages</h4>
+            <p>Why do ensemble methods typically outperform single models?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">They always use more data</div>
+        <div class="enhanced-quiz-option" data-correct="false">They are faster to train</div>
+        <div class="enhanced-quiz-option" data-correct="true">They combine multiple perspectives to reduce individual model weaknesses</div>
+        <div class="enhanced-quiz-option" data-correct="false">They require less hyperparameter tuning</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Exactly!</strong> Ensemble methods work by combining multiple models that may make different errors, thereby reducing the impact of individual model weaknesses and improving overall performance.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 8: Random Forest Key Features</h3>
-                        <p>What are the two key techniques that make Random Forest effective?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> Gradient descent and regularization</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) Bootstrap sampling and feature randomness ✓</strong></p>
-                            <p><strong>C)</strong> Sequential training and residual learning</p>
-                            <p><strong>D)</strong> L1 and L2 regularization</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Random Forest uses bootstrap sampling to create diverse datasets for each tree and feature randomness to ensure trees make different splits, reducing correlation between trees.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz8">
+        <div class="enhanced-quiz-question">
+            <h4>Question 8: Random Forest Key Features</h4>
+            <p>What are the two key techniques that make Random Forest effective?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">Gradient descent and regularization</div>
+        <div class="enhanced-quiz-option" data-correct="true">Bootstrap sampling and feature randomness</div>
+        <div class="enhanced-quiz-option" data-correct="false">Sequential training and residual learning</div>
+        <div class="enhanced-quiz-option" data-correct="false">L1 and L2 regularization</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Perfect!</strong> Random Forest uses bootstrap sampling to create diverse datasets for each tree and feature randomness to ensure trees make different splits, reducing correlation between trees.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 9: Gradient Boosting Learning Process</h3>
-                        <p>How does gradient boosting differ from random forest in its learning approach?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> It uses deeper trees</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) It trains models sequentially, each learning from previous errors ✓</strong></p>
-                            <p><strong>C)</strong> It uses more data</p>
-                            <p><strong>D)</strong> It requires more computational power</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Gradient boosting trains models sequentially, with each new model specifically trained to correct the residual errors of the previous models, while Random Forest trains trees independently in parallel.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz9">
+        <div class="enhanced-quiz-question">
+            <h4>Question 9: Gradient Boosting Learning Process</h4>
+            <p>How does gradient boosting differ from random forest in its learning approach?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">It uses deeper trees</div>
+        <div class="enhanced-quiz-option" data-correct="true">It trains models sequentially, each learning from previous errors</div>
+        <div class="enhanced-quiz-option" data-correct="false">It uses more data</div>
+        <div class="enhanced-quiz-option" data-correct="false">It requires more computational power</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Correct!</strong> Gradient boosting trains models sequentially, with each new model specifically trained to correct the residual errors of the previous models, while Random Forest trains trees independently in parallel.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 10: When to Use Linear Models</h3>
-                        <p>In which scenario would you choose a linear model over ensemble methods?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> When you need maximum accuracy</p>
-                            <p><strong>B)</strong> When you have very large datasets</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>C) When you need fast inference and interpretability with limited computational resources ✓</strong></p>
-                            <p><strong>D)</strong> When your data has many missing values</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Linear models are ideal when you need fast inference and interpretability with limited computational resources. They train quickly, make predictions instantly, and provide clear coefficient interpretations.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz10">
+        <div class="enhanced-quiz-question">
+            <h4>Question 10: When to Use Linear Models</h4>
+            <p>In which scenario would you choose a linear model over ensemble methods?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">When you need maximum accuracy</div>
+        <div class="enhanced-quiz-option" data-correct="false">When you have very large datasets</div>
+        <div class="enhanced-quiz-option" data-correct="true">When you need fast inference and interpretability with limited computational resources</div>
+        <div class="enhanced-quiz-option" data-correct="false">When your data has many missing values</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Excellent!</strong> Linear models are ideal when you need fast inference and interpretability with limited computational resources. They train quickly, make predictions instantly, and provide clear coefficient interpretations.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 11: XGBoost Competitive Advantages</h3>
-                        <p>What makes XGBoost superior to traditional gradient boosting?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> It uses different algorithms</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) System optimizations, built-in regularization, and automatic missing value handling ✓</strong></p>
-                            <p><strong>C)</strong> It only works with large datasets</p>
-                            <p><strong>D)</strong> It doesn't require hyperparameter tuning</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> XGBoost improves upon gradient boosting with parallel processing, cache optimization, built-in L1/L2 regularization, automatic missing value handling, and advanced tree pruning techniques.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz11">
+        <div class="enhanced-quiz-question">
+            <h4>Question 11: XGBoost Competitive Advantages</h4>
+            <p>What makes XGBoost superior to traditional gradient boosting?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">It uses different algorithms</div>
+        <div class="enhanced-quiz-option" data-correct="true">System optimizations, built-in regularization, and automatic missing value handling</div>
+        <div class="enhanced-quiz-option" data-correct="false">It only works with large datasets</div>
+        <div class="enhanced-quiz-option" data-correct="false">It doesn't require hyperparameter tuning</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Right!</strong> XGBoost improves upon gradient boosting with parallel processing, cache optimization, built-in L1/L2 regularization, automatic missing value handling, and advanced tree pruning techniques.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 12: Feature Importance Analysis</h3>
-                        <p>Why is feature importance analysis crucial in ensemble methods?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> It makes models train faster</p>
-                            <p><strong>B)</strong> It reduces overfitting automatically</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>C) It helps understand model behavior and identify the most influential variables ✓</strong></p>
-                            <p><strong>D)</strong> It eliminates the need for data preprocessing</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Feature importance helps understand which variables drive model predictions, enables feature selection, supports model interpretation, and can reveal insights about the underlying problem domain.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz12">
+        <div class="enhanced-quiz-question">
+            <h4>Question 12: Feature Importance Analysis</h4>
+            <p>Why is feature importance analysis crucial in ensemble methods?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">It makes models train faster</div>
+        <div class="enhanced-quiz-option" data-correct="false">It reduces overfitting automatically</div>
+        <div class="enhanced-quiz-option" data-correct="true">It helps understand model behavior and identify the most influential variables</div>
+        <div class="enhanced-quiz-option" data-correct="false">It eliminates the need for data preprocessing</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Perfect!</strong> Feature importance helps understand which variables drive model predictions, enables feature selection, supports model interpretation, and can reveal insights about the underlying problem domain.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 13: Cross-Validation Purpose</h3>
-                        <p>What is the primary benefit of using cross-validation in model selection?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> It makes models more accurate</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>B) It provides more reliable estimates of model performance on unseen data ✓</strong></p>
-                            <p><strong>C)</strong> It reduces training time</p>
-                            <p><strong>D)</strong> It eliminates the need for a test set</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Cross-validation uses multiple train/validation splits to get a more robust estimate of how the model will perform on unseen data, reducing the impact of any single validation set's characteristics.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz13">
+        <div class="enhanced-quiz-question">
+            <h4>Question 13: Cross-Validation Purpose</h4>
+            <p>What is the primary benefit of using cross-validation in model selection?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">It makes models more accurate</div>
+        <div class="enhanced-quiz-option" data-correct="true">It provides more reliable estimates of model performance on unseen data</div>
+        <div class="enhanced-quiz-option" data-correct="false">It reduces training time</div>
+        <div class="enhanced-quiz-option" data-correct="false">It eliminates the need for a test set</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Exactly!</strong> Cross-validation uses multiple train/validation splits to get a more robust estimate of how the model will perform on unseen data, reducing the impact of any single validation set's characteristics.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 14: Hyperparameter Tuning Strategy</h3>
-                        <p>What is the recommended approach for hyperparameter tuning?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> Always use random search</p>
-                            <p><strong>B)</strong> Tune all parameters simultaneously from the start</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>C) Start with default parameters, then systematic tuning (grid search, then random search) ✓</strong></p>
-                            <p><strong>D)</strong> Only tune learning rate</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Best practice is to establish a baseline with default parameters, then systematically tune parameters starting with the most impactful ones, using grid search for few parameters and random search for many parameters.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz14">
+        <div class="enhanced-quiz-question">
+            <h4>Question 14: Hyperparameter Tuning Strategy</h4>
+            <p>What is the recommended approach for hyperparameter tuning?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">Always use random search</div>
+        <div class="enhanced-quiz-option" data-correct="false">Tune all parameters simultaneously from the start</div>
+        <div class="enhanced-quiz-option" data-correct="true">Start with default parameters, then systematic tuning (grid search, then random search)</div>
+        <div class="enhanced-quiz-option" data-correct="false">Only tune learning rate</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Correct!</strong> Best practice is to establish a baseline with default parameters, then systematically tune parameters starting with the most impactful ones, using grid search for few parameters and random search for many parameters.
+        </div>
+    </div>
 
-                    <div class="azbn-card">
-                        <h3>Question 15: Production Deployment Considerations</h3>
-                        <p>What is the most critical factor when deploying ML models to production?</p>
-                        <div style="margin: 1rem 0;">
-                            <p><strong>A)</strong> Using the most complex model possible</p>
-                            <p><strong>B)</strong> Achieving 100% accuracy on training data</p>
-                            <p style="color: #10b981; font-weight: bold;"><strong>C) Monitoring model performance and data drift over time ✓</strong></p>
-                            <p><strong>D)</strong> Never updating the model once deployed</p>
-                        </div>
-                        <div style="background: #f0fdf4; border: 1px solid #10b981; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                            <strong>Explanation:</strong> Production models need continuous monitoring for performance degradation, data drift, and changing patterns. Without monitoring and updating, even the best models will deteriorate over time as real-world conditions change.
-                        </div>
-                    </div>
+    <div class="enhanced-quiz-container" data-quiz-id="chapter8-quiz15">
+        <div class="enhanced-quiz-question">
+            <h4>Question 15: Production Deployment Considerations</h4>
+            <p>What is the most critical factor when deploying ML models to production?</p>
+        </div>
+        <div class="enhanced-quiz-option" data-correct="false">Using the most complex model possible</div>
+        <div class="enhanced-quiz-option" data-correct="false">Achieving 100% accuracy on training data</div>
+        <div class="enhanced-quiz-option" data-correct="true">Monitoring model performance and data drift over time</div>
+        <div class="enhanced-quiz-option" data-correct="false">Never updating the model once deployed</div>
+        <div class="enhanced-quiz-explanation">
+            <strong>Excellent!</strong> Production models need continuous monitoring for performance degradation, data drift, and changing patterns. Without monitoring and updating, even the best models will deteriorate over time as real-world conditions change.
+        </div>
+    </div>
+</div>
+<div style="text-align: center; margin: 3rem 0;">
+    <div style="padding: 2rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 12px;">
+        <h3 style="color: white; margin-bottom: 1rem;">Course Complete!</h3>
+        <p style="color: white; font-size: 1.1rem; margin-bottom: 1rem;">Congratulations! You have completed the ML Model Relationships tutorial and mastered the connections between different algorithms.</p>
+        <p style="color: white; font-size: 1rem;">You now understand how to choose the right algorithm for your specific problem and implement it successfully in production.</p>
+    </div>
+</div>
+</div>
+</section>
+</main>
+</body>
+</html>
 
-                    <div style="text-align: center; margin: 3rem 0;">
-                        <div style="padding: 2rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 12px;">
-                            <h3 style="color: white; margin-bottom: 1rem;">Course Complete!</h3>
-                            <p style="color: white; font-size: 1.1rem; margin-bottom: 1rem;">Congratulations! You have completed the ML Model Relationships tutorial and mastered the connections between different algorithms.</p>
-                            <p style="color: white; font-size: 1rem;">You now understand how to choose the right algorithm for your specific problem and implement it successfully in production.</p>
-                        </div>
-                    </div>
-                </div>
+
+                

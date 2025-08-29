@@ -6,262 +6,11 @@
     <title>Chapter 4: Ensemble Methods - The Power of Many - ML Model Relationships</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/ml-model-relationships.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-model-relationships/chapter4.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/nlp/nlp.css') }}">
-    <style>
-        /* Chapter 4 Specific Styles */
-        .ensemble-demo {
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-            border: 2px solid #14b8a6;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            position: relative;
-        }
-        
-        .ensemble-demo::before {
-            content: "Ensemble Demonstration";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: #14b8a6;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .voting-visualization {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-        
-        .model-vote {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-        
-        .model-vote:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .model-vote.correct {
-            border-color: #22c55e;
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-        }
-        
-        .model-vote.incorrect {
-            border-color: #ef4444;
-            background: linear-gradient(135deg, #fef2f2, #fee2e2);
-        }
-        
-        .vote-prediction {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .vote-confidence {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        
-        .ensemble-result {
-            background: linear-gradient(135deg, #1e40af, #3730a3);
-            color: white;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-            position: relative;
-        }
-        
-        .ensemble-result::before {
-            content: "Final Ensemble Prediction";
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            color: #1e40af;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .bagging-boosting-comparison {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .method-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        
-        .bagging-card {
-            border-left: 4px solid #3b82f6;
-        }
-        
-        .boosting-card {
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .process-flow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-        
-        .process-step {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            text-align: center;
-            min-width: 120px;
-            position: relative;
-        }
-        
-        .process-arrow {
-            font-size: 1.5rem;
-            color: #667eea;
-            font-weight: bold;
-        }
-        
-        .interactive-ensemble {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .model-selector {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-        }
-        
-        .model-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: white;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 2px solid #e2e8f0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .model-checkbox:hover {
-            border-color: #14b8a6;
-        }
-        
-        .model-checkbox.selected {
-            border-color: #14b8a6;
-            background: #f0fdfa;
-        }
-        
-        .performance-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-        
-        .metric-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 0.5rem;
-        }
-        
-        .metric-label {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        
-        .wisdom-crowds {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border-left: 4px solid #f59e0b;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .diversity-demo {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .diversity-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .diversity-high {
-            border-color: #22c55e;
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-        }
-        
-        .diversity-low {
-            border-color: #ef4444;
-            background: linear-gradient(135deg, #fef2f2, #fee2e2);
-        }
-        
-        @media (max-width: 768px) {
-            .bagging-boosting-comparison {
-                grid-template-columns: 1fr;
-            }
-            
-            .voting-visualization {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .process-flow {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .process-arrow {
-                transform: rotate(90deg);
-            }
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/ml-model-relationships/chapter4.js') }}"></script>
+
 </head>
 <body>
     <header class="azbn-header">
@@ -311,9 +60,6 @@
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
                     <div class="progress-dot completed"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
-                    <div class="progress-dot"></div>
                     <div class="progress-dot"></div>
                 </div>
 
@@ -685,288 +431,47 @@
                     <h2>Chapter 4 Quiz</h2>
                     <p>Test your understanding of ensemble methods:</p>
 
-                    <div class="quiz-section">
-                        <div class="quiz-question">
+                    <div class="enhanced-quiz-container" data-quiz-id="chapter4-quiz1">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 1: What is the main difference between bagging and boosting?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'a', true)">Bagging trains models in parallel, boosting trains sequentially</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'b', false)">Bagging is more accurate than boosting</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'c', false)">Boosting always uses decision trees</button>
-                            <button class="quiz-option" onclick="selectAnswer(1, 'd', false)">Bagging requires more data than boosting</button>
-                            <div id="q1-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Correct!</strong> This is the fundamental difference: bagging creates independent models simultaneously, while boosting builds models sequentially where each new model learns from the mistakes of previous ones.
-                            </div>
                         </div>
-
-                        <div class="quiz-question">
+                        <div class="enhanced-quiz-option" data-correct="true">Bagging trains models in parallel, boosting trains sequentially</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Bagging is more accurate than boosting</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Boosting always uses decision trees</div>
+                        <div class="enhanced-quiz-option" data-correct="false">Bagging requires more data than boosting</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Correct!</strong> This is the fundamental difference: bagging creates independent models simultaneously, while boosting builds models sequentially where each new model learns from the mistakes of previous ones.
+                        </div>
+                     </div>
+                     
+                     <div class="enhanced-quiz-container" data-quiz-id="chapter4-quiz2">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 2: Why do ensemble methods often outperform single models?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'a', false)">They always use more data</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'b', true)">Different models make different errors that can cancel out when combined</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'c', false)">They are faster to train</button>
-                            <button class="quiz-option" onclick="selectAnswer(2, 'd', false)">They require less feature engineering</button>
-                            <div id="q2-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Exactly!</strong> The wisdom of crowds principle: when diverse models make different types of errors, combining their predictions can cancel out individual mistakes, leading to more accurate overall predictions.
-                            </div>
                         </div>
-
-                        <div class="quiz-question">
+                        <div class="enhanced-quiz-option" data-correct="false">They always use more data</div>
+                        <div class="enhanced-quiz-option" data-correct="true">Different models make different errors that can cancel out when combined</div>
+                        <div class="enhanced-quiz-option" data-correct="false">They are faster to train</div>
+                        <div class="enhanced-quiz-option" data-correct="false">They require less feature engineering</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Exactly!</strong> The wisdom of crowds principle: when diverse models make different types of errors, combining their predictions can cancel out individual mistakes, leading to more accurate overall predictions.
+                        </div>
+                     </div>
+                     
+                     <div class="enhanced-quiz-container" data-quiz-id="chapter4-quiz3">
+                        <div class="enhanced-quiz-question">
                             <h4>Question 3: When would you prefer bagging over boosting?</h4>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'a', false)">When you need the highest possible accuracy</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'b', true)">When you have high-variance base models and want stability</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'c', false)">When you have very simple base models</button>
-                            <button class="quiz-option" onclick="selectAnswer(3, 'd', false)">When interpretability is most important</button>
-                            <div id="q3-explanation" style="display: none; margin-top: 1rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
-                                <strong>Perfect!</strong> Bagging is ideal for high-variance models (like deep decision trees) because averaging their predictions reduces variance and creates more stable, robust predictions.
-                            </div>
                         </div>
-
-                        <div style="text-align: center; margin: 2rem 0;">
-                            <button onclick="submitQuiz()" class="azbn-btn">Submit Quiz</button>
-                            <div id="quiz-results" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                        <div class="enhanced-quiz-option" data-correct="false">When you need the highest possible accuracy</div>
+                        <div class="enhanced-quiz-option" data-correct="true">When you have high-variance base models and want stability</div>
+                        <div class="enhanced-quiz-option" data-correct="false">When you have very simple base models</div>
+                        <div class="enhanced-quiz-option" data-correct="false">When interpretability is most important</div>
+                        <div class="enhanced-quiz-explanation">
+                            <strong>Perfect!</strong> Bagging is ideal for high-variance models (like deep decision trees) because averaging their predictions reduces variance and creates more stable, robust predictions.
                         </div>
-                    </div>
+                     </div>
                 </div>
-
-
             </div>
         </section>
     </main>
-
-    <script>
-        let quizAnswers = {};
-        let selectedModels = ['linear', 'tree'];
-        let modelPredictions = [
-            {pred: 'Yes', conf: 85, correct: true},
-            {pred: 'No', conf: 73, correct: false},
-            {pred: 'Yes', conf: 91, correct: true},
-            {pred: 'Yes', conf: 67, correct: true},
-            {pred: 'No', conf: 79, correct: false}
-        ];
-        
-        // Section Navigation
-        function showSection(sectionName) {
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionName).classList.add('active');
-            
-            document.querySelectorAll('.section-nav button').forEach(button => {
-                button.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        // Ensemble Voting Demo
-        function toggleModelPrediction(modelNum) {
-            const predElement = document.getElementById(`model${modelNum}-pred`);
-            const card = event.currentTarget;
-            
-            // Toggle prediction
-            if (modelPredictions[modelNum-1].pred === 'Yes') {
-                modelPredictions[modelNum-1].pred = 'No';
-                modelPredictions[modelNum-1].correct = false;
-            } else {
-                modelPredictions[modelNum-1].pred = 'Yes';
-                modelPredictions[modelNum-1].correct = true;
-            }
-            
-            predElement.textContent = modelPredictions[modelNum-1].pred;
-            
-            // Update card styling
-            card.classList.remove('correct', 'incorrect');
-            if (modelPredictions[modelNum-1].correct) {
-                card.classList.add('correct');
-            } else {
-                card.classList.add('incorrect');
-            }
-            
-            updateEnsembleResult();
-        }
-
-        function updateEnsembleResult() {
-            const yesVotes = modelPredictions.filter(m => m.pred === 'Yes').length;
-            const noVotes = modelPredictions.length - yesVotes;
-            const avgConfidence = modelPredictions.reduce((sum, m) => sum + m.conf, 0) / modelPredictions.length;
-            
-            document.getElementById('ensemble-prediction').textContent = yesVotes > noVotes ? 'YES' : 'NO';
-            document.getElementById('ensemble-reasoning').textContent = `${yesVotes} models vote YES, ${noVotes} vote NO`;
-            document.getElementById('ensemble-confidence').textContent = `Average confidence: ${Math.round(avgConfidence)}%`;
-        }
-
-        // Model Selection for Wisdom of Crowds
-        function toggleModelType(modelType) {
-            const checkbox = event.currentTarget;
-            const input = checkbox.querySelector('input');
-            
-            checkbox.classList.toggle('selected');
-            input.checked = checkbox.classList.contains('selected');
-            
-            if (checkbox.classList.contains('selected')) {
-                selectedModels.push(modelType);
-            } else {
-                selectedModels = selectedModels.filter(m => m !== modelType);
-            }
-            
-            updateEnsemblePerformance();
-        }
-
-        function updateEnsemblePerformance() {
-            const basePerformances = {
-                linear: 0.82,
-                tree: 0.79,
-                svm: 0.85,
-                knn: 0.76,
-                nb: 0.74
-            };
-            
-            if (selectedModels.length === 0) {
-                document.getElementById('individual-best').textContent = '0.00';
-                document.getElementById('ensemble-perf').textContent = '0.00';
-                document.getElementById('diversity-score').textContent = '0.00';
-                document.getElementById('improvement').textContent = '+0%';
-                return;
-            }
-            
-            const individualPerfs = selectedModels.map(m => basePerformances[m]);
-            const bestIndividual = Math.max(...individualPerfs);
-            
-            // Simulate diversity and ensemble performance
-            const diversity = Math.min(0.95, selectedModels.length * 0.15 + 0.1);
-            const ensemblePerf = bestIndividual + (diversity * 0.1);
-            const improvement = ((ensemblePerf - bestIndividual) / bestIndividual * 100);
-            
-            document.getElementById('individual-best').textContent = bestIndividual.toFixed(2);
-            document.getElementById('ensemble-perf').textContent = ensemblePerf.toFixed(2);
-            document.getElementById('diversity-score').textContent = diversity.toFixed(2);
-            document.getElementById('improvement').textContent = `+${improvement.toFixed(0)}%`;
-            
-            // Update explanation
-            const explanation = document.getElementById('diversity-explanation');
-            if (diversity > 0.6) {
-                explanation.innerHTML = '<h5>High Model Diversity</h5><p>Your selected models make different types of errors, leading to strong ensemble performance!</p>';
-            } else {
-                explanation.innerHTML = '<h5>Low Model Diversity</h5><p>Selected models are too similar. Try adding different algorithm types for better ensemble performance.</p>';
-            }
-        }
-
-        // Bagging Demo
-        function updateBaggingDemo() {
-            const bootstrapSize = parseInt(document.getElementById('bootstrap-size').value);
-            const numModels = parseInt(document.getElementById('num-models').value);
-            
-            document.getElementById('bootstrap-value').textContent = `${bootstrapSize}%`;
-            document.getElementById('models-value').textContent = numModels;
-            
-            const sampleSize = Math.round(1000 * bootstrapSize / 100);
-            document.getElementById('sample-info').textContent = `${numModels} × ${sampleSize} samples`;
-            
-            // Simulate bagging effects
-            const baseVariance = 0.20;
-            const varianceReduction = Math.sqrt(numModels) / numModels;
-            const newVariance = baseVariance * varianceReduction;
-            
-            const baseBias = 0.08;
-            const sampleEffect = (100 - bootstrapSize) * 0.001;
-            const newBias = baseBias + sampleEffect;
-            
-            const accuracy = 0.95 - newVariance - newBias;
-            
-            document.getElementById('bagging-variance').textContent = newVariance.toFixed(2);
-            document.getElementById('bagging-bias').textContent = newBias.toFixed(2);
-            document.getElementById('bagging-accuracy').textContent = accuracy.toFixed(2);
-        }
-
-        // Boosting Demo
-        function updateBoostingDemo() {
-            const rounds = parseInt(document.getElementById('boosting-rounds').value);
-            document.getElementById('rounds-value').textContent = rounds;
-            
-            const container = document.getElementById('boosting-sequence');
-            let html = '<div class="process-flow" style="flex-direction: column; gap: 1rem;">';
-            
-            for (let i = 1; i <= rounds; i++) {
-                const error = Math.max(0.02, 0.25 - (i * 0.03));
-                const focus = i === 1 ? 'All data equally' : `Focus on ${Math.round(error * 500)} difficult examples`;
-                
-                html += `
-                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                        <div class="process-step">Round ${i}<br><small>Error: ${(error * 100).toFixed(0)}%</small></div>
-                        <div class="process-arrow">→</div>
-                        <div class="process-step">${focus}<br><small>Train weak learner</small></div>
-                    </div>
-                `;
-                
-                if (i < rounds) {
-                    html += '<div style="text-align: center; color: #64748b; font-size: 0.9rem;">Update example weights based on errors</div>';
-                }
-            }
-            
-            html += '</div>';
-            container.innerHTML = html;
-            
-            // Update metrics
-            const finalError = Math.max(0.02, 0.25 - (rounds * 0.03));
-            const bias = Math.max(0.03, 0.15 - (rounds * 0.02));
-            const accuracy = 1 - finalError;
-            
-            document.getElementById('boosting-error').textContent = finalError.toFixed(2);
-            document.getElementById('boosting-bias').textContent = bias.toFixed(2);
-            document.getElementById('boosting-accuracy').textContent = accuracy.toFixed(2);
-        }
-
-        // Quiz Functions
-        function selectAnswer(questionNum, option, isCorrect) {
-            const question = event.target.closest('.quiz-question');
-            question.querySelectorAll('.quiz-option').forEach(btn => {
-                btn.classList.remove('selected', 'correct', 'incorrect');
-            });
-            
-            event.target.classList.add('selected');
-            quizAnswers[questionNum] = { option, isCorrect };
-        }
-
-        function submitQuiz() {
-            const totalQuestions = 3;
-            let correctAnswers = 0;
-            
-            for (let i = 1; i <= totalQuestions; i++) {
-                const question = document.querySelector(`.quiz-question:nth-child(${i})`);
-                const selectedBtn = question.querySelector('.quiz-option.selected');
-                
-                if (quizAnswers[i]) {
-                    if (quizAnswers[i].isCorrect) {
-                        selectedBtn.classList.add('correct');
-                        correctAnswers++;
-                        document.getElementById(`q${i}-explanation`).style.display = 'block';
-                    } else {
-                        selectedBtn.classList.add('incorrect');
-                        const correctBtn = question.querySelector('.quiz-option[onclick*="true"]');
-                        if (correctBtn) correctBtn.classList.add('correct');
-                    }
-                }
-            }
-            
-            const score = Math.round((correctAnswers / totalQuestions) * 100);
-            const results = document.getElementById('quiz-results');
-            
-            let message = `Score: ${correctAnswers}/${totalQuestions} (${score}%)`;
-            if (score >= 80) {
-                message += '<br>Outstanding! You understand ensemble principles and are ready for Random Forest!';
-            } else if (score >= 60) {
-                message += '<br>Good work! Review the differences between bagging and boosting.';
-            } else {
-                message += '<br>Study more! Focus on understanding why ensemble methods work and their differences.';
-            }
-            
-            results.innerHTML = message;
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateEnsembleResult();
-            updateEnsemblePerformance();
-            updateBaggingDemo();
-            updateBoostingDemo();
-        });
-    </script>
 </body>
 </html>
