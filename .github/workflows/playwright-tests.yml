@@ -98,35 +98,18 @@ jobs:
           
           if (fs.existsSync(path)) {
             const testResults = fs.readFileSync(path, 'utf8');
-            const parser = require('xml2js').Parser();
+            const comment = `## Playwright Test Results
             
-            parser.parseString(testResults, (err, result) => {
-              if (!err && result.testsuite) {
-                const suite = result.testsuite.$;
-                const tests = suite.tests;
-                const failures = suite.failures;
-                const errors = suite.errors;
-                const time = parseFloat(suite.time).toFixed(2);
-                
-                const status = (failures == 0 && errors == 0) ? '✅ PASSED' : '❌ FAILED';
-                
-                const comment = `## 🎭 Playwright Test Results ${status}
-                
-**Browser:** Chromium
-**Tests:** ${tests} total
-**Failures:** ${failures}
-**Errors:** ${errors}
-**Duration:** ${time}s
+            **Browser:** Chromium
+            **Status:** Tests completed
+            
+            [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
 
-[ View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-
-                github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: comment
-                });
-              }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
             });
           }
 
