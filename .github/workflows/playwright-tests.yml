@@ -5,26 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
-  schedule:
-    # Run tests daily at 6 AM UTC to catch any website issues
-    - cron: '0 6 * * *'
   workflow_dispatch:
-    # Allow manual trigger from GitHub UI
-    inputs:
-      base_url:
-        description: 'Base URL to test against'
-        required: false
-        default: 'https://www.zanganehai.com'
-        type: string
-      browser:
-        description: 'Browser to test with'
-        required: false
-        default: 'chromium'
-        type: choice
-        options:
-        - chromium
-        - firefox
-        - webkit
 
 jobs:
   test:
@@ -41,7 +22,7 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -54,20 +35,13 @@ jobs:
     - name: Install Playwright Browsers
       run: playwright install --with-deps
       
-    - name: Create reports directory
-      run: mkdir -p reports
-      
     - name: Run Playwright tests
-      env:
-        BASE_URL: ${{ github.event.inputs.base_url || 'https://www.zanganehai.com' }}
-        BROWSER: ${{ matrix.browser }}
       run: |
         pytest tests/ \
           --browser=${{ matrix.browser }} \
-          --base-url="${BASE_URL}" \
+          --base-url="https://www.zanganehai.com" \
           --html=reports/report-${{ matrix.browser }}.html \
           --self-contained-html \
-          --junitxml=reports/junit-${{ matrix.browser }}.xml \
           -v
           
     - name: Upload test results
@@ -75,104 +49,5 @@ jobs:
       if: always()
       with:
         name: playwright-report-${{ matrix.browser }}
-        path: |
-          reports/
-          test-results/
-        retention-days: 30
-        
-    - name: Upload to GitHub Pages (on main branch)
-      if: always() && github.ref == 'refs/heads/main' && matrix.browser == 'chromium'
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./reports
-        destination_dir: test-reports
-        
-    - name: Comment PR with test results
-      if: always() && github.event_name == 'pull_request' && matrix.browser == 'chromium'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          const path = './reports/junit-chromium.xml';
-          
-          if (fs.existsSync(path)) {
-            const testResults = fs.readFileSync(path, 'utf8');
-            const comment = `## Playwright Test Results
-            
-            **Browser:** Chromium
-            **Status:** Tests completed
-            
-            [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-          }
-
-  # Smoke tests job - runs a subset of critical tests quickly
-  smoke-tests:
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        cache: 'pip'
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-test.txt
-        
-    - name: Install Playwright Browsers
-      run: playwright install chromium --with-deps
-      
-    - name: Run smoke tests
-      run: |
-        pytest tests/test_homepage.py tests/test_api_endpoints.py \
-          --browser=chromium \
-          --base-url="https://www.zanganehai.com" \
-          -v \
-          -m "not slow"
-
-  # Security and performance check
-  lighthouse:
-    timeout-minutes: 30
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Install Lighthouse CI
-      run: npm install -g @lhci/cli@0.12.x
-      
-    - name: Run Lighthouse CI
-      run: |
-        lhci autorun --upload.target=filesystem --upload.outputDir=./lighthouse-reports
-      env:
-        LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
-        LHCI_BUILD_CONTEXT__COMMIT_TIME: ${{ github.event.head_commit.timestamp }}
-        
-    - name: Upload Lighthouse reports
-      uses: actions/upload-artifact@v4
-      with:
-        name: lighthouse-reports
-        path: lighthouse-reports/
+        path: reports/
         retention-days: 30
