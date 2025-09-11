@@ -1,4 +1,5 @@
-name: Playwright Tests with Working Allure Reports
+# Replace .github/workflows/playwright-tests.yml with this:
+name: Playwright Tests with HTML Reports
 
 on:
   push:
@@ -15,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        browser: [chromium]  # Start with just chromium to test
         
     steps:
     - name: Checkout repository
@@ -35,79 +36,18 @@ jobs:
     - name: Install Playwright Browsers
       run: playwright install --with-deps
       
-    - name: Create reports directories
-      run: |
-        mkdir -p reports
-        mkdir -p allure-results
-        
-    - name: Run Playwright tests with Allure
+    - name: Run Playwright tests
       run: |
         pytest tests/ \
           --browser=${{ matrix.browser }} \
           --base-url="https://www.zanganehai.com" \
-          --html=reports/report-${{ matrix.browser }}.html \
+          --html=reports/report.html \
           --self-contained-html \
-          --alluredir=allure-results \
           -v
           
-    - name: Upload HTML test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: html-report-${{ matrix.browser }}
-        path: reports/
-        retention-days: 30
-        
-    - name: Upload Allure test results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: allure-results-${{ matrix.browser }}
-        path: allure-results/
-        retention-days: 30
-
-  # Generate Allure report using different method
-  allure-report:
-    runs-on: ubuntu-latest
-    needs: test
-    if: always()
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Download all Allure results
-      uses: actions/download-artifact@v4
-      with:
-        pattern: allure-results-*
-        path: allure-results
-        merge-multiple: true
-        
-    - name: Setup Java (required for Allure)
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'microsoft'
-        java-version: '17'
-        
-    - name: Install Allure CLI
-      run: |
-        wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
-        tar -zxf allure-2.24.0.tgz
-        sudo mv allure-2.24.0 /opt/allure
-        sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-        
-    - name: Generate Allure Report
-      run: |
-        allure generate allure-results --clean -o allure-report
-        
-    - name: Add index.html for GitHub Pages
-      run: |
-        echo '<meta http-equiv="refresh" content="0; url=./allure-report/index.html" />' > index.html
-        
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        keep_files: false
+        publish_dir: reports
