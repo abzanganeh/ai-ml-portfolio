@@ -8,7 +8,7 @@ class TestBlog:
         """Test blog page displays correctly"""
         page.goto(f"{base_url}/blog")
         
-        expect(page).to_have_title("Blog")
+        expect(page).to_have_title("ML Blog - Alireza Barzin Zanganeh - ML/Data Science Portfolio")
         
         # Check for blog content
         blog_posts = page.locator(".blog-post, .post, [data-testid='blog-post']")
@@ -33,5 +33,5 @@ class TestBlog:
             post_links.first.click()
             
             # Should navigate to blog post detail
-            expect(page.url).to_contain("/blog/")
+            expect(page).to_have_url(re.compile(r".*/blog/.*"))
             expect(page.url).not_to_equal(f"{base_url}/blog")

@@ -198,7 +198,7 @@ class TestProjects:
         page.goto(f"{base_url}/projects/")
         
         # Test mobile viewport
-        page.set_viewport_size(375, 667)
+        page.set_viewport_size({"width": 375, "height": 667})
         expect(page.locator(".projects-grid")).to_be_visible()
         
         # Test tablet viewport
