@@ -83,6 +83,10 @@ jobs:
         
         find all-reports -name "*.html" -exec cp {} final-reports/ \;
         
+        # Get current date and time
+        CURRENT_DATE=$(date '+%B %d, %Y at %H:%M UTC')
+        
+        # Create HTML with placeholder
         cat > final-reports/index.html << 'EOF'
         <!DOCTYPE html>
         <html>
@@ -205,13 +209,16 @@ jobs:
                 
                 <div class="meta">
                     <p><strong>Test Target:</strong> https://www.zanganehai.com</p>
-                    <p><strong>Generated:</strong> $CURRENT_DATE</p>
+                    <p><strong>Generated:</strong> DATE_PLACEHOLDER</p>
                     <p><strong>Test Framework:</strong> Playwright with Pytest</p>
                 </div>
             </div>
         </body>
         </html>
         EOF
+        
+        # Replace the placeholder with actual date
+        sed -i "s/DATE_PLACEHOLDER/$CURRENT_DATE/g" final-reports/index.html
         
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
@@ -221,4 +228,3 @@ jobs:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-      
