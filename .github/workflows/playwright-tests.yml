@@ -73,7 +73,9 @@ jobs:
     - name: Download all test reports
       uses: actions/download-artifact@v4
       with:
+        pattern: playwright-report-*
         path: all-reports
+        merge-multiple: true
         
     - name: Create index page
       run: |
@@ -121,7 +123,6 @@ jobs:
                     border-radius: 12px; 
                     background: #ffffff;
                     transition: all 0.3s ease;
-                    position: relative;
                 }
                 .report-card:hover { 
                     transform: translateY(-2px); 
@@ -213,10 +214,10 @@ jobs:
         EOF
         
     - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: final-reports
         
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
