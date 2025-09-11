@@ -135,7 +135,23 @@ TUTORIALS_DATA = [
             <li>Test feature importance</li>
         </ol>
         '''
+    },
+    {
+        'title': 'Complete Exploratory Data Analysis: LeetCode Dataset',
+        'slug': 'complete-eda-leetcode',
+        'description': 'Master the complete EDA workflow from data loading to insights, using a real LeetCode dataset with 1825 coding problems.',
+        'category': 'Data Science',
+        'difficulty': 'intermediate',
+        'duration': '90 minutes',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/complete-eda-leetcode/index.html',
+        'published': True,
+        'excerpt': 'Learn the complete EDA process: missing data strategies, outlier detection, visualization techniques, and statistical insights.',
+        'tags': 'eda,pandas,matplotlib,seaborn,data-cleaning,statistics,visualization'
     }
+
+    
 ]
 
 def get_tutorial_by_slug(slug):
