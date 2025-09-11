@@ -1,4 +1,4 @@
-import re  # Add missing import
+import re  
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -10,10 +10,10 @@ class TestBlog:
         page.goto(f"{base_url}/blog")
         page.wait_for_load_state("networkidle")
         
-        # More flexible title matching
+      
         expect(page).to_have_title(re.compile(r".*Blog.*", re.IGNORECASE))
         
-        # Check for blog content with more flexible selectors
+     
         blog_posts = page.locator(".blog-post, .post, [data-testid='blog-post'], .card, article, .content")
         
         # If blog posts exist, check they're visible, otherwise just verify page loaded
@@ -54,6 +54,7 @@ class TestBlog:
             
             # Should navigate to blog post detail
             expect(page).to_have_url(re.compile(r".*/blog/.*"))
-            expect(page.url).not_to_equal(f"{base_url}/blog")
+            # Fix: Use assertion instead of expect for string comparison
+            assert page.url != f"{base_url}/blog", f"Should navigate away from blog listing page. Current URL: {page.url}"
         else:
             print("No blog post links found to test navigation")

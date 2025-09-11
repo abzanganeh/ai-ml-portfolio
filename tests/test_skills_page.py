@@ -42,8 +42,10 @@ class TestSkillsPage:
         # Fix: Use flexible title matching instead of exact match
         expect(page).to_have_title(re.compile(r".*About.*", re.IGNORECASE))
         
-        # Check for about content
-        expect(page.locator("h1, h2")).to_be_visible()
+        # Fix: Handle multiple headings - check that at least one is visible
+        headings = page.locator("h1, h2")
+        assert headings.count() > 0, "About page should have at least one heading"
+        expect(headings.first).to_be_visible()
         
         # Optional: Check for typical about page content
         about_content = page.locator(".about, .bio, .introduction, [data-testid='about']")
