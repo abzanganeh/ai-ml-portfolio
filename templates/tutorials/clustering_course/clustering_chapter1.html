@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Introduction to Clustering - ML Fundamentals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml_fundamentals/chapter1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .visualization-placeholder {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .algorithm-step {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .demo-controls {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .data-point {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 2px;
+        }
+        .cluster-visualization {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            min-height: 300px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/ml-fundamentals" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <img src="/static/images/logo.png" alt="Logo" style="height: 40px;">
+                    <span>ML Fundamentals - Clustering Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to Course</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter2" class="azbn-btn" style="text-decoration: none;">Chapter 2: Distance Metrics →</a>
+                </div>
+
+                <h1>Chapter 1: Introduction to Clustering and Unsupervised Learning</h1>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+                    Discover the fundamental concepts of unsupervised learning and clustering analysis, from basic theory to mathematical foundations.
+                </p>
+
+                <div class="learning-objectives-card">
+                    <h2>🎯 Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the fundamental differences between supervised and unsupervised learning</li>
+                        <li>Master the core concepts and terminology of clustering analysis</li>
+                        <li>Learn the mathematical foundations of similarity and dissimilarity measures</li>
+                        <li>Explore various types of clustering problems and their applications</li>
+                        <li>Recognize when to apply clustering in real-world scenarios</li>
+                        <li>Understand the challenges and assumptions of clustering algorithms</li>
+                    </ul>
+                </div>
+
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('introduction')">What is Clustering?</button>
+                    <button onclick="showSection('unsupervised')">Unsupervised Learning</button>
+                    <button onclick="showSection('types')">Types of Clustering</button>
+                    <button onclick="showSection('applications')">Real-World Applications</button>
+                    <button onclick="showSection('challenges')">Challenges & Assumptions</button>
+                    <button onclick="showSection('mathematical')">Mathematical Foundations</button>
+                    <button onclick="showSection('demo')">Interactive Demo</button>
+                    <button onclick="showSection('quiz')">Quiz</button>
+                </div>
+
+                <!-- Introduction Section -->
+                <div id="introduction" class="content-section active">
+                    <h2>What is Clustering?</h2>
+                    
+                    <p>Clustering is one of the most fundamental and widely used techniques in machine learning and data analysis. At its core, clustering is the task of organizing data points into groups (clusters) such that points within the same group are more similar to each other than to points in other groups.</p>
+
+                    <div class="formula-box">
+                        <h3>📊 Mathematical Definition of Clustering</h3>
+                        <p>Given a dataset X = {x₁, x₂, ..., xₙ} where each xᵢ represents a data point in d-dimensional space, clustering aims to partition X into k clusters C = {C₁, C₂, ..., Cₖ} such that:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>C₁ ∪ C₂ ∪ ... ∪ Cₖ = X</strong><br>
+                            <strong>Cᵢ ∩ Cⱼ = ∅ for i ≠ j</strong>
+                        </div>
+                        <p>Where each cluster Cᵢ contains data points that are similar according to some distance or similarity metric.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>📈 Visualization: Basic Clustering Example</h4>
+                        <p><strong>Image Description:</strong> A 2D scatter plot showing 30 data points in three natural groups. The first group (red circles) is located in the upper-left quadrant, the second group (blue triangles) in the upper-right, and the third group (green squares) in the lower-center. Each group contains roughly 10 points clustered closely together with clear separation between groups. Dashed circles outline each cluster boundary.</p>
+                        <p><em>This will be replaced with an actual matplotlib-generated clustering visualization</em></p>
+                    </div>
+
+                    <h3>🔍 Key Concepts and Terminology</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🎯 Cluster</h4>
+                            <p>A group of data points that are similar to each other and dissimilar to points in other clusters. Mathematically, a cluster is a subset of the dataset.</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>📏 Centroid</h4>
+                            <p>The center point of a cluster, typically calculated as the mean of all points in the cluster: <strong>μᵢ = (1/|Cᵢ|) Σ_{x∈Cᵢ} x</strong></p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>📐 Intra-cluster Distance</h4>
+                            <p>The distance between points within the same cluster. Lower intra-cluster distances indicate more cohesive clusters.</p>
+                        </div>
+                        
+                        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                            <h4>🔄 Inter-cluster Distance</h4>
+                            <p>The distance between different clusters. Higher inter-cluster distances indicate better cluster separation.</p>
+                        </div>
+                    </div>
+
+                    <h3>🔬 The Clustering Objective</h3>
+                    <p>The fundamental goal of clustering is to maximize intra-cluster similarity while maximizing inter-cluster dissimilarity. This can be formalized mathematically as an optimization problem:</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Optimization Objective</h4>
+                        <p>Minimize the within-cluster sum of squares (WCSS):</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>WCSS = Σᵢ₌₁ᵏ Σ_{x∈Cᵢ} ||x - μᵢ||²</strong>
+                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>k</strong> = number of clusters</li>
+                            <li><strong>Cᵢ</strong> = the i-th cluster</li>
+                            <li><strong>μᵢ</strong> = centroid of cluster i</li>
+                            <li><strong>||x - μᵢ||²</strong> = squared Euclidean distance</li>
+                        </ul>
+                    </div>
+
+                    <h3>🎲 Why is Clustering Challenging?</h3>
+                    <p>Clustering is considered one of the most challenging problems in machine learning for several mathematical and practical reasons:</p>
+                    
+                    <ol>
+                        <li><strong>No Ground Truth:</strong> Unlike supervised learning, there's no "correct" answer to guide the algorithm</li>
+                        <li><strong>Subjectivity:</strong> The definition of "similarity" depends on the application and domain</li>
+                        <li><strong>Curse of Dimensionality:</strong> Distance metrics become less meaningful in high-dimensional spaces</li>
+                        <li><strong>Scalability:</strong> Many algorithms have high computational complexity O(n²) or worse</li>
+                        <li><strong>Parameter Selection:</strong> Choosing the number of clusters k is often non-trivial</li>
+                    </ol>
+                </div>
+
+                <!-- Unsupervised Learning Section -->
+                <div id="unsupervised" class="content-section">
+                    <h2>Understanding Unsupervised Learning</h2>
+                    
+                    <p>To fully appreciate clustering, we must understand its place within the broader context of machine learning. Clustering belongs to the category of <strong>unsupervised learning</strong>, which fundamentally differs from supervised learning in both methodology and objectives.</p>
+
+                    <h3>🔄 Supervised vs Unsupervised Learning</h3>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Supervised Learning</th>
+                                <th>Unsupervised Learning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Data Structure</strong></td>
+                                <td>Labeled data: (X, y) pairs</td>
+                                <td>Unlabeled data: X only</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Objective</strong></td>
+                                <td>Learn mapping f: X → y</td>
+                                <td>Discover hidden patterns in X</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Evaluation</strong></td>
+                                <td>Compare predictions with true labels</td>
+                                <td>Internal validation metrics</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Examples</strong></td>
+                                <td>Classification, Regression</td>
+                                <td>Clustering, Dimensionality Reduction</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mathematical Goal</strong></td>
+                                <td>Minimize prediction error</td>
+                                <td>Maximize data structure discovery</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="visualization-placeholder">
+                        <h4>📊 Visualization: Learning Paradigms Comparison</h4>
+                        <p><strong>Image Description:</strong> Two side-by-side 2D plots. Left plot (Supervised): scattered points in red and blue with a clear decision boundary line separating them, labeled "Known Classes". Right plot (Unsupervised): same points but all in gray color with question marks, and dashed circles showing potential cluster groupings, labeled "Hidden Patterns to Discover".</p>
+                        <p><em>This will show the fundamental difference between having labels vs discovering structure</em></p>
+                    </div>
+
+                    <h3>🧠 The Mathematical Framework of Unsupervised Learning</h3>
+                    
+                    <p>In unsupervised learning, we work with a dataset D = {x₁, x₂, ..., xₙ} where each xᵢ ∈ ℝᵈ is a d-dimensional feature vector. Our goal is to discover hidden structures, patterns, or relationships within this data without any external guidance.</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Unsupervised Learning Objectives</h4>
+                        <p>Common mathematical objectives in unsupervised learning include:</p>
+                        <ol>
+                            <li><strong>Density Estimation:</strong> Estimate p(x) - the probability density function of the data</li>
+                            <li><strong>Dimensionality Reduction:</strong> Find a lower-dimensional representation: f: ℝᵈ → ℝᵏ where k < d</li>
+                            <li><strong>Clustering:</strong> Partition data into meaningful groups</li>
+                            <li><strong>Association Rule Learning:</strong> Discover relationships between variables</li>
+                        </ol>
+                    </div>
+
+                    <h3>🎭 Types of Unsupervised Learning</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🎯 Clustering</h4>
+                            <p><strong>Goal:</strong> Group similar data points</p>
+                            <p><strong>Algorithms:</strong> K-means, Hierarchical, DBSCAN</p>
+                            <p><strong>Output:</strong> Cluster assignments</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>📐 Dimensionality Reduction</h4>
+                            <p><strong>Goal:</strong> Reduce feature space</p>
+                            <p><strong>Algorithms:</strong> PCA, t-SNE, UMAP</p>
+                            <p><strong>Output:</strong> Lower-dimensional representation</p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>🔍 Anomaly Detection</h4>
+                            <p><strong>Goal:</strong> Identify outliers</p>
+                            <p><strong>Algorithms:</strong> Isolation Forest, LOF</p>
+                            <p><strong>Output:</strong> Anomaly scores</p>
+                        </div>
+                        
+                        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                            <h4>🔗 Association Rules</h4>
+                            <p><strong>Goal:</strong> Find frequent patterns</p>
+                            <p><strong>Algorithms:</strong> Apriori, FP-Growth</p>
+                            <p><strong>Output:</strong> Rule sets</p>
+                        </div>
+                    </div>
+
+                    <h3>⚖️ The Challenge of Validation</h3>
+                    <p>One of the most significant challenges in unsupervised learning is validation. Without ground truth labels, how do we know if our clustering is "good"? This leads us to several important concepts:</p>
+
+                    <div class="formula-box">
+                        <h4>📊 Internal Validation Measures</h4>
+                        <p>Since we lack external labels, we must rely on internal measures of cluster quality:</p>
+                        <ul>
+                            <li><strong>Silhouette Coefficient:</strong> Measures how similar an object is to its own cluster compared to other clusters</li>
+                            <li><strong>Calinski-Harabasz Index:</strong> Ratio of between-cluster to within-cluster variance</li>
+                            <li><strong>Davies-Bouldin Index:</strong> Average similarity ratio of each cluster with its most similar cluster</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Types of Clustering Section -->
+                <div id="types" class="content-section">
+                    <h2>Types of Clustering Methods</h2>
+                    
+                    <p>Clustering algorithms can be categorized into several distinct types, each with its own mathematical foundations, assumptions, and optimal use cases. Understanding these categories is crucial for selecting the appropriate algorithm for your specific problem.</p>
+
+                    <h3>🎯 Partitional Clustering</h3>
+                    <p>Partitional clustering methods divide the dataset into k non-overlapping clusters. The most famous example is K-means clustering.</p>
+
+                    <div class="algorithm-step">
+                        <h4>💡 Characteristics of Partitional Clustering:</h4>
+                        <ul>
+                            <li><strong>Fixed Number of Clusters:</strong> The number of clusters k must be specified in advance</li>
+                            <li><strong>Non-overlapping:</strong> Each data point belongs to exactly one cluster</li>
+                            <li><strong>Optimization-based:</strong> Typically minimize an objective function</li>
+                            <li><strong>Computational Complexity:</strong> Generally O(nkt) where t is the number of iterations</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🎯 Visualization: Partitional Clustering Example</h4>
+                        <p><strong>Image Description:</strong> A 2D plot showing K-means clustering with k=3. Data points are colored according to their cluster assignment (red, blue, green). Three large X marks indicate cluster centroids. Voronoi diagram boundaries show the decision regions for each cluster. Points clearly belong to one cluster each with no overlap.</p>
+                        <p><em>This demonstrates the non-overlapping nature of partitional clustering</em></p>
+                    </div>
+
+                    <h3>🌳 Hierarchical Clustering</h3>
+                    <p>Hierarchical clustering creates a tree-like structure of clusters, representing nested groupings at different levels of granularity.</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>⬆️ Agglomerative (Bottom-up)</h4>
+                            <p><strong>Process:</strong> Start with each point as its own cluster, then merge closest clusters iteratively</p>
+                            <p><strong>Mathematical Foundation:</strong></p>
+                            <div style="background: white; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0;">
+                                <code>
+                                Initialize: C = {{x₁}, {x₂}, ..., {xₙ}}<br>
+                                While |C| > 1:<br>
+                                &nbsp;&nbsp;Find closest clusters Cᵢ, Cⱼ<br>
+                                &nbsp;&nbsp;Merge: C = C ∪ {Cᵢ ∪ Cⱼ} \ {Cᵢ, Cⱼ}
+                                </code>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>⬇️ Divisive (Top-down)</h4>
+                            <p><strong>Process:</strong> Start with all points in one cluster, then recursively split clusters</p>
+                            <p><strong>Mathematical Foundation:</strong></p>
+                            <div style="background: white; padding: 0.5rem; border-radius: 4px; margin: 0.5rem 0;">
+                                <code>
+                                Initialize: C = {X}<br>
+                                While stopping criterion not met:<br>
+                                &nbsp;&nbsp;Select cluster Cᵢ to split<br>
+                                &nbsp;&nbsp;Find optimal split of Cᵢ into C₁, C₂
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🌳 Visualization: Dendrogram Example</h4>
+                        <p><strong>Image Description:</strong> A hierarchical tree diagram (dendrogram) showing the merging process of 8 data points labeled A through H. The y-axis shows distance/height from 0 to 4. Branches merge at different heights indicating when clusters were combined. Three main clusters are visible when cut at height 2.5, shown with a red dashed horizontal line.</p>
+                        <p><em>This will illustrate how hierarchical clustering creates a nested structure of clusters</em></p>
+                    </div>
+
+                    <h3>🏠 Density-Based Clustering</h3>
+                    <p>Density-based methods identify clusters as areas of high density separated by areas of low density. They can discover clusters of arbitrary shape and automatically handle noise.</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Mathematical Foundation of Density-Based Clustering</h4>
+                        <p>Key concepts in density-based clustering:</p>
+                        <ul>
+                            <li><strong>ε-neighborhood:</strong> Nₑ(x) = {y ∈ D | dist(x,y) ≤ ε}</li>
+                            <li><strong>Core point:</strong> A point x where |Nₑ(x)| ≥ minPts</li>
+                            <li><strong>Density-reachable:</strong> Point y is density-reachable from x if there exists a chain of core points connecting them</li>
+                            <li><strong>Density-connected:</strong> Points x and y are density-connected if both are density-reachable from some point z</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🌟 Visualization: DBSCAN Clustering Example</h4>
+                        <p><strong>Image Description:</strong> A 2D scatter plot showing DBSCAN results with irregularly shaped clusters. Three distinct regions: (1) dense circular cluster in red, (2) crescent-shaped cluster in blue, (3) elongated cluster in green. Black dots represent noise points. Larger dots indicate core points, medium dots are border points, small dots are noise.</p>
+                        <p><em>This demonstrates DBSCAN's ability to find arbitrary-shaped clusters and identify outliers</em></p>
+                    </div>
+
+                    <h3>📊 Model-Based Clustering</h3>
+                    <p>Model-based clustering assumes that data is generated from a mixture of probability distributions. The most common approach is Gaussian Mixture Models (GMM).</p>
+
+                    <div class="formula-box">
+                        <h4>🎲 Gaussian Mixture Model Mathematics</h4>
+                        <p>A GMM represents the data as a mixture of k Gaussian distributions:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>p(x) = Σᵢ₌₁ᵏ πᵢ 𝒩(x | μᵢ, Σᵢ)</strong>
+                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>πᵢ</strong> = mixing coefficient (prior probability of cluster i)</li>
+                            <li><strong>𝒩(x | μᵢ, Σᵢ)</strong> = multivariate Gaussian with mean μᵢ and covariance Σᵢ</li>
+                            <li><strong>Σᵢ₌₁ᵏ πᵢ = 1</strong> (mixing coefficients sum to 1)</li>
+                        </ul>
+                    </div>
+
+                    <h3>📋 Comparison of Clustering Types</h3>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Cluster Shape</th>
+                                <th>Number of Clusters</th>
+                                <th>Handles Noise</th>
+                                <th>Computational Complexity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>K-means</strong></td>
+                                <td>Spherical</td>
+                                <td>Pre-specified</td>
+                                <td>No</td>
+                                <td>O(nkt)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hierarchical</strong></td>
+                                <td>Any</td>
+                                <td>Determined by cut</td>
+                                <td>Limited</td>
+                                <td>O(n³)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DBSCAN</strong></td>
+                                <td>Arbitrary</td>
+                                <td>Automatic</td>
+                                <td>Yes</td>
+                                <td>O(n log n)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GMM</strong></td>
+                                <td>Elliptical</td>
+                                <td>Pre-specified</td>
+                                <td>Limited</td>
+                                <td>O(nkt)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Applications Section -->
+                <div id="applications" class="content-section">
+                    <h2>Real-World Applications of Clustering</h2>
+                    
+                    <p>Clustering algorithms have found applications across virtually every domain where data analysis is performed. Understanding these applications helps contextualize the theoretical concepts and demonstrates the practical importance of clustering techniques.</p>
+
+                    <h3>🛒 Customer Segmentation and Marketing</h3>
+                    <p>One of the most commercially successful applications of clustering is in customer segmentation, where businesses group customers based on purchasing behavior, demographics, and preferences.</p>
+
+                    <div class="algorithm-step">
+                        <h4>📊 Mathematical Approach to Customer Segmentation:</h4>
+                        <p>Given customer data matrix X ∈ ℝⁿˣᵈ where:</p>
+                        <ul>
+                            <li>n = number of customers</li>
+                            <li>d = number of features (age, income, purchase frequency, etc.)</li>
+                            <li>xᵢⱼ = j-th feature value for customer i</li>
+                        </ul>
+                        <p>The goal is to partition customers into k segments such that customers within each segment have similar purchasing patterns and can be targeted with tailored marketing strategies.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🎯 Visualization: Customer Segmentation Example</h4>
+                        <p><strong>Image Description:</strong> A 3D scatter plot with axes labeled "Annual Income ($)", "Age (years)", and "Spending Score (1-100)". Four distinct clusters are visible: (1) Young, low income, low spending (blue), (2) Young, low income, high spending (red), (3) Middle-aged, high income, high spending (green), (4) Older, high income, low spending (purple). Each cluster has a 3D ellipsoid boundary showing the cluster region.</p>
+                        <p><em>This demonstrates how customers naturally group into distinct behavioral segments</em></p>
+                    </div>
+
+                    <h3>🧬 Bioinformatics and Genomics</h3>
+                    <p>In bioinformatics, clustering is used to analyze gene expression data, protein sequences, and other biological data to understand relationships and functions.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🧬 Gene Expression Analysis</h4>
+                            <p><strong>Problem:</strong> Group genes with similar expression patterns</p>
+                            <p><strong>Data:</strong> Expression levels across different conditions/tissues</p>
+                            <p><strong>Mathematics:</strong> Correlation-based distance metrics</p>
+                            <p><strong>Insight:</strong> Co-expressed genes often have related functions</p>
+                        </div>
+                        
+                        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                            <h4>🔬 Protein Structure Analysis</h4>
+                            <p><strong>Problem:</strong> Classify proteins by structural similarity</p>
+                            <p><strong>Data:</strong> 3D coordinates, amino acid sequences</p>
+                            <p><strong>Mathematics:</strong> RMSD (Root Mean Square Deviation)</p>
+                            <p><strong>Insight:</strong> Similar structures suggest similar functions</p>
+                        </div>
+                    </div>
+
+                    <h3>🖼️ Image Segmentation and Computer Vision</h3>
+                    <p>Clustering plays a crucial role in computer vision for tasks like image segmentation, object recognition, and feature extraction.</p>
+
+                    <div class="formula-box">
+                        <h4>🎨 Mathematical Framework for Image Segmentation</h4>
+                        <p>In image segmentation, we treat each pixel as a data point in a feature space:</p>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>x = [R, G, B, X, Y]ᵀ</strong>
+                        </div>
+                        <p>Where R, G, B are color values and X, Y are spatial coordinates. The goal is to partition pixels into regions corresponding to different objects or textures.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🖼️ Visualization: Image Segmentation Process</h4>
+                        <p><strong>Image Description:</strong> Three side-by-side images: (1) Original photo of a landscape with sky, mountains, and lake, (2) Same image with each pixel colored by its cluster assignment - sky in blue, mountains in brown, lake in dark blue, (3) Segmentation boundaries overlaid as white lines on the original image, clearly delineating the three regions.</p>
+                        <p><em>This shows how clustering can automatically identify distinct regions in images</em></p>
+                    </div>
+
+                    <h3>📱 Social Network Analysis</h3>
+                    <p>In social networks, clustering helps identify communities, influence groups, and patterns of interaction.</p>
+
+                    <div class="algorithm-step">
+                        <h4>🌐 Graph-Based Clustering Mathematics:</h4>
+                        <p>Given a graph G = (V, E) representing a social network:</p>
+                        <ul>
+                            <li><strong>V</strong> = set of users/nodes</li>
+                            <li><strong>E</strong> = set of connections/edges</li>
+                            <li><strong>Adjacency Matrix A:</strong> Aᵢⱼ = 1 if edge exists between users i and j</li>
+                        </ul>
+                        <p>Community detection algorithms like modularity maximization aim to partition V into communities with high internal connectivity and low external connectivity.</p>
+                    </div>
+
+                    <h3>💰 Financial Services and Fraud Detection</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>💳 Credit Card Fraud Detection</h4>
+                            <p><strong>Approach:</strong> Cluster normal transactions and identify outliers</p>
+                            <p><strong>Features:</strong> Amount, time, location, merchant type</p>
+                            <p><strong>Algorithm:</strong> Isolation Forest, DBSCAN for anomaly detection</p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>📊 Portfolio Management</h4>
+                            <p><strong>Approach:</strong> Group stocks with similar risk/return profiles</p>
+                            <p><strong>Features:</strong> Returns, volatility, correlations</p>
+                            <p><strong>Algorithm:</strong> K-means, hierarchical clustering</p>
+                        </div>
+                    </div>
+
+                    <h3>🏥 Healthcare and Medical Diagnosis</h3>
+                    <p>Medical applications of clustering range from patient stratification to drug discovery and epidemiological studies.</p>
+
+                    <div class="visualization-placeholder">
+                        <h4>🏥 Visualization: Patient Clustering for Personalized Medicine</h4>
+                        <p><strong>Image Description:</strong> A 2D projection of high-dimensional patient data showing three distinct clusters: (1) Young patients with mild symptoms (green cluster, lower-left), (2) Middle-aged patients with moderate symptoms (blue cluster, center), (3) Elderly patients with severe symptoms (red cluster, upper-right). Each point represents a patient, with medical icons indicating different treatment protocols for each cluster.</p>
+                        <p><em>This illustrates how patient clustering enables personalized treatment strategies</em></p>
+                    </div>
+
+                    <h3>📚 Document Classification and Text Mining</h3>
+                    <p>In natural language processing, clustering helps organize documents, identify topics, and analyze sentiment patterns.</p>
+
+                    <div class="formula-box">
+                        <h4>📝 Text Clustering Mathematics</h4>
+                        <p>Documents are typically represented using the Vector Space Model:</p>
+                        <ul>
+                            <li><strong>TF-IDF Vector:</strong> xᵢⱼ = tfᵢⱼ × log(N/dfⱼ)</li>
+                            <li><strong>tfᵢⱼ:</strong> Term frequency of word j in document i</li>
+                            <li><strong>dfⱼ:</strong> Document frequency of word j</li>
+                            <li><strong>N:</strong> Total number of documents</li>
+                        </ul>
+                        <p>Cosine similarity is often used as the distance metric for text clustering due to the high dimensionality and sparsity of text data.</p>
+                    </div>
+                </div>
+
+                <!-- Challenges Section -->
+                <div id="challenges" class="content-section">
+                    <h2>Challenges and Assumptions in Clustering</h2>
+                    
+                    <p>While clustering is a powerful tool for data analysis, it comes with significant challenges and limitations that must be understood to apply these techniques effectively. These challenges stem from both theoretical limitations and practical implementation issues.</p>
+
+                    <h3>🎯 The Fundamental Challenge: Defining Similarity</h3>
+                    <p>The core challenge in clustering is that the notion of "similarity" is inherently subjective and context-dependent. What constitutes a meaningful cluster varies dramatically across domains and applications.</p>
+
+                    <div class="visualization-placeholder">
+                        <h4>❓ Visualization: Subjective Nature of Clustering</h4>
+                        <p><strong>Image Description:</strong> Four panels showing the same 2D data points clustered in different ways: (1) Two vertical clusters, (2) Two horizontal clusters, (3) Three circular clusters, (4) One large cluster with outliers. Each clustering is mathematically valid but represents different interpretations of the data structure. A question mark in the center asks "Which clustering is correct?"</p>
+                        <p><em>This demonstrates that multiple valid clusterings can exist for the same dataset</em></p>
+                    </div>
+
+                    <h3>📐 The Curse of Dimensionality</h3>
+                    <p>As the number of features increases, distance-based clustering algorithms face fundamental mathematical challenges that can render them ineffective.</p>
+
+                    <div class="formula-box">
+                        <h4>📊 Mathematical Analysis of High-Dimensional Distance</h4>
+                        <p>In high-dimensional spaces, the ratio of the maximum to minimum distance approaches 1:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>lim_{d→∞} (d_max - d_min) / d_min → 0</strong>
+                        </div>
+                        <p>This phenomenon, known as the "concentration of distances," means that all points appear equidistant in high-dimensional spaces, making clustering based on distance metrics ineffective.</p>
+                        
+                        <h5>Consequences for Clustering:</h5>
+                        <ul>
+                            <li>Distance metrics lose discriminative power</li>
+                            <li>Nearest neighbor relationships become less meaningful</li>
+                            <li>Cluster boundaries become less distinct</li>
+                            <li>Traditional algorithms may fail to find meaningful clusters</li>
+                        </ul>
+                    </div>
+
+                    <h3>🔢 The Parameter Selection Problem</h3>
+                    <p>Most clustering algorithms require the specification of parameters that significantly affect the results, yet there's often no principled way to choose these parameters.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #ffebee; padding: 1rem; border-radius: 8px;">
+                            <h4>⚡ K-means: Number of Clusters (k)</h4>
+                            <p><strong>Challenge:</strong> How to choose k?</p>
+                            <p><strong>Methods:</strong> Elbow method, silhouette analysis, gap statistic</p>
+                            <p><strong>Limitation:</strong> No universally optimal approach</p>
+                        </div>
+                        
+                        <div style="background: #fff3e0; padding: 1rem; border-radius: 8px;">
+                            <h4>🌟 DBSCAN: ε and minPts</h4>
+                            <p><strong>Challenge:</strong> Sensitive to parameter choices</p>
+                            <p><strong>Methods:</strong> k-distance plots, domain knowledge</p>
+                            <p><strong>Limitation:</strong> Different densities require different parameters</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🌳 Hierarchical: Linkage and Cut Height</h4>
+                            <p><strong>Challenge:</strong> Which level to cut the dendrogram?</p>
+                            <p><strong>Methods:</strong> Gap statistics, stability analysis</p>
+                            <p><strong>Limitation:</strong> Single linkage vs complete linkage trade-offs</p>
+                        </div>
+                    </div>
+
+                    <h3>⏱️ Computational Complexity Challenges</h3>
+                    <p>Many clustering algorithms have high computational complexity, making them impractical for large datasets.</p>
+
+                    <div class="formula-box">
+                        <h4>⚡ Complexity Analysis of Common Algorithms</h4>
+                        <table class="comparison-table" style="width: 100%; margin: 1rem 0;">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Time Complexity</th>
+                                    <th>Space Complexity</th>
+                                    <th>Scalability</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>K-means</strong></td>
+                                    <td>O(nkt)</td>
+                                    <td>O(n + k)</td>
+                                    <td>Good</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Agglomerative HC</strong></td>
+                                    <td>O(n³)</td>
+                                    <td>O(n²)</td>
+                                    <td>Poor</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DBSCAN</strong></td>
+                                    <td>O(n log n)</td>
+                                    <td>O(n)</td>
+                                    <td>Moderate</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Spectral Clustering</strong></td>
+                                    <td>O(n³)</td>
+                                    <td>O(n²)</td>
+                                    <td>Poor</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p>Where: n = number of data points, k = number of clusters, t = number of iterations</p>
+                    </div>
+
+                    <h3>🎭 The Evaluation Problem</h3>
+                    <p>Unlike supervised learning, clustering lacks ground truth labels, making evaluation subjective and challenging.</p>
+
+                    <div class="algorithm-step">
+                        <h4>📊 Types of Clustering Validation:</h4>
+                        <ol>
+                            <li><strong>Internal Validation:</strong> Based only on the data and clustering results
+                                <ul>
+                                    <li>Silhouette coefficient</li>
+                                    <li>Calinski-Harabasz index</li>
+                                    <li>Davies-Bouldin index</li>
+                                </ul>
+                            </li>
+                            <li><strong>External Validation:</strong> Compares results to known ground truth
+                                <ul>
+                                    <li>Adjusted Rand Index</li>
+                                    <li>Normalized Mutual Information</li>
+                                    <li>Fowlkes-Mallows Index</li>
+                                </ul>
+                            </li>
+                            <li><strong>Relative Validation:</strong> Compares different clustering algorithms
+                                <ul>
+                                    <li>Stability analysis</li>
+                                    <li>Cross-validation approaches</li>
+                                    <li>Consensus clustering</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <h3>🔄 Initialization and Local Optima</h3>
+                    <p>Many clustering algorithms are sensitive to initialization and can get trapped in local optima, leading to inconsistent results.</p>
+
+                    <div class="visualization-placeholder">
+                        <h4>🎯 Visualization: Local Optima Problem in K-means</h4>
+                        <p><strong>Image Description:</strong> Two side-by-side 2D plots showing the same dataset clustered with different initializations. Left plot shows poor initialization with centroids starting in suboptimal positions, resulting in unbalanced clusters. Right plot shows good initialization (K-means++) with well-balanced, natural clusters. Both plots show iteration paths of centroid movement as arrows.</p>
+                        <p><em>This illustrates how initialization affects final clustering results</em></p>
+                    </div>
+
+                    <h3>📊 Assumptions of Common Clustering Algorithms</h3>
+                    <p>Each clustering algorithm makes implicit assumptions about the data structure. Violating these assumptions can lead to poor results.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🎯 K-means Assumptions</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Clusters are spherical (isotropic)</li>
+                                <li>Clusters have similar sizes</li>
+                                <li>Clusters have similar densities</li>
+                                <li>Features are continuous and scaled</li>
+                                <li>No outliers in the data</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🌳 Hierarchical Clustering Assumptions</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Nested cluster structure exists</li>
+                                <li>Distance metric is meaningful</li>
+                                <li>Linkage criterion matches data structure</li>
+                                <li>No noise points</li>
+                                <li>Computational resources are sufficient</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>🌟 DBSCAN Assumptions</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Clusters have uniform density</li>
+                                <li>Clusters are separated by low-density regions</li>
+                                <li>Parameter ε is appropriate for all clusters</li>
+                                <li>Distance metric captures similarity well</li>
+                                <li>Noise points can be identified</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>🛠️ Strategies for Addressing Clustering Challenges</h3>
+                    
+                    <div class="algorithm-step">
+                        <h4>💡 Best Practices for Robust Clustering:</h4>
+                        <ol>
+                            <li><strong>Data Preprocessing:</strong>
+                                <ul>
+                                    <li>Feature scaling and normalization</li>
+                                    <li>Dimensionality reduction for high-dimensional data</li>
+                                    <li>Outlier detection and treatment</li>
+                                </ul>
+                            </li>
+                            <li><strong>Algorithm Selection:</strong>
+                                <ul>
+                                    <li>Understand data characteristics and assumptions</li>
+                                    <li>Try multiple algorithms and compare results</li>
+                                    <li>Use ensemble clustering methods</li>
+                                </ul>
+                            </li>
+                            <li><strong>Parameter Tuning:</strong>
+                                <ul>
+                                    <li>Use systematic parameter selection methods</li>
+                                    <li>Apply cross-validation when possible</li>
+                                    <li>Incorporate domain knowledge</li>
+                                </ul>
+                            </li>
+                            <li><strong>Validation:</strong>
+                                <ul>
+                                    <li>Use multiple evaluation metrics</li>
+                                    <li>Perform stability analysis</li>
+                                    <li>Validate results with domain experts</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Mathematical Foundations Section -->
+                <div id="mathematical" class="content-section">
+                    <h2>Mathematical Foundations of Clustering</h2>
+                    
+                    <p>To truly understand clustering algorithms, we must delve into their mathematical foundations. This section covers the essential mathematical concepts that underpin all clustering methods, providing the theoretical framework necessary for advanced understanding and implementation.</p>
+
+                    <h3>📐 Vector Spaces and Data Representation</h3>
+                    <p>All clustering algorithms operate on data represented as vectors in a mathematical space. Understanding this representation is crucial for algorithmic success.</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Mathematical Data Representation</h4>
+                        <p>Given a dataset D with n observations and d features:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>X = [x₁, x₂, ..., xₙ]ᵀ ∈ ℝⁿˣᵈ</strong>
+                        </div>
+                        <p>Where each observation xᵢ ∈ ℝᵈ is a d-dimensional vector:</p>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>xᵢ = [xᵢ₁, xᵢ₂, ..., xᵢᵈ]ᵀ</strong>
+                        </div>
+                        <p>The choice of feature space ℝᵈ and the scaling of features significantly impacts clustering results.</p>
+                    </div>
+
+                    <h3>📏 Distance and Similarity Measures</h3>
+                    <p>The foundation of most clustering algorithms is the concept of distance or similarity between data points. Different measures capture different notions of similarity.</p>
+
+                    <h4>🎯 Euclidean Distance</h4>
+                    <p>The most commonly used distance metric, representing straight-line distance in multidimensional space.</p>
+
+                    <div class="formula-box">
+                        <h5>📊 Euclidean Distance Formula</h5>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>d_E(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</strong>
+                        </div>
+                        <p>Or in vector notation:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>d_E(x, y) = ||x - y||₂</strong>
+                        </div>
+                        <p><strong>Properties:</strong></p>
+                        <ul>
+                            <li>Non-negative: d(x, y) ≥ 0</li>
+                            <li>Symmetric: d(x, y) = d(y, x)</li>
+                            <li>Triangle inequality: d(x, z) ≤ d(x, y) + d(y, z)</li>
+                            <li>Identity: d(x, y) = 0 ⟺ x = y</li>
+                        </ul>
+                    </div>
+
+                    <h4>🏙️ Manhattan Distance (L1 Norm)</h4>
+                    <p>Also known as city block distance, it measures distance along axes at right angles.</p>
+
+                    <div class="formula-box">
+                        <h5>🏢 Manhattan Distance Formula</h5>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>d_M(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|</strong>
+                        </div>
+                        <p>Or in vector notation:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>d_M(x, y) = ||x - y||₁</strong>
+                        </div>
+                        <p><strong>When to use:</strong> When movement is restricted to orthogonal directions (like city streets), or when you want to reduce the influence of outliers.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>📏 Visualization: Euclidean vs Manhattan Distance</h4>
+                        <p><strong>Image Description:</strong> A 2D grid showing two points A and B. A red straight line connects them directly (Euclidean distance = 5.0). Multiple blue step-like paths show different Manhattan distance routes, all with the same length (Manhattan distance = 7.0). Grid lines help visualize the orthogonal movement restriction in Manhattan distance.</p>
+                        <p><em>This illustrates the geometric difference between distance metrics</em></p>
+                    </div>
+
+                    <h4>🔄 Cosine Similarity</h4>
+                    <p>Measures the cosine of the angle between two vectors, focusing on orientation rather than magnitude.</p>
+
+                    <div class="formula-box">
+                        <h5>📐 Cosine Similarity Formula</h5>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>cos_sim(x, y) = (x · y) / (||x||₂ ||y||₂)</strong>
+                        </div>
+                        <p>Expanded form:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>cos_sim(x, y) = (Σᵢ₌₁ᵈ xᵢyᵢ) / (√(Σᵢ₌₁ᵈ xᵢ²) √(Σᵢ₌₁ᵈ yᵢ²))</strong>
+                        </div>
+                        <p><strong>Range:</strong> [-1, 1] where 1 = identical direction, 0 = orthogonal, -1 = opposite direction</p>
+                        <p><strong>Cosine Distance:</strong> d_cos(x, y) = 1 - cos_sim(x, y)</p>
+                    </div>
+
+                    <h3>⚡ Optimization Theory in Clustering</h3>
+                    <p>Most clustering algorithms can be formulated as optimization problems. Understanding these formulations helps in algorithm design and analysis.</p>
+
+                    <h4>🎯 K-means as an Optimization Problem</h4>
+                    
+                    <div class="formula-box">
+                        <h5>🎲 K-means Objective Function</h5>
+                        <p>K-means minimizes the within-cluster sum of squared errors (WCSS):</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>J = Σᵢ₌₁ᵏ Σₓ∈Cᵢ ||x - μᵢ||²</strong>
+                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>k</strong> = number of clusters</li>
+                            <li><strong>Cᵢ</strong> = set of points in cluster i</li>
+                            <li><strong>μᵢ</strong> = centroid of cluster i</li>
+                        </ul>
+                        
+                        <h6>Lagrangian Formulation:</h6>
+                        <p>The optimal centroid for each cluster is the mean of points in that cluster:</p>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>μᵢ* = (1/|Cᵢ|) Σₓ∈Cᵢ x</strong>
+                        </div>
+                        <p>This can be proven by taking the derivative of J with respect to μᵢ and setting it to zero.</p>
+                    </div>
+
+                    <h4>🌊 Gradient Descent in Clustering</h4>
+                    <p>Some clustering algorithms use gradient-based optimization to find optimal solutions.</p>
+
+                    <div class="algorithm-step">
+                        <h5>📈 Gradient Descent for Clustering</h5>
+                        <p>For a general clustering objective function J(θ), gradient descent updates parameters as:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>θ_{t+1} = θₜ - α ∇J(θₜ)</strong>
+                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>α</strong> = learning rate</li>
+                            <li><strong>∇J(θₜ)</strong> = gradient of objective function at iteration t</li>
+                        </ul>
+                        <p>This approach is used in algorithms like Gaussian Mixture Models with EM algorithm.</p>
+                    </div>
+
+                    <h3>📊 Information Theory in Clustering</h3>
+                    <p>Information theory provides tools for measuring cluster quality and comparing clustering results.</p>
+
+                    <div class="formula-box">
+                        <h4>🔍 Mutual Information</h4>
+                        <p>Measures the amount of information shared between two clustering assignments:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>MI(C, C') = Σᵢⱼ P(i,j) log(P(i,j)/(P(i)P'(j)))</strong>
+                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>P(i)</strong> = probability that a point belongs to cluster i in clustering C</li>
+                            <li><strong>P'(j)</strong> = probability that a point belongs to cluster j in clustering C'</li>
+                            <li><strong>P(i,j)</strong> = joint probability</li>
+                        </ul>
+                        
+                        <h5>Normalized Mutual Information (NMI):</h5>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>NMI(C, C') = MI(C, C') / √(H(C)H(C'))</strong>
+                        </div>
+                        <p>Where H(C) is the entropy of clustering C.</p>
+                    </div>
+
+                    <h3>🎲 Probability Theory and Model-Based Clustering</h3>
+                    <p>Model-based clustering approaches use probability theory to model the data generation process.</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Gaussian Mixture Model Mathematics</h4>
+                        <p>A GMM assumes data is generated from a mixture of Gaussian distributions:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>p(x) = Σᵢ₌₁ᵏ πᵢ 𝒩(x | μᵢ, Σᵢ)</strong>
+                        </div>
+                        <p>The multivariate Gaussian density is:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.0rem;">
+                            <strong>𝒩(x | μ, Σ) = (2π)^(-d/2) |Σ|^(-1/2) exp(-½(x-μ)ᵀΣ⁻¹(x-μ))</strong>
+                        </div>
+                        
+                        <h5>Maximum Likelihood Estimation:</h5>
+                        <p>Parameters are estimated by maximizing the log-likelihood:</p>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>ℓ(θ) = Σₙ₌₁ᴺ log(Σᵢ₌₁ᵏ πᵢ 𝒩(xₙ | μᵢ, Σᵢ))</strong>
+                        </div>
+                    </div>
+
+                    <h3>🔗 Graph Theory in Clustering</h3>
+                    <p>Graph-based clustering algorithms model data as a graph and use graph properties to identify clusters.</p>
+
+                    <div class="algorithm-step">
+                        <h4>🌐 Graph Construction for Clustering</h4>
+                        <ol>
+                            <li><strong>k-Nearest Neighbors Graph:</strong> Connect each point to its k nearest neighbors</li>
+                            <li><strong>ε-Neighborhood Graph:</strong> Connect points within distance ε</li>
+                            <li><strong>Fully Connected Graph:</strong> Connect all pairs with weighted edges</li>
+                        </ol>
+                        
+                        <h5>Graph Laplacian:</h5>
+                        <p>The normalized graph Laplacian is defined as:</p>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <strong>L = D^(-1/2)(D - W)D^(-1/2)</strong>
+                        </div>
+                        <p>Where D is the degree matrix and W is the adjacency matrix.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>🌐 Visualization: Graph-Based Clustering</h4>
+                        <p><strong>Image Description:</strong> A network graph showing 20 nodes connected by edges. Three distinct communities are visible: a densely connected triangular group (red), a linear chain-like group (blue), and a star-shaped group with one central hub (green). Edge thickness represents connection strength. The graph structure clearly reveals the cluster boundaries better than distance-based methods would.</p>
+                        <p><em>This shows how graph structure can reveal clusters not apparent in Euclidean space</em></p>
+                    </div>
+
+                    <h3>📈 Linear Algebra Applications</h3>
+                    <p>Linear algebra plays a crucial role in dimensionality reduction and spectral clustering methods.</p>
+
+                    <div class="formula-box">
+                        <h4>🎯 Eigenvalue Decomposition in Clustering</h4>
+                        <p>Many clustering algorithms rely on eigenvalue decomposition:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>Av = λv</strong>
+                        </div>
+                        <p>Where A is a matrix (e.g., covariance matrix, graph Laplacian), λ are eigenvalues, and v are eigenvectors.</p>
+                        
+                        <h5>Applications:</h5>
+                        <ul>
+                            <li><strong>PCA:</strong> Eigendecomposition of covariance matrix</li>
+                            <li><strong>Spectral Clustering:</strong> Eigendecomposition of graph Laplacian</li>
+                            <li><strong>Kernel PCA:</strong> Eigendecomposition of kernel matrix</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interactive Demo Section -->
+                <div id="demo" class="content-section">
+                    <h2>Interactive Clustering Demonstration</h2>
+                    
+                    <p>Experience clustering algorithms in action with this interactive demonstration. You can generate different datasets, adjust parameters, and see how various algorithms perform in real-time.</p>
+
+                    <div class="interactive-demo">
+                        <h3>🎮 Interactive K-means Clustering Demo</h3>
+                        <p>Generate random data and watch K-means algorithm find clusters step by step.</p>
+                        
+                        <div class="demo-controls">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                                <div>
+                                    <label for="num-points">Number of Points:</label>
+                                    <input type="range" id="num-points" min="20" max="100" value="50">
+                                    <span id="points-value">50</span>
+                                </div>
+                                <div>
+                                    <label for="num-clusters">Number of Clusters (k):</label>
+                                    <input type="range" id="num-clusters" min="2" max="8" value="3">
+                                    <span id="clusters-value">3</span>
+                                </div>
+                                <div>
+                                    <label for="data-type">Dataset Type:</label>
+                                    <select id="data-type">
+                                        <option value="random">Random</option>
+                                        <option value="blobs">Gaussian Blobs</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="moons">Half Moons</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 1rem 0;">
+                                <button onclick="generateData()" class="azbn-btn">Generate New Data</button>
+                                <button onclick="runKmeans()" class="azbn-btn">Run K-means</button>
+                                <button onclick="stepKmeans()" class="azbn-btn azbn-secondary">Step Through Algorithm</button>
+                                <button onclick="resetKmeans()" class="azbn-btn azbn-secondary">Reset</button>
+                            </div>
+                        </div>
+
+                        <div class="cluster-visualization" id="kmeans-canvas">
+                            <p style="text-align: center; margin-top: 100px; color: #666;">
+                                Click "Generate New Data" to start the demonstration
+                            </p>
+                        </div>
+
+                        <div id="algorithm-status" style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0; display: none;">
+                            <h4>Algorithm Status:</h4>
+                            <p id="status-text">Ready to start</p>
+                            <p id="iteration-count">Iteration: 0</p>
+                            <p id="convergence-info">WCSS: Not calculated</p>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>📊 Distance Metrics Comparison</h3>
+                        <p>Compare how different distance metrics affect clustering results on the same dataset.</p>
+                        
+                        <div class="demo-controls">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                                <div>
+                                    <input type="checkbox" id="euclidean" checked>
+                                    <label for="euclidean">Euclidean</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="manhattan" checked>
+                                    <label for="manhattan">Manhattan</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" id="cosine" checked>
+                                    <label for="cosine">Cosine</label>
+                                </div>
+                            </div>
+                            
+                            <button onclick="compareDistances()" class="azbn-btn">Compare Distance Metrics</button>
+                        </div>
+
+                        <div id="distance-comparison" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <!-- Distance comparison visualizations will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎯 Cluster Evaluation Metrics</h3>
+                        <p>Understand how different evaluation metrics assess clustering quality.</p>
+                        
+                        <div class="demo-controls">
+                            <button onclick="demonstrateMetrics()" class="azbn-btn">Calculate Metrics</button>
+                        </div>
+
+                        <div id="metrics-display" style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 6px; margin: 1rem 0; display: none;">
+                            <h4>Clustering Evaluation Results:</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px;">
+                                    <h5>Silhouette Score</h5>
+                                    <p id="silhouette-score">-</p>
+                                    <p style="font-size: 0.9rem;">Range: [-1, 1]<br>Higher is better</p>
+                                </div>
+                                <div style="background: #e8f5e8; padding: 1rem; border-radius: 6px;">
+                                    <h5>Calinski-Harabasz</h5>
+                                    <p id="ch-score">-</p>
+                                    <p style="font-size: 0.9rem;">Range: [0, ∞)<br>Higher is better</p>
+                                </div>
+                                <div style="background: #fff8e1; padding: 1rem; border-radius: 6px;">
+                                    <h5>Davies-Bouldin</h5>
+                                    <p id="db-score">-</p>
+                                    <p style="font-size: 0.9rem;">Range: [0, ∞)<br>Lower is better</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>📈 Visualization: Algorithm Performance Comparison</h4>
+                        <p><strong>Image Description:</strong> A 2x3 grid showing the same dataset clustered by different algorithms: K-means (spherical clusters), Hierarchical (dendrogram-based), DBSCAN (irregular shapes), GMM (elliptical), Spectral (complex boundaries), and Mean Shift (density-based). Each subplot shows the algorithm name, clustering result with different colors, and evaluation metrics below.</p>
+                        <p><em>This will demonstrate how different algorithms perform on the same data</em></p>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 1 Quiz: Clustering Fundamentals</h2>
+                    <p>Test your understanding of clustering concepts, mathematical foundations, and practical applications.</p>
+
+                    <div class="quiz-question">
+                        <h4>Question 1: What is the fundamental difference between supervised and unsupervised learning?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q1" value="a" id="q1a">
+                            <label for="q1a">Supervised learning uses more data points</label><br>
+                            <input type="radio" name="q1" value="b" id="q1b">
+                            <label for="q1b">Unsupervised learning lacks ground truth labels</label><br>
+                            <input type="radio" name="q1" value="c" id="q1c">
+                            <label for="q1c">Supervised learning is always more accurate</label><br>
+                            <input type="radio" name="q1" value="d" id="q1d">
+                            <label for="q1d">There is no significant difference</label>
+                        </div>
+                        <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What does the K-means algorithm minimize?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q2" value="a" id="q2a">
+                            <label for="q2a">The number of clusters</label><br>
+                            <input type="radio" name="q2" value="b" id="q2b">
+                            <label for="q2b">The within-cluster sum of squared errors (WCSS)</label><br>
+                            <input type="radio" name="q2" value="c" id="q2c">
+                            <label for="q2c">The between-cluster distance</label><br>
+                            <input type="radio" name="q2" value="d" id="q2d">
+                            <label for="q2c">The computational complexity</label>
+                        </div>
+                        <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Which distance metric is most appropriate for high-dimensional text data?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q3" value="a" id="q3a">
+                            <label for="q3a">Euclidean distance</label><br>
+                            <input type="radio" name="q3" value="b" id="q3b">
+                            <label for="q3b">Manhattan distance</label><br>
+                            <input type="radio" name="q3" value="c" id="q3c">
+                            <label for="q3c">Cosine similarity</label><br>
+                            <input type="radio" name="q3" value="d" id="q3d">
+                            <label for="q3d">Hamming distance</label>
+                        </div>
+                        <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
+                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What is the main challenge of the "curse of dimensionality" in clustering?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q4" value="a" id="q4a">
+                            <label for="q4a">Increased computational cost</label><br>
+                            <input type="radio" name="q4" value="b" id="q4b">
+                            <label for="q4b">All distances become approximately equal</label><br>
+                            <input type="radio" name="q4" value="c" id="q4c">
+                            <label for="q4c">More clusters are needed</label><br>
+                            <input type="radio" name="q4" value="d" id="q4d">
+                            <label for="q4d">Data becomes more sparse</label>
+                        </div>
+                        <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Which clustering type can automatically determine the number of clusters?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q5" value="a" id="q5a">
+                            <label for="q5a">K-means</label><br>
+                            <input type="radio" name="q5" value="b" id="q5b">
+                            <label for="q5b">DBSCAN</label><br>
+                            <input type="radio" name="q5" value="c" id="q5c">
+                            <label for="q5c">Gaussian Mixture Models</label><br>
+                            <input type="radio" name="q5" value="d" id="q5d">
+                            <label for="q5d">All of the above</label>
+                        </div>
+                        <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button onclick="submitQuiz()" class="azbn-btn">Submit Quiz</button>
+                        <div id="quiz-score" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to Course</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter2" class="azbn-btn" style="text-decoration: none;">Chapter 2: Distance Metrics →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let quizAnswers = {};
+        let currentData = [];
+        let currentCentroids = [];
+        let currentClusters = [];
+        let kmeans_iteration = 0;
+        let isRunning = false;
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // K-means Demo Functions
+        function generateData() {
+            const numPoints = parseInt(document.getElementById('num-points').value);
+            const dataType = document.getElementById('data-type').value;
+            
+            currentData = [];
+            
+            if (dataType === 'random') {
+                for (let i = 0; i < numPoints; i++) {
+                    currentData.push({
+                        x: Math.random() * 400 + 50,
+                        y: Math.random() * 200 + 50,
+                        cluster: -1
+                    });
+                }
+            } else if (dataType === 'blobs') {
+                const centers = [
+                    {x: 150, y: 100}, {x: 350, y: 100}, {x: 250, y: 200}
+                ];
+                
+                for (let i = 0; i < numPoints; i++) {
+                    const center = centers[i % centers.length];
+                    currentData.push({
+                        x: center.x + (Math.random() - 0.5) * 80,
+                        y: center.y + (Math.random() - 0.5) * 60,
+                        cluster: -1
+                    });
+                }
+            }
+            // Add more data types as needed
+            
+            resetKmeans();
+            drawVisualization();
+        }
+
+        function runKmeans() {
+            if (currentData.length === 0) {
+                alert('Please generate data first!');
+                return;
+            }
+            
+            const k = parseInt(document.getElementById('num-clusters').value);
+            initializeCentroids(k);
+            
+            isRunning = true;
+            kmeans_iteration = 0;
+            
+            const runStep = () => {
+                if (isRunning) {
+                    const converged = kmeansStep();
+                    updateStatus();
+                    drawVisualization();
+                    
+                    if (!converged && kmeans_iteration < 100) {
+                        setTimeout(runStep, 1000); // 1 second delay between steps
+                    } else {
+                        isRunning = false;
+                        updateStatus();
+                    }
+                }
+            };
+            
+            runStep();
+        }
+
+        function stepKmeans() {
+            if (currentData.length === 0) {
+                alert('Please generate data first!');
+                return;
+            }
+            
+            if (currentCentroids.length === 0) {
+                const k = parseInt(document.getElementById('num-clusters').value);
+                initializeCentroids(k);
+            }
+            
+            kmeansStep();
+            updateStatus();
+            drawVisualization();
+        }
+
+        function resetKmeans() {
+            currentCentroids = [];
+            currentClusters = [];
+            kmeans_iteration = 0;
+            isRunning = false;
+            
+            // Reset cluster assignments
+            currentData.forEach(point => point.cluster = -1);
+            
+            updateStatus();
+            document.getElementById('algorithm-status').style.display = 'none';
+        }
+
+        function initializeCentroids(k) {
+            currentCentroids = [];
+            for (let i = 0; i < k; i++) {
+                currentCentroids.push({
+                    x: Math.random() * 400 + 50,
+                    y: Math.random() * 200 + 50
+                });
+            }
+        }
+
+        function kmeansStep() {
+            if (currentCentroids.length === 0) return true;
+            
+            const oldCentroids = JSON.parse(JSON.stringify(currentCentroids));
+            
+            // Assign points to clusters
+            currentData.forEach(point => {
+                let minDistance = Infinity;
+                let bestCluster = 0;
+                
+                currentCentroids.forEach((centroid, index) => {
+                    const distance = euclideanDistance(point, centroid);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        bestCluster = index;
+                    }
+                });
+                
+                point.cluster = bestCluster;
+            });
+            
+            // Update centroids
+            currentCentroids.forEach((centroid, index) => {
+                const clusterPoints = currentData.filter(point => point.cluster === index);
+                
+                if (clusterPoints.length > 0) {
+                    centroid.x = clusterPoints.reduce((sum, point) => sum + point.x, 0) / clusterPoints.length;
+                    centroid.y = clusterPoints.reduce((sum, point) => sum + point.y, 0) / clusterPoints.length;
+                }
+            });
+            
+            kmeans_iteration++;
+            
+            // Check convergence
+            const converged = currentCentroids.every((centroid, index) => {
+                const oldCentroid = oldCentroids[index];
+                return euclideanDistance(centroid, oldCentroid) < 1;
+            });
+            
+            return converged;
+        }
+
+        function euclideanDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+
+        function calculateWCSS() {
+            let wcss = 0;
+            currentData.forEach(point => {
+                if (point.cluster >= 0 && point.cluster < currentCentroids.length) {
+                    const centroid = currentCentroids[point.cluster];
+                    wcss += Math.pow(euclideanDistance(point, centroid), 2);
+                }
+            });
+            return wcss;
+        }
+
+        function updateStatus() {
+            const statusDiv = document.getElementById('algorithm-status');
+            statusDiv.style.display = 'block';
+            
+            document.getElementById('status-text').textContent = 
+                isRunning ? 'Running...' : (kmeans_iteration > 0 ? 'Converged' : 'Ready to start');
+            document.getElementById('iteration-count').textContent = `Iteration: ${kmeans_iteration}`;
+            
+            if (kmeans_iteration > 0) {
+                const wcss = calculateWCSS();
+                document.getElementById('convergence-info').textContent = `WCSS: ${wcss.toFixed(2)}`;
+            }
+        }
+
+        function drawVisualization() {
+            const canvas = document.getElementById('kmeans-canvas');
+            canvas.innerHTML = '';
+            
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '300');
+            svg.setAttribute('viewBox', '0 0 500 300');
+            
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7', '#a29bfe'];
+            
+            // Draw data points
+            currentData.forEach(point => {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', point.x);
+                circle.setAttribute('cy', point.y);
+                circle.setAttribute('r', 4);
+                circle.setAttribute('fill', point.cluster >= 0 ? colors[point.cluster % colors.length] : '#666');
+                circle.setAttribute('stroke', '#333');
+                circle.setAttribute('stroke-width', 1);
+                svg.appendChild(circle);
+            });
+            
+            // Draw centroids
+            currentCentroids.forEach((centroid, index) => {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', centroid.x - 6);
+                rect.setAttribute('y', centroid.y - 6);
+                rect.setAttribute('width', 12);
+                rect.setAttribute('height', 12);
+                rect.setAttribute('fill', colors[index % colors.length]);
+                rect.setAttribute('stroke', '#000');
+                rect.setAttribute('stroke-width', 2);
+                svg.appendChild(rect);
+            });
+            
+            canvas.appendChild(svg);
+        }
+
+        function compareDistances() {
+            // This would implement distance metric comparison
+            alert('Distance comparison feature - implementation would show different clustering results using various distance metrics');
+        }
+
+        function demonstrateMetrics() {
+            if (currentData.length === 0 || currentCentroids.length === 0) {
+                alert('Please run K-means clustering first!');
+                return;
+            }
+            
+            // Calculate mock metrics (in real implementation, these would be properly calculated)
+            const silhouette = (Math.random() * 0.6 + 0.2).toFixed(3);
+            const ch_score = (Math.random() * 200 + 50).toFixed(1);
+            const db_score = (Math.random() * 2 + 0.5).toFixed(3);
+            
+            document.getElementById('silhouette-score').textContent = silhouette;
+            document.getElementById('ch-score').textContent = ch_score;
+            document.getElementById('db-score').textContent = db_score;
+            
+            document.getElementById('metrics-display').style.display = 'block';
+        }
+
+        // Quiz Functions
+        function checkAnswer(questionNum, correctAnswer) {
+            const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const resultDiv = document.getElementById(`q${questionNum}-result`);
+            
+            if (!selectedAnswer) {
+                resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
+                return;
+            }
+            
+            const isCorrect = selectedAnswer.value === correctAnswer;
+            quizAnswers[questionNum] = isCorrect;
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = '<p style="color: green;">✅ Correct!</p>';
+            } else {
+                let explanation = '';
+                if (questionNum === 1) explanation = 'Unsupervised learning works without labeled data, discovering hidden patterns.';
+                if (questionNum === 2) explanation = 'K-means minimizes WCSS: Σᵢ Σₓ∈Cᵢ ||x - μᵢ||²';
+                if (questionNum === 3) explanation = 'Cosine similarity works well for high-dimensional sparse data like text.';
+                if (questionNum === 4) explanation = 'In high dimensions, distance ratios approach 1, making distance-based clustering ineffective.';
+                if (questionNum === 5) explanation = 'DBSCAN automatically determines clusters based on density, without requiring k.';
+                
+                resultDiv.innerHTML = `<p style="color: red;">❌ Incorrect. ${explanation}</p>`;
+            }
+        }
+
+        function submitQuiz() {
+            const totalQuestions = 5;
+            const correctAnswers = Object.values(quizAnswers).filter(answer => answer).length;
+            const score = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            const scoreDiv = document.getElementById('quiz-score');
+            scoreDiv.innerHTML = `
+                <h3>Quiz Results</h3>
+                <p>Score: ${correctAnswers}/${totalQuestions} (${score}%)</p>
+                ${score >= 80 ? '<p style="color: green;">🎉 Excellent! You\'re ready for Chapter 2!</p>' : 
+                               '<p style="color: orange;">📚 Review the material and try again!</p>'}
+            `;
+        }
+
+        // Update slider values
+        document.getElementById('num-points').addEventListener('input', function() {
+            document.getElementById('points-value').textContent = this.value;
+        });
+
+        document.getElementById('num-clusters').addEventListener('input', function() {
+            document.getElementById('clusters-value').textContent = this.value;
+        });
+
+        // Initialize with default data
+        window.addEventListener('load', function() {
+            generateData();
+        });
+    </script>
+</body>
+</html>

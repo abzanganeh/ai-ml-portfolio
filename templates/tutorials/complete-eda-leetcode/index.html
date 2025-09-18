@@ -13,9 +13,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@3.0.0/dist/chartjs-chart-matrix.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/complete-eda-leetcode" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>Complete EDA Tutorial</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
     <div class="tutorial-header">
         <div class="header-content">
             <h1>Complete Exploratory Data Analysis</h1>
@@ -670,6 +688,37 @@ print(correlation_matrix)</code></pre>
                         <option value="acceptance_rate">Acceptance Rate</option>
                         <option value="frequency">Frequency</option>
                     </select>
+                </div>
+                <div class="control-group">
+                    <button class="viz-settings-btn" onclick="toggleVizSettings()">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </div>
+            </div>
+            <div class="viz-settings-panel" id="viz-settings-panel" style="display: none;">
+                <h4>Visualization Settings</h4>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>Color Scheme:</label>
+                        <select id="color-scheme" onchange="updateVisualization()">
+                            <option value="default">Default</option>
+                            <option value="blue">Blue Theme</option>
+                            <option value="green">Green Theme</option>
+                            <option value="red">Red Theme</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Show Grid:</label>
+                        <input type="checkbox" id="show-grid" checked onchange="updateVisualization()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Show Legend:</label>
+                        <input type="checkbox" id="show-legend" checked onchange="updateVisualization()">
+                    </div>
+                    <div class="setting-item">
+                        <label>Animation:</label>
+                        <input type="checkbox" id="enable-animation" checked onchange="updateVisualization()">
+                    </div>
                 </div>
             </div>
             <div class="viz-display">
@@ -1333,6 +1382,8 @@ print(f"Ready for advanced analysis and modeling!")</code></pre>
             </div>
         </div>
     </div>
+
+    </main>
 
     <script src="{{ url_for('static', filename='js/tutorials/complete-eda-leetcode.js') }}"></script>
 </body>
