@@ -149,6 +149,20 @@ TUTORIALS_DATA = [
         'published': True,
         'excerpt': 'Learn the complete EDA process: missing data strategies, outlier detection, visualization techniques, and statistical insights.',
         'tags': 'eda,pandas,matplotlib,seaborn,data-cleaning,statistics,visualization'
+    },
+    {
+        'title': 'Comprehensive Clustering Analysis Course',
+        'slug': 'clustering-course',
+        'description': 'Master clustering algorithms from mathematical foundations to advanced applications. 15 comprehensive chapters covering distance metrics, K-means, hierarchical clustering, DBSCAN, and evaluation techniques.',
+        'category': 'Machine Learning',
+        'difficulty': 'intermediate',
+        'duration': '120 minutes',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/clustering-course/index.html',
+        'published': True,
+        'excerpt': 'Complete clustering course with mathematical derivations, algorithm implementations, and real-world applications across 15 detailed chapters.',
+        'tags': 'clustering,k-means,hierarchical-clustering,dbscan,distance-metrics,unsupervised-learning,mathematics'
     }
 
     

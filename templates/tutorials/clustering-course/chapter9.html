@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 9: Linkage Criteria - Comprehensive Clustering Analysis Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering-course/clustering-course.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering-course/shared-tutorial.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/clustering-course" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>Clustering Analysis Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <div class="clustering-header">
+            <h1>Chapter 9: Linkage Criteria</h1>
+            <p>Single, Complete, Average, and Ward Methods</p>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 60%;"></div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <h2>Linkage Criteria in Hierarchical Clustering</h2>
+                <p>
+                    Linkage criteria determine how to measure the distance between clusters when merging them. 
+                    Different linkage methods produce different clustering results and are suitable for different types of data.
+                </p>
+
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('overview', this)">Overview</button>
+                    <button onclick="showSection('single', this)">Single Linkage</button>
+                    <button onclick="showSection('complete', this)">Complete Linkage</button>
+                    <button onclick="showSection('average', this)">Average Linkage</button>
+                    <button onclick="showSection('ward', this)">Ward's Method</button>
+                </div>
+                
+                <!-- Overview Section -->
+                <div id="overview" class="content-section active">
+                    <div class="linkage-methods">
+                        <div class="method-card">
+                            <h3>Single Linkage</h3>
+                        <p>Distance between closest points in two clusters</p>
+                        <div class="math-formula">d(C₁, C₂) = min{d(x, y) : x ∈ C₁, y ∈ C₂}</div>
+                        <div class="method-properties">
+                            <strong>Properties:</strong> Tends to create elongated clusters, sensitive to outliers
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Single Linkage Section -->
+                <div id="single" class="content-section">
+                    <div class="method-card">
+                        <h3>Complete Linkage</h3>
+                        <p>Distance between farthest points in two clusters</p>
+                        <div class="math-formula">d(C₁, C₂) = max{d(x, y) : x ∈ C₁, y ∈ C₂}</div>
+                        <div class="method-properties">
+                            <strong>Properties:</strong> Creates compact, spherical clusters, less sensitive to outliers
+                        </div>
+                    </div>
+                    
+                    <div class="method-card">
+                        <h3>Average Linkage</h3>
+                        <p>Average distance between all pairs of points</p>
+                        <div class="math-formula">d(C₁, C₂) = (1/|C₁||C₂|) Σᵢ∈C₁ Σⱼ∈C₂ d(xᵢ, xⱼ)</div>
+                        <div class="method-properties">
+                            <strong>Properties:</strong> Balanced approach, good for most applications
+                        </div>
+                    </div>
+                    
+                    <div class="method-card">
+                        <h3>Ward's Method</h3>
+                        <p>Minimizes within-cluster variance</p>
+                        <div class="math-formula">d(C₁, C₂) = (|C₁||C₂|/(|C₁|+|C₂|)) ||μ₁ - μ₂||²</div>
+                        <div class="method-properties">
+                            <strong>Properties:</strong> Creates clusters of similar size, minimizes variance
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Complete Linkage Section -->
+                <div id="complete" class="content-section">
+                    <div class="method-card">
+                        <h3>Complete Linkage Details</h3>
+                        <p>Complete linkage uses the maximum distance between any two points in different clusters.</p>
+                        <div class="math-formula">d(C₁, C₂) = max{d(x, y) : x ∈ C₁, y ∈ C₂}</div>
+                        <div class="method-properties">
+                            <strong>Advantages:</strong> Creates compact, spherical clusters, less sensitive to outliers
+                        </div>
+                        <div class="method-properties">
+                            <strong>Disadvantages:</strong> Can break large clusters prematurely
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Average Linkage Section -->
+                <div id="average" class="content-section">
+                    <div class="method-card">
+                        <h3>Average Linkage Details</h3>
+                        <p>Average linkage uses the average distance between all pairs of points in different clusters.</p>
+                        <div class="math-formula">d(C₁, C₂) = (1/|C₁||C₂|) Σ d(x, y) for x ∈ C₁, y ∈ C₂</div>
+                        <div class="method-properties">
+                            <strong>Advantages:</strong> Balanced approach, good for most data types
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ward's Method Section -->
+                <div id="ward" class="content-section">
+                    <div class="method-card">
+                        <h3>Ward's Method Details</h3>
+                        <p>Ward's method minimizes the increase in within-cluster variance when merging clusters.</p>
+                        <div class="math-formula">d(C₁, C₂) = (|C₁||C₂|/(|C₁|+|C₂|)) ||μ₁ - μ₂||²</div>
+                        <div class="method-properties">
+                            <strong>Advantages:</strong> Creates clusters of similar size, minimizes variance
+                        </div>
+                        <div class="method-properties">
+                            <strong>Best for:</strong> Spherical clusters of similar size
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chapter-navigation">
+                    <button id="prev-chapter" class="nav-btn secondary" onclick="navigateToPreviousChapter()">
+                        ← Previous Chapter: Hierarchical Clustering Theory
+                    </button>
+                    <button id="next-chapter" class="nav-btn primary" onclick="navigateToNextChapter()">
+                        Next Chapter: Dendrogram Construction →
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showSection(sectionName, clickedElement) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        function navigateToPreviousChapter() {
+            window.location.href = '/tutorials/clustering-course/chapter8';
+        }
+
+        function navigateToNextChapter() {
+            window.location.href = '/tutorials/clustering-course/chapter10';
+        }
+
+        // Initialize with default section
+        window.addEventListener('load', function() {
+            showSection('overview');
+        });
+    </script>
+</body>
+</html>

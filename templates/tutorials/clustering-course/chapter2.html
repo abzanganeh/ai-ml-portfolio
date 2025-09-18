@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Distance Metrics Fundamentals - Comprehensive Clustering Analysis Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering-course/chapter2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        .visualization-placeholder {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .proof-box {
+            background: #fff8e1;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .property-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .demo-controls {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .distance-calculator {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .metric-visualization {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            min-height: 250px;
+            position: relative;
+        }
+        .point-input {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/clustering-course" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <img src="/static/images/logo.png" alt="Logo" style="height: 40px;">
+                    <span>Comprehensive Clustering Analysis Course - Clustering Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Comprehensive Chapter Header -->
+                <div class="chapter-header">
+                    <div class="azbn-container">
+                        <h1 class="chapter-title">Chapter 2: Distance Metrics Fundamentals</h1>
+                        <p class="chapter-subtitle">Master the mathematical foundations of Euclidean and Manhattan distance metrics, the building blocks of clustering algorithms.</p>
+                        
+                        <!-- Chapter Progress Bar (2/15) -->
+                        <div class="chapter-progress">
+                            <div class="chapter-progress-fill" style="width: 13.33%;"></div>
+                        </div>
+                        
+                        <!-- Chapter Navigation (All 15 chapters) -->
+                        <div class="chapter-navigation">
+                            <a href="/tutorials/clustering-course/chapter1" class="chapter-nav-btn">1</a>
+                            <a href="/tutorials/clustering-course/chapter2" class="chapter-nav-btn active">2</a>
+                            <a href="/tutorials/clustering-course/chapter3" class="chapter-nav-btn">3</a>
+                            <a href="/tutorials/clustering-course/chapter4" class="chapter-nav-btn">4</a>
+                            <a href="/tutorials/clustering-course/chapter5" class="chapter-nav-btn">5</a>
+                            <a href="/tutorials/clustering-course/chapter6" class="chapter-nav-btn">6</a>
+                            <a href="/tutorials/clustering-course/chapter7" class="chapter-nav-btn">7</a>
+                            <a href="/tutorials/clustering-course/chapter8" class="chapter-nav-btn">8</a>
+                            <a href="/tutorials/clustering-course/chapter9" class="chapter-nav-btn">9</a>
+                            <a href="/tutorials/clustering-course/chapter10" class="chapter-nav-btn">10</a>
+                            <a href="/tutorials/clustering-course/chapter11" class="chapter-nav-btn">11</a>
+                            <a href="/tutorials/clustering-course/chapter12" class="chapter-nav-btn">12</a>
+                            <a href="/tutorials/clustering-course/chapter13" class="chapter-nav-btn">13</a>
+                            <a href="/tutorials/clustering-course/chapter14" class="chapter-nav-btn">14</a>
+                            <a href="/tutorials/clustering-course/chapter15" class="chapter-nav-btn">15</a>
+                        </div>
+                        
+                        <!-- Section Progress Bar -->
+                        <div class="section-progress">
+                            <div class="section-progress-fill" style="width: 14.29%;"></div>
+                        </div>
+                        
+                        <!-- Section Navigation -->
+                        <div class="section-nav">
+                            <button class="active" onclick="showSection('theory', this)">Metric Space Theory</button>
+                            <button onclick="showSection('euclidean', this)">Euclidean Distance</button>
+                            <button onclick="showSection('manhattan', this)">Manhattan Distance</button>
+                            <button onclick="showSection('optimization', this)">Optimization Techniques</button>
+                            <button onclick="showSection('applications', this)">Real-World Applications</button>
+                            <button onclick="showSection('calculator', this)">Interactive Calculator</button>
+                            <button onclick="showSection('quiz', this)">Quiz</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="learning-objectives-card">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the mathematical definitions and properties of Euclidean distance</li>
+                        <li>Master Manhattan distance theory and geometric interpretations</li>
+                        <li>Learn formal proofs of metric space properties</li>
+                        <li>Analyze computational complexity and efficiency considerations</li>
+                        <li>Apply distance metrics to real-world clustering problems</li>
+                        <li>Compare and contrast different distance measures through interactive demos</li>
+                        <li>Understand when to choose each metric for specific data types</li>
+                    </ul>
+                </div>
+
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('introduction')">Metric Space Theory</button>
+                    <button onclick="showSection('euclidean')">Euclidean Distance</button>
+                    <button onclick="showSection('manhattan')">Manhattan Distance</button>
+                    <button onclick="showSection('properties')">Mathematical Properties</button>
+                    <button onclick="showSection('geometric')">Geometric Interpretation</button>
+                    <button onclick="showSection('computational')">Computational Aspects</button>
+                    <button onclick="showSection('applications')">Applications & Examples</button>
+                    <button onclick="showSection('interactive')">Interactive Calculator</button>
+                    <button onclick="showSection('quiz')">Quiz</button>
+                </div>
+
+                <!-- Metric Space Theory Section -->
+                <div id="theory" class="section-content active">
+                    <h2>Metric Space Theory: The Mathematical Foundation</h2>
+                    
+                    <p>Before diving into specific distance metrics, we must understand the mathematical framework that underlies all distance measures in clustering. A metric space provides the formal foundation for measuring similarity and dissimilarity between data points.</p>
+
+                    <div class="formula-box">
+                        <h3>📐 Definition of a Metric Space</h3>
+                        <p>A metric space is an ordered pair (X, d) where X is a set and d is a metric on X. A metric d: X × X → ℝ is a function that satisfies four fundamental properties for all x, y, z ∈ X:</p>
+                        
+                        <div style="margin: 1.5rem 0;">
+                            <h4>1️⃣ Non-negativity (Positivity)</h4>
+                            <div style="text-align: center; font-size: 1.2rem; margin: 0.5rem 0; background: white; padding: 0.5rem; border-radius: 4px;">
+                                <strong>d(x, y) ≥ 0</strong>
+                            </div>
+                            <p>The distance between any two points is always non-negative.</p>
+                        </div>
+
+                        <div style="margin: 1.5rem 0;">
+                            <h4>2️⃣ Identity of Indiscernibles</h4>
+                            <div style="text-align: center; font-size: 1.2rem; margin: 0.5rem 0; background: white; padding: 0.5rem; border-radius: 4px;">
+                                <strong>d(x, y) = 0 ⟺ x = y</strong>
+                            </div>
+                            <p>The distance is zero if and only if the two points are identical.</p>
+                        </div>
+
+                        <div style="margin: 1.5rem 0;">
+                            <h4>3️⃣ Symmetry</h4>
+                            <div style="text-align: center; font-size: 1.2rem; margin: 0.5rem 0; background: white; padding: 0.5rem; border-radius: 4px;">
+                                <strong>d(x, y) = d(y, x)</strong>
+                            </div>
+                            <p>The distance from x to y equals the distance from y to x.</p>
+                        </div>
+
+                        <div style="margin: 1.5rem 0;">
+                            <h4>4️⃣ Triangle Inequality</h4>
+                            <div style="text-align: center; font-size: 1.2rem; margin: 0.5rem 0; background: white; padding: 0.5rem; border-radius: 4px;">
+                                <strong>d(x, z) ≤ d(x, y) + d(y, z)</strong>
+                            </div>
+                            <p>The direct distance between two points is always less than or equal to any indirect path through a third point.</p>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>📊 Visualization: Metric Space Properties</h4>
+                        <p><strong>Image Description:</strong> Four separate 2D diagrams illustrating each metric property. (1) Non-negativity: Two points A and B with distance arrow labeled d ≥ 0. (2) Identity: Point A with d(A,A) = 0. (3) Symmetry: Points A and B with bidirectional arrows showing d(A,B) = d(B,A). (4) Triangle inequality: Triangle ABC with sides labeled showing d(A,C) ≤ d(A,B) + d(B,C).</p>
+                        <p><em>This demonstrates the four fundamental properties that any valid distance metric must satisfy</em></p>
+                    </div>
+
+                    <h3>🔬 Why These Properties Matter</h3>
+                    <p>These four properties are not arbitrary mathematical abstractions—they encode our intuitive understanding of distance and ensure that clustering algorithms behave predictably and meaningfully.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🎯 Non-negativity Impact</h4>
+                            <p>Ensures that similarity measures have a consistent interpretation. Negative distances would create ambiguity in clustering algorithms.</p>
+                            <p><strong>Example:</strong> K-means centroids are always meaningful since all distances are positive.</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🔍 Identity Importance</h4>
+                            <p>Guarantees that identical data points are recognized as such. Critical for handling duplicate data in clustering.</p>
+                            <p><strong>Example:</strong> Prevents artificial cluster fragmentation due to identical points.</p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>⚖️ Symmetry Significance</h4>
+                            <p>Ensures that similarity is mutual. Clustering algorithms rely on this for consistent neighbor relationships.</p>
+                            <p><strong>Example:</strong> Hierarchical clustering linkage calculations require symmetric distances.</p>
+                        </div>
+                        
+                        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                            <h4>📐 Triangle Inequality Utility</h4>
+                            <p>Enables computational optimizations and ensures geometric consistency. Many algorithms use this for pruning.</p>
+                            <p><strong>Example:</strong> DBSCAN uses triangle inequality to efficiently find neighbors.</p>
+                        </div>
+                    </div>
+
+                    <h3>🧮 Mathematical Notation and Conventions</h3>
+                    <p>Throughout this course, we'll use consistent mathematical notation. Understanding this notation is crucial for following the theoretical developments.</p>
+
+                    <div class="formula-box">
+                        <h4>📝 Standard Notation</h4>
+                        <ul>
+                            <li><strong>ℝⁿ:</strong> n-dimensional real vector space</li>
+                            <li><strong>x, y, z:</strong> Points/vectors in the space (typically column vectors)</li>
+                            <li><strong>xᵢ:</strong> The i-th component of vector x</li>
+                            <li><strong>‖x‖:</strong> Norm of vector x</li>
+                            <li><strong>⟨x, y⟩:</strong> Inner product (dot product) of vectors x and y</li>
+                            <li><strong>d(x, y):</strong> Distance between points x and y</li>
+                            <li><strong>∀:</strong> "For all" (universal quantifier)</li>
+                            <li><strong>∃:</strong> "There exists" (existential quantifier)</li>
+                            <li><strong>⟺:</strong> "If and only if" (bidirectional implication)</li>
+                        </ul>
+                    </div>
+
+                    <h3>🎪 Common Distance Families</h3>
+                    <p>Distance metrics can be classified into several major families, each with distinct mathematical properties and optimal use cases.</p>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Distance Family</th>
+                                <th>Examples</th>
+                                <th>Mathematical Form</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Lp Norms</strong></td>
+                                <td>Euclidean, Manhattan, Chebyshev</td>
+                                <td>(Σᵢ |xᵢ - yᵢ|ᵖ)^(1/p)</td>
+                                <td>Continuous data, geometric problems</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Angular Metrics</strong></td>
+                                <td>Cosine, Angular distance</td>
+                                <td>Based on vector angles</td>
+                                <td>High-dimensional, sparse data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Edit Distances</strong></td>
+                                <td>Hamming, Levenshtein</td>
+                                <td>Character/element operations</td>
+                                <td>Strings, sequences, categorical data</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Statistical Distances</strong></td>
+                                <td>Mahalanobis, Chi-squared</td>
+                                <td>Based on distributions</td>
+                                <td>Correlated features, statistical data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="property-box">
+                        <h4>🧠 Cache-Aware Computing</h4>
+                        
+                        <h5>📁 Memory Hierarchy Considerations:</h5>
+                        <ul>
+                            <li><strong>Cache Lines:</strong> Modern CPUs load 64-byte cache lines</li>
+                            <li><strong>Spatial Locality:</strong> Adjacent memory accesses are faster</li>
+                            <li><strong>Temporal Locality:</strong> Recently accessed data is faster</li>
+                            <li><strong>Cache Misses:</strong> Can be 100x slower than cache hits</li>
+                        </ul>
+                        
+                        <h5>🎯 Optimization Strategies:</h5>
+                        <ul>
+                            <li><strong>Row-major layout:</strong> Store points contiguously for better cache performance</li>
+                            <li><strong>Blocking:</strong> Process data in cache-sized chunks</li>
+                            <li><strong>Prefetching:</strong> Load next data while computing current</li>
+                            <li><strong>Memory alignment:</strong> Align data structures to cache line boundaries</li>
+                        </ul>
+                        
+                        <h5>📊 Practical Impact:</h5>
+                        <p>Well-optimized distance calculations can be 5-10x faster than naive implementations, with Manhattan distance typically showing greater improvement due to simpler operations.</p>
+                    </div>
+
+                    <h3>🔧 Algorithm-Specific Optimizations</h3>
+                    <p>Different clustering algorithms can leverage specific properties of distance metrics for significant performance improvements.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🎯 K-means Optimizations</h4>
+                            <h5>🔵 Euclidean Distance:</h5>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Squared distances:</strong> Avoid square root in comparison</li>
+                                <li><strong>Triangle inequality:</strong> Skip calculations when possible</li>
+                                <li><strong>Precompute centroids:</strong> Cache ‖centroid‖² values</li>
+                                <li><strong>BLAS libraries:</strong> Use optimized linear algebra</li>
+                            </ul>
+                            
+                            <h5>🔷 Manhattan Distance:</h5>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Early termination:</strong> Stop when distance exceeds threshold</li>
+                                <li><strong>Median updates:</strong> Use median instead of mean for centroids</li>
+                                <li><strong>Sparse optimization:</strong> Skip zero components</li>
+                                <li><strong>Integer arithmetic:</strong> Use when data allows</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🌳 Hierarchical Clustering</h4>
+                            <h5>🔧 Distance Matrix Optimization:</h5>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Symmetry:</strong> Compute only upper triangle</li>
+                                <li><strong>Sparse storage:</strong> Use compressed formats for large matrices</li>
+                                <li><strong>Incremental updates:</strong> Update only affected distances</li>
+                                <li><strong>Parallel computation:</strong> Distribute matrix calculations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>🔍 Approximation Methods</h3>
+                    <p>For very large datasets, exact distance calculations may be too expensive. Various approximation methods can provide significant speedups with controlled accuracy loss.</p>
+
+                    <div class="formula-box">
+                        <h4>⚡ Fast Approximation Techniques</h4>
+                        
+                        <h5>🎲 Random Sampling:</h5>
+                        <ul>
+                            <li><strong>Landmark points:</strong> Compute distances to representative subset</li>
+                            <li><strong>Monte Carlo estimation:</strong> Sample point pairs for average distance</li>
+                            <li><strong>Sketching algorithms:</strong> Use random projections for approximation</li>
+                        </ul>
+                        
+                        <h5>🌐 Spatial Data Structures:</h5>
+                        <ul>
+                            <li><strong>KD-trees:</strong> Effective for low-dimensional Euclidean spaces</li>
+                            <li><strong>Ball trees:</strong> Work with any metric, better for high dimensions</li>
+                            <li><strong>LSH (Locality Sensitive Hashing):</strong> Approximate nearest neighbors</li>
+                            <li><strong>VP-trees:</strong> Vantage point trees for metric spaces</li>
+                        </ul>
+                        
+                        <h5>📊 Dimensionality Reduction:</h5>
+                        <ul>
+                            <li><strong>PCA:</strong> Preserve Euclidean distances in lower dimensions</li>
+                            <li><strong>Random projections:</strong> Johnson-Lindenstrauss lemma</li>
+                            <li><strong>Feature selection:</strong> Remove irrelevant dimensions</li>
+                        </ul>
+                    </div>
+
+                    <h3>🖥️ Parallel and Distributed Computing</h3>
+                    <p>Large-scale clustering requires parallel computation strategies that can efficiently distribute distance calculations across multiple processors or machines.</p>
+
+                    <div class="property-box">
+                        <h4>🔄 Parallelization Strategies</h4>
+                        
+                        <h5>🧵 Thread-Level Parallelism:</h5>
+                        <ul>
+                            <li><strong>Data parallelism:</strong> Distribute points across threads</li>
+                            <li><strong>Task parallelism:</strong> Parallel distance matrix computation</li>
+                            <li><strong>Pipeline parallelism:</strong> Overlap computation and data movement</li>
+                            <li><strong>NUMA awareness:</strong> Consider memory topology</li>
+                        </ul>
+                        
+                        <h5>🌐 Distributed Computing:</h5>
+                        <ul>
+                            <li><strong>MapReduce:</strong> Distribute pairwise distance calculations</li>
+                            <li><strong>Spark:</strong> In-memory distributed distance matrices</li>
+                            <li><strong>MPI:</strong> Message passing for HPC environments</li>
+                            <li><strong>GPU acceleration:</strong> CUDA/OpenCL for massively parallel computation</li>
+                        </ul>
+                        
+                        <h5>📈 Scalability Considerations:</h5>
+                        <ul>
+                            <li><strong>Communication overhead:</strong> Minimize data transfer</li>
+                            <li><strong>Load balancing:</strong> Ensure even work distribution</li>
+                            <li><strong>Fault tolerance:</strong> Handle node failures gracefully</li>
+                            <li><strong>Memory constraints:</strong> Stream processing for large datasets</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Euclidean Distance Section -->
+                <div id="euclidean" class="section-content">
+                    <h2>Euclidean Distance: The Geometric Standard</h2>
+                    
+                    <p>Euclidean distance is the most intuitive and widely used distance metric, representing the straight-line distance between two points in space. It forms the foundation of many clustering algorithms and provides the geometric interpretation that most people naturally understand.</p>
+
+                    <div class="formula-box">
+                        <h3>Mathematical Definition</h3>
+                        <p>For two points x = (x₁, x₂, ..., xₙ) and y = (y₁, y₂, ..., yₙ) in n-dimensional space:</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>d(x, y) = √(Σᵢ₌₁ⁿ (xᵢ - yᵢ)²)</strong>
+                        </div>
+                        <p>This is the L₂ norm of the difference vector (x - y).</p>
+                    </div>
+
+                    <div class="property-box">
+                        <h3>Key Properties</h3>
+                        <ul>
+                            <li><strong>Geometric interpretation:</strong> Straight-line distance in Euclidean space</li>
+                            <li><strong>Rotation invariant:</strong> Distance remains unchanged under rotations</li>
+                            <li><strong>Scale sensitive:</strong> Affected by the scale of individual dimensions</li>
+                            <li><strong>Computational complexity:</strong> O(n) for n-dimensional points</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Manhattan Distance Section -->
+                <div id="manhattan" class="section-content">
+                    <h2>Manhattan Distance: The City Block Metric</h2>
+                    
+                    <p>Manhattan distance, also known as L₁ norm or taxicab distance, measures the sum of absolute differences between coordinates. It's named after the grid-like street layout of Manhattan, where you can only move horizontally or vertically.</p>
+
+                    <div class="formula-box">
+                        <h3>Mathematical Definition</h3>
+                        <p>For two points x = (x₁, x₂, ..., xₙ) and y = (y₁, y₂, ..., yₙ):</p>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <strong>d(x, y) = Σᵢ₌₁ⁿ |xᵢ - yᵢ|</strong>
+                        </div>
+                        <p>This is the L₁ norm of the difference vector (x - y).</p>
+                    </div>
+
+                    <div class="property-box">
+                        <h3>Key Properties</h3>
+                        <ul>
+                            <li><strong>Grid-based interpretation:</strong> Distance along grid lines only</li>
+                            <li><strong>Less sensitive to outliers:</strong> Absolute differences are more robust</li>
+                            <li><strong>Feature independence:</strong> Each dimension contributes equally</li>
+                            <li><strong>Computational efficiency:</strong> O(n) with simple arithmetic operations</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Optimization Techniques Section -->
+                <div id="optimization" class="section-content">
+                    <h2>Optimization Techniques and Computational Efficiency</h2>
+                    
+                    <p>Efficient computation of distance metrics is crucial for large-scale clustering applications. This section covers various optimization strategies, from algorithmic improvements to hardware-specific optimizations.</p>
+
+                    <div class="algorithm-step">
+                        <h3>Vectorized Operations</h3>
+                        <p>Modern numerical libraries like NumPy and BLAS provide highly optimized vectorized operations that can compute distances for entire datasets efficiently.</p>
+                        <ul>
+                            <li><strong>SIMD instructions:</strong> Single instruction, multiple data operations</li>
+                            <li><strong>Memory locality:</strong> Optimized memory access patterns</li>
+                            <li><strong>Cache efficiency:</strong> Minimizing cache misses</li>
+                        </ul>
+                    </div>
+
+                    <div class="algorithm-step">
+                        <h3>Approximation Methods</h3>
+                        <p>For very large datasets, exact distance computation may be too expensive. Various approximation techniques can provide good results with significantly reduced computational cost.</p>
+                        <ul>
+                            <li><strong>Random sampling:</strong> Compute distances on a subset</li>
+                            <li><strong>Locality-sensitive hashing:</strong> Approximate nearest neighbors</li>
+                            <li><strong>Dimensionality reduction:</strong> PCA, random projections</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Applications Section -->
+                <div id="applications" class="section-content">
+                    <h2>Applications and Real-World Examples</h2>
+                    
+                    <p>Understanding when and how to apply Euclidean versus Manhattan distance requires examining real-world scenarios where each metric's properties align with problem characteristics. This section explores diverse applications across multiple domains, providing practical guidance for metric selection.</p>
+
+                    <h3>🏪 E-commerce and Recommendation Systems</h3>
+                    <p>Distance metrics play a crucial role in recommendation systems, where the choice between Euclidean and Manhattan distance can significantly impact recommendation quality and user experience.</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>🛒 Product Similarity (Euclidean)</h4>
+                            <p><strong>Use Case:</strong> Finding similar products based on numerical features</p>
+                            <p><strong>Features:</strong> Price, rating, dimensions, weight</p>
+                            
+                            <div style="background: white; padding: 0.8rem; border-radius: 4px; margin: 0.5rem 0;">
+                                <strong>Example:</strong> Camera similarity<br>
+                                Product A: [price: 500, rating: 4.2, megapixels: 24, weight: 600g]<br>
+                                Product B: [price: 520, rating: 4.1, megapixels: 26, weight: 580g]<br>
+                                <em>Euclidean distance captures overall similarity well</em>
+                            </div>
+                            
+                            <p><strong>Why Euclidean:</strong> Features are continuous and correlations matter</p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>👤 User Behavior (Manhattan)</h4>
+                            <p><strong>Use Case:</strong> Finding similar users based on categorical preferences</p>
+                            <p><strong>Features:</strong> Category purchases, brand preferences, activity counts</p>
+                            
+                            <div style="background: white; padding: 0.8rem; border-radius: 4px; margin: 0.5rem 0;">
+                                <strong>Example:</strong> User similarity<br>
+                                User A: [books: 5, electronics: 2, clothing: 8, sports: 0]<br>
+                                User B: [books: 7, electronics: 1, clothing: 6, sports: 1]<br>
+                                <em>Manhattan distance better handles discrete counts</em>
+                            </div>
+                            
+                            <p><strong>Why Manhattan:</strong> Features are counts/frequencies, independent categories</p>
+                        </div>
+                    </div>
+
+                    <h3>🏥 Healthcare and Medical Diagnosis</h3>
+                    <p>Medical applications require careful consideration of distance metrics, as the choice can impact diagnostic accuracy and patient outcomes.</p>
+
+                    <div class="formula-box">
+                        <h4>🔬 Medical Data Types and Metric Selection</h4>
+                        
+                        <h5>📊 Continuous Medical Measurements (Euclidean):</h5>
+                        <ul>
+                            <li><strong>Vital signs:</strong> Blood pressure, heart rate, temperature</li>
+                            <li><strong>Lab values:</strong> Blood glucose, cholesterol, protein levels</li>
+                            <li><strong>Physical measurements:</strong> Height, weight, BMI</li>
+                            <li><strong>Imaging features:</strong> Tumor dimensions, organ volumes</li>
+                        </ul>
+                        
+                        <h5>🏥 Discrete Medical Data (Manhattan):</h5>
+                        <ul>
+                            <li><strong>Symptom counts:</strong> Number of symptoms present</li>
+                            <li><strong>Medication dosages:</strong> Discrete pill counts</li>
+                            <li><strong>Frequency data:</strong> Episodes per month, visits per year</li>
+                            <li><strong>Severity scales:</strong> Pain scales (1-10), functional scores</li>
+                        </ul>
+                        
+                        <h5>🎯 Case Study: Patient Similarity for Treatment Recommendation</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Scenario:</strong> Finding similar patients for personalized treatment</p>
+                            <p><strong>Data:</strong> Mixed continuous (age, BMI, lab values) and discrete (symptom counts, severity scores)</p>
+                            <p><strong>Solution:</strong> Combine normalized Euclidean for continuous features with Manhattan for discrete features</p>
+                            <p><strong>Formula:</strong> d_total = w₁ × d_E(continuous) + w₂ × d_M(discrete)</p>
+                        </div>
+                    </div>
+
+                    <h3>🌍 Geographic and Location-Based Services</h3>
+                    <p>Geographic applications provide clear intuitive examples of when each distance metric is appropriate.</p>
+
+                    <div class="visualization-placeholder">
+                        <h4>🗺️ Visualization: Geographic Distance Comparison</h4>
+                        <p><strong>Image Description:</strong> A city map showing two points A and B. Three different paths are highlighted: (1) Straight-line distance (red line) representing Euclidean distance "as the crow flies", (2) Driving route (blue path) following roads that approximates Euclidean in open areas, (3) Walking route in Manhattan grid (green step-like path) representing Manhattan distance in downtown grid. Distance measurements shown: Euclidean = 2.3 km, Driving = 3.1 km, Manhattan grid = 3.8 km.</p>
+                        <p><em>This demonstrates how geographic constraints determine appropriate distance metrics</em></p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>✈️ Air Travel (Euclidean)</h4>
+                            <p><strong>Application:</strong> Flight routing, airport clustering</p>
+                            <p><strong>Why Euclidean:</strong> Aircraft can travel in straight lines (great circle distances)</p>
+                            <p><strong>Example:</strong> Grouping airports by geographic proximity for hub-and-spoke networks</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🚗 Ground Transportation (Manhattan)</h4>
+                            <p><strong>Application:</strong> Urban delivery, taxi routing</p>
+                            <p><strong>Why Manhattan:</strong> Roads constrain movement to grid-like patterns</p>
+                            <p><strong>Example:</strong> Optimizing delivery routes in downtown areas with grid street layouts</p>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>🏢 Service Area Planning</h4>
+                            <p><strong>Application:</strong> Emergency services, retail locations</p>
+                            <p><strong>Metric Choice:</strong> Depends on service type and terrain</p>
+                            <p><strong>Example:</strong> Helicopter emergency services (Euclidean) vs ambulance services (Manhattan/road network)</p>
+                        </div>
+                    </div>
+
+                    <h3>💰 Financial Services and Risk Analysis</h3>
+                    <p>Financial applications require careful metric selection based on the nature of financial relationships and risk characteristics.</p>
+
+                    <div class="property-box">
+                        <h4>📈 Financial Distance Applications</h4>
+                        
+                        <h5>📊 Portfolio Analysis (Euclidean):</h5>
+                        <ul>
+                            <li><strong>Asset correlation clustering:</strong> Group correlated stocks</li>
+                            <li><strong>Risk profiling:</strong> Cluster investments by risk-return characteristics</li>
+                            <li><strong>Market segment analysis:</strong> Identify market sectors based on performance metrics</li>
+                        </ul>
+                        
+                        <h5>🔍 Fraud Detection (Manhattan):</h5>
+                        <ul>
+                            <li><strong>Transaction pattern analysis:</strong> Compare discrete transaction counts</li>
+                            <li><strong>Behavioral anomaly detection:</strong> Identify unusual activity patterns</li>
+                            <li><strong>Risk scoring:</strong> Combine multiple independent risk factors</li>
+                        </ul>
+                        
+                        <h5>💳 Case Study: Credit Card Fraud Detection</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Challenge:</strong> Identify fraudulent transactions in real-time</p>
+                            <p><strong>Features:</strong> Transaction amount, merchant category, time since last transaction, geographic distance from home</p>
+                            <p><strong>Manhattan Distance Advantages:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Robust to outliers (extremely large transactions)</li>
+                                <li>Better handles discrete categories</li>
+                                <li>Computationally faster for real-time processing</li>
+                                <li>More interpretable for explaining decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>🎮 Gaming and Entertainment</h3>
+                    <p>Game development and entertainment applications showcase practical distance metric selection based on gameplay mechanics and user experience considerations.</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #f3e5f5; padding: 1rem; border-radius: 8px;">
+                            <h4>🎲 Turn-Based Strategy Games</h4>
+                            <p><strong>Movement System:</strong> Grid-based with orthogonal movement</p>
+                            <p><strong>Distance Metric:</strong> Manhattan distance</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Chess piece movement (rook moves)</li>
+                                <li>Tactical RPGs with grid movement</li>
+                                <li>Board game simulations</li>
+                                <li>Tile-based strategy games</li>
+                            </ul>
+                            <p><strong>Advantage:</strong> Natural mapping to game mechanics</p>
+                        </div>
+                        
+                        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px;">
+                            <h4>🏃 Real-Time Action Games</h4>
+                            <p><strong>Movement System:</strong> Free movement in continuous space</p>
+                            <p><strong>Distance Metric:</strong> Euclidean distance</p>
+                            <p><strong>Examples:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>First-person shooters</li>
+                                <li>Racing games</li>
+                                <li>Flight simulators</li>
+                                <li>Physics-based games</li>
+                            </ul>
+                            <p><strong>Advantage:</strong> Matches player intuition for "real" distance</p>
+                        </div>
+                    </div>
+
+                    <h3>🔬 Text Mining and Natural Language Processing</h3>
+                    <p>Text analysis applications demonstrate how data characteristics determine optimal distance metric selection.</p>
+
+                    <div class="formula-box">
+                        <h4>📚 Text Distance Applications</h4>
+                        
+                        <h5>📖 Document Similarity (Often Neither Euclidean nor Manhattan):</h5>
+                        <p>While text applications often use cosine similarity, understanding when Euclidean or Manhattan might apply:</p>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Manhattan Distance for Text:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Word count comparisons</li>
+                                <li>Frequency-based features</li>
+                                <li>Sparse high-dimensional representations</li>
+                                <li>Categorical text features (topic presence/absence)</li>
+                            </ul>
+                            
+                            <p><strong>Euclidean Distance for Text:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Dense word embeddings (Word2Vec, BERT)</li>
+                                <li>Continuous semantic features</li>
+                                <li>Style analysis with continuous metrics</li>
+                                <li>Sentiment scores and continuous ratings</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>🏭 Manufacturing and Quality Control</h3>
+                    <p>Industrial applications often require robust distance metrics that can handle measurement noise and discrete quality indicators.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px;">
+                            <h4>⚙️ Product Quality Clustering</h4>
+                            <p><strong>Euclidean Applications:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Dimensional measurements</li>
+                                <li>Temperature/pressure sensors</li>
+                                <li>Continuous process variables</li>
+                                <li>Physical property measurements</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: #fff8e1; padding: 1rem; border-radius: 8px;">
+                            <h4>🔧 Defect Pattern Analysis</h4>
+                            <p><strong>Manhattan Applications:</strong></p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Defect counts by type</li>
+                                <li>Binary quality indicators</li>
+                                <li>Discrete severity levels</li>
+                                <li>Pass/fail test results</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>📊 Visualization: Manufacturing Quality Clustering</h4>
+                        <p><strong>Image Description:</strong> Two side-by-side scatter plots showing the same manufacturing data clustered differently. Left plot: "Euclidean Distance" shows smooth, circular clusters of products based on continuous measurements (temperature, pressure). Right plot: "Manhattan Distance" shows angular, diamond-shaped clusters better separating products based on discrete defect counts and quality indicators. Different cluster boundaries highlight how metric choice affects quality categorization.</p>
+                        <p><em>This demonstrates how distance metric choice impacts quality control clustering results</em></p>
+                    </div>
+
+                    <h3>🎯 Practical Guidelines for Metric Selection</h3>
+                    <p>Based on the applications explored, here are practical guidelines for choosing between Euclidean and Manhattan distance:</p>
+
+                    <div class="property-box">
+                        <h4>✅ Decision Framework</h4>
+                        
+                        <h5>🔵 Choose Euclidean Distance When:</h5>
+                        <ul>
+                            <li><strong>Continuous data:</strong> Features represent continuous measurements</li>
+                            <li><strong>Correlated features:</strong> Feature relationships matter</li>
+                            <li><strong>Geometric problems:</strong> Physical space or geometric intuition applies</li>
+                            <li><strong>Gaussian assumptions:</strong> Data follows normal distributions</li>
+                            <li><strong>Dense representations:</strong> Most feature values are non-zero</li>
+                            <li><strong>Optimization friendly:</strong> Need smooth, differentiable objective functions</li>
+                        </ul>
+                        
+                        <h5>🔷 Choose Manhattan Distance When:</h5>
+                        <ul>
+                            <li><strong>Discrete/count data:</strong> Features represent counts or frequencies</li>
+                            <li><strong>Independent features:</strong> Features represent separate, unrelated quantities</li>
+                            <li><strong>Outlier robustness:</strong> Need resistance to extreme values</li>
+                            <li><strong>Grid-constrained problems:</strong> Movement restricted to orthogonal directions</li>
+                            <li><strong>Sparse data:</strong> Many features are zero</li>
+                            <li><strong>High dimensions:</strong> Better discrimination in high-dimensional spaces</li>
+                            <li><strong>Computational efficiency:</strong> Speed is critical</li>
+                        </ul>
+                        
+                        <h5>🤔 Consider Hybrid Approaches When:</h5>
+                        <ul>
+                            <li><strong>Mixed data types:</strong> Combination of continuous and discrete features</li>
+                            <li><strong>Domain-specific needs:</strong> Different feature groups require different treatments</li>
+                            <li><strong>Uncertain assumptions:</strong> Try both and compare results</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interactive Calculator Section -->
+                <div id="calculator" class="section-content">
+                    <h2>Interactive Distance Calculator</h2>
+                    
+                    <p>Explore Euclidean and Manhattan distances hands-on with this interactive calculator. Input your own points, compare different metrics, and visualize the results to build intuition about distance behavior.</p>
+
+                    <div class="interactive-demo">
+                        <h3>🧮 Two-Point Distance Calculator</h3>
+                        <p>Calculate and compare Euclidean and Manhattan distances between two points in up to 5 dimensions.</p>
+                        
+                        <div class="distance-calculator">
+                            <h4>📍 Point Coordinates</h4>
+                            <div class="point-input">
+                                <div>
+                                    <label for="dim-count">Number of Dimensions:</label>
+                                    <select id="dim-count" onchange="updateDimensions()">
+                                        <option value="2">2D</option>
+                                        <option value="3">3D</option>
+                                        <option value="4">4D</option>
+                                        <option value="5">5D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 1.5rem 0;">
+                                <div>
+                                    <h5>Point A:</h5>
+                                    <div id="point-a-inputs">
+                                        <input type="number" id="a-x" placeholder="X" value="1" step="0.1">
+                                        <input type="number" id="a-y" placeholder="Y" value="2" step="0.1">
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5>Point B:</h5>
+                                    <div id="point-b-inputs">
+                                        <input type="number" id="b-x" placeholder="X" value="4" step="0.1">
+                                        <input type="number" id="b-y" placeholder="Y" value="6" step="0.1">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="calculateDistances()" class="azbn-btn">Calculate Distances</button>
+                            
+                            <div id="distance-results" style="display: none; margin-top: 1.5rem;">
+                                <h4>📊 Results</h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                    <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px;">
+                                        <h5>🔵 Euclidean Distance</h5>
+                                        <div id="euclidean-result" style="font-size: 1.2rem; font-weight: bold; color: #2196f3;"></div>
+                                        <div id="euclidean-formula" style="font-size: 0.9rem; margin-top: 0.5rem;"></div>
+                                    </div>
+                                    <div style="background: #fff8e1; padding: 1rem; border-radius: 6px;">
+                                        <h5>🔷 Manhattan Distance</h5>
+                                        <div id="manhattan-result" style="font-size: 1.2rem; font-weight: bold; color: #ff9800;"></div>
+                                        <div id="manhattan-formula" style="font-size: 0.9rem; margin-top: 0.5rem;"></div>
+                                    </div>
+                                    <div style="background: #f3e5f5; padding: 1rem; border-radius: 6px;">
+                                        <h5>📐 Ratio Analysis</h5>
+                                        <div id="ratio-result" style="font-size: 1.2rem; font-weight: bold; color: #9c27b0;"></div>
+                                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">Manhattan / Euclidean</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>📈 Batch Distance Analysis</h3>
+                        <p>Generate random points and analyze distance distributions to understand metric behavior.</p>
+                        
+                        <div class="demo-controls">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                                <div>
+                                    <label for="num-random-points">Number of Points:</label>
+                                    <input type="range" id="num-random-points" min="10" max="100" value="50">
+                                    <span id="points-count">50</span>
+                                </div>
+                                <div>
+                                    <label for="random-dimensions">Dimensions:</label>
+                                    <select id="random-dimensions">
+                                        <option value="2">2D</option>
+                                        <option value="3">3D</option>
+                                        <option value="5">5D</option>
+                                        <option value="10">10D</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="distribution-type">Distribution:</label>
+                                    <select id="distribution-type">
+                                        <option value="uniform">Uniform</option>
+                                        <option value="normal">Normal</option>
+                                        <option value="exponential">Exponential</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button onclick="generateBatchAnalysis()" class="azbn-btn">Generate & Analyze</button>
+                        </div>
+
+                        <div id="batch-results" style="display: none; margin-top: 1.5rem;">
+                            <h4>📊 Statistical Analysis</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                <div style="background: #e3f2fd; padding: 1rem; border-radius: 6px;">
+                                    <h5>🔵 Euclidean Statistics</h5>
+                                    <div id="euclidean-stats"></div>
+                                </div>
+                                <div style="background: #fff8e1; padding: 1rem; border-radius: 6px;">
+                                    <h5>🔷 Manhattan Statistics</h5>
+                                    <div id="manhattan-stats"></div>
+                                </div>
+                                <div style="background: #e8f5e8; padding: 1rem; border-radius: 6px;">
+                                    <h5>📈 Comparison</h5>
+                                    <div id="comparison-stats"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🎯 Clustering Comparison Demo</h3>
+                        <p>See how Euclidean and Manhattan distances create different clustering results on the same data.</p>
+                        
+                        <div class="demo-controls">
+                            <button onclick="generateClusteringDemo()" class="azbn-btn">Generate Clustering Demo</button>
+                            <button onclick="stepClusteringDemo()" class="azbn-btn azbn-secondary">Step Through Iterations</button>
+                            <button onclick="resetClusteringDemo()" class="azbn-btn azbn-secondary">Reset</button>
+                        </div>
+
+                        <div id="clustering-comparison" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                            <div>
+                                <h4>🔵 Euclidean K-means</h4>
+                                <div class="metric-visualization" id="euclidean-clustering">
+                                    <p style="text-align: center; margin-top: 100px; color: #666;">Click "Generate Clustering Demo" to start</p>
+                                </div>
+                                <div id="euclidean-cluster-info" style="margin-top: 0.5rem; font-size: 0.9rem;"></div>
+                            </div>
+                            <div>
+                                <h4>🔷 Manhattan K-means</h4>
+                                <div class="metric-visualization" id="manhattan-clustering">
+                                    <p style="text-align: center; margin-top: 100px; color: #666;">Click "Generate Clustering Demo" to start</p>
+                                </div>
+                                <div id="manhattan-cluster-info" style="margin-top: 0.5rem; font-size: 0.9rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>🧪 Custom Experiment Designer</h3>
+                        <p>Design your own experiments to test specific hypotheses about distance metric behavior.</p>
+                        
+                        <div class="demo-controls">
+                            <h4>Experiment Setup</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                                <div>
+                                    <label for="experiment-type">Experiment Type:</label>
+                                    <select id="experiment-type">
+                                        <option value="outliers">Outlier Sensitivity</option>
+                                        <option value="scaling">Feature Scaling Impact</option>
+                                        <option value="correlation">Feature Correlation Effects</option>
+                                        <option value="dimensions">High-Dimensional Behavior</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="experiment-intensity">Intensity:</label>
+                                    <input type="range" id="experiment-intensity" min="1" max="10" value="5">
+                                    <span id="intensity-value">5</span>
+                                </div>
+                            </div>
+                            
+                            <button onclick="runCustomExperiment()" class="azbn-btn">Run Experiment</button>
+                        </div>
+
+                        <div id="experiment-results" style="display: none; margin-top: 1.5rem;">
+                            <h4>🔬 Experiment Results</h4>
+                            <div id="experiment-analysis"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="section-content">
+                    <h2>Chapter 2 Quiz: Distance Metrics Mastery</h2>
+                    <p>Test your understanding of Euclidean and Manhattan distance theory, properties, and applications.</p>
+
+                    <div class="quiz-question">
+                        <h4>Question 1: Which property is required for a function to be a valid metric?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q1" value="a" id="q1a">
+                            <label for="q1a">Differentiability everywhere</label><br>
+                            <input type="radio" name="q1" value="b" id="q1b">
+                            <label for="q1b">Triangle inequality</label><br>
+                            <input type="radio" name="q1" value="c" id="q1c">
+                            <label for="q1c">Rotation invariance</label><br>
+                            <input type="radio" name="q1" value="d" id="q1d">
+                            <label for="q1d">Computational efficiency</label>
+                        </div>
+                        <button onclick="checkQuizAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: What is the Manhattan distance between points (2, 3, 1) and (5, 1, 4)?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q2" value="a" id="q2a">
+                            <label for="q2a">5</label><br>
+                            <input type="radio" name="q2" value="b" id="q2b">
+                            <label for="q2b">8</label><br>
+                            <input type="radio" name="q2" value="c" id="q2c">
+                            <label for="q2c">√22</label><br>
+                            <input type="radio" name="q2" value="d" id="q2d">
+                            <label for="q2d">22</label>
+                        </div>
+                        <button onclick="checkQuizAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Which statement about high-dimensional behavior is correct?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q3" value="a" id="q3a">
+                            <label for="q3a">Euclidean distance becomes more discriminative in high dimensions</label><br>
+                            <input type="radio" name="q3" value="b" id="q3b">
+                            <label for="q3b">Manhattan distance maintains better discrimination than Euclidean in high dimensions</label><br>
+                            <input type="radio" name="q3" value="c" id="q3c">
+                            <label for="q3c">Both metrics perform equally well in high dimensions</label><br>
+                            <input type="radio" name="q3" value="d" id="q3d">
+                            <label for="q3d">Distance metrics become meaningless in high dimensions</label>
+                        </div>
+                        <button onclick="checkQuizAnswer(3, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: What is the shape of the L₁ (Manhattan) unit ball in 2D?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q4" value="a" id="q4a">
+                            <label for="q4a">Circle</label><br>
+                            <input type="radio" name="q4" value="b" id="q4b">
+                            <label for="q4b">Square</label><br>
+                            <input type="radio" name="q4" value="c" id="q4c">
+                            <label for="q4c">Diamond (rotated square)</label><br>
+                            <input type="radio" name="q4" value="d" id="q4d">
+                            <label for="q4d">Ellipse</label>
+                        </div>
+                        <button onclick="checkQuizAnswer(4, 'c')" class="azbn-btn">Check Answer</button>
+                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: When is Manhattan distance typically preferred over Euclidean distance?</h4>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q5" value="a" id="q5a">
+                            <label for="q5a">When features are highly correlated</label><br>
+                            <input type="radio" name="q5" value="b" id="q5b">
+                            <label for="q5a">When working with count data and need outlier robustness</label><br>
+                            <input type="radio" name="q5" value="c" id="q5c">
+                            <label for="q5c">When rotation invariance is important</label><br>
+                            <input type="radio" name="q5" value="d" id="q5d">
+                            <label for="q5d">When all features have the same scale</label>
+                        </div>
+                        <button onclick="checkQuizAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button onclick="submitChapter2Quiz()" class="azbn-btn">Submit Quiz</button>
+                        <div id="chapter2-quiz-score" style="margin-top: 1rem; font-size: 1.2rem; font-weight: bold;"></div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="/tutorials/clustering-course/chapter1" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 1: Introduction</a>
+                    <a href="/tutorials/clustering-course/chapter3" class="azbn-btn" style="text-decoration: none;">Chapter 3: Minkowski Distance →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    </main>
+
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Alireza Barzin Zanganeh</h3>
+                    <p>ML Engineer & Data Scientist</p>
+                    <p>Passionate about creating intelligent solutions through machine learning and data science.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/#projects">Projects</a></li>
+                        <li><a href="/tutorials/">Tutorials</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://linkedin.com/in/alireza-barzin-zanganeh" target="_blank" rel="noopener" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://github.com/alireza-barzin" target="_blank" rel="noopener" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="mailto:alireza.barzin.zanganeh@gmail.com" aria-label="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Alireza Barzin Zanganeh. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let quizAnswers = {};
+        
+        function showSection(sectionName) {
+            document.querySelectorAll(".content-section").forEach(section => {
+                section.classList.remove("active");
+            });
+            document.getElementById(sectionName).classList.add("active");
+            
+            document.querySelectorAll(".section-nav button").forEach(button => {
+                button.classList.remove("active");
+            });
+            event.target.classList.add("active");
+        }
+
+        function checkQuizAnswer(questionNum, correctAnswer) {
+            const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const resultDiv = document.getElementById(`q${questionNum}-result`);
+            
+            if (!selectedAnswer) {
+                resultDiv.innerHTML = "<p style=\"color: orange;\">Please select an answer first.</p>";
+                return;
+            }
+            
+            const isCorrect = selectedAnswer.value === correctAnswer;
+            quizAnswers[questionNum] = isCorrect;
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = "<p style=\"color: green;\">✅ Correct!</p>";
+            } else {
+                let explanation = "";
+                if (questionNum === 1) explanation = "Triangle inequality d(x,z) ≤ d(x,y) + d(y,z) is a fundamental metric property.";
+                if (questionNum === 2) explanation = "Manhattan distance: |2-5| + |3-1| + |1-4| = 3 + 2 + 3 = 8";
+                if (questionNum === 3) explanation = "Manhattan distance maintains better discrimination in high dimensions due to slower concentration.";
+                if (questionNum === 4) explanation = "L₁ unit ball {x: |x₁| + |x₂| ≤ 1} forms a diamond shape in 2D.";
+                if (questionNum === 5) explanation = "Manhattan distance is more robust to outliers and works well with count data.";
+                
+                resultDiv.innerHTML = `<p style="color: red;">❌ Incorrect. ${explanation}</p>`;
+            }
+        }
+
+        function submitChapter2Quiz() {
+            const totalQuestions = 5;
+            const correctAnswers = Object.values(quizAnswers).filter(Boolean).length;
+            const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            const scoreDiv = document.getElementById("chapter2-quiz-score");
+            scoreDiv.innerHTML = `Quiz Score: ${correctAnswers}/${totalQuestions} (${percentage}%)`;
+            
+            if (percentage >= 80) {
+                scoreDiv.style.color = "green";
+            } else if (percentage >= 60) {
+                scoreDiv.style.color = "orange";
+            } else {
+                scoreDiv.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>
