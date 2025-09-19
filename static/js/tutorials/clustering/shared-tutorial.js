@@ -364,9 +364,70 @@ function scrollToTop() {
     });
 }
 
+// ===== SHARED CLUSTERING FUNCTIONS =====
+// These functions are used across multiple chapters
+
+function initializeCentroids(data, k) {
+    const centroids = [];
+    for (let i = 0; i < k; i++) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        centroids.push({
+            x: data[randomIndex].x,
+            y: data[randomIndex].y
+        });
+    }
+    return centroids;
+}
+
+function updateCentroids(clusters) {
+    const clusterGroups = {};
+    clusters.forEach(point => {
+        if (!clusterGroups[point.cluster]) {
+            clusterGroups[point.cluster] = [];
+        }
+        clusterGroups[point.cluster].push(point);
+    });
+    
+    return Object.keys(clusterGroups).map(clusterId => {
+        const points = clusterGroups[clusterId];
+        const avgX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+        const avgY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+        return { x: avgX, y: avgY };
+    });
+}
+
+function hasConverged(oldClusters, newClusters) {
+    return oldClusters.every((point, index) => 
+        point.cluster === newClusters[index].cluster
+    );
+}
+
+function generateSampleData(clusterCount, pointsPerCluster = 20) {
+    const data = [];
+    
+    for (let i = 0; i < clusterCount; i++) {
+        const centerX = Math.random() * 300 + 50;
+        const centerY = Math.random() * 200 + 50;
+        
+        for (let j = 0; j < pointsPerCluster; j++) {
+            data.push({
+                x: centerX + (Math.random() - 0.5) * 40,
+                y: centerY + (Math.random() - 0.5) * 40,
+                cluster: i
+            });
+        }
+    }
+    
+    return data;
+}
+
 // Export functions for potential use in other files
 window.showSection = showSection;
 window.navigateSubSection = navigateSubSection;
 window.updateSectionProgress = updateSectionProgress;
 window.updateSubSectionNavigation = updateSubSectionNavigation;
 window.scrollToTop = scrollToTop;
+window.initializeCentroids = initializeCentroids;
+window.updateCentroids = updateCentroids;
+window.hasConverged = hasConverged;
+window.generateSampleData = generateSampleData;
