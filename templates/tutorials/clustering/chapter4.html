@@ -97,112 +97,192 @@
                 <main class="chapter-main-content">
                     <!-- Algorithm Overview Section -->
                     <div id="algorithm" class="content-section active">
-                        <h2>K-means Algorithm Overview</h2>
+                        <h2>Beyond Minkowski: The World of Specialized Distance Metrics</h2>
                         
-                        <div class="explanation-box">
-                            <p>K-means is one of the most widely used clustering algorithms due to its simplicity, efficiency, and effectiveness. It partitions data into k clusters by minimizing the within-cluster sum of squares (WCSS), making it particularly suitable for spherical clusters of similar sizes.</p>
-                        </div>
+                        <p>While Minkowski distances provide a powerful foundation for measuring similarity, many real-world applications require specialized metrics that capture domain-specific notions of distance and similarity. This chapter explores advanced distance measures that excel in particular contexts, from high-dimensional sparse data to categorical variables and correlated features.</p>
 
-                        <div class="model-box">
-                            <h3>Algorithm Steps</h3>
-                            <ol>
-                                <li><strong>Initialize:</strong> Choose k initial centroids randomly or using a specific method</li>
-                                <li><strong>Assign:</strong> Assign each data point to the nearest centroid</li>
-                                <li><strong>Update:</strong> Recalculate centroids as the mean of assigned points</li>
-                                <li><strong>Repeat:</strong> Iterate steps 2-3 until convergence</li>
-                            </ol>
-                        </div>
+                        <h3>Why Specialized Metrics Matter</h3>
+                        <p>Different types of data and applications expose the limitations of general-purpose metrics like Euclidean and Manhattan distance:</p>
 
-                        <div class="formula-box">
-                            <h3>Objective Function</h3>
-                            <div class="formula-display">
-                                <h4>Within-Cluster Sum of Squares (WCSS)</h4>
-                                <div class="formula">J = Σᵢ₌₁ᵏ Σₓ∈Cᵢ ||x - μᵢ||²</div>
-                                <p><strong>Where:</strong></p>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Limitations of Standard Metrics</h4>
                                 <ul>
-                                    <li>k is the number of clusters</li>
-                                    <li>Cᵢ is the set of points in cluster i</li>
-                                    <li>μᵢ is the centroid of cluster i</li>
-                                    <li>||x - μᵢ||² is the squared Euclidean distance</li>
+                                    <li><strong>High dimensions:</strong> Euclidean distance loses discriminative power</li>
+                                    <li><strong>Sparse data:</strong> Most components are zero, distances become meaningless</li>
+                                    <li><strong>Categorical data:</strong> Ordering assumptions don't apply</li>
+                                    <li><strong>Correlated features:</strong> Some directions more important than others</li>
+                                    <li><strong>Scale differences:</strong> Features with different units dominate</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Specialized Solutions</h4>
+                                <ul>
+                                    <li><strong>Cosine similarity:</strong> Direction matters more than magnitude</li>
+                                    <li><strong>Hamming distance:</strong> Direct comparison of categorical values</li>
+                                    <li><strong>Mahalanobis distance:</strong> Accounts for feature correlations</li>
+                                    <li><strong>Edit distances:</strong> Sequence and string comparisons</li>
+                                    <li><strong>Custom metrics:</strong> Domain-specific similarity measures</li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="image-container">
-                            <h4>Visualization: K-means Iteration Process</h4>
-                            <div class="visualization-placeholder">
-                                <p>Interactive visualization showing K-means algorithm iterations with data points, centroids, and cluster assignments</p>
-                            </div>
-                            <p><strong>Iteration Process:</strong> Watch how centroids move and cluster assignments change with each iteration until convergence.</p>
-                        </div>
+                        <h3>Taxonomy of Advanced Distance Metrics</h3>
+                        <p>Advanced distance metrics can be categorized by the type of data they're designed for and the similarity concept they capture:</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Metrics</th>
+                                    <th>Data Type</th>
+                                    <th>Key Concept</th>
+                                    <th>Primary Applications</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Angular Metrics</strong></td>
+                                    <td>Cosine, Angular distance</td>
+                                    <td>Continuous vectors</td>
+                                    <td>Direction vs magnitude</td>
+                                    <td>Text analysis, recommender systems</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Edit Distances</strong></td>
+                                    <td>Hamming, Levenshtein, Jaccard</td>
+                                    <td>Discrete sequences</td>
+                                    <td>Transformation cost</td>
+                                    <td>DNA sequences, spell checking</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Statistical Distances</strong></td>
+                                    <td>Mahalanobis, Bhattacharyya</td>
+                                    <td>Continuous features</td>
+                                    <td>Statistical relationships</td>
+                                    <td>Multivariate analysis, anomaly detection</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Correlation Distances</strong></td>
+                                    <td>Pearson, Spearman, Kendall</td>
+                                    <td>Time series, rankings</td>
+                                    <td>Co-variation patterns</td>
+                                    <td>Gene expression, financial data</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- Mathematical Foundation Section -->
                     <div id="mathematics" class="content-section">
-                        <h2>Mathematical Foundation</h2>
+                        <h2>Cosine Similarity: Angular Distance in High Dimensions</h2>
                         
-                        <div class="explanation-box">
-                            <p>The mathematical foundation of K-means is based on optimization theory, specifically the minimization of the within-cluster sum of squares. Understanding this foundation is crucial for implementing the algorithm correctly and analyzing its properties.</p>
-                        </div>
+                        <p>Cosine similarity is one of the most important and widely used similarity measures in machine learning, particularly for high-dimensional sparse data like text documents, user preferences, and recommendation systems. Unlike Euclidean distance, cosine similarity focuses on the angle between vectors rather than their magnitude.</p>
+
+                        <h3>Mathematical Foundation</h3>
+                        <p>Cosine similarity measures the cosine of the angle between two non-zero vectors, providing a measure of orientation rather than magnitude.</p>
 
                         <div class="formula-box">
-                            <h3>Centroid Update Rule</h3>
+                            <h3>Cosine Similarity Formula</h3>
+                            <p>For two vectors x, y ∈ ℝⁿ, cosine similarity is defined as:</p>
+                            
                             <div class="formula-display">
-                                <h4>Optimal Centroid Calculation</h4>
-                                <div class="formula">μᵢ* = (1/|Cᵢ|) Σₓ∈Cᵢ x</div>
-                                <p><strong>Derivation:</strong> Taking the derivative of the objective function with respect to μᵢ and setting it to zero:</p>
-                                <div class="formula">∂J/∂μᵢ = -2 Σₓ∈Cᵢ (x - μᵢ) = 0</div>
-                                <div class="formula">Σₓ∈Cᵢ x = |Cᵢ|μᵢ</div>
-                                <div class="formula">μᵢ = (1/|Cᵢ|) Σₓ∈Cᵢ x</div>
+                                <strong>cos_sim(x, y) = (x · y) / (‖x‖₂ ‖y‖₂)</strong>
                             </div>
-                        </div>
-
-                        <div class="explanation-box">
-                            <h3>Convexity and Local Minima</h3>
-                            <p>The K-means objective function is non-convex, which means the algorithm can get trapped in local minima. This is why initialization is crucial and why multiple runs with different initializations are often recommended.</p>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Algorithm Properties</h3>
+                            
+                            <p>Expanded form:</p>
+                            <div class="formula-display">
+                                <strong>cos_sim(x, y) = (Σᵢ₌₁ⁿ xᵢyᵢ) / (√(Σᵢ₌₁ⁿ xᵢ²) √(Σᵢ₌₁ⁿ yᵢ²))</strong>
+                            </div>
+                            
+                            <h4>Related Measures:</h4>
                             <ul>
-                                <li><strong>Guaranteed Convergence:</strong> The algorithm always converges to a local minimum</li>
-                                <li><strong>Finite Iterations:</strong> Convergence occurs in finite time</li>
-                                <li><strong>Monotonic Decrease:</strong> Objective function never increases</li>
-                                <li><strong>Local Optima:</strong> May not find global optimum</li>
+                                <li><strong>Cosine Distance:</strong> cos_dist(x, y) = 1 - cos_sim(x, y)</li>
+                                <li><strong>Angular Distance:</strong> θ = arccos(cos_sim(x, y))</li>
+                                <li><strong>Angular Similarity:</strong> 1 - θ/π (normalized to [0, 1])</li>
+                            </ul>
+                        </div>
+
+                        <div class="image-container">
+                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter4/cosine_similarity.png') }}" alt="Cosine Similarity Geometric Interpretation" class="tutorial-image">
+                            <p class="image-caption">2D coordinate system showing vectors and their angles with cosine similarity values</p>
+                        </div>
+
+                        <h3>Properties and Applications</h3>
+                        <div class="model-box">
+                            <h4>Key Properties</h4>
+                            <ul>
+                                <li><strong>Range:</strong> [-1, 1] for any real vectors</li>
+                                <li><strong>Scale invariant:</strong> cos_sim(αx, βy) = cos_sim(x, y) for α, β > 0</li>
+                                <li><strong>Directional:</strong> Captures vector orientation, not magnitude</li>
+                                <li><strong>High-dimensional friendly:</strong> Less affected by curse of dimensionality</li>
+                            </ul>
+                            
+                            <h4>Primary Applications</h4>
+                            <ul>
+                                <li><strong>Text Analysis:</strong> Document similarity using TF-IDF vectors</li>
+                                <li><strong>Recommendation Systems:</strong> User-item and item-item similarity</li>
+                                <li><strong>Information Retrieval:</strong> Query-document matching</li>
+                                <li><strong>Computer Vision:</strong> Feature vector comparison</li>
                             </ul>
                         </div>
                     </div>
 
                     <!-- Initialization Methods Section -->
                     <div id="initialization" class="content-section">
-                        <h2>Initialization Methods</h2>
+                        <h2>Hamming Distance and Edit Distances</h2>
                         
-                        <div class="explanation-box">
-                            <p>The choice of initialization method significantly affects K-means performance. Poor initialization can lead to suboptimal clustering results, while good initialization can improve both convergence speed and final cluster quality.</p>
-                        </div>
+                        <p>For categorical data, sequences, and discrete structures, traditional Lp distances often fail to capture meaningful similarity. Edit distances, led by Hamming distance, provide natural measures for comparing discrete sequences by counting the operations needed to transform one sequence into another.</p>
 
-                        <div class="model-box">
-                            <h3>Random Initialization</h3>
+                        <h3>Hamming Distance: The Foundation</h3>
+                        <p>Named after Richard Hamming, this distance measures the number of positions at which corresponding symbols differ between two strings of equal length.</p>
+
+                        <div class="formula-box">
+                            <h3>Hamming Distance Definition</h3>
+                            <p>For two strings x, y of equal length n over alphabet Σ:</p>
+                            
+                            <div class="formula-display">
+                                <strong>d_H(x, y) = Σᵢ₌₁ⁿ [xᵢ ≠ yᵢ]</strong>
+                            </div>
+                            
+                            <p>Where [xᵢ ≠ yᵢ] is the Iverson bracket: 1 if xᵢ ≠ yᵢ, 0 otherwise.</p>
+                            
+                            <h4>Properties:</h4>
                             <ul>
-                                <li><strong>Method:</strong> Randomly select k data points as initial centroids</li>
-                                <li><strong>Pros:</strong> Simple, fast, unbiased</li>
-                                <li><strong>Cons:</strong> Can lead to poor local minima, inconsistent results</li>
-                                <li><strong>Usage:</strong> Often used with multiple runs</li>
+                                <li><strong>Range:</strong> [0, n] where n is string length</li>
+                                <li><strong>Valid metric:</strong> Satisfies all four metric axioms</li>
+                                <li><strong>Discrete:</strong> Only integer values possible</li>
+                                <li><strong>Position-dependent:</strong> Order matters in comparison</li>
                             </ul>
                         </div>
 
+                        <h3>Levenshtein Distance: Edit Distance for Different Lengths</h3>
+                        <p>While Hamming distance requires equal-length strings, Levenshtein distance allows insertions, deletions, and substitutions to compare strings of different lengths.</p>
+
                         <div class="model-box">
-                            <h3>K-means++ Initialization</h3>
-                            <ul>
-                                <li><strong>Method:</strong> Probabilistic selection favoring distant points</li>
-                                <li><strong>Algorithm:</strong></li>
-                                <ol>
-                                    <li>Choose first centroid randomly</li>
-                                    <li>For each remaining centroid, choose with probability proportional to squared distance to nearest existing centroid</li>
-                                </ol>
-                                <li><strong>Pros:</strong> Better initialization, faster convergence</li>
-                                <li><strong>Cons:</strong> Slightly more complex</li>
-                            </ul>
+                            <h4>Levenshtein Distance Definition</h4>
+                            <p>The minimum number of single-character edits (insertions, deletions, substitutions) needed to change one string into another.</p>
+                            
+                            <h5>Dynamic Programming Formulation:</h5>
+                            <p>Let L(i, j) be the distance between the first i characters of string x and first j characters of string y:</p>
+                            
+                            <div class="formula-box">
+                                <p><strong>Base cases:</strong></p>
+                                <ul>
+                                    <li>L(0, j) = j (insert j characters)</li>
+                                    <li>L(i, 0) = i (delete i characters)</li>
+                                </ul>
+                                
+                                <p><strong>Recursive relation:</strong></p>
+                                <div class="formula-display">
+                                    L(i, j) = min{<br>
+                                    L(i-1, j) + 1,      (deletion)<br>
+                                    L(i, j-1) + 1,      (insertion)<br>
+                                    L(i-1, j-1) + cost  (substitution)
+                                </div>
+                                <p>Where cost = 0 if xᵢ = yⱼ, 1 otherwise</p>
+                            </div>
                         </div>
 
                         <div class="interactive-container">
