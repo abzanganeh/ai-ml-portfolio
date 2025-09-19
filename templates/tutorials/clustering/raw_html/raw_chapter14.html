@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 14: Clustering Evaluation - Comprehensive Clustering Analysis Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml_fundamentals/chapter14.css') }}">
+    <style>
+        .visualization-placeholder {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .metric-box {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .internal-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .external-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .validation-box {
+            background: #fce4ec;
+            border-left: 4px solid #e91e63;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .statistical-box {
+            background: #f1f8e9;
+            border-left: 4px solid #689f38;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .quiz-question {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .learning-objectives-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        .section-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+        .section-nav button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .section-nav button:hover {
+            background: #e9ecef;
+        }
+        .section-nav button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .metric-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/ml-fundamentals" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <img src="/static/images/logo.png" alt="Logo" style="height: 40px;">
+                    <span>Comprehensive Clustering Analysis Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter13" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 13: Mean Shift Clustering</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter15" class="azbn-btn" style="text-decoration: none;">Chapter 15: Advanced Applications →</a>
+                </div>
+
+                <h1>Chapter 14: Clustering Evaluation and Validation</h1>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+                    Master the critical skill of evaluating clustering quality through comprehensive validation techniques. Learn internal metrics like silhouette analysis, external metrics for ground truth comparison, and statistical methods for assessing clustering significance and stability.
+                </p>
+
+                <div class="learning-objectives-card">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the fundamental challenges in clustering evaluation</li>
+                        <li>Master internal validation metrics: silhouette, Davies-Bouldin, Calinski-Harabasz</li>
+                        <li>Learn external validation metrics: Adjusted Rand Index, Normalized Mutual Information</li>
+                        <li>Explore relative validation techniques for comparing clustering solutions</li>
+                        <li>Apply statistical significance testing to clustering results</li>
+                        <li>Understand stability analysis and consensus clustering methods</li>
+                        <li>Develop practical guidelines for real-world clustering evaluation</li>
+                        <li>Compare different validation approaches and their appropriate use cases</li>
+                    </ul>
+                </div>
+
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('introduction', this)">Introduction</button>
+                    <button onclick="showSection('internal', this)">Internal Metrics</button>
+                    <button onclick="showSection('external', this)">External Metrics</button>
+                    <button onclick="showSection('relative', this)">Relative Validation</button>
+                    <button onclick="showSection('statistical', this)">Statistical Testing</button>
+                    <button onclick="showSection('stability', this)">Stability Analysis</button>
+                    <button onclick="showSection('practical', this)">Practical Guidelines</button>
+                    <button onclick="showSection('interactive', this)">Interactive Demo</button>
+                    <button onclick="showSection('quiz', this)">Quiz</button>
+                </div>
+
+                <!-- Introduction Section -->
+                <div id="introduction" class="content-section active">
+                    <h2>The Challenge of Clustering Evaluation</h2>
+                    
+                    <p>Evaluating clustering quality is one of the most challenging aspects of unsupervised learning. Unlike supervised learning where we can measure performance against known targets, clustering evaluation requires sophisticated techniques to assess the meaningfulness and quality of discovered patterns without external references.</p>
+
+                    <h3>Why Clustering Evaluation is Difficult</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>No Ground Truth</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Unsupervised nature:</strong> No "correct" clustering to compare against</li>
+                                <li><strong>Subjective quality:</strong> What constitutes a "good" clustering varies by application</li>
+                                <li><strong>Multiple valid solutions:</strong> Same data may have several meaningful clusterings</li>
+                                <li><strong>Domain dependence:</strong> Quality criteria change with application context</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Evaluation Complexity</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Multi-faceted quality:</strong> Compactness, separation, stability, interpretability</li>
+                                <li><strong>Scale sensitivity:</strong> Metrics may favor certain cluster sizes or counts</li>
+                                <li><strong>Algorithm bias:</strong> Some metrics favor specific clustering approaches</li>
+                                <li><strong>Noise handling:</strong> How to account for outliers and noise points</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Practical Challenges</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Computational cost:</strong> Some metrics expensive for large datasets</li>
+                                <li><strong>Interpretation difficulty:</strong> Understanding what metric values mean</li>
+                                <li><strong>Threshold selection:</strong> Determining acceptable quality levels</li>
+                                <li><strong>Comparative analysis:</strong> Fairly comparing different algorithms</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Evaluation Challenges</h4>
+                        <p><strong>Multi-Panel Demonstration:</strong> Shows the same dataset with different clustering solutions that each optimize different quality criteria. Illustrates how "good" clustering depends on perspective: (1) Maximum separation, (2) Balanced cluster sizes, (3) Minimum within-cluster variance, (4) Maximum stability. Each solution looks reasonable but emphasizes different aspects of quality.</p>
+                    </div>
+
+                    <h3>Types of Clustering Validation</h3>
+                    <p>Clustering validation approaches can be categorized into three main types, each addressing different aspects of clustering quality.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="azbn-card">
+                            <h4>Internal Validation</h4>
+                            <p><strong>Philosophy:</strong> Evaluate using only the data and clustering results</p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>No external information required</li>
+                                <li>Focus on cluster compactness and separation</li>
+                                <li>Examples: Silhouette, Davies-Bouldin Index</li>
+                            </ul>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>External Validation</h4>
+                            <p><strong>Philosophy:</strong> Compare against external ground truth or reference</p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Requires known true clustering or class labels</li>
+                                <li>Measures agreement with external standard</li>
+                                <li>Examples: Adjusted Rand Index, Mutual Information</li>
+                            </ul>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>Relative Validation</h4>
+                            <p><strong>Philosophy:</strong> Compare different clustering solutions</p>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Ranks multiple clustering alternatives</li>
+                                <li>Determines optimal parameters or algorithms</li>
+                                <li>Examples: Gap statistic, stability analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Key Quality Dimensions</h3>
+                    <div class="metric-box">
+                        <h4>Fundamental Clustering Quality Aspects</h4>
+                        
+                        <h5>Compactness (Cohesion):</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Definition:</strong> How tightly grouped points within clusters are</li>
+                                <li><strong>Measurement:</strong> Within-cluster sum of squares, average intra-cluster distance</li>
+                                <li><strong>Goal:</strong> Minimize distances between points in same cluster</li>
+                                <li><strong>Trade-off:</strong> Very tight clusters may miss natural variations</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Separation (Isolation):</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Definition:</strong> How well-separated different clusters are</li>
+                                <li><strong>Measurement:</strong> Between-cluster distances, cluster centroid separation</li>
+                                <li><strong>Goal:</strong> Maximize distances between different clusters</li>
+                                <li><strong>Trade-off:</strong> Over-separation may create artificial boundaries</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Stability (Robustness):</h5>
+                        <ul>
+                            <li><strong>Consistency:</strong> Similar results across multiple runs or data perturbations</li>
+                            <li><strong>Parameter sensitivity:</strong> Robustness to parameter changes</li>
+                            <li><strong>Subset stability:</strong> Consistent clustering on data subsets</li>
+                            <li><strong>Noise resilience:</strong> Maintaining structure with added noise</li>
+                        </ul>
+                        
+                        <h5>Interpretability:</h5>
+                        <ul>
+                            <li><strong>Meaningful groups:</strong> Clusters correspond to real-world concepts</li>
+                            <li><strong>Cluster characterization:</strong> Ability to describe cluster properties</li>
+                            <li><strong>Size balance:</strong> Reasonable cluster size distribution</li>
+                            <li><strong>Domain relevance:</strong> Alignment with application requirements</li>
+                        </ul>
+                    </div>
+
+                    <h3>Evaluation Framework</h3>
+                    <div class="validation-box">
+                        <h4>Systematic Approach to Clustering Evaluation</h4>
+                        
+                        <h5>Step 1: Define Quality Goals</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li>Identify primary clustering objectives (exploration, compression, prediction)</li>
+                                <li>Determine domain-specific quality requirements</li>
+                                <li>Establish acceptable trade-offs between quality dimensions</li>
+                                <li>Consider computational and interpretability constraints</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Step 2: Select Appropriate Metrics</h5>
+                        <ul>
+                            <li>Choose metrics aligned with quality goals</li>
+                            <li>Use multiple complementary measures</li>
+                            <li>Consider computational requirements</li>
+                            <li>Account for data characteristics (size, dimensionality, noise)</li>
+                        </ul>
+                        
+                        <h5>Step 3: Establish Baselines</h5>
+                        <ul>
+                            <li>Compare against random clustering</li>
+                            <li>Use simple clustering methods as reference</li>
+                            <li>Employ domain-specific baselines when available</li>
+                            <li>Consider theoretical bounds and expectations</li>
+                        </ul>
+                        
+                        <h5>Step 4: Perform Comprehensive Evaluation</h5>
+                        <ul>
+                            <li>Apply multiple validation techniques</li>
+                            <li>Test across different parameter settings</li>
+                            <li>Assess stability and robustness</li>
+                            <li>Validate on multiple datasets when possible</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Internal Metrics Section -->
+                <div id="internal" class="content-section">
+                    <h2>Internal Validation Metrics</h2>
+                    
+                    <p>Internal validation metrics evaluate clustering quality using only the data and the clustering results themselves. These metrics focus on geometric properties like cluster compactness and separation, making them widely applicable without requiring external information.</p>
+
+                    <h3>Silhouette Analysis</h3>
+                    <p>The silhouette coefficient is one of the most popular and intuitive internal validation metrics, providing both global and per-point quality assessments.</p>
+
+                    <div class="internal-box">
+                        <h4>Silhouette Coefficient</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <p>For each point i in cluster C(i):</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>s(i) = (b(i) - a(i)) / max(a(i), b(i))</strong>
+                            </div>
+                            
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>a(i):</strong> Average distance to other points in same cluster</li>
+                                <li><strong>b(i):</strong> Average distance to points in nearest neighboring cluster</li>
+                            </ul>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>Range:</strong> [-1, 1]</li>
+                                <li><strong>s(i) ≈ 1:</strong> Point well-clustered (much closer to own cluster)</li>
+                                <li><strong>s(i) ≈ 0:</strong> Point on cluster boundary (ambiguous assignment)</li>
+                                <li><strong>s(i) ≈ -1:</strong> Point likely misclassified (closer to other cluster)</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Global Silhouette Score:</h5>
+                        <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <strong>S = (1/n) Σᵢ₌₁ⁿ s(i)</strong>
+                        </div>
+                        <p>Average silhouette coefficient across all points provides overall clustering quality measure.</p>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Silhouette Analysis</h4>
+                        <p><strong>Interactive Silhouette Plot:</strong> Shows silhouette plot for a clustering result with bars for each point sorted by cluster and silhouette value. Different clusters shown in different colors. Users can adjust clustering parameters and see how silhouette values change. Includes interpretation guide for silhouette values and overall score.</p>
+                    </div>
+
+                    <h3>Davies-Bouldin Index</h3>
+                    <p>The Davies-Bouldin Index measures the average similarity between each cluster and its most similar cluster, where similarity accounts for both within-cluster and between-cluster distances.</p>
+
+                    <div class="internal-box">
+                        <h4>Davies-Bouldin Index</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>DB = (1/k) Σᵢ₌₁ᵏ maxⱼ≠ᵢ Rᵢⱼ</strong>
+                            </div>
+                            
+                            <p>Where the similarity measure Rᵢⱼ is:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Rᵢⱼ = (Sᵢ + Sⱼ) / Mᵢⱼ</strong>
+                            </div>
+                            
+                            <ul>
+                                <li><strong>Sᵢ:</strong> Average distance within cluster i (compactness)</li>
+                                <li><strong>Mᵢⱼ:</strong> Distance between cluster centers i and j (separation)</li>
+                                <li><strong>k:</strong> Number of clusters</li>
+                            </ul>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>Lower values indicate better clustering</strong></li>
+                                <li><strong>Range:</strong> [0, ∞) with 0 being perfect</li>
+                                <li><strong>Favors:</strong> Compact, well-separated clusters</li>
+                                <li><strong>Limitation:</strong> Assumes spherical clusters</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Calinski-Harabasz Index</h3>
+                    <p>Also known as the Variance Ratio Criterion, this metric compares between-cluster variance to within-cluster variance.</p>
+
+                    <div class="internal-box">
+                        <h4>Calinski-Harabasz Index</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>CH = (Between-Cluster Sum of Squares / (k-1)) / (Within-Cluster Sum of Squares / (n-k))</strong>
+                            </div>
+                            
+                            <p>More specifically:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>CH = (BCSS/(k-1)) / (WCSS/(n-k))</strong>
+                            </div>
+                            
+                            <ul>
+                                <li><strong>BCSS:</strong> Σᵢ nᵢ ||cᵢ - c||² (between-cluster sum of squares)</li>
+                                <li><strong>WCSS:</strong> Σᵢ Σⱼ∈Cᵢ ||xⱼ - cᵢ||² (within-cluster sum of squares)</li>
+                                <li><strong>nᵢ:</strong> Number of points in cluster i</li>
+                                <li><strong>cᵢ:</strong> Centroid of cluster i</li>
+                                <li><strong>c:</strong> Overall data centroid</li>
+                            </ul>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>Higher values indicate better clustering</strong></li>
+                                <li><strong>Range:</strong> [0, ∞)</li>
+                                <li><strong>Related to F-statistic in ANOVA</strong></li>
+                                <li><strong>Assumes spherical clusters and equal sizes</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Other Important Internal Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Dunn Index</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>DI = min(inter-cluster distance) / max(intra-cluster distance)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Higher values better</strong></li>
+                                <li>Measures compactness and separation</li>
+                                <li>Sensitive to outliers</li>
+                                <li>Computationally expensive</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Inertia (WCSS)</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>I = Σᵢ Σⱼ∈Cᵢ ||xⱼ - cᵢ||²</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Lower values better</strong></li>
+                                <li>Used in K-means optimization</li>
+                                <li>Always decreases with more clusters</li>
+                                <li>Needs normalization for comparison</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Gap Statistic</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Gap(k) = E[log(W)] - log(W(k))</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Higher values better</strong></li>
+                                <li>Compares to null reference</li>
+                                <li>Good for determining optimal k</li>
+                                <li>Requires bootstrap sampling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="internal-box">
+                        <h4>Choosing Internal Metrics</h4>
+                        
+                        <h5>Guidelines for Metric Selection:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Silhouette:</strong> General-purpose, interpretable, works with any distance metric</li>
+                                <li><strong>Davies-Bouldin:</strong> Fast computation, good for spherical clusters</li>
+                                <li><strong>Calinski-Harabasz:</strong> Statistical foundation, good for determining k</li>
+                                <li><strong>Dunn Index:</strong> When maximum separation is critical</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Limitations to Consider:</h5>
+                        <ul>
+                            <li><strong>Shape bias:</strong> Most metrics favor spherical clusters</li>
+                            <li><strong>Size bias:</strong> Some metrics favor balanced cluster sizes</li>
+                            <li><strong>Density assumptions:</strong> May not work well with varying densities</li>
+                            <li><strong>Computational cost:</strong> Some metrics expensive for large datasets</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- External Metrics Section -->
+                <div id="external" class="content-section">
+                    <h2>External Validation Metrics</h2>
+                    
+                    <p>External validation metrics compare clustering results against external ground truth or reference labels. These metrics are essential when labeled data is available and provide objective measures of clustering accuracy.</p>
+
+                    <h3>Adjusted Rand Index (ARI)</h3>
+                    <p>The Adjusted Rand Index measures the similarity between two clusterings while correcting for chance agreement, making it one of the most reliable external validation metrics.</p>
+
+                    <div class="external-box">
+                        <h4>Adjusted Rand Index</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <p>Based on the contingency table of cluster vs. true class assignments:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>ARI = (RI - E[RI]) / (max(RI) - E[RI])</strong>
+                            </div>
+                            
+                            <p>Where RI is the Rand Index:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>RI = (TP + TN) / (TP + FP + FN + TN)</strong>
+                            </div>
+                            
+                            <h5>Contingency Table Elements:</h5>
+                            <ul>
+                                <li><strong>TP:</strong> Pairs in same cluster and same class</li>
+                                <li><strong>TN:</strong> Pairs in different clusters and different classes</li>
+                                <li><strong>FP:</strong> Pairs in same cluster but different classes</li>
+                                <li><strong>FN:</strong> Pairs in different clusters but same class</li>
+                            </ul>
+                            
+                            <h5>Properties:</h5>
+                            <ul>
+                                <li><strong>Range:</strong> [-1, 1] with 1 being perfect agreement</li>
+                                <li><strong>Chance correction:</strong> Expected value 0 for random clustering</li>
+                                <li><strong>Symmetric:</strong> ARI(X,Y) = ARI(Y,X)</li>
+                                <li><strong>Robust:</strong> Not affected by cluster label permutations</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: ARI Calculation</h4>
+                        <p><strong>Interactive Contingency Table:</strong> Shows how ARI is calculated from a contingency table. Users can modify cluster assignments and see how ARI changes. Includes breakdown of TP, TN, FP, FN pairs and demonstrates the chance correction effect. Color-coded matrix shows agreement and disagreement patterns.</p>
+                    </div>
+
+                    <h3>Normalized Mutual Information (NMI)</h3>
+                    <p>Normalized Mutual Information measures the amount of information shared between the clustering and ground truth labels, normalized to account for different numbers of clusters.</p>
+
+                    <div class="external-box">
+                        <h4>Normalized Mutual Information</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>NMI = MI(X,Y) / √(H(X)H(Y))</strong>
+                            </div>
+                            
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>MI(X,Y):</strong> Mutual information between clusterings X and Y</li>
+                                <li><strong>H(X):</strong> Entropy of clustering X</li>
+                                <li><strong>H(Y):</strong> Entropy of clustering Y</li>
+                            </ul>
+                            
+                            <h5>Mutual Information:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>MI(X,Y) = Σᵢⱼ p(i,j) log(p(i,j)/(p(i)p(j)))</strong>
+                            </div>
+                            
+                            <h5>Entropy:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>H(X) = -Σᵢ p(i) log(p(i))</strong>
+                            </div>
+                            
+                            <h5>Properties:</h5>
+                            <ul>
+                                <li><strong>Range:</strong> [0, 1] with 1 being perfect agreement</li>
+                                <li><strong>Information theoretic foundation</strong></li>
+                                <li><strong>Symmetric:</strong> NMI(X,Y) = NMI(Y,X)</li>
+                                <li><strong>Handles different cluster counts well</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Additional External Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Fowlkes-Mallows Index</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>FM = √((TP/(TP+FP)) × (TP/(TP+FN)))</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Range:</strong> [0, 1], higher better</li>
+                                <li>Geometric mean of precision and recall</li>
+                                <li>Sensitive to cluster size imbalances</li>
+                                <li>No chance correction</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Homogeneity & Completeness</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.0rem;">
+                                <strong>H = 1 - H(Y|X)/H(Y)<br>C = 1 - H(X|Y)/H(X)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Range:</strong> [0, 1], higher better</li>
+                                <li>H: clusters contain only one class</li>
+                                <li>C: all class members in same cluster</li>
+                                <li>V-measure: harmonic mean of H and C</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Jaccard Index</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>J = TP / (TP + FP + FN)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Range:</strong> [0, 1], higher better</li>
+                                <li>Simple overlap measure</li>
+                                <li>Ignores true negatives</li>
+                                <li>Sensitive to cluster size</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="external-box">
+                        <h4>When to Use External Metrics</h4>
+                        
+                        <h5>Appropriate Scenarios:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Algorithm comparison:</strong> Comparing different clustering methods on labeled datasets</li>
+                                <li><strong>Parameter tuning:</strong> Optimizing clustering parameters with ground truth</li>
+                                <li><strong>Method validation:</strong> Establishing clustering quality on benchmark datasets</li>
+                                <li><strong>Preprocessing evaluation:</strong> Assessing impact of data preprocessing</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Limitations and Considerations:</h5>
+                        <ul>
+                            <li><strong>Ground truth required:</strong> Not available for most real-world applications</li>
+                            <li><strong>Label dependency:</strong> Results depend on specific ground truth labeling</li>
+                            <li><strong>Multiple valid solutions:</strong> Ground truth may not be the only valid clustering</li>
+                            <li><strong>Artificial evaluation:</strong> May not reflect real-world clustering quality</li>
+                        </ul>
+                        
+                        <h5>Best Practices:</h5>
+                        <ul>
+                            <li><strong>Use multiple metrics:</strong> Different metrics capture different aspects</li>
+                            <li><strong>Consider metric properties:</strong> Chance correction, symmetry, range</li>
+                            <li><strong>Validate assumptions:</strong> Ensure ground truth is meaningful for task</li>
+                            <li><strong>Complement with internal metrics:</strong> Use both external and internal validation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Relative Validation Section -->
+                <div id="relative" class="content-section">
+                    <h2>Relative Validation Techniques</h2>
+                    
+                    <p>Relative validation techniques compare different clustering solutions to determine the best among alternatives. These methods are particularly useful for parameter selection and algorithm comparison when no ground truth is available.</p>
+
+                    <h3>Gap Statistic</h3>
+                    <p>The Gap statistic compares the within-cluster dispersion of the data with that expected from a null reference distribution, helping determine the optimal number of clusters.</p>
+
+                    <div class="validation-box">
+                        <h4>Gap Statistic Method</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Mathematical Definition:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Gap(k) = E*[log(Wₖ)] - log(Wₖ)</strong>
+                            </div>
+                            
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>Wₖ:</strong> Within-cluster sum of squares for k clusters</li>
+                                <li><strong>E*[log(Wₖ)]:</strong> Expected log(Wₖ) under null hypothesis</li>
+                                <li><strong>Null hypothesis:</strong> Data uniformly distributed in feature space</li>
+                            </ul>
+                            
+                            <h5>Algorithm Steps:</h5>
+                            <ol>
+                                <li>For each k, compute Wₖ for actual data</li>
+                                <li>Generate B reference datasets under null hypothesis</li>
+                                <li>Compute W*ₖᵦ for each reference dataset b</li>
+                                <li>Calculate Gap(k) = (1/B)Σᵦlog(W*ₖᵦ) - log(Wₖ)</li>
+                                <li>Compute standard error sₖ</li>
+                                <li>Choose k such that Gap(k) ≥ Gap(k+1) - sₖ₊₁</li>
+                            </ol>
+                            
+                            <h5>Advantages:</h5>
+                            <ul>
+                                <li><strong>Principled approach:</strong> Statistical foundation</li>
+                                <li><strong>No assumptions:</strong> Works with any clustering algorithm</li>
+                                <li><strong>Handles noise:</strong> Accounts for random structure</li>
+                                <li><strong>Automatic selection:</strong> Provides clear stopping criterion</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Gap Statistic Analysis</h4>
+                        <p><strong>Interactive Gap Plot:</strong> Shows Gap statistic values for different k values with error bars. Includes the actual data clustering performance, reference distribution performance, and their difference (gap). Users can see how the optimal k is selected using the Gap criterion and explore different null reference distributions.</p>
+                    </div>
+
+                    <h3>Elbow Method</h3>
+                    <p>The elbow method plots clustering quality metrics against the number of clusters and looks for an "elbow" point where the rate of improvement sharply decreases.</p>
+
+                    <div class="validation-box">
+                        <h4>Elbow Method Analysis</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Procedure:</h5>
+                            <ol>
+                                <li>Run clustering for k = 1, 2, ..., K_max</li>
+                                <li>Compute quality metric for each k (usually WCSS)</li>
+                                <li>Plot metric values vs. k</li>
+                                <li>Look for "elbow" point where improvement slows</li>
+                                <li>Select k at the elbow as optimal</li>
+                            </ol>
+                            
+                            <h5>Mathematical Elbow Detection:</h5>
+                            <p>Compute second derivative or use knee-finding algorithms:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Curvature(k) = |f''(k)| / (1 + f'(k)²)^(3/2)</strong>
+                            </div>
+                            
+                            <h5>Challenges:</h5>
+                            <ul>
+                                <li><strong>Subjective interpretation:</strong> Elbow may not be clear</li>
+                                <li><strong>Multiple elbows:</strong> Several potential candidates</li>
+                                <li><strong>Gradual curves:</strong> No sharp elbow point</li>
+                                <li><strong>Metric dependence:</strong> Different metrics give different elbows</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Cross-Validation for Clustering</h3>
+                    <p>Cross-validation can be adapted for clustering by measuring consistency across different data subsets or using prediction-based approaches.</p>
+
+                    <div class="validation-box">
+                        <h4>Clustering Cross-Validation Methods</h4>
+                        
+                        <h5>Prediction Strength:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li>Split data into training and test sets</li>
+                                <li>Cluster training data with k clusters</li>
+                                <li>Assign test points to nearest training clusters</li>
+                                <li>Measure how well test points predict each other's clusters</li>
+                                <li>High prediction strength indicates good k</li>
+                            </ol>
+                        </div>
+                        
+                        <h5>Stability-Based CV:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li>Create multiple bootstrap samples or data splits</li>
+                                <li>Cluster each sample with same parameters</li>
+                                <li>Measure clustering similarity across samples</li>
+                                <li>High similarity indicates stable clustering</li>
+                                <li>Select parameters maximizing stability</li>
+                            </ol>
+                        </div>
+                        
+                        <h5>Figure of Merit:</h5>
+                        <ul>
+                            <li>Remove subset of features (genes in bioinformatics)</li>
+                            <li>Cluster based on remaining features</li>
+                            <li>Predict removed features from cluster assignments</li>
+                            <li>Lower prediction error indicates better clustering</li>
+                        </ul>
+                    </div>
+
+                    <h3>Information Criteria for Clustering</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Akaike Information Criterion</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>AIC = -2 × log(L) + 2 × p</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>L:</strong> Likelihood of clustering model</li>
+                                <li><strong>p:</strong> Number of parameters</li>
+                                <li><strong>Lower values better</strong></li>
+                                <li>Requires probabilistic clustering model</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Bayesian Information Criterion</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>BIC = -2 × log(L) + p × log(n)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>n:</strong> Number of data points</li>
+                                <li><strong>Stronger penalty than AIC</strong></li>
+                                <li><strong>Lower values better</strong></li>
+                                <li>Generally prefers simpler models</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Minimum Description Length</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>MDL = -log(L) + complexity</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Information-theoretic principle</strong></li>
+                                <li>Balance data fit with model complexity</li>
+                                <li><strong>Lower values better</strong></li>
+                                <li>Requires encoding scheme definition</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="validation-box">
+                        <h4>Choosing Relative Validation Methods</h4>
+                        
+                        <h5>Method Selection Guidelines:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Gap statistic:</strong> When you need statistical rigor and automatic selection</li>
+                                <li><strong>Elbow method:</strong> For quick exploratory analysis and intuitive interpretation</li>
+                                <li><strong>Cross-validation:</strong> When prediction or stability is important</li>
+                                <li><strong>Information criteria:</strong> For probabilistic models with well-defined likelihood</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Computational Considerations:</h5>
+                        <ul>
+                            <li><strong>Gap statistic:</strong> Expensive due to bootstrap sampling</li>
+                            <li><strong>Elbow method:</strong> Fast, only requires clustering multiple k values</li>
+                            <li><strong>Cross-validation:</strong> Moderate cost, depends on CV scheme</li>
+                            <li><strong>Information criteria:</strong> Fast if likelihood computable</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Statistical Testing Section -->
+                <div id="statistical" class="content-section">
+                    <h2>Statistical Significance Testing</h2>
+                    
+                    <p>Statistical testing in clustering helps determine whether discovered structures are statistically significant or could have arisen by chance. These methods provide confidence measures for clustering results and enable principled comparison of different solutions.</p>
+
+                    <h3>Null Hypothesis Testing for Clustering</h3>
+                    <p>The fundamental challenge in clustering significance testing is defining appropriate null hypotheses that represent "no structure" in the data.</p>
+
+                    <div class="statistical-box">
+                        <h4>Common Null Hypotheses</h4>
+                        
+                        <h5>Uniform Random Distribution:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Assumption:</strong> Data points uniformly distributed in feature space</li>
+                                <li><strong>Generation:</strong> Sample from uniform distribution over data range</li>
+                                <li><strong>Use case:</strong> Testing for any non-random structure</li>
+                                <li><strong>Limitation:</strong> May not preserve feature correlations</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Gaussian Random Distribution:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Assumption:</strong> Data from multivariate Gaussian distribution</li>
+                                <li><strong>Generation:</strong> Sample from estimated Gaussian with same mean and covariance</li>
+                                <li><strong>Use case:</strong> When data appears roughly Gaussian</li>
+                                <li><strong>Advantage:</strong> Preserves second-order statistics</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Permutation Null:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Assumption:</strong> No relationship between features</li>
+                                <li><strong>Generation:</strong> Independently permute each feature column</li>
+                                <li><strong>Use case:</strong> Testing for feature interactions</li>
+                                <li><strong>Advantage:</strong> Preserves marginal distributions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Permutation Tests</h3>
+                    <p>Permutation tests provide a non-parametric approach to assess clustering significance by comparing observed clustering quality to results from shuffled data.</p>
+
+                    <div class="statistical-box">
+                        <h4>Permutation Testing Procedure</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Algorithm:</h5>
+                            <ol>
+                                <li>Compute clustering quality metric Q for original data</li>
+                                <li>For i = 1 to B (number of permutations):
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li>Generate permuted dataset according to null hypothesis</li>
+                                        <li>Apply same clustering algorithm</li>
+                                        <li>Compute quality metric Q*ᵢ</li>
+                                    </ul>
+                                </li>
+                                <li>Calculate p-value: p = (1 + Σᵢ I(Q*ᵢ ≥ Q)) / (B + 1)</li>
+                                <li>Reject null hypothesis if p < α (significance level)</li>
+                            </ol>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>Low p-value:</strong> Clustering significantly better than random</li>
+                                <li><strong>High p-value:</strong> Clustering not significantly different from random</li>
+                                <li><strong>Effect size:</strong> How much better than random expectation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Permutation Test</h4>
+                        <p><strong>Statistical Test Dashboard:</strong> Shows distribution of clustering quality metrics from permuted datasets compared to observed value. Includes histogram of null distribution, observed statistic marker, p-value calculation, and confidence intervals. Users can adjust significance level and see critical regions.</p>
+                    </div>
+
+                    <h3>Bootstrap Confidence Intervals</h3>
+                    <p>Bootstrap methods provide confidence intervals for clustering metrics and help assess the stability of clustering solutions.</p>
+
+                    <div class="statistical-box">
+                        <h4>Bootstrap Confidence Intervals</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Bootstrap Procedure:</h5>
+                            <ol>
+                                <li>For b = 1 to B bootstrap samples:
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li>Sample n points with replacement from original data</li>
+                                        <li>Apply clustering algorithm to bootstrap sample</li>
+                                        <li>Compute clustering metric Q*ᵦ</li>
+                                    </ul>
+                                </li>
+                                <li>Sort bootstrap statistics: Q*₍₁₎ ≤ ... ≤ Q*₍ᵦ₎</li>
+                                <li>Compute confidence interval:
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li>Lower bound: Q*₍α/₂×B₎</li>
+                                        <li>Upper bound: Q*₍₍₁₋α/₂₎×B₎</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            
+                            <h5>Applications:</h5>
+                            <ul>
+                                <li><strong>Metric uncertainty:</strong> Confidence intervals for silhouette, ARI, etc.</li>
+                                <li><strong>Parameter sensitivity:</strong> How robust are results to data variations</li>
+                                <li><strong>Algorithm comparison:</strong> Overlapping intervals suggest similar performance</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Hypothesis Testing for Algorithm Comparison</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Paired t-test</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Use:</strong> Compare two algorithms on multiple datasets</li>
+                                <li><strong>Assumption:</strong> Differences normally distributed</li>
+                                <li><strong>Test statistic:</strong> t = d̄ / (s/√n)</li>
+                                <li><strong>Limitation:</strong> Requires multiple independent datasets</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Wilcoxon Signed-Rank</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Use:</strong> Non-parametric algorithm comparison</li>
+                                <li><strong>Advantage:</strong> No normality assumption</li>
+                                <li><strong>Test:</strong> Ranks of absolute differences</li>
+                                <li><strong>Robust:</strong> Less sensitive to outliers</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>McNemar's Test</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Use:</strong> Binary clustering success comparison</li>
+                                <li><strong>Focus:</strong> Disagreement patterns</li>
+                                <li><strong>Statistic:</strong> Chi-square on 2×2 table</li>
+                                <li><strong>Application:</strong> Success/failure clustering outcomes</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Multiple Testing Correction</h3>
+                    <div class="statistical-box">
+                        <h4>Controlling Family-Wise Error Rate</h4>
+                        
+                        <h5>The Multiple Testing Problem:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Issue:</strong> Testing multiple clusterings increases Type I error</li>
+                                <li><strong>Example:</strong> Testing k = 2, 3, ..., 10 clusters</li>
+                                <li><strong>Consequence:</strong> Higher chance of false discoveries</li>
+                                <li><strong>Solution:</strong> Adjust significance levels</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Correction Methods:</h5>
+                        <ul>
+                            <li><strong>Bonferroni:</strong> α' = α/m (conservative)</li>
+                            <li><strong>Holm-Bonferroni:</strong> Step-down procedure</li>
+                            <li><strong>Benjamini-Hochberg:</strong> False Discovery Rate control</li>
+                            <li><strong>Westfall-Young:</strong> Permutation-based correction</li>
+                        </ul>
+                        
+                        <h5>Recommendations:</h5>
+                        <ul>
+                            <li><strong>Pre-specify tests:</strong> Avoid data snooping</li>
+                            <li><strong>Use FDR control:</strong> When many tests are conducted</li>
+                            <li><strong>Report uncorrected p-values:</strong> Along with correction method</li>
+                            <li><strong>Consider practical significance:</strong> Not just statistical significance</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Stability Analysis Section -->
+                <div id="stability" class="content-section">
+                    <h2>Stability Analysis and Consensus Clustering</h2>
+                    
+                    <p>Stability analysis examines how consistent clustering results are across different perturbations of the data or algorithm parameters. Stable clusterings are more likely to represent genuine structure rather than artifacts of specific algorithm choices or data quirks.</p>
+
+                    <h3>Types of Clustering Stability</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Data Perturbation Stability</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Bootstrap sampling:</strong> Cluster resampled datasets</li>
+                                <li><strong>Noise injection:</strong> Add small random perturbations</li>
+                                <li><strong>Feature subsampling:</strong> Cluster with feature subsets</li>
+                                <li><strong>Data splitting:</strong> Cluster overlapping data splits</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Algorithm Perturbation Stability</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Random initialization:</strong> Multiple random starts</li>
+                                <li><strong>Parameter variation:</strong> Slight parameter changes</li>
+                                <li><strong>Algorithm variants:</strong> Different versions of same method</li>
+                                <li><strong>Hyperparameter sensitivity:</strong> Robustness to tuning</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Structural Stability</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Cluster count consistency:</strong> Same number of clusters</li>
+                                <li><strong>Membership consistency:</strong> Same point assignments</li>
+                                <li><strong>Boundary stability:</strong> Consistent cluster boundaries</li>
+                                <li><strong>Hierarchy preservation:</strong> Stable cluster relationships</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="validation-box">
+                        <h4>Stability Measurement Methods</h4>
+                        
+                        <h5>Jaccard Stability:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>For each cluster pair (C_i, C_j) across two clusterings:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Jaccard(C_i, C_j) = |C_i ∩ C_j| / |C_i ∪ C_j|</strong>
+                            </div>
+                            <p>Overall stability = average maximum Jaccard similarity for each cluster</p>
+                        </div>
+                        
+                        <h5>ARI-based Stability:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>Compute Adjusted Rand Index between clusterings from perturbed data:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Stability = E[ARI(C_orig, C_perturbed)]</strong>
+                            </div>
+                            <p>Higher values indicate more stable clustering</p>
+                        </div>
+                        
+                        <h5>Consensus Matrix Approach:</h5>
+                        <ol>
+                            <li>Generate B perturbed datasets or algorithm runs</li>
+                            <li>For each pair of points (i,j), count co-occurrence in same cluster</li>
+                            <li>Create consensus matrix M where M_ij = frequency of co-clustering</li>
+                            <li>Analyze consensus matrix properties for stability assessment</li>
+                        </ol>
+                    </div>
+
+                    <h3>Consensus Clustering</h3>
+                    <p>Consensus clustering combines multiple clustering solutions to create a more robust final clustering that captures the agreement across different methods or parameters.</p>
+
+                    <div class="validation-box">
+                        <h4>Consensus Clustering Framework</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Algorithm Steps:</h5>
+                            <ol>
+                                <li><strong>Generate ensemble:</strong> Create H different clusterings</li>
+                                <li><strong>Build consensus matrix:</strong> M_ij = proportion of clusterings where i,j co-cluster</li>
+                                <li><strong>Final clustering:</strong> Apply clustering to consensus matrix</li>
+                                <li><strong>Quality assessment:</strong> Analyze consensus matrix structure</li>
+                            </ol>
+                            
+                            <h5>Ensemble Generation Strategies:</h5>
+                            <ul>
+                                <li><strong>Different algorithms:</strong> K-means, hierarchical, spectral, etc.</li>
+                                <li><strong>Parameter variation:</strong> Different k values, linkage criteria</li>
+                                <li><strong>Feature subsets:</strong> Cluster with different feature combinations</li>
+                                <li><strong>Data subsets:</strong> Bootstrap or random subsampling</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Consensus Matrix Analysis</h4>
+                        <p><strong>Interactive Consensus Heatmap:</strong> Shows consensus matrix as heatmap where darker colors indicate higher co-clustering frequency. Includes reordered matrix to show block structure, stability metrics for different k values, and comparison of individual clusterings vs. consensus result. Users can adjust ensemble parameters and see effect on consensus.</p>
+                    </div>
+
+                    <h3>Cluster Validity Indices</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Prediction Strength</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>PS(k) = min_{clusters} P(same cluster | same predicted cluster)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Split data into training/test sets</li>
+                                <li>Cluster training, predict test assignments</li>
+                                <li>High PS indicates stable clustering</li>
+                                <li>Choose k where PS > threshold (e.g., 0.8)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Figure of Merit (FOM)</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>FOM(k) = √(Σ_v Σ_i (x_iv - x̄_v(c_i))²)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Remove features, cluster on remainder</li>
+                                <li>Predict removed features from clusters</li>
+                                <li>Lower prediction error = better clustering</li>
+                                <li>Useful for gene expression data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Clest</h4>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Clest = Bootstrap(Prediction Error)</strong>
+                            </div>
+                            <ul style="font-size: 0.9rem;">
+                                <li>Bootstrap-based validation</li>
+                                <li>Measures prediction stability</li>
+                                <li>Accounts for sampling variability</li>
+                                <li>Provides confidence intervals</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Practical Stability Assessment</h3>
+                    <div class="validation-box">
+                        <h4>Implementing Stability Analysis</h4>
+                        
+                        <h5>Recommended Workflow:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li><strong>Define perturbation strategy:</strong> Choose appropriate data/algorithm perturbations</li>
+                                <li><strong>Generate ensemble:</strong> Create 50-200 clustering instances</li>
+                                <li><strong>Compute stability metrics:</strong> Use multiple complementary measures</li>
+                                <li><strong>Analyze consensus:</strong> Build and examine consensus matrix</li>
+                                <li><strong>Select optimal parameters:</strong> Choose stable parameter ranges</li>
+                                <li><strong>Validate final clustering:</strong> Ensure selected solution is robust</li>
+                            </ol>
+                        </div>
+                        
+                        <h5>Interpretation Guidelines:</h5>
+                        <ul>
+                            <li><strong>High stability (>0.8):</strong> Strong evidence for cluster structure</li>
+                            <li><strong>Moderate stability (0.6-0.8):</strong> Reasonable clustering, consider validation</li>
+                            <li><strong>Low stability (<0.6):</strong> Weak or unreliable clustering structure</li>
+                            <li><strong>Parameter sensitivity:</strong> Wide stability ranges suggest robust clustering</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Practical Guidelines Section -->
+                <div id="practical" class="content-section">
+                    <h2>Practical Guidelines for Clustering Evaluation</h2>
+                    
+                    <p>Effective clustering evaluation requires a systematic approach that combines multiple validation techniques, considers domain-specific requirements, and balances computational constraints with evaluation thoroughness.</p>
+
+                    <h3>Evaluation Framework for Real-World Applications</h3>
+                    <div class="validation-box">
+                        <h4>Step-by-Step Evaluation Protocol</h4>
+                        
+                        <h5>Phase 1: Problem Definition and Goals</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Define clustering objectives:</strong> Exploration, compression, prediction, interpretation</li>
+                                <li><strong>Identify quality priorities:</strong> Compactness, separation, stability, interpretability</li>
+                                <li><strong>Determine constraints:</strong> Computational budget, real-time requirements</li>
+                                <li><strong>Establish success criteria:</strong> Minimum acceptable quality thresholds</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Phase 2: Initial Assessment</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Data exploration:</strong> Understand data characteristics and potential structure</li>
+                                <li><strong>Baseline establishment:</strong> Simple clustering methods as reference</li>
+                                <li><strong>Metric selection:</strong> Choose appropriate validation measures</li>
+                                <li><strong>Parameter ranges:</strong> Define reasonable parameter search spaces</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Phase 3: Comprehensive Evaluation</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Multi-metric assessment:</strong> Apply diverse validation techniques</li>
+                                <li><strong>Stability analysis:</strong> Test robustness to perturbations</li>
+                                <li><strong>Parameter sensitivity:</strong> Analyze performance across parameter ranges</li>
+                                <li><strong>Algorithm comparison:</strong> Compare multiple clustering approaches</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Phase 4: Validation and Selection</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Cross-validation:</strong> Validate on held-out data if possible</li>
+                                <li><strong>Domain expert review:</strong> Seek expert opinion on clustering quality</li>
+                                <li><strong>Practical testing:</strong> Test clustering in downstream applications</li>
+                                <li><strong>Final selection:</strong> Choose best solution based on comprehensive assessment</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Metric Selection Guidelines</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Scenario</th>
+                                <th>Recommended Metrics</th>
+                                <th>Rationale</th>
+                                <th>Alternatives</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>No ground truth</strong></td>
+                                <td>Silhouette, Gap statistic</td>
+                                <td>Internal validation, automatic k selection</td>
+                                <td>Davies-Bouldin, Calinski-Harabasz</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ground truth available</strong></td>
+                                <td>ARI, NMI</td>
+                                <td>Chance-corrected, robust to label permutations</td>
+                                <td>Fowlkes-Mallows, V-measure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parameter selection</strong></td>
+                                <td>Gap statistic, Elbow method</td>
+                                <td>Designed for optimal parameter selection</td>
+                                <td>Information criteria, Cross-validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Algorithm comparison</strong></td>
+                                <td>Multiple metrics + significance tests</td>
+                                <td>Comprehensive assessment with statistical rigor</td>
+                                <td>Ranking aggregation methods</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Large datasets</strong></td>
+                                <td>Efficient internal metrics</td>
+                                <td>Computational constraints</td>
+                                <td>Sampling-based evaluation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>High dimensions</strong></td>
+                                <td>Subspace-aware metrics</td>
+                                <td>Account for curse of dimensionality</td>
+                                <td>Feature selection + standard metrics</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Common Pitfalls and How to Avoid Them</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Single Metric Dependence</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Problem:</strong> Each metric has biases and limitations</li>
+                                <li><strong>Solution:</strong> Use multiple complementary metrics</li>
+                                <li><strong>Example:</strong> Combine silhouette (separation) with stability (robustness)</li>
+                                <li><strong>Best practice:</strong> Report multiple metrics, discuss trade-offs</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Overfitting to Validation Metrics</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Problem:</strong> Optimizing clustering to maximize specific metrics</li>
+                                <li><strong>Solution:</strong> Reserve validation set, use cross-validation</li>
+                                <li><strong>Example:</strong> Don't repeatedly adjust parameters to maximize silhouette</li>
+                                <li><strong>Best practice:</strong> Pre-specify evaluation protocol</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Ignoring Domain Knowledge</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Problem:</strong> Purely statistical evaluation without context</li>
+                                <li><strong>Solution:</strong> Incorporate domain expertise in evaluation</li>
+                                <li><strong>Example:</strong> Biologically meaningful gene clusters</li>
+                                <li><strong>Best practice:</strong> Validate with domain experts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Reporting Clustering Results</h3>
+                    <div class="validation-box">
+                        <h4>Best Practices for Result Communication</h4>
+                        
+                        <h5>Essential Information to Report:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Data characteristics:</strong> Size, dimensionality, preprocessing steps</li>
+                                <li><strong>Algorithm details:</strong> Method, parameters, initialization strategy</li>
+                                <li><strong>Evaluation metrics:</strong> Multiple measures with interpretation</li>
+                                <li><strong>Stability assessment:</strong> Robustness analysis results</li>
+                                <li><strong>Parameter sensitivity:</strong> How results change with parameters</li>
+                                <li><strong>Computational cost:</strong> Runtime and memory requirements</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Visualization Recommendations:</h5>
+                        <ul>
+                            <li><strong>Cluster plots:</strong> 2D projections showing cluster structure</li>
+                            <li><strong>Silhouette plots:</strong> Per-point quality assessment</li>
+                            <li><strong>Metric curves:</strong> Quality vs. number of clusters</li>
+                            <li><strong>Stability heatmaps:</strong> Consensus matrix visualization</li>
+                            <li><strong>Parameter sensitivity:</strong> Performance across parameter ranges</li>
+                        </ul>
+                        
+                        <h5>Statistical Rigor:</h5>
+                        <ul>
+                            <li><strong>Confidence intervals:</strong> Uncertainty quantification for metrics</li>
+                            <li><strong>Significance tests:</strong> Statistical comparison of methods</li>
+                            <li><strong>Multiple testing correction:</strong> Account for multiple comparisons</li>
+                            <li><strong>Effect sizes:</strong> Practical significance beyond statistical significance</li>
+                        </ul>
+                    </div>
+
+                    <h3>Domain-Specific Considerations</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="metric-card">
+                            <h4>Bioinformatics</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Biological validation:</strong> Gene ontology enrichment</li>
+                                <li><strong>Functional coherence:</strong> Pathway analysis</li>
+                                <li><strong>Literature validation:</strong> Known gene relationships</li>
+                                <li><strong>Stability emphasis:</strong> Robust to experimental noise</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Market Segmentation</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Business relevance:</strong> Actionable customer segments</li>
+                                <li><strong>Size constraints:</strong> Minimum viable segment sizes</li>
+                                <li><strong>Interpretability:</strong> Clear segment characteristics</li>
+                                <li><strong>Temporal stability:</strong> Consistent over time</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h4>Image Segmentation</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Visual coherence:</strong> Perceptually meaningful regions</li>
+                                <li><strong>Boundary quality:</strong> Sharp, accurate boundaries</li>
+                                <li><strong>Computational efficiency:</strong> Real-time constraints</li>
+                                <li><strong>Scale appropriateness:</strong> Object-level segmentation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Demo Section -->
+                <div id="interactive" class="content-section">
+                    <h2>Interactive Clustering Evaluation Demo</h2>
+                    
+                    <p>Explore different validation metrics and their behavior through hands-on demonstrations that illustrate how various factors affect clustering evaluation results.</p>
+
+                    <div class="interactive-demo">
+                        <h4>Metric Comparison Dashboard</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="eval-dataset">Dataset:</label>
+                                <select id="eval-dataset" onchange="updateEvalDemo()">
+                                    <option value="wellseparated">Well-Separated Clusters</option>
+                                    <option value="overlapping">Overlapping Clusters</option>
+                                    <option value="different-sizes">Different Cluster Sizes</option>
+                                    <option value="noisy">Noisy Data</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="eval-algorithm">Algorithm:</label>
+                                <select id="eval-algorithm" onchange="updateEvalDemo()">
+                                    <option value="kmeans">K-Means</option>
+                                    <option value="dbscan">DBSCAN</option>
+                                    <option value="hierarchical">Hierarchical</option>
+                                    <option value="gmm">Gaussian Mixture</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="eval-clusters">Number of Clusters: <span id="eval-k-val">3</span></label>
+                                <input type="range" id="eval-clusters" min="2" max="8" step="1" value="3" onchange="updateEvalDemo()">
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 300px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Clustering Result Visualization</strong></p>
+                                <p>Shows clustering result with different validation metrics</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Validation Metrics:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Silhouette:</strong> <span id="eval-silhouette">0.65</span></div>
+                                <div><strong>Davies-Bouldin:</strong> <span id="eval-db">1.23</span></div>
+                                <div><strong>Calinski-Harabasz:</strong> <span id="eval-ch">245.7</span></div>
+                                <div><strong>Dunn Index:</strong> <span id="eval-dunn">0.42</span></div>
+                            </div>
+                            <div style="margin-top: 1rem; padding: 0.5rem; background: white; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 0.9rem;" id="eval-interpretation">
+                                    Good clustering quality with well-separated, compact clusters.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Stability Analysis Tool</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="stability-method">Perturbation Type:</label>
+                                <select id="stability-method" onchange="updateStabilityDemo()">
+                                    <option value="bootstrap">Bootstrap Sampling</option>
+                                    <option value="noise">Noise Injection</option>
+                                    <option value="subsample">Feature Subsampling</option>
+                                    <option value="parameters">Parameter Variation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="stability-runs">Number of Runs: <span id="stability-runs-val">50</span></label>
+                                <input type="range" id="stability-runs" min="10" max="100" step="10" value="50" onchange="updateStabilityDemo()">
+                            </div>
+                            <div>
+                                <label for="stability-level">Perturbation Level: <span id="stability-level-val">0.1</span></label>
+                                <input type="range" id="stability-level" min="0.05" max="0.5" step="0.05" value="0.1" onchange="updateStabilityDemo()">
+                            </div>
+                        </div>
+                        
+                        <button onclick="runStabilityAnalysis()" class="azbn-btn" style="margin: 1rem 0;">Run Stability Analysis</button>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="background: white; border: 2px dashed #ccc; height: 200px; 
+                                        display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                                <div style="text-align: center;">
+                                    <p><strong>Stability Distribution</strong></p>
+                                    <p>Histogram of ARI values across runs</p>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                                <h5>Stability Results:</h5>
+                                <div style="font-family: monospace; font-size: 0.9rem;">
+                                    <p><strong>Mean ARI:</strong> <span id="stability-mean">0.78</span></p>
+                                    <p><strong>Std Dev:</strong> <span id="stability-std">0.12</span></p>
+                                    <p><strong>Min ARI:</strong> <span id="stability-min">0.52</span></p>
+                                    <p><strong>Max ARI:</strong> <span id="stability-max">0.94</span></p>
+                                </div>
+                                <div style="margin-top: 1rem; padding: 0.5rem; background: white; border-radius: 4px;">
+                                    <p style="margin: 0; font-size: 0.9rem;" id="stability-assessment">
+                                        High stability - clustering is robust to perturbations.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Parameter Selection Assistant</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="selection-metric">Selection Method:</label>
+                                <select id="selection-metric" onchange="updateSelectionDemo()">
+                                    <option value="gap">Gap Statistic</option>
+                                    <option value="elbow">Elbow Method</option>
+                                    <option value="silhouette">Silhouette Analysis</option>
+                                    <option value="stability">Stability-based</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="max-k">Maximum K: <span id="max-k-val">10</span></label>
+                                <input type="range" id="max-k" min="5" max="15" step="1" value="10" onchange="updateSelectionDemo()">
+                            </div>
+                            <div>
+                                <label for="selection-data">Data Complexity:</label>
+                                <select id="selection-data" onchange="updateSelectionDemo()">
+                                    <option value="simple">Simple Structure</option>
+                                    <option value="moderate">Moderate Complexity</option>
+                                    <option value="complex">Complex Structure</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Parameter Selection Curve</strong></p>
+                                <p>Quality metric vs. number of clusters</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Selection Results:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Optimal K:</strong> <span id="selection-optimal">4</span></div>
+                                <div><strong>Quality Score:</strong> <span id="selection-score">0.73</span></div>
+                                <div><strong>Confidence:</strong> <span id="selection-confidence">High</span></div>
+                                <div><strong>Alternative K:</strong> <span id="selection-alternative">3, 5</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Test Your Clustering Evaluation Knowledge</h2>
+                    
+                    <p>Assess your understanding of clustering validation techniques, metrics, and best practices.</p>
+
+                    <div class="quiz-question">
+                        <h4>Question 1: Silhouette Coefficient</h4>
+                        <p>What does a silhouette coefficient of 0 indicate for a data point?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q1" value="a" id="q1a">
+                            <label for="q1a">The point is perfectly clustered</label><br>
+                            <input type="radio" name="q1" value="b" id="q1b">
+                            <label for="q1b">The point is on the boundary between clusters (ambiguous assignment)</label><br>
+                            <input type="radio" name="q1" value="c" id="q1c">
+                            <label for="q1c">The point is definitely misclassified</label><br>
+                            <input type="radio" name="q1" value="d" id="q1d">
+                            <label for="q1d">The point is an outlier</label><br>
+                        </div>
+                        <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Adjusted Rand Index</h4>
+                        <p>What is the main advantage of ARI over the basic Rand Index?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q2" value="a" id="q2a">
+                            <label for="q2a">ARI is faster to compute</label><br>
+                            <input type="radio" name="q2" value="b" id="q2b">
+                            <label for="q2b">ARI corrects for chance agreement and has expected value 0 for random clustering</label><br>
+                            <input type="radio" name="q2" value="c" id="q2c">
+                            <label for="q2c">ARI works better with large datasets</label><br>
+                            <input type="radio" name="q2" value="d" id="q2d">
+                            <label for="q2d">ARI doesn't require ground truth labels</label><br>
+                        </div>
+                        <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Gap Statistic</h4>
+                        <p>What does the Gap statistic compare the observed clustering quality against?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q3" value="a" id="q3a">
+                            <label for="q3a">The optimal clustering solution</label><br>
+                            <input type="radio" name="q3" value="b" id="q3b">
+                            <label for="q3b">A null reference distribution (typically uniform random data)</label><br>
+                            <input type="radio" name="q3" value="c" id="q3c">
+                            <label for="q3c">K-means clustering results</label><br>
+                            <input type="radio" name="q3" value="d" id="q3d">
+                            <label for="q3d">The worst possible clustering</label><br>
+                        </div>
+                        <button onclick="checkAnswer(3, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Internal vs External Validation</h4>
+                        <p>When should you primarily rely on internal validation metrics?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q4" value="a" id="q4a">
+                            <label for="q4a">When you have high-quality ground truth labels</label><br>
+                            <input type="radio" name="q4" value="b" id="q4b">
+                            <label for="q4b">When no ground truth is available and you need to assess clustering quality</label><br>
+                            <input type="radio" name="q4" value="c" id="q4c">
+                            <label for="q4c">Only for comparing different algorithms</label><br>
+                            <input type="radio" name="q4" value="d" id="q4d">
+                            <label for="q4d">When computational resources are unlimited</label><br>
+                        </div>
+                        <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Clustering Stability</h4>
+                        <p>High clustering stability indicates:</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q5" value="a" id="q5a">
+                            <label for="q5a">The clustering algorithm is computationally efficient</label><br>
+                            <input type="radio" name="q5" value="b" id="q5b">
+                            <label for="q5b">The clustering results are consistent across data perturbations or algorithm variations</label><br>
+                            <input type="radio" name="q5" value="c" id="q5c">
+                            <label for="q5c">The clusters are perfectly separated</label><br>
+                            <input type="radio" name="q5" value="d" id="q5d">
+                            <label for="q5d">The number of clusters is optimal</label><br>
+                        </div>
+                        <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="margin: 2rem 0; padding: 1rem; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                        <h4>Quiz Score</h4>
+                        <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                        <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter13" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 13: Mean Shift Clustering</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter15" class="azbn-btn" style="text-decoration: none;">Chapter 15: Advanced Applications →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let quizAnswers = {};
+        
+        function showSection(sectionName, clickedElement) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        function updateEvalDemo() {
+            const dataset = document.getElementById('eval-dataset').value;
+            const algorithm = document.getElementById('eval-algorithm').value;
+            const clusters = document.getElementById('eval-clusters').value;
+            
+            document.getElementById('eval-k-val').textContent = clusters;
+            
+            // Simulate metric values based on scenario
+            const scenarios = {
+                'wellseparated': { sil: 0.75, db: 0.85, ch: 420.3, dunn: 0.68, interp: 'Excellent clustering with well-separated, compact clusters.' },
+                'overlapping': { sil: 0.45, db: 1.45, ch: 185.2, dunn: 0.32, interp: 'Moderate quality with some cluster overlap.' },
+                'different-sizes': { sil: 0.58, db: 1.12, ch: 298.7, dunn: 0.41, interp: 'Good separation but unbalanced cluster sizes.' },
+                'noisy': { sil: 0.35, db: 1.78, ch: 156.4, dunn: 0.28, interp: 'Lower quality due to noise interference.' }
+            };
+            
+            const scenario = scenarios[dataset];
+            const algEffect = algorithm === 'dbscan' ? 1.1 : algorithm === 'gmm' ? 0.95 : 1.0;
+            
+            document.getElementById('eval-silhouette').textContent = (scenario.sil * algEffect).toFixed(2);
+            document.getElementById('eval-db').textContent = (scenario.db / algEffect).toFixed(2);
+            document.getElementById('eval-ch').textContent = (scenario.ch * algEffect).toFixed(1);
+            document.getElementById('eval-dunn').textContent = (scenario.dunn * algEffect).toFixed(2);
+            document.getElementById('eval-interpretation').textContent = scenario.interp;
+        }
+
+        function updateStabilityDemo() {
+            const method = document.getElementById('stability-method').value;
+            const runs = document.getElementById('stability-runs').value;
+            const level = document.getElementById('stability-level').value;
+            
+            document.getElementById('stability-runs-val').textContent = runs;
+            document.getElementById('stability-level-val').textContent = level;
+        }
+
+        function runStabilityAnalysis() {
+            const method = document.getElementById('stability-method').value;
+            const level = parseFloat(document.getElementById('stability-level').value);
+            
+            // Simulate stability results
+            const baseMean = 0.78;
+            const perturbationEffect = level * 2; // Higher perturbation = lower stability
+            const mean = Math.max(0.3, baseMean - perturbationEffect);
+            const std = level * 0.5 + 0.1;
+            const min = Math.max(0.1, mean - 2 * std);
+            const max = Math.min(1.0, mean + 1.5 * std);
+            
+            document.getElementById('stability-mean').textContent = mean.toFixed(2);
+            document.getElementById('stability-std').textContent = std.toFixed(2);
+            document.getElementById('stability-min').textContent = min.toFixed(2);
+            document.getElementById('stability-max').textContent = max.toFixed(2);
+            
+            const assessment = mean > 0.7 ? 'High stability - clustering is robust to perturbations.' :
+                             mean > 0.5 ? 'Moderate stability - some sensitivity to perturbations.' :
+                             'Low stability - clustering may not be reliable.';
+            document.getElementById('stability-assessment').textContent = assessment;
+        }
+
+        function updateSelectionDemo() {
+            const metric = document.getElementById('selection-metric').value;
+            const maxK = document.getElementById('max-k').value;
+            const complexity = document.getElementById('selection-data').value;
+            
+            document.getElementById('max-k-val').textContent = maxK;
+            
+            // Simulate selection results based on complexity
+            const complexityMap = { simple: 3, moderate: 5, complex: 7 };
+            const baseOptimal = complexityMap[complexity];
+            const optimal = Math.min(parseInt(maxK), baseOptimal + (Math.random() > 0.5 ? 1 : 0));
+            
+            const score = metric === 'gap' ? (0.6 + Math.random() * 0.3).toFixed(2) :
+                         metric === 'silhouette' ? (0.5 + Math.random() * 0.4).toFixed(2) :
+                         (0.7 + Math.random() * 0.2).toFixed(2);
+            
+            const confidence = complexity === 'simple' ? 'High' : complexity === 'complex' ? 'Medium' : 'High';
+            const alternatives = [optimal - 1, optimal + 1].filter(k => k >= 2 && k <= maxK).join(', ');
+            
+            document.getElementById('selection-optimal').textContent = optimal;
+            document.getElementById('selection-score').textContent = score;
+            document.getElementById('selection-confidence').textContent = confidence;
+            document.getElementById('selection-alternative').textContent = alternatives;
+        }
+
+        function checkAnswer(questionNum, correctAnswer) {
+            const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const resultDiv = document.getElementById(`q${questionNum}-result`);
+            
+            if (!selectedAnswer) {
+                resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
+                return;
+            }
+            
+            const isCorrect = selectedAnswer.value === correctAnswer;
+            quizAnswers[questionNum] = isCorrect;
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = '<p style="color: green;">✓ Correct!</p>';
+            } else {
+                resultDiv.innerHTML = '<p style="color: red;">✗ Incorrect. Try again!</p>';
+            }
+            
+            updateQuizScore();
+        }
+
+        function updateQuizScore() {
+            const correct = Object.values(quizAnswers).filter(answer => answer).length;
+            document.getElementById('quiz-score').textContent = correct;
+        }
+
+        function resetQuiz() {
+            quizAnswers = {};
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('[id$="-result"]').forEach(div => {
+                div.innerHTML = '';
+            });
+            document.getElementById('quiz-score').textContent = '0';
+        }
+
+        // Initialize with default section and demo values
+        window.addEventListener('load', function() {
+            showSection('introduction');
+            updateEvalDemo();
+            updateStabilityDemo();
+            updateSelectionDemo();
+        });
+    </script>
+</body>
+</html>

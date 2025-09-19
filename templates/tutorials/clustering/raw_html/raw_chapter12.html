@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 12: Gaussian Mixture Models - Comprehensive Clustering Analysis Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml_fundamentals/chapter12.css') }}">
+    <style>
+        .visualization-placeholder {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .theorem-box {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .algorithm-box {
+            background: #f1f8e9;
+            border-left: 4px solid #689f38;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .em-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .convergence-box {
+            background: #fce4ec;
+            border-left: 4px solid #e91e63;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .quiz-question {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .learning-objectives-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        .section-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+        .section-nav button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .section-nav button:hover {
+            background: #e9ecef;
+        }
+        .section-nav button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .gaussian-viz {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav" style="top: 50px;">
+            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/tutorials/ml-fundamentals" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+                    <img src="/static/images/logo.png" alt="Logo" style="height: 40px;">
+                    <span>Comprehensive Clustering Analysis Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main style="padding-top: 100px;">
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter11" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 11: DBSCAN</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter13" class="azbn-btn" style="text-decoration: none;">Chapter 13: Mean Shift Clustering →</a>
+                </div>
+
+                <h1>Chapter 12: Gaussian Mixture Models</h1>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+                    Explore Gaussian Mixture Models (GMMs), a powerful probabilistic approach to clustering that models data as a mixture of Gaussian distributions. Learn the Expectation-Maximization algorithm and understand how GMMs provide soft clustering with uncertainty quantification.
+                </p>
+
+                <div class="learning-objectives-card">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the probabilistic foundation of Gaussian Mixture Models</li>
+                        <li>Master multivariate Gaussian distributions and mixture model theory</li>
+                        <li>Learn the Expectation-Maximization (EM) algorithm step by step</li>
+                        <li>Analyze convergence properties and parameter estimation</li>
+                        <li>Explore model selection techniques for determining optimal components</li>
+                        <li>Compare GMMs with hard clustering methods like K-means</li>
+                        <li>Apply GMMs to real-world probabilistic clustering problems</li>
+                        <li>Understand soft clustering and uncertainty quantification</li>
+                    </ul>
+                </div>
+
+                <div class="section-nav">
+                    <button class="active" onclick="showSection('introduction', this)">Introduction</button>
+                    <button onclick="showSection('theory', this)">Mathematical Theory</button>
+                    <button onclick="showSection('em-algorithm', this)">EM Algorithm</button>
+                    <button onclick="showSection('convergence', this)">Convergence & Estimation</button>
+                    <button onclick="showSection('model-selection', this)">Model Selection</button>
+                    <button onclick="showSection('comparison', this)">Method Comparison</button>
+                    <button onclick="showSection('interactive', this)">Interactive Demo</button>
+                    <button onclick="showSection('quiz', this)">Quiz</button>
+                </div>
+
+                <!-- Introduction Section -->
+                <div id="introduction" class="content-section active">
+                    <h2>Probabilistic Clustering with Gaussian Mixtures</h2>
+                    
+                    <p>Gaussian Mixture Models represent a fundamental shift from deterministic to probabilistic clustering. Instead of assigning each point to exactly one cluster, GMMs model the data as arising from a mixture of Gaussian distributions, providing soft cluster assignments with uncertainty measures.</p>
+
+                    <h3>From Hard to Soft Clustering</h3>
+                    <p>Traditional clustering methods make hard decisions about cluster membership. GMMs introduce probabilistic reasoning that better reflects real-world uncertainty.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Hard Clustering (K-means)</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Binary assignment:</strong> Each point belongs to exactly one cluster</li>
+                                <li><strong>No uncertainty:</strong> Assignment confidence not quantified</li>
+                                <li><strong>Spherical assumption:</strong> Assumes spherical cluster shapes</li>
+                                <li><strong>Distance-based:</strong> Uses Euclidean distance to centroids</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Soft Clustering (GMM)</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Probabilistic assignment:</strong> Membership probabilities for each cluster</li>
+                                <li><strong>Uncertainty quantification:</strong> Confidence levels for assignments</li>
+                                <li><strong>Flexible shapes:</strong> Elliptical clusters with varying orientations</li>
+                                <li><strong>Likelihood-based:</strong> Uses probability density functions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Hard vs Soft Clustering</h4>
+                        <p><strong>Interactive Comparison:</strong> Side-by-side view showing K-means hard assignments vs GMM soft assignments on the same dataset. The GMM visualization shows probability contours and uncertainty regions, while K-means shows discrete cluster boundaries. Points are colored by their strongest cluster membership but with transparency indicating uncertainty.</p>
+                    </div>
+
+                    <h3>Core Concepts of Gaussian Mixtures</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="azbn-card">
+                            <h4>Mixture Components</h4>
+                            <p>Each component is a multivariate Gaussian distribution with its own mean, covariance, and mixing weight.</p>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>Latent Variables</h4>
+                            <p>Hidden cluster assignments that determine which component generated each data point.</p>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>Maximum Likelihood</h4>
+                            <p>Parameter estimation by maximizing the likelihood of observing the data.</p>
+                        </div>
+                    </div>
+
+                    <h3>Advantages of Probabilistic Modeling</h3>
+                    <div class="theorem-box">
+                        <h4>Benefits of the GMM Approach</h4>
+                        
+                        <h5>Uncertainty Quantification:</h5>
+                        <ul>
+                            <li><strong>Membership probabilities:</strong> Know how confident each assignment is</li>
+                            <li><strong>Boundary uncertainty:</strong> Identify points near cluster boundaries</li>
+                            <li><strong>Model uncertainty:</strong> Assess confidence in the overall model</li>
+                        </ul>
+                        
+                        <h5>Flexible Modeling:</h5>
+                        <ul>
+                            <li><strong>Elliptical clusters:</strong> Different shapes and orientations</li>
+                            <li><strong>Varying sizes:</strong> Clusters can have different scales</li>
+                            <li><strong>Unequal weights:</strong> Some clusters can be more prevalent</li>
+                        </ul>
+                        
+                        <h5>Principled Framework:</h5>
+                        <ul>
+                            <li><strong>Statistical foundation:</strong> Grounded in probability theory</li>
+                            <li><strong>Model selection:</strong> Principled methods for choosing complexity</li>
+                            <li><strong>Generative model:</strong> Can generate new samples</li>
+                        </ul>
+                    </div>
+
+                    <h3>Applications and Use Cases</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Image and Signal Processing</h4>
+                            <ul>
+                                <li><strong>Image segmentation:</strong> Pixel clustering with uncertainty</li>
+                                <li><strong>Color quantization:</strong> Reducing color palettes</li>
+                                <li><strong>Background subtraction:</strong> Modeling scene backgrounds</li>
+                                <li><strong>Speech recognition:</strong> Modeling phoneme distributions</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Finance and Economics</h4>
+                            <ul>
+                                <li><strong>Risk modeling:</strong> Portfolio risk assessment</li>
+                                <li><strong>Market segmentation:</strong> Customer behavior modeling</li>
+                                <li><strong>Anomaly detection:</strong> Identifying unusual transactions</li>
+                                <li><strong>Economic forecasting:</strong> Modeling economic regimes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Bioinformatics and Medicine</h4>
+                            <ul>
+                                <li><strong>Gene expression:</strong> Identifying gene clusters</li>
+                                <li><strong>Medical diagnosis:</strong> Symptom pattern recognition</li>
+                                <li><strong>Drug discovery:</strong> Molecular similarity modeling</li>
+                                <li><strong>Population genetics:</strong> Ancestry inference</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mathematical Theory Section -->
+                <div id="theory" class="content-section">
+                    <h2>Mathematical Foundations</h2>
+                    
+                    <p>Gaussian Mixture Models are built on the foundation of multivariate Gaussian distributions and probability theory. Understanding these mathematical concepts is crucial for effective application and parameter interpretation.</p>
+
+                    <h3>Multivariate Gaussian Distribution</h3>
+                    <p>The building block of GMMs is the multivariate Gaussian distribution, which generalizes the familiar bell curve to multiple dimensions.</p>
+
+                    <div class="formula-box">
+                        <h4>Multivariate Gaussian Probability Density</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>For a d-dimensional vector <strong>x</strong> with mean <strong>μ</strong> and covariance matrix <strong>Σ</strong>:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>𝒩(x|μ, Σ) = (2π)^(-d/2) |Σ|^(-1/2) exp(-½(x-μ)ᵀΣ⁻¹(x-μ))</strong>
+                            </div>
+                            
+                            <h5>Key Components:</h5>
+                            <ul>
+                                <li><strong>μ (mean vector):</strong> Center location of the distribution</li>
+                                <li><strong>Σ (covariance matrix):</strong> Shape, size, and orientation</li>
+                                <li><strong>|Σ| (determinant):</strong> Normalization factor for volume</li>
+                                <li><strong>Σ⁻¹ (inverse):</strong> Precision matrix for distance calculation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="gaussian-viz">
+                        <h4>Understanding Covariance Matrix Effects</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Diagonal Σ</h5>
+                                <p>Axis-aligned ellipses<br>Independent features</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Full Σ</h5>
+                                <p>Rotated ellipses<br>Correlated features</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Spherical Σ</h5>
+                                <p>Circular contours<br>Equal variance all directions</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Mixture Model Formulation</h3>
+                    <p>A Gaussian Mixture Model combines multiple Gaussian distributions with mixing weights to model complex data distributions.</p>
+
+                    <div class="formula-box">
+                        <h4>GMM Probability Density</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>A mixture of K Gaussian components:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>p(x) = Σᵢ₌₁ᴷ πᵢ 𝒩(x|μᵢ, Σᵢ)</strong>
+                            </div>
+                            
+                            <h5>Parameters:</h5>
+                            <ul>
+                                <li><strong>K:</strong> Number of mixture components</li>
+                                <li><strong>πᵢ:</strong> Mixing weights (πᵢ ≥ 0, Σπᵢ = 1)</li>
+                                <li><strong>μᵢ:</strong> Mean vector for component i</li>
+                                <li><strong>Σᵢ:</strong> Covariance matrix for component i</li>
+                            </ul>
+                        </div>
+                        
+                        <h4>Posterior Probabilities (Responsibilities)</h4>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>Probability that point x belongs to component k:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>γ(zₖ) = πₖ𝒩(x|μₖ, Σₖ) / Σⱼ₌₁ᴷ πⱼ𝒩(x|μⱼ, Σⱼ)</strong>
+                            </div>
+                            <p>This gives us soft cluster assignments with uncertainty quantification.</p>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: GMM Components and Mixing</h4>
+                        <p><strong>Interactive 3D Surface:</strong> Shows individual Gaussian components and their weighted combination forming the mixture distribution. Users can adjust mixing weights and see how the overall distribution changes. Includes 2D contour plots showing how different covariance matrices create different cluster shapes.</p>
+                    </div>
+
+                    <h3>Likelihood and Log-Likelihood</h3>
+                    <p>Parameter estimation in GMMs relies on maximizing the likelihood of the observed data under the model.</p>
+
+                    <div class="formula-box">
+                        <h4>Likelihood Functions</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Data Likelihood:</h5>
+                            <p>For dataset X = {x₁, x₂, ..., xₙ}:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>L(θ) = ∏ᵢ₌₁ⁿ p(xᵢ|θ) = ∏ᵢ₌₁ⁿ Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ)</strong>
+                            </div>
+                            
+                            <h5>Log-Likelihood:</h5>
+                            <p>More convenient for optimization:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>ℓ(θ) = Σᵢ₌₁ⁿ log(Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ))</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Challenges with Direct Optimization</h3>
+                    <div class="theorem-box">
+                        <h4>Why Direct Maximum Likelihood is Difficult</h4>
+                        
+                        <h5>Mathematical Challenges:</h5>
+                        <ul>
+                            <li><strong>Logarithm of sum:</strong> log(Σ) terms don't simplify nicely</li>
+                            <li><strong>Coupling:</strong> Parameters of different components are coupled</li>
+                            <li><strong>No closed form:</strong> No analytical solution for optimal parameters</li>
+                            <li><strong>Multiple modes:</strong> Likelihood surface has many local maxima</li>
+                        </ul>
+                        
+                        <h5>Computational Issues:</h5>
+                        <ul>
+                            <li><strong>Numerical instability:</strong> Matrix inversions and determinants</li>
+                            <li><strong>Singularities:</strong> Covariance matrices becoming singular</li>
+                            <li><strong>Initialization sensitivity:</strong> Results depend on starting values</li>
+                        </ul>
+                        
+                        <p><strong>Solution:</strong> The Expectation-Maximization (EM) algorithm provides an elegant iterative approach to this optimization problem.</p>
+                    </div>
+                </div>
+
+                <!-- EM Algorithm Section -->
+                <div id="em-algorithm" class="content-section">
+                    <h2>The Expectation-Maximization Algorithm</h2>
+                    
+                    <p>The EM algorithm is an iterative method for finding maximum likelihood estimates in models with latent variables. For GMMs, it alternates between computing posterior probabilities (E-step) and updating parameters (M-step).</p>
+
+                    <h3>Algorithm Overview</h3>
+                    <p>EM elegantly handles the coupling between parameters by introducing latent variables representing cluster assignments.</p>
+
+                    <div class="algorithm-box">
+                        <h4>EM Algorithm Structure</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li><strong>Initialize:</strong> Set initial values for θ⁽⁰⁾ = {π₁⁽⁰⁾, μ₁⁽⁰⁾, Σ₁⁽⁰⁾, ..., πₖ⁽⁰⁾, μₖ⁽⁰⁾, Σₖ⁽⁰⁾}</li>
+                                <li><strong>Repeat until convergence:</strong>
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li><strong>E-step:</strong> Compute posterior probabilities γᵢₖ⁽ᵗ⁾</li>
+                                        <li><strong>M-step:</strong> Update parameters θ⁽ᵗ⁺¹⁾ using γᵢₖ⁽ᵗ⁾</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Output:</strong> Final parameter estimates θ*</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <h3>E-Step: Computing Responsibilities</h3>
+                    <p>The Expectation step computes the posterior probability that each data point belongs to each component.</p>
+
+                    <div class="em-box">
+                        <h4>E-Step Computations</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>For each data point xᵢ and component k, compute:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>γᵢₖ⁽ᵗ⁾ = πₖ⁽ᵗ⁻¹⁾𝒩(xᵢ|μₖ⁽ᵗ⁻¹⁾, Σₖ⁽ᵗ⁻¹⁾) / Σⱼ₌₁ᴷ πⱼ⁽ᵗ⁻¹⁾𝒩(xᵢ|μⱼ⁽ᵗ⁻¹⁾, Σⱼ⁽ᵗ⁻¹⁾)</strong>
+                            </div>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>γᵢₖ:</strong> "Responsibility" of component k for point xᵢ</li>
+                                <li><strong>Soft assignment:</strong> Values between 0 and 1</li>
+                                <li><strong>Normalization:</strong> Σₖγᵢₖ = 1 for each point i</li>
+                                <li><strong>Uncertainty:</strong> Multiple components can have non-zero responsibility</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>M-Step: Parameter Updates</h3>
+                    <p>The Maximization step updates model parameters using the computed responsibilities as weighted assignments.</p>
+
+                    <div class="em-box">
+                        <h4>M-Step Parameter Updates</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Effective Sample Size:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Nₖ⁽ᵗ⁾ = Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾</strong>
+                            </div>
+                            
+                            <h5>Mixing Weights:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>πₖ⁽ᵗ⁾ = Nₖ⁽ᵗ⁾ / n</strong>
+                            </div>
+                            
+                            <h5>Means:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>μₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ xᵢ</strong>
+                            </div>
+                            
+                            <h5>Covariances:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Σₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ (xᵢ - μₖ⁽ᵗ⁾)(xᵢ - μₖ⁽ᵗ⁾)ᵀ</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: EM Algorithm Iterations</h4>
+                        <p><strong>Animated EM Process:</strong> Step-by-step visualization showing how EM converges. Shows initial random parameters, then alternates between E-step (updating point colors/transparency based on responsibilities) and M-step (moving cluster centers and reshaping ellipses). Includes log-likelihood plot showing monotonic increase.</p>
+                    </div>
+
+                    <h3>Complete EM Algorithm Implementation</h3>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <h4>Pseudocode:</h4>
+                        <pre style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+<strong>function</strong> GMM_EM(X, K, max_iter=100, tol=1e-6):
+    // Initialize parameters
+    π ← uniform distribution over K components
+    μ ← K random points from X  
+    Σ ← K identity matrices
+    
+    <strong>for</strong> iter = 1 to max_iter:
+        // E-step: Compute responsibilities
+        <strong>for</strong> i = 1 to n:
+            <strong>for</strong> k = 1 to K:
+                γᵢₖ ← πₖ * N(xᵢ|μₖ, Σₖ) / Σⱼ πⱼ * N(xᵢ|μⱼ, Σⱼ)
+        
+        // M-step: Update parameters  
+        <strong>for</strong> k = 1 to K:
+            Nₖ ← Σᵢ γᵢₖ
+            πₖ ← Nₖ / n
+            μₖ ← (1/Nₖ) Σᵢ γᵢₖ * xᵢ
+            Σₖ ← (1/Nₖ) Σᵢ γᵢₖ * (xᵢ - μₖ)(xᵢ - μₖ)ᵀ
+        
+        // Check convergence
+        <strong>if</strong> |ℓ⁽ᵗ⁾ - ℓ⁽ᵗ⁻¹⁾| < tol:
+            <strong>break</strong>
+    
+    <strong>return</strong> π, μ, Σ, γ
+        </pre>
+                    </div>
+
+                    <h3>Implementation Considerations</h3>
+                    <div class="theorem-box">
+                        <h4>Practical EM Implementation</h4>
+                        
+                        <h5>Numerical Stability:</h5>
+                        <ul>
+                            <li><strong>Regularization:</strong> Add small values to diagonal of covariance matrices</li>
+                            <li><strong>Log-space computation:</strong> Work in log probabilities to avoid underflow</li>
+                            <li><strong>Numerical conditioning:</strong> Check matrix condition numbers</li>
+                        </ul>
+                        
+                        <h5>Initialization Strategies:</h5>
+                        <ul>
+                            <li><strong>K-means initialization:</strong> Start with K-means cluster centers</li>
+                            <li><strong>Random restarts:</strong> Run multiple times with different initializations</li>
+                            <li><strong>Data-driven init:</strong> Choose initial centers from data points</li>
+                        </ul>
+                        
+                        <h5>Convergence Monitoring:</h5>
+                        <ul>
+                            <li><strong>Log-likelihood:</strong> Monitor monotonic increase</li>
+                            <li><strong>Parameter change:</strong> Check parameter stability</li>
+                            <li><strong>Maximum iterations:</strong> Prevent infinite loops</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Convergence Section -->
+                <div id="convergence" class="content-section">
+                    <h2>Convergence and Parameter Estimation</h2>
+                    
+                    <p>Understanding EM convergence properties is crucial for reliable parameter estimation and model validation in Gaussian Mixture Models.</p>
+
+                    <div class="convergence-box">
+                        <h4>EM Convergence Guarantees</h4>
+                        
+                        <h5>Theoretical Properties:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Monotonic increase:</strong> ℓ⁽ᵗ⁺¹⁾ ≥ ℓ⁽ᵗ⁾ (log-likelihood never decreases)</li>
+                                <li><strong>Bounded convergence:</strong> Algorithm converges to local maximum</li>
+                                <li><strong>No guarantee of global optimum:</strong> May converge to local maxima</li>
+                                <li><strong>Rate of convergence:</strong> Generally linear, can be slow near convergence</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Convergence Criteria:</h5>
+                        <ul>
+                            <li><strong>Log-likelihood change:</strong> |ℓ⁽ᵗ⁾ - ℓ⁽ᵗ⁻¹⁾| < ε</li>
+                            <li><strong>Parameter change:</strong> ||θ⁽ᵗ⁾ - θ⁽ᵗ⁻¹⁾|| < δ</li>
+                            <li><strong>Maximum iterations:</strong> Prevent infinite loops</li>
+                            <li><strong>Responsibility stability:</strong> Changes in γᵢₖ below threshold</li>
+                        </ul>
+                    </div>
+
+                    <h3>Dealing with Convergence Issues</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Singular Covariance Matrices</h4>
+                            <ul>
+                                <li><strong>Problem:</strong> Matrix becomes non-invertible</li>
+                                <li><strong>Cause:</strong> All responsibility concentrated on few points</li>
+                                <li><strong>Solution:</strong> Regularization, minimum eigenvalue constraints</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Local Maxima</h4>
+                            <ul>
+                                <li><strong>Problem:</strong> Algorithm stuck in suboptimal solution</li>
+                                <li><strong>Cause:</strong> Poor initialization or complex likelihood surface</li>
+                                <li><strong>Solution:</strong> Multiple random restarts, better initialization</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Slow Convergence</h4>
+                            <ul>
+                                <li><strong>Problem:</strong> Many iterations needed for convergence</li>
+                                <li><strong>Cause:</strong> Components with very different scales</li>
+                                <li><strong>Solution:</strong> Adaptive step sizes, acceleration methods</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Convergence Analysis</h4>
+                        <p><strong>Multi-panel Dashboard:</strong> Shows log-likelihood progression, parameter trajectories, and responsibility evolution during EM iterations. Includes examples of good convergence, local maxima trapping, and numerical issues. Users can adjust initialization and see different convergence behaviors.</p>
+                    </div>
+
+                    <h3>Advanced EM Variants</h3>
+                    <div class="algorithm-box">
+                        <h4>EM Algorithm Improvements</h4>
+                        
+                        <h5>Regularized EM:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Covariance regularization:</strong></p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>Σₖ⁽ᵗ⁾ ← Σₖ⁽ᵗ⁾ + λI</strong>
+                            </div>
+                            <p>Prevents singular matrices and improves numerical stability.</p>
+                        </div>
+                        
+                        <h5>Constrained EM:</h5>
+                        <ul>
+                            <li><strong>Tied covariances:</strong> All components share same covariance</li>
+                            <li><strong>Diagonal covariances:</strong> Assume feature independence</li>
+                            <li><strong>Spherical covariances:</strong> Equal variance in all directions</li>
+                        </ul>
+                        
+                        <h5>Accelerated EM:</h5>
+                        <ul>
+                            <li><strong>Aitken acceleration:</strong> Extrapolate parameter updates</li>
+                            <li><strong>Quasi-Newton methods:</strong> Use second-order information</li>
+                            <li><strong>Incremental EM:</strong> Update parameters after each data point</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Model Selection Section -->
+                <div id="model-selection" class="content-section">
+                    <h2>Model Selection and Complexity</h2>
+                    
+                    <p>Determining the optimal number of components K is crucial for GMM performance. Too few components underfit the data, while too many components lead to overfitting and poor generalization.</p>
+
+                    <h3>The Model Selection Challenge</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Underfitting (K too small)</h4>
+                            <ul>
+                                <li><strong>Symptoms:</strong> Poor data fit, high bias</li>
+                                <li><strong>Indicators:</strong> Low log-likelihood, large residuals</li>
+                                <li><strong>Solution:</strong> Increase number of components</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Overfitting (K too large)</h4>
+                            <ul>
+                                <li><strong>Symptoms:</strong> Perfect training fit, poor generalization</li>
+                                <li><strong>Indicators:</strong> Singular covariances, unstable parameters</li>
+                                <li><strong>Solution:</strong> Decrease components or regularize</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Information Criteria</h3>
+                    <p>Information criteria balance model fit with complexity by penalizing the number of parameters.</p>
+
+                    <div class="formula-box">
+                        <h4>Model Selection Criteria</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Akaike Information Criterion (AIC):</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>AIC = -2ℓ(θ̂) + 2p</strong>
+                            </div>
+                            
+                            <h5>Bayesian Information Criterion (BIC):</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>BIC = -2ℓ(θ̂) + p log(n)</strong>
+                            </div>
+                            
+                            <h5>Parameter Count for GMM:</h5>
+                            <p>For K components in d dimensions:</p>
+                            <ul>
+                                <li><strong>Mixing weights:</strong> K-1 parameters</li>
+                                <li><strong>Means:</strong> K×d parameters</li>
+                                <li><strong>Covariances:</strong> K×d(d+1)/2 parameters (full)</li>
+                                <li><strong>Total:</strong> p = (K-1) + Kd + Kd(d+1)/2</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Model Selection Curves</h4>
+                        <p><strong>Interactive Model Selection:</strong> Shows log-likelihood, AIC, and BIC curves as functions of K. Users can see how different criteria suggest different optimal values. Includes visualization of fitted models for different K values to show underfitting and overfitting effects.</p>
+                    </div>
+
+                    <h3>Cross-Validation Approaches</h3>
+                    <div class="theorem-box">
+                        <h4>Validation-Based Model Selection</h4>
+                        
+                        <h5>K-Fold Cross-Validation:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li>Split data into K folds</li>
+                                <li>For each number of components m:
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li>Train GMM on K-1 folds</li>
+                                        <li>Evaluate likelihood on held-out fold</li>
+                                        <li>Average across all folds</li>
+                                    </ul>
+                                </li>
+                                <li>Select m with highest average likelihood</li>
+                            </ol>
+                        </div>
+                        
+                        <h5>Advantages and Limitations:</h5>
+                        <ul>
+                            <li><strong>Pros:</strong> Direct generalization assessment, less prone to overfitting</li>
+                            <li><strong>Cons:</strong> Computationally expensive, sensitive to data splitting</li>
+                            <li><strong>Recommendation:</strong> Use for final model validation</li>
+                        </ul>
+                    </div>
+
+                    <h3>Alternative Selection Methods</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Silhouette Analysis</h4>
+                            <ul>
+                                <li><strong>Method:</strong> Measure cluster cohesion and separation</li>
+                                <li><strong>Advantage:</strong> Intuitive interpretation</li>
+                                <li><strong>Limitation:</strong> Requires hard cluster assignments</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Gap Statistic</h4>
+                            <ul>
+                                <li><strong>Method:</strong> Compare to null reference distribution</li>
+                                <li><strong>Advantage:</strong> Principled statistical test</li>
+                                <li><strong>Limitation:</strong> Assumes specific null model</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Minimum Description Length</h4>
+                            <ul>
+                                <li><strong>Method:</strong> Balance encoding cost with fit quality</li>
+                                <li><strong>Advantage:</strong> Information-theoretic foundation</li>
+                                <li><strong>Limitation:</strong> Complex to compute and interpret</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Model Selection Demo</h4>
+                        <p>Explore how different criteria select optimal number of components:</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="max-components">Max Components: <span id="max-comp-val">10</span></label>
+                                <input type="range" id="max-components" min="2" max="15" step="1" value="10" onchange="updateModelSelection()">
+                            </div>
+                            <div>
+                                <label for="data-complexity">Data Complexity:</label>
+                                <select id="data-complexity" onchange="updateModelSelection()">
+                                    <option value="simple">Simple (2-3 clusters)</option>
+                                    <option value="moderate">Moderate (4-5 clusters)</option>
+                                    <option value="complex">Complex (6+ clusters)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                            <h5>Optimal K by Different Criteria:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>AIC:</strong> <span id="aic-optimal">3</span></div>
+                                <div><strong>BIC:</strong> <span id="bic-optimal">2</span></div>
+                                <div><strong>Cross-Val:</strong> <span id="cv-optimal">3</span></div>
+                                <div><strong>Silhouette:</strong> <span id="sil-optimal">3</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method Comparison Section -->
+                <div id="comparison" class="content-section">
+                    <h2>GMM vs Other Clustering Methods</h2>
+                    
+                    <p>Understanding when to use GMMs requires comparing their strengths and limitations with other clustering approaches.</p>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>GMM</th>
+                                <th>K-Means</th>
+                                <th>DBSCAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Clustering Type</strong></td>
+                                <td>Soft/probabilistic</td>
+                                <td>Hard/deterministic</td>
+                                <td>Hard with noise detection</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cluster Shape</strong></td>
+                                <td>Elliptical, flexible orientation</td>
+                                <td>Spherical</td>
+                                <td>Arbitrary shapes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Model Assumptions</strong></td>
+                                <td>Gaussian distributions</td>
+                                <td>Spherical clusters, equal variance</td>
+                                <td>Density-based connectivity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parameter Selection</strong></td>
+                                <td>Number of components K</td>
+                                <td>Number of clusters K</td>
+                                <td>Epsilon and MinPts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uncertainty Quantification</strong></td>
+                                <td>Explicit probabilities</td>
+                                <td>None</td>
+                                <td>None (hard assignments)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Outlier Handling</strong></td>
+                                <td>Low probability assignments</td>
+                                <td>Forced cluster assignment</td>
+                                <td>Explicit noise detection</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Detailed Comparison: GMM vs K-Means</h3>
+                    <div class="theorem-box">
+                        <h4>Relationship Between GMM and K-Means</h4>
+                        
+                        <h5>Special Case Connection:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>K-means can be viewed as a special case of GMM:</p>
+                            <ul>
+                                <li><strong>Equal mixing weights:</strong> πₖ = 1/K for all k</li>
+                                <li><strong>Spherical covariances:</strong> Σₖ = σ²I for all k</li>
+                                <li><strong>Hard assignments:</strong> σ² → 0 limit gives hard clustering</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>When to Choose GMM over K-Means:</h5>
+                        <ul>
+                            <li><strong>Need uncertainty:</strong> Want membership probabilities</li>
+                            <li><strong>Non-spherical clusters:</strong> Elliptical or elongated shapes</li>
+                            <li><strong>Unequal cluster sizes:</strong> Natural variation in cluster prevalence</li>
+                            <li><strong>Generative modeling:</strong> Need to generate new samples</li>
+                        </ul>
+                        
+                        <h5>When K-Means is Preferable:</h5>
+                        <ul>
+                            <li><strong>Large datasets:</strong> K-means is much faster</li>
+                            <li><strong>Spherical clusters:</strong> Assumptions are met</li>
+                            <li><strong>Simple requirements:</strong> Hard assignments sufficient</li>
+                            <li><strong>Interpretability:</strong> Cluster centers more intuitive</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Method Comparison on Various Datasets</h4>
+                        <p><strong>Multi-Algorithm Comparison:</strong> Shows GMM, K-means, and DBSCAN results on different synthetic datasets: (1) Well-separated spherical clusters, (2) Overlapping elliptical clusters, (3) Clusters with different densities, (4) Non-convex shapes. Demonstrates each method's strengths and limitations.</p>
+                    </div>
+
+                    <h3>GMM Applications and Advantages</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Probabilistic Benefits</h4>
+                            <ul>
+                                <li><strong>Uncertainty quantification:</strong> Know confidence in assignments</li>
+                                <li><strong>Outlier detection:</strong> Points with low probability in all components</li>
+                                <li><strong>Model comparison:</strong> Principled selection criteria</li>
+                                <li><strong>Bayesian integration:</strong> Natural extension to Bayesian methods</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Modeling Flexibility</h4>
+                            <ul>
+                                <li><strong>Cluster shapes:</strong> Elliptical with arbitrary orientation</li>
+                                <li><strong>Cluster sizes:</strong> Different scales and prevalences</li>
+                                <li><strong>Generative capability:</strong> Sample from learned distribution</li>
+                                <li><strong>Missing data:</strong> Can handle incomplete observations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Demo Section -->
+                <div id="interactive" class="content-section">
+                    <h2>Interactive GMM Demonstration</h2>
+                    
+                    <p>Explore Gaussian Mixture Models through interactive demonstrations that show parameter effects, EM convergence, and model selection.</p>
+
+                    <div class="interactive-demo">
+                        <h4>Live GMM Fitting</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="gmm-components">Components: <span id="gmm-comp-val">3</span></label>
+                                <input type="range" id="gmm-components" min="1" max="6" step="1" value="3" onchange="updateGMMDemo()">
+                            </div>
+                            <div>
+                                <label for="gmm-dataset">Dataset:</label>
+                                <select id="gmm-dataset" onchange="updateGMMDemo()">
+                                    <option value="overlapping">Overlapping Gaussians</option>
+                                    <option value="separated">Well-Separated</option>
+                                    <option value="elongated">Elongated Clusters</option>
+                                    <option value="mixed">Mixed Sizes</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="covariance-type">Covariance:</label>
+                                <select id="covariance-type" onchange="updateGMMDemo()">
+                                    <option value="full">Full</option>
+                                    <option value="diagonal">Diagonal</option>
+                                    <option value="spherical">Spherical</option>
+                                    <option value="tied">Tied</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 400px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Interactive GMM Visualization</strong></p>
+                                <p>Shows probability contours, data points with soft assignments</p>
+                                <p><em>Ellipses show 1σ, 2σ confidence regions • Point transparency indicates membership probability</em></p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Model Information:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Log-likelihood:</strong> <span id="gmm-loglik">-1245.6</span></div>
+                                <div><strong>AIC:</strong> <span id="gmm-aic">2567.2</span></div>
+                                <div><strong>BIC:</strong> <span id="gmm-bic">2634.8</span></div>
+                                <div><strong>Parameters:</strong> <span id="gmm-params">23</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>EM Algorithm Convergence</h4>
+                        
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0;">
+                            <button onclick="startEM()" class="azbn-btn">Start EM</button>
+                            <button onclick="stepEM()" class="azbn-btn azbn-secondary">Single Step</button>
+                            <button onclick="resetEM()" class="azbn-btn azbn-secondary">Reset</button>
+                            <div>
+                                <label for="em-speed">Speed:</label>
+                                <select id="em-speed">
+                                    <option value="slow">Slow</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="fast">Fast</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                            <div style="background: white; border: 2px dashed #ccc; height: 300px; 
+                                        display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                                <div style="text-align: center;">
+                                    <p><strong>EM Algorithm Progress</strong></p>
+                                    <p>Watch clusters evolve through iterations</p>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                                <h5>EM Status:</h5>
+                                <div style="font-family: monospace; font-size: 0.9rem;">
+                                    <p><strong>Iteration:</strong> <span id="em-iteration">0</span></p>
+                                    <p><strong>Log-likelihood:</strong> <span id="em-loglik">-</span></p>
+                                    <p><strong>Change:</strong> <span id="em-change">-</span></p>
+                                    <p><strong>Status:</strong> <span id="em-status">Ready</span></p>
+                                </div>
+                                
+                                <div style="margin-top: 1rem;">
+                                    <h6>Convergence Plot:</h6>
+                                    <div style="background: white; height: 100px; border: 1px solid #ddd; border-radius: 4px;
+                                                display: flex; align-items: center; justify-content: center; color: #999;">
+                                        Log-likelihood vs iteration
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Model Selection Explorer</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="selection-data">Dataset Size:</label>
+                                <select id="selection-data" onchange="updateSelection()">
+                                    <option value="small">Small (100 points)</option>
+                                    <option value="medium" selected>Medium (500 points)</option>
+                                    <option value="large">Large (2000 points)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="true-components">True Components: <span id="true-comp-val">3</span></label>
+                                <input type="range" id="true-components" min="2" max="6" step="1" value="3" onchange="updateSelection()">
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Model Selection Curves</strong></p>
+                                <p>AIC, BIC, and Cross-validation scores vs number of components</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Selection Results:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                                <div><strong>True K:</strong> <span id="true-k">3</span></div>
+                                <div><strong>AIC Best:</strong> <span id="aic-best">4</span></div>
+                                <div><strong>BIC Best:</strong> <span id="bic-best">3</span></div>
+                                <div><strong>CV Best:</strong> <span id="cv-best">3</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Test Your GMM Knowledge</h2>
+                    
+                    <p>Evaluate your understanding of Gaussian Mixture Models, EM algorithm, and probabilistic clustering concepts.</p>
+
+                    <div class="quiz-question">
+                        <h4>Question 1: GMM Components</h4>
+                        <p>In a Gaussian Mixture Model, what does each mixture component represent?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q1" value="a" id="q1a">
+                            <label for="q1a">A single data point in the dataset</label><br>
+                            <input type="radio" name="q1" value="b" id="q1b">
+                            <label for="q1b">A multivariate Gaussian distribution with its own parameters</label><br>
+                            <input type="radio" name="q1" value="c" id="q1c">
+                            <label for="q1c">A cluster centroid like in K-means</label><br>
+                            <input type="radio" name="q1" value="d" id="q1d">
+                            <label for="q1d">A distance threshold for clustering</label><br>
+                        </div>
+                        <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: EM Algorithm Steps</h4>
+                        <p>What does the E-step in the EM algorithm compute?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q2" value="a" id="q2a">
+                            <label for="q2a">The optimal model parameters</label><br>
+                            <input type="radio" name="q2" value="b" id="q2b">
+                            <label for="q2b">The posterior probabilities (responsibilities) for each data point</label><br>
+                            <input type="radio" name="q2" value="c" id="q2c">
+                            <label for="q2c">The log-likelihood of the current model</label><br>
+                            <input type="radio" name="q2" value="d" id="q2d">
+                            <label for="q2d">The number of components needed</label><br>
+                        </div>
+                        <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Model Selection</h4>
+                        <p>Which information criterion is generally more conservative (prefers simpler models)?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q3" value="a" id="q3a">
+                            <label for="q3a">AIC (Akaike Information Criterion)</label><br>
+                            <input type="radio" name="q3" value="b" id="q3b">
+                            <label for="q3b">BIC (Bayesian Information Criterion)</label><br>
+                            <input type="radio" name="q3" value="c" id="q3c">
+                            <label for="q3c">Both are equally conservative</label><br>
+                            <input type="radio" name="q3" value="d" id="q3d">
+                            <label for="q3d">Neither - they both prefer complex models</label><br>
+                        </div>
+                        <button onclick="checkAnswer(3, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Soft vs Hard Clustering</h4>
+                        <p>What is the main advantage of GMM's soft clustering over K-means' hard clustering?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q4" value="a" id="q4a">
+                            <label for="q4a">GMM is always faster than K-means</label><br>
+                            <input type="radio" name="q4" value="b" id="q4b">
+                            <label for="q4b">GMM provides uncertainty quantification and membership probabilities</label><br>
+                            <input type="radio" name="q4" value="c" id="q4c">
+                            <label for="q4c">GMM can only find spherical clusters</label><br>
+                            <input type="radio" name="q4" value="d" id="q4d">
+                            <label for="q4d">GMM doesn't require parameter selection</label><br>
+                        </div>
+                        <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: EM Convergence</h4>
+                        <p>Which statement about EM algorithm convergence is correct?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q5" value="a" id="q5a">
+                            <label for="q5a">EM always converges to the global maximum</label><br>
+                            <input type="radio" name="q5" value="b" id="q5b">
+                            <label for="q5b">Log-likelihood monotonically increases and EM converges to a local maximum</label><br>
+                            <input type="radio" name="q5" value="c" id="q5c">
+                            <label for="q5c">EM can decrease the log-likelihood in some iterations</label><br>
+                            <input type="radio" name="q5" value="d" id="q5d">
+                            <label for="q5d">EM convergence is not guaranteed</label><br>
+                        </div>
+                        <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="margin: 2rem 0; padding: 1rem; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                        <h4>Quiz Score</h4>
+                        <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                        <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter11" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 11: DBSCAN</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter13" class="azbn-btn" style="text-decoration: none;">Chapter 13: Mean Shift Clustering →</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let quizAnswers = {};
+        
+        function showSection(sectionName, clickedElement) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+        }
+
+        function updateGMMDemo() {
+            const components = document.getElementById('gmm-components').value;
+            const dataset = document.getElementById('gmm-dataset').value;
+            const covType = document.getElementById('covariance-type').value;
+            
+            document.getElementById('gmm-comp-val').textContent = components;
+            
+            // Simulate model metrics based on parameters
+            const loglik = -1200 - (parseInt(components) - 3) * 50 + Math.random() * 100;
+            const params = calculateGMMParams(parseInt(components), 2, covType);
+            const aic = -2 * loglik + 2 * params;
+            const bic = -2 * loglik + params * Math.log(500);
+            
+            document.getElementById('gmm-loglik').textContent = loglik.toFixed(1);
+            document.getElementById('gmm-aic').textContent = aic.toFixed(1);
+            document.getElementById('gmm-bic').textContent = bic.toFixed(1);
+            document.getElementById('gmm-params').textContent = params;
+        }
+
+        function calculateGMMParams(K, d, covType) {
+            const mixingWeights = K - 1;
+            const means = K * d;
+            let covariances;
+            
+            switch(covType) {
+                case 'full': covariances = K * d * (d + 1) / 2; break;
+                case 'diagonal': covariances = K * d; break;
+                case 'spherical': covariances = K; break;
+                case 'tied': covariances = d * (d + 1) / 2; break;
+            }
+            
+            return mixingWeights + means + covariances;
+        }
+
+        function startEM() {
+            document.getElementById('em-status').textContent = 'Running';
+            document.getElementById('em-iteration').textContent = '1';
+            document.getElementById('em-loglik').textContent = '-1456.2';
+            document.getElementById('em-change').textContent = 'N/A';
+        }
+
+        function stepEM() {
+            const current = parseInt(document.getElementById('em-iteration').textContent) || 0;
+            const newIter = current + 1;
+            const loglik = -1500 + newIter * 10 + Math.random() * 5;
+            const change = current > 0 ? (Math.random() * 10).toFixed(2) : 'N/A';
+            
+            document.getElementById('em-iteration').textContent = newIter;
+            document.getElementById('em-loglik').textContent = loglik.toFixed(1);
+            document.getElementById('em-change').textContent = change;
+            document.getElementById('em-status').textContent = newIter > 15 ? 'Converged' : 'Running';
+        }
+
+        function resetEM() {
+            document.getElementById('em-iteration').textContent = '0';
+            document.getElementById('em-loglik').textContent = '-';
+            document.getElementById('em-change').textContent = '-';
+            document.getElementById('em-status').textContent = 'Ready';
+        }
+
+        function updateSelection() {
+            const trueK = document.getElementById('true-components').value;
+            const dataSize = document.getElementById('selection-data').value;
+            
+            document.getElementById('true-comp-val').textContent = trueK;
+            document.getElementById('true-k').textContent = trueK;
+            
+            // Simulate selection results
+            const aic = parseInt(trueK) + (Math.random() > 0.7 ? 1 : 0);
+            const bic = Math.max(1, parseInt(trueK) - (Math.random() > 0.3 ? 1 : 0));
+            const cv = parseInt(trueK) + (Math.random() > 0.5 ? (Math.random() > 0.5 ? 1 : -1) : 0);
+            
+            document.getElementById('aic-best').textContent = aic;
+            document.getElementById('bic-best').textContent = bic;
+            document.getElementById('cv-best').textContent = Math.max(1, cv);
+        }
+
+        function updateModelSelection() {
+            const maxComp = document.getElementById('max-components').value;
+            const complexity = document.getElementById('data-complexity').value;
+            
+            document.getElementById('max-comp-val').textContent = maxComp;
+            
+            // Simulate optimal values based on complexity
+            let aic, bic, cv, sil;
+            switch(complexity) {
+                case 'simple':
+                    aic = 3; bic = 2; cv = 3; sil = 3;
+                    break;
+                case 'moderate':
+                    aic = 5; bic = 4; cv = 4; sil = 4;
+                    break;
+                case 'complex':
+                    aic = 7; bic = 5; cv = 6; sil = 6;
+                    break;
+            }
+            
+            document.getElementById('aic-optimal').textContent = aic;
+            document.getElementById('bic-optimal').textContent = bic;
+            document.getElementById('cv-optimal').textContent = cv;
+            document.getElementById('sil-optimal').textContent = sil;
+        }
+
+        function checkAnswer(questionNum, correctAnswer) {
+            const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+            const resultDiv = document.getElementById(`q${questionNum}-result`);
+            
+            if (!selectedAnswer) {
+                resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
+                return;
+            }
+            
+            const isCorrect = selectedAnswer.value === correctAnswer;
+            quizAnswers[questionNum] = isCorrect;
+            
+            if (isCorrect) {
+                resultDiv.innerHTML = '<p style="color: green;">✓ Correct!</p>';
+            } else {
+                resultDiv.innerHTML = '<p style="color: red;">✗ Incorrect. Try again!</p>';
+            }
+            
+            updateQuizScore();
+        }
+
+        function updateQuizScore() {
+            const correct = Object.values(quizAnswers).filter(answer => answer).length;
+            document.getElementById('quiz-score').textContent = correct;
+        }
+
+        function resetQuiz() {
+            quizAnswers = {};
+            document.querySelectorAll('input[type="radio"]').forEach(input => {
+                input.checked = false;
+            });
+            document.querySelectorAll('[id$="-result"]').forEach(div => {
+                div.innerHTML = '';
+            });
+            document.getElementById('quiz-score').textContent = '0';
+        }
+
+        // Initialize with default section and demo values
+        window.addEventListener('load', function() {
+            showSection('introduction');
+            updateGMMDemo();
+            updateSelection();
+            updateModelSelection();
+        });
+    </script>
+</body>
+</html>
