@@ -99,9 +99,7 @@
                     <div id="theory" class="content-section active">
                         <h2>Metric Space Theory: The Mathematical Foundation</h2>
                         
-                        <div class="explanation-box">
-                            <p>Before diving into specific distance metrics, we must understand the mathematical framework that underlies all distance measures in clustering. A metric space provides the formal foundation for measuring similarity and dissimilarity between data points.</p>
-                        </div>
+                        <p>Before diving into specific distance metrics, we must understand the mathematical framework that underlies all distance measures in clustering. A metric space provides the formal foundation for measuring similarity and dissimilarity between data points.</p>
 
                         <div class="formula-box">
                             <h3>Definition of a Metric Space</h3>
@@ -122,33 +120,177 @@
                             <div class="formula-display">
                                 <h4>3. Symmetry</h4>
                                 <div class="formula">d(x, y) = d(y, x)</div>
-                                <p>The distance from point x to point y is the same as the distance from y to x.</p>
+                                <p>The distance from x to y equals the distance from y to x.</p>
                             </div>
 
                             <div class="formula-display">
                                 <h4>4. Triangle Inequality</h4>
                                 <div class="formula">d(x, z) ≤ d(x, y) + d(y, z)</div>
-                                <p>The direct distance between two points is never longer than the sum of distances through any intermediate point.</p>
+                                <p>The direct distance between two points is always less than or equal to any indirect path through a third point.</p>
                             </div>
-                        </div>
-
-                        <div class="explanation-box">
-                            <h3>Why Metric Spaces Matter in Clustering</h3>
-                            <p>These four properties ensure that our distance measures behave intuitively and mathematically sound. In clustering algorithms, these properties guarantee:</p>
-                            <ul>
-                                <li><strong>Consistency:</strong> Similar points will always have small distances</li>
-                                <li><strong>Reliability:</strong> Distance calculations are deterministic and reproducible</li>
-                                <li><strong>Efficiency:</strong> Algorithms can make assumptions about distance relationships</li>
-                                <li><strong>Interpretability:</strong> Results can be understood in geometric terms</li>
-                            </ul>
                         </div>
 
                         <div class="image-container">
-                            <h4>Visualization: Metric Space Properties</h4>
-                            <div class="visualization-placeholder">
-                                <p>Interactive visualization showing the four metric space properties with geometric examples</p>
+                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter2/metric_properties.png') }}" alt="Metric Space Properties" class="tutorial-image">
+                            <p class="image-caption">Four separate diagrams illustrating each metric property with geometric examples</p>
+                        </div>
+
+                        <h3>Why These Properties Matter</h3>
+                        <p>These four properties are not arbitrary mathematical abstractions—they encode our intuitive understanding of distance and ensure that clustering algorithms behave predictably and meaningfully.</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Non-negativity Impact</h4>
+                                <p>Ensures that similarity measures have a consistent interpretation. Negative distances would create ambiguity in clustering algorithms.</p>
+                                <p><strong>Example:</strong> K-means centroids are always meaningful since all distances are positive.</p>
                             </div>
-                            <p><strong>Geometric Interpretation:</strong> Visual demonstration of how the triangle inequality ensures that direct paths are always shortest in metric spaces.</p>
+                            
+                            <div class="type-card">
+                                <h4>Identity Importance</h4>
+                                <p>Guarantees that identical data points are recognized as such. Critical for handling duplicate data in clustering.</p>
+                                <p><strong>Example:</strong> Prevents artificial cluster fragmentation due to identical points.</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Symmetry Significance</h4>
+                                <p>Ensures that similarity is mutual. Clustering algorithms rely on this for consistent neighbor relationships.</p>
+                                <p><strong>Example:</strong> Hierarchical clustering linkage calculations require symmetric distances.</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Triangle Inequality Utility</h4>
+                                <p>Enables computational optimizations and ensures geometric consistency. Many algorithms use this for pruning.</p>
+                                <p><strong>Example:</strong> DBSCAN uses triangle inequality to efficiently find neighbors.</p>
+                            </div>
+                        </div>
+
+                        <h3>Mathematical Notation and Conventions</h3>
+                        <p>Throughout this course, we'll use consistent mathematical notation. Understanding this notation is crucial for following the theoretical developments.</p>
+
+                        <div class="formula-box">
+                            <h4>Standard Notation</h4>
+                            <ul>
+                                <li><strong>ℝⁿ:</strong> n-dimensional real vector space</li>
+                                <li><strong>x, y, z:</strong> Points/vectors in the space (typically column vectors)</li>
+                                <li><strong>xᵢ:</strong> The i-th component of vector x</li>
+                                <li><strong>‖x‖:</strong> Norm of vector x</li>
+                                <li><strong>⟨x, y⟩:</strong> Inner product (dot product) of vectors x and y</li>
+                                <li><strong>d(x, y):</strong> Distance between points x and y</li>
+                                <li><strong>∀:</strong> "For all" (universal quantifier)</li>
+                                <li><strong>∃:</strong> "There exists" (existential quantifier)</li>
+                                <li><strong>⟺:</strong> "If and only if" (bidirectional implication)</li>
+                            </ul>
+                        </div>
+
+                        <h3>Common Distance Families</h3>
+                        <p>Distance metrics can be classified into several major families, each with distinct mathematical properties and optimal use cases.</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Distance Family</th>
+                                    <th>Examples</th>
+                                    <th>Mathematical Form</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Lp Norms</strong></td>
+                                    <td>Euclidean, Manhattan, Chebyshev</td>
+                                    <td>(Σᵢ |xᵢ - yᵢ|ᵖ)^(1/p)</td>
+                                    <td>Continuous data, geometric problems</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Angular Metrics</strong></td>
+                                    <td>Cosine, Angular distance</td>
+                                    <td>Based on vector angles</td>
+                                    <td>High-dimensional, sparse data</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Edit Distances</strong></td>
+                                    <td>Hamming, Levenshtein</td>
+                                    <td>Character/element operations</td>
+                                    <td>Strings, sequences, categorical data</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Statistical Distances</strong></td>
+                                    <td>Mahalanobis, Chi-squared</td>
+                                    <td>Based on distributions</td>
+                                    <td>Correlated features, statistical data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="model-box">
+                            <h4>Cache-Aware Computing</h4>
+                            
+                            <h5>Memory Hierarchy Considerations:</h5>
+                            <ul>
+                                <li><strong>Cache Lines:</strong> Modern CPUs load 64-byte cache lines</li>
+                                <li><strong>Spatial Locality:</strong> Adjacent memory accesses are faster</li>
+                                <li><strong>Temporal Locality:</strong> Recently accessed data is faster</li>
+                                <li><strong>Cache Misses:</strong> Can be 100x slower than cache hits</li>
+                            </ul>
+                            
+                            <h5>Optimization Strategies:</h5>
+                            <ul>
+                                <li><strong>Row-major layout:</strong> Store points contiguously for better cache performance</li>
+                                <li><strong>Blocking:</strong> Process data in cache-sized chunks</li>
+                                <li><strong>Prefetching:</strong> Load next data while computing current</li>
+                                <li><strong>Memory alignment:</strong> Align data structures to cache line boundaries</li>
+                            </ul>
+                            
+                            <h5>Practical Impact:</h5>
+                            <p>Well-optimized distance calculations can be 5-10x faster than naive implementations, with Manhattan distance typically showing greater improvement due to simpler operations.</p>
+                        </div>
+
+                        <h3>Algorithm-Specific Optimizations</h3>
+                        <p>Different clustering algorithms can leverage specific properties of distance metrics for significant performance improvements.</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>K-means Optimizations</h4>
+                                <h5>Euclidean Distance:</h5>
+                                <ul>
+                                    <li><strong>Squared distances:</strong> Avoid square root in comparison</li>
+                                    <li><strong>Triangle inequality:</strong> Skip calculations when possible</li>
+                                    <li><strong>Precompute centroids:</strong> Cache ‖centroid‖² values</li>
+                                    <li><strong>BLAS libraries:</strong> Use optimized linear algebra</li>
+                                </ul>
+                                
+                                <h5>Manhattan Distance:</h5>
+                                <ul>
+                                    <li><strong>Early termination:</strong> Stop when distance exceeds threshold</li>
+                                    <li><strong>Median updates:</strong> Use median instead of mean for centroids</li>
+                                    <li><strong>Sparse optimization:</strong> Skip zero components</li>
+                                    <li><strong>Integer arithmetic:</strong> Use when data allows</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Hierarchical Clustering</h4>
+                                <h5>Distance Matrix Optimization:</h5>
+                                <ul>
+                                    <li><strong>Symmetry:</strong> Compute only upper triangle</li>
+                                    <li><strong>Sparse storage:</strong> Use compressed formats for large matrices</li>
+                                    <li><strong>Incremental updates:</strong> Update only affected distances</li>
+                                    <li><strong>Parallel computation:</strong> Distribute matrix calculations</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Approximation Methods</h3>
+                        <p>For very large datasets, exact distance calculations may be too expensive. Various approximation methods can provide significant speedups with controlled accuracy loss.</p>
+
+                        <div class="formula-box">
+                            <h4>Fast Approximation Techniques</h4>
+                            <ul>
+                                <li><strong>Random Projections:</strong> Johnson-Lindenstrauss lemma for dimensionality reduction</li>
+                                <li><strong>Locality-Sensitive Hashing (LSH):</strong> Hash similar points to same buckets</li>
+                                <li><strong>Sampling:</strong> Use subset of features for distance estimation</li>
+                                <li><strong>Quantization:</strong> Reduce precision for faster computation</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -545,7 +687,7 @@
     <!-- Chapter Navigation Footer -->
     <div class="navigation-buttons">
         <a href="/tutorials/clustering/chapter1" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 1: Introduction</a>
-        <a href="/tutorials/clustering/chapter3" class="azbn-btn" onclick="scrollToTop()">Chapter 3: Minkowski Distance →</a>
+        <a href="/tutorials/clustering/chapter3" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 3: Minkowski Distance →</a>
     </div>
 </body>
 </html>
