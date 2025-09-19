@@ -105,8 +105,9 @@
                         <p>The central idea behind K-means is elegantly simple yet mathematically profound: given n data points in d-dimensional space, partition them into k clusters such that each point belongs to the cluster with the nearest centroid (cluster center).</p>
 
                         <div class="image-container">
+                            <h4>Visualization: K-Means Core Concept</h4>
                             <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter5/kmeans_concept.png') }}" alt="K-Means Core Concept" class="tutorial-image">
-                            <p class="image-caption">2D scatter plot showing three distinct clusters with centroids and Voronoi diagram boundaries</p>
+                            <p class="image-caption">A 2D scatter plot showing three distinct clusters of colored points (red, blue, green) with their respective centroids marked as larger symbols. Voronoi diagram lines separate the clusters, demonstrating how each region belongs to the nearest centroid. Animation shows the iterative process: initial random centroids, point assignments, centroid updates, and convergence to final positions.</p>
                         </div>
 
                         <h3>Mathematical Foundations</h3>
@@ -114,7 +115,7 @@
 
                         <div class="formula-box">
                             <h4>K-Means Objective Function</h4>
-                            <p>Given dataset X = {x₁, x₂, ..., xₙ} where xᵢ ∈ ℝᵈ, and k cluster centers μ₁, μ₂, ..., μₖ:</p>
+                            <p>Given dataset X = &#123;x₁, x₂, ..., xₙ&#125; where xᵢ ∈ ℝᵈ, and k cluster centers μ₁, μ₂, ..., μₖ:</p>
                             
                             <div class="formula-display">
                                 <strong>J(C, μ) = Σᵢ₌₁ⁿ Σⱼ₌₁ᵏ wᵢⱼ ||xᵢ - μⱼ||²</strong>
@@ -122,9 +123,9 @@
                             
                             <p>Where:</p>
                             <ul>
-                                <li><strong>wᵢⱼ ∈ {0, 1}:</strong> Assignment indicator (1 if xᵢ assigned to cluster j, 0 otherwise)</li>
-                                <li><strong>C = {C₁, C₂, ..., Cₖ}:</strong> Cluster assignments</li>
-                                <li><strong>μ = {μ₁, μ₂, ..., μₖ}:</strong> Cluster centroids</li>
+                                <li><strong>wᵢⱼ ∈ &#123;0, 1&#125;:</strong> Assignment indicator (1 if xᵢ assigned to cluster j, 0 otherwise)</li>
+                                <li><strong>C = &#123;C₁, C₂, ..., Cₖ&#125;:</strong> Cluster assignments</li>
+                                <li><strong>μ = &#123;μ₁, μ₂, ..., μₖ&#125;:</strong> Cluster centroids</li>
                                 <li><strong>||·||²:</strong> Squared Euclidean distance</li>
                             </ul>
                             
@@ -143,10 +144,99 @@
                                 <p><strong>subject to:</strong></p>
                                 <ul>
                                     <li>Σⱼ₌₁ᵏ wᵢⱼ = 1 for all i = 1, ..., n (each point in exactly one cluster)</li>
-                                    <li>wᵢⱼ ∈ {0, 1} for all i, j (binary assignment)</li>
+                                    <li>wᵢⱼ ∈ &#123;0, 1&#125; for all i, j (binary assignment)</li>
                                     <li>Σᵢ₌₁ⁿ wᵢⱼ ≥ 1 for all j = 1, ..., k (no empty clusters)</li>
                                 </ul>
                             </div>
+                            
+                            <h5>Two-Step Optimization:</h5>
+                            <p>The problem is non-convex due to the discrete nature of assignments, but it becomes convex when we fix either C or μ:</p>
+                            <ul>
+                                <li><strong>Fixed μ:</strong> Optimal C found by nearest neighbor assignment</li>
+                                <li><strong>Fixed C:</strong> Optimal μ are cluster centroids (means)</li>
+                            </ul>
+                            
+                            <h5>Coordinate Descent Solution:</h5>
+                            <p>Lloyd's algorithm alternates between these two convex subproblems, guaranteeing monotonic decrease in objective function.</p>
+                        </div>
+
+                        <h3>Historical Context and Significance</h3>
+                        <p>Understanding the historical development helps appreciate K-means' importance in machine learning and data science.</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Historical Development</h4>
+                                <ul>
+                                    <li><strong>1957:</strong> Stuart Lloyd develops algorithm at Bell Labs</li>
+                                    <li><strong>1967:</strong> MacQueen coins term "K-means"</li>
+                                    <li><strong>1982:</strong> Lloyd's work published</li>
+                                    <li><strong>1990s:</strong> Computational improvements and variants</li>
+                                    <li><strong>2000s:</strong> Large-scale applications and distributed versions</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Why K-Means Matters</h4>
+                                <ul>
+                                    <li><strong>Simplicity:</strong> Easy to understand and implement</li>
+                                    <li><strong>Efficiency:</strong> Linear time complexity in n and d</li>
+                                    <li><strong>Scalability:</strong> Works well on large datasets</li>
+                                    <li><strong>Interpretability:</strong> Clear cluster centers and assignments</li>
+                                    <li><strong>Foundation:</strong> Basis for many advanced methods</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Modern Applications</h4>
+                                <ul>
+                                    <li><strong>Customer segmentation:</strong> Marketing and e-commerce</li>
+                                    <li><strong>Image processing:</strong> Color quantization and compression</li>
+                                    <li><strong>Bioinformatics:</strong> Gene expression analysis</li>
+                                    <li><strong>Computer vision:</strong> Feature clustering and object recognition</li>
+                                    <li><strong>Recommendation systems:</strong> User and item clustering</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Strengths and Limitations</h3>
+                        <p>Like all algorithms, K-means has distinct advantages and limitations that determine its appropriate use cases.</p>
+
+                        <div class="model-box">
+                            <h4>Algorithm Characteristics</h4>
+                            
+                            <h5>Strengths:</h5>
+                            <ul>
+                                <li><strong>Computational Efficiency:</strong> O(nkd) per iteration</li>
+                                <li><strong>Simplicity:</strong> Easy to understand and implement</li>
+                                <li><strong>Scalability:</strong> Linear in dataset size</li>
+                                <li><strong>Interpretability:</strong> Clear cluster centers</li>
+                                <li><strong>Guaranteed Convergence:</strong> Finite number of iterations</li>
+                            </ul>
+                            
+                            <h5>Limitations:</h5>
+                            <ul>
+                                <li><strong>Local Optima:</strong> Sensitive to initialization</li>
+                                <li><strong>Spherical Clusters:</strong> Assumes circular/spherical shapes</li>
+                                <li><strong>Fixed K:</strong> Number of clusters predetermined</li>
+                                <li><strong>Sensitive to Outliers:</strong> Centroid-based method</li>
+                                <li><strong>Equal Cluster Sizes:</strong> Bias toward similar-sized clusters</li>
+                            </ul>
+                            
+                            <h5>Mitigation Strategies:</h5>
+                            <ul>
+                                <li>Multiple random restarts, K-means++</li>
+                                <li>Feature transformation, kernel K-means</li>
+                                <li>Elbow method, silhouette analysis</li>
+                                <li>Robust variants, outlier detection</li>
+                                <li>Weighted variants, different algorithms</li>
+                            </ul>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: K-Means Limitations</h4>
+                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter5/kmeans_limitations.png') }}" alt="K-Means Limitations" class="tutorial-image">
+                            <p class="image-caption">Four 2D subplots showing K-means failures: (1) Non-spherical clusters: elongated elliptical clusters incorrectly partitioned, (2) Different densities: dense cluster split while sparse clusters merged, (3) Overlapping clusters: natural clusters with some overlap incorrectly separated, (4) Outliers: few extreme points pulling centroids away from natural cluster centers.</p>
+                        </div>
                             
                             <h5>Two-Step Optimization:</h5>
                             <p>The problem is non-convex due to the discrete nature of assignments, but it becomes convex when we fix either C or μ:</p>
@@ -225,7 +315,7 @@
                                 </div>
                                 
                                 <p><strong>4. Expanded Euclidean Form:</strong></p>
-                                <div class="formula-display">
+                            <div class="formula-display">
                                     <strong>J(W, μ) = Σᵢ₌₁ⁿ Σⱼ₌₁ᵏ wᵢⱼ Σₗ₌₁ᵈ (xᵢₗ - μⱼₗ)²</strong>
                                 </div>
                             </div>
