@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Minkowski Distance and Generalized Formulas - Comprehensive Clustering Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter3.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/clustering" class="course-link">
+                    <span>Comprehensive Clustering Analysis</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 3: Minkowski Distance and Generalized Formulas</h1>
+                <p class="chapter-subtitle">Explore the mathematical generalization of distance metrics through Minkowski distance and understand how different p-values affect clustering behavior.</p>
+                
+                <!-- Chapter Progress Bar (3/15) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="20"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 15 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/clustering/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/clustering/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/clustering/chapter3" class="chapter-nav-btn active">Chapter 3</a>
+                    <a href="/tutorials/clustering/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/clustering/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/clustering/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/clustering/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/clustering/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                    <a href="/tutorials/clustering/chapter9" class="chapter-nav-btn">Chapter 9</a>
+                    <a href="/tutorials/clustering/chapter10" class="chapter-nav-btn">Chapter 10</a>
+                    <a href="/tutorials/clustering/chapter11" class="chapter-nav-btn">Chapter 11</a>
+                    <a href="/tutorials/clustering/chapter12" class="chapter-nav-btn">Chapter 12</a>
+                    <a href="/tutorials/clustering/chapter13" class="chapter-nav-btn">Chapter 13</a>
+                    <a href="/tutorials/clustering/chapter14" class="chapter-nav-btn">Chapter 14</a>
+                    <a href="/tutorials/clustering/chapter15" class="chapter-nav-btn">Chapter 15</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.29"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="minkowski">Minkowski Distance</button>
+                    <button class="section-nav-btn" data-section="special-cases">Special Cases</button>
+                    <button class="section-nav-btn" data-section="properties">Mathematical Properties</button>
+                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
+                    <button class="section-nav-btn" data-section="applications">Applications</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the mathematical definition and properties of Minkowski distance</li>
+                        <li>Master the relationship between p-values and distance behavior</li>
+                        <li>Learn how Minkowski distance generalizes Euclidean and Manhattan distances</li>
+                        <li>Analyze convergence properties as p approaches infinity</li>
+                        <li>Apply Minkowski distance to real-world clustering problems</li>
+                        <li>Compare different p-values through interactive demonstrations</li>
+                        <li>Understand when to choose specific p-values for different data types</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Minkowski Distance Section -->
+                    <div id="minkowski" class="content-section active">
+                        <h2>Minkowski Distance: The Mathematical Generalization</h2>
+                        
+                        <div class="explanation-box">
+                            <p>The Minkowski distance is a generalized distance metric that unifies Euclidean, Manhattan, and other distance measures under a single mathematical framework. It provides a powerful tool for understanding how different distance metrics behave and allows us to explore the continuum between various distance measures.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Mathematical Definition</h3>
+                            <div class="formula-display">
+                                <h4>Minkowski Distance Formula</h4>
+                                <div class="formula">d_p(x, y) = (Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ)^(1/p)</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>x, y are d-dimensional vectors</li>
+                                    <li>p is the order parameter (p ≥ 1)</li>
+                                    <li>|xᵢ - yᵢ|ᵖ is the p-th power of absolute difference in dimension i</li>
+                                    <li>^(1/p) is the p-th root of the sum</li>
+                                </ul>
+                            </div>
+
+                            <div class="formula-display">
+                                <h4>Vector Notation</h4>
+                                <div class="formula">d_p(x, y) = ||x - y||_p</div>
+                                <p>This represents the Lp norm (Minkowski norm) of the vector difference between x and y.</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Geometric Interpretation</h3>
+                            <p>The parameter p controls the shape of the "unit circle" in the distance metric. As p changes, the geometric properties of the distance function change dramatically:</p>
+                            <ul>
+                                <li><strong>p = 1:</strong> Manhattan distance (diamond-shaped unit circle)</li>
+                                <li><strong>p = 2:</strong> Euclidean distance (circular unit circle)</li>
+                                <li><strong>p → ∞:</strong> Chebyshev distance (square-shaped unit circle)</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Properties of Minkowski Distance</h3>
+                            <ul>
+                                <li><strong>Metric Properties:</strong> Satisfies all four metric space axioms for p ≥ 1</li>
+                                <li><strong>Monotonicity:</strong> For fixed points, distance increases as p increases</li>
+                                <li><strong>Continuity:</strong> Continuous function of p for p > 0</li>
+                                <li><strong>Computational Complexity:</strong> O(d) for d-dimensional vectors</li>
+                            </ul>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: Minkowski Distance Unit Circles</h4>
+                            <div class="visualization-placeholder">
+                                <p>Interactive visualization showing how the unit circle changes shape as p varies from 1 to infinity</p>
+                            </div>
+                            <p><strong>Geometric Evolution:</strong> See how the unit circle transforms from diamond (p=1) to circle (p=2) to square (p=∞) as the parameter changes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Special Cases Section -->
+                    <div id="special-cases" class="content-section">
+                        <h2>Special Cases of Minkowski Distance</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Minkowski distance encompasses several well-known distance metrics as special cases. Understanding these relationships helps us choose the appropriate distance measure for specific clustering applications.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Manhattan Distance (p = 1)</h3>
+                            <div class="formula-display">
+                                <h4>L1 Norm</h4>
+                                <div class="formula">d₁(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|</div>
+                                <p><strong>Characteristics:</strong></p>
+                                <ul>
+                                    <li>Sum of absolute differences</li>
+                                    <li>Robust to outliers</li>
+                                    <li>Diamond-shaped unit circle</li>
+                                    <li>Optimal for sparse data</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Euclidean Distance (p = 2)</h3>
+                            <div class="formula-display">
+                                <h4>L2 Norm</h4>
+                                <div class="formula">d₂(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</div>
+                                <p><strong>Characteristics:</strong></p>
+                                <ul>
+                                    <li>Square root of sum of squared differences</li>
+                                    <li>Most intuitive geometric interpretation</li>
+                                    <li>Circular unit circle</li>
+                                    <li>Optimal for normally distributed data</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Chebyshev Distance (p = ∞)</h3>
+                            <div class="formula-display">
+                                <h4>L∞ Norm</h4>
+                                <div class="formula">d_∞(x, y) = maxᵢ |xᵢ - yᵢ|</div>
+                                <p><strong>Characteristics:</strong></p>
+                                <ul>
+                                    <li>Maximum difference across all dimensions</li>
+                                    <li>Square-shaped unit circle</li>
+                                    <li>Useful for quality control applications</li>
+                                    <li>Emphasizes the worst-case difference</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Comparison of Special Cases</h3>
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Distance Type</th>
+                                        <th>p-value</th>
+                                        <th>Unit Circle Shape</th>
+                                        <th>Outlier Sensitivity</th>
+                                        <th>Best Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Manhattan</td>
+                                        <td>1</td>
+                                        <td>Diamond</td>
+                                        <td>Low</td>
+                                        <td>Sparse data, robust clustering</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Euclidean</td>
+                                        <td>2</td>
+                                        <td>Circle</td>
+                                        <td>Medium</td>
+                                        <td>General purpose, geometric data</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Chebyshev</td>
+                                        <td>∞</td>
+                                        <td>Square</td>
+                                        <td>High</td>
+                                        <td>Quality control, worst-case analysis</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Properties Section -->
+                    <div id="properties" class="content-section">
+                        <h2>Mathematical Properties and Theorems</h2>
+                        
+                        <div class="explanation-box">
+                            <p>The Minkowski distance satisfies important mathematical properties that make it suitable for clustering algorithms. Understanding these properties helps us predict how the distance metric will behave in different scenarios.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Metric Space Properties</h3>
+                            <div class="formula-display">
+                                <h4>Theorem: Minkowski Distance is a Metric</h4>
+                                <p>For p ≥ 1, the Minkowski distance d_p satisfies all four metric space axioms:</p>
+                                <ol>
+                                    <li><strong>Non-negativity:</strong> d_p(x, y) ≥ 0</li>
+                                    <li><strong>Identity:</strong> d_p(x, y) = 0 ⟺ x = y</li>
+                                    <li><strong>Symmetry:</strong> d_p(x, y) = d_p(y, x)</li>
+                                    <li><strong>Triangle Inequality:</strong> d_p(x, z) ≤ d_p(x, y) + d_p(y, z)</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Monotonicity Property</h3>
+                            <div class="formula-display">
+                                <h4>Theorem: Distance Monotonicity</h4>
+                                <div class="formula">For fixed x, y and 1 ≤ p₁ ≤ p₂ ≤ ∞: d_{p₁}(x, y) ≤ d_{p₂}(x, y)</div>
+                                <p><strong>Proof Sketch:</strong> This follows from the fact that the p-norm is non-decreasing in p for fixed vectors.</p>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Convergence to Chebyshev Distance</h3>
+                            <div class="formula-display">
+                                <h4>Theorem: Limit Behavior</h4>
+                                <div class="formula">lim_{p→∞} d_p(x, y) = maxᵢ |xᵢ - yᵢ| = d_∞(x, y)</div>
+                                <p><strong>Interpretation:</strong> As p approaches infinity, the Minkowski distance converges to the Chebyshev distance, which considers only the maximum difference across all dimensions.</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Computational Considerations</h3>
+                            <ul>
+                                <li><strong>Integer p:</strong> Most efficient computation, especially for p = 1, 2</li>
+                                <li><strong>Fractional p:</strong> Requires more complex numerical methods</li>
+                                <li><strong>Large p:</strong> Numerical stability issues may arise</li>
+                                <li><strong>p → ∞:</strong> Special handling required for limit case</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Convergence Analysis Section -->
+                    <div id="convergence" class="content-section">
+                        <h2>Convergence Analysis and Limit Behavior</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Understanding how Minkowski distance behaves as p approaches infinity provides insights into the relationship between different distance metrics and helps us understand the theoretical foundations of distance-based clustering.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Convergence Theorem</h3>
+                            <div class="formula-display">
+                                <h4>Pointwise Convergence</h4>
+                                <div class="formula">For any fixed vectors x, y ∈ ℝᵈ: lim_{p→∞} ||x - y||_p = ||x - y||_∞</div>
+                                <p><strong>Where:</strong> ||x - y||_∞ = maxᵢ |xᵢ - yᵢ|</p>
+                            </div>
+
+                            <div class="formula-display">
+                                <h4>Rate of Convergence</h4>
+                                <div class="formula">||x - y||_p - ||x - y||_∞ = O(1/p) as p → ∞</div>
+                                <p>The convergence rate is inversely proportional to p, meaning larger p values approach the limit faster.</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Practical Implications</h3>
+                            <ul>
+                                <li><strong>Large p values:</strong> Approximate Chebyshev distance behavior</li>
+                                <li><strong>Numerical stability:</strong> Very large p values may cause overflow</li>
+                                <li><strong>Clustering behavior:</strong> High p values emphasize maximum differences</li>
+                                <li><strong>Dimensionality effects:</strong> Convergence behavior depends on data dimensionality</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Convergence Visualization</h3>
+                            <p>As p increases, the Minkowski distance gradually transitions from considering all dimensions equally (p=1) to focusing primarily on the dimension with the largest difference (p=∞). This transition affects how clustering algorithms group data points.</p>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: Convergence Behavior</h4>
+                            <div class="visualization-placeholder">
+                                <p>Interactive plot showing how Minkowski distance converges to Chebyshev distance as p increases</p>
+                            </div>
+                            <p><strong>Convergence Analysis:</strong> Observe how the distance values change as p increases from 1 to 100, demonstrating the approach to the Chebyshev limit.</p>
+                        </div>
+                    </div>
+
+                    <!-- Applications Section -->
+                    <div id="applications" class="content-section">
+                        <h2>Real-World Applications of Minkowski Distance</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Minkowski distance finds applications across various domains where different p-values provide optimal performance for specific data characteristics and problem requirements.</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Computer Vision and Image Processing</h3>
+                            <ul>
+                                <li><strong>p = 1 (Manhattan):</strong> Pixel-level image comparison, robust to noise</li>
+                                <li><strong>p = 2 (Euclidean):</strong> Feature vector comparison, color space analysis</li>
+                                <li><strong>p = ∞ (Chebyshev):</strong> Quality control, maximum deviation detection</li>
+                                <li><strong>Fractional p:</strong> Custom similarity measures for specific applications</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Machine Learning and Data Mining</h3>
+                            <ul>
+                                <li><strong>K-means clustering:</strong> Different p-values for different data distributions</li>
+                                <li><strong>Nearest neighbor classification:</strong> Adaptive distance metrics</li>
+                                <li><strong>Anomaly detection:</strong> Chebyshev distance for outlier identification</li>
+                                <li><strong>Feature selection:</strong> Manhattan distance for sparse feature spaces</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Scientific Computing and Engineering</h3>
+                            <ul>
+                                <li><strong>Signal processing:</strong> Different norms for different signal characteristics</li>
+                                <li><strong>Optimization problems:</strong> L1 for sparsity, L2 for smoothness</li>
+                                <li><strong>Control systems:</strong> Chebyshev for worst-case analysis</li>
+                                <li><strong>Numerical analysis:</strong> Convergence studies and error analysis</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Choosing the Right p-Value</h3>
+                            <ul>
+                                <li><strong>p = 1:</strong> When robustness to outliers is important</li>
+                                <li><strong>p = 2:</strong> For general-purpose applications with normal data</li>
+                                <li><strong>p > 2:</strong> When maximum differences are critical</li>
+                                <li><strong>p → ∞:</strong> For quality control and worst-case scenarios</li>
+                            </ul>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: Application Examples</h4>
+                            <div class="visualization-placeholder">
+                                <p>Interactive examples showing how different p-values perform on real-world datasets from various domains</p>
+                            </div>
+                            <p><strong>Domain-Specific Performance:</strong> See how the choice of p-value affects clustering quality across different application areas.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive Minkowski Distance Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Experiment with different p-values and see how they affect the Minkowski distance calculation and clustering behavior. This interactive demonstration helps you understand the practical implications of choosing different distance metrics.</p>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>Minkowski Distance Calculator</h3>
+                            
+                            <div class="demo-controls">
+                                <label for="p-value">p-value (Minkowski parameter):</label>
+                                <input type="range" id="p-value" min="1" max="10" step="0.1" value="2">
+                                <span id="p-value-display">2.0</span>
+                                
+                                <label for="point1-x">Point 1 X:</label>
+                                <input type="number" id="point1-x" value="1" step="0.1">
+                                
+                                <label for="point1-y">Point 1 Y:</label>
+                                <input type="number" id="point1-y" value="1" step="0.1">
+                                
+                                <label for="point2-x">Point 2 X:</label>
+                                <input type="number" id="point2-x" value="4" step="0.1">
+                                
+                                <label for="point2-y">Point 2 Y:</label>
+                                <input type="number" id="point2-y" value="5" step="0.1">
+                                
+                                <button onclick="calculateMinkowskiDistance()">Calculate Distance</button>
+                            </div>
+                            
+                            <div class="p-value-demo">
+                                <h4>Distance Results</h4>
+                                <div id="minkowski-result">
+                                    <strong>Minkowski Distance (p=<span id="current-p">2.0</span>):</strong> <span id="minkowski-value">5.00</span>
+                                </div>
+                                <div id="comparison-results">
+                                    <div><strong>Manhattan (p=1):</strong> <span id="manhattan-value">7.00</span></div>
+                                    <div><strong>Euclidean (p=2):</strong> <span id="euclidean-value">5.00</span></div>
+                                    <div><strong>Chebyshev (p=∞):</strong> <span id="chebyshev-value">4.00</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-visualization" id="minkowski-canvas">
+                                <p>Visual representation of Minkowski distance with different p-values</p>
+                            </div>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>Clustering with Different p-Values</h3>
+                            
+                            <div class="demo-controls">
+                                <label for="clustering-p">p-value for clustering:</label>
+                                <select id="clustering-p">
+                                    <option value="1">Manhattan (p=1)</option>
+                                    <option value="2" selected>Euclidean (p=2)</option>
+                                    <option value="3">p=3</option>
+                                    <option value="5">p=5</option>
+                                    <option value="10">p=10</option>
+                                    <option value="infinity">Chebyshev (p=∞)</option>
+                                </select>
+                                
+                                <label for="cluster-count">Number of Clusters:</label>
+                                <input type="range" id="cluster-count" min="2" max="6" value="3">
+                                <span id="cluster-count-display">3</span>
+                                
+                                <button onclick="runMinkowskiClustering()">Run Clustering</button>
+                                <button onclick="resetClustering()">Reset</button>
+                            </div>
+                            
+                            <div class="metric-visualization" id="clustering-canvas">
+                                <p>Click "Run Clustering" to see how different p-values affect clustering results</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Understanding the Results</h3>
+                            <ul>
+                                <li><strong>p = 1:</strong> Emphasizes all dimensions equally, robust to outliers</li>
+                                <li><strong>p = 2:</strong> Balanced approach, most intuitive for geometric data</li>
+                                <li><strong>p > 2:</strong> Increasingly emphasizes maximum differences</li>
+                                <li><strong>p = ∞:</strong> Considers only the largest difference across dimensions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 3 Quiz</h2>
+                        
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 1: What is the mathematical definition of Minkowski distance?</h4>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>d_p(x, y) = (Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ)^(1/p)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>d_p(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>d_p(x, y) = maxᵢ |xᵢ - yᵢ|</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>d_p(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> The Minkowski distance formula includes the p-th root of the sum of p-th powers of absolute differences, making it a proper generalization of distance metrics.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 2: What happens to Minkowski distance as p approaches infinity?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It approaches zero</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It approaches the Euclidean distance</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>It approaches the Chebyshev distance (maximum difference)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It becomes undefined</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> As p approaches infinity, the Minkowski distance converges to the Chebyshev distance, which considers only the maximum difference across all dimensions.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 3: Which p-value is most robust to outliers in clustering?</h4>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>p = 1 (Manhattan distance)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>p = 2 (Euclidean distance)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>p = 5</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>p = ∞ (Chebyshev distance)</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> Manhattan distance (p=1) is most robust to outliers because it sums absolute differences rather than squared differences, making extreme values less influential.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/clustering/chapter2" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 2: Distance Metrics</a>
+        <a href="/tutorials/clustering/chapter4" class="azbn-btn" onclick="scrollToTop()">Chapter 4: K-means Clustering →</a>
+    </div>
+</body>
+</html>
