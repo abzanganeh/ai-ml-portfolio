@@ -34,7 +34,17 @@
 - **Load Order**: Always load shared files first, then chapter-specific
 - **JavaScript**: Functions must be in correct files (shared vs chapter-specific)
 
-### 4. **Content Boxing Requirements**
+### 4. **Duplicate Prevention Protocol**
+- **Rule**: Never duplicate functions across multiple chapter files
+- **Process**: 
+  1. Check if function exists in multiple chapters
+  2. If duplicated → move to shared-tutorial.js
+  3. If chapter-specific → keep in chapterX.js
+  4. Export shared functions to window object
+- **Examples of Shared Functions**: initializeCentroids, updateCentroids, hasConverged, generateSampleData
+- **Examples of Chapter-Specific**: calculateDistances, drawVisualization, chapter-specific demos
+
+### 5. **Content Boxing Requirements**
 - **Rule**: All long text must be wrapped in styling boxes
 - **Exceptions**: Only titles and 1-2 sentence descriptions can be outside boxes
 - **Boxes**: explanation-box, formula-box, model-box, important-notes, code-box, image-container, interactive-container
@@ -234,11 +244,15 @@
 7. **Incomplete Template Copying**: Did not copy the complete structure including all footer elements
 8. **Duplicate JavaScript Functions**: Had duplicate updateSubSectionNavigation functions in shared-tutorial.js and old chapter1.js
 9. **Wrong Navigation Logic**: Used parameter-based function instead of auto-detection approach
+10. **Inconsistent Chapter Navigation Buttons**: Chapter 3 had missing 'azbn-secondary' class on second button
+11. **Duplicate Clustering Functions**: Same functions (initializeCentroids, updateCentroids, etc.) in multiple chapter files
 
 ### How to Prevent:
 - **ALWAYS copy Chapter 1 structure exactly**
 - **Verify CSS/JS loading order matches Chapter 1**
 - **Include ALL footer elements**: Sub-section Navigation Footer + Chapter Navigation Footer
+- **Chapter Navigation Buttons**: Both buttons must have `class="azbn-btn azbn-secondary"`
+- **Check for duplicates**: Move shared functions to shared-tutorial.js, keep chapter-specific in chapterX.js
 - **Test all functionality before completion**
 - **Follow the established patterns, don't innovate**
 - **Use the complete template structure provided above**
