@@ -484,58 +484,145 @@
 
                     <!-- Real-World Applications Section -->
                     <div id="applications" class="content-section">
-                        <h2>Real-World Applications of Distance Metrics</h2>
+                        <h2>Applications and Real-World Examples</h2>
                         
-                        <div class="explanation-box">
-                            <p>Distance metrics are fundamental to many real-world applications beyond just clustering. Understanding when and how to apply different distance measures is crucial for practical data science and machine learning projects.</p>
+                        <p>Understanding when and how to apply Euclidean versus Manhattan distance requires examining real-world scenarios where each metric's properties align with problem characteristics. This section explores diverse applications across multiple domains, providing practical guidance for metric selection.</p>
+
+                        <h3>E-commerce and Recommendation Systems</h3>
+                        <p>Distance metrics play a crucial role in recommendation systems, where the choice between Euclidean and Manhattan distance can significantly impact recommendation quality and user experience.</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Product Similarity (Euclidean)</h4>
+                                <p><strong>Use Case:</strong> Finding similar products based on numerical features</p>
+                                <p><strong>Features:</strong> Price, rating, dimensions, weight</p>
+                                
+                                <div class="formula-box">
+                                    <strong>Example:</strong> Camera similarity<br>
+                                    Product A: [price: 500, rating: 4.2, megapixels: 24, weight: 600g]<br>
+                                    Product B: [price: 520, rating: 4.1, megapixels: 26, weight: 580g]<br>
+                                    <em>Euclidean distance captures overall similarity well</em>
+                                </div>
+                                
+                                <p><strong>Why Euclidean:</strong> Features are continuous and correlations matter</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>User Behavior (Manhattan)</h4>
+                                <p><strong>Use Case:</strong> Finding similar users based on categorical preferences</p>
+                                <p><strong>Features:</strong> Category purchases, brand preferences, activity counts</p>
+                                
+                                <div class="formula-box">
+                                    <strong>Example:</strong> User similarity<br>
+                                    User A: [books: 5, electronics: 2, clothing: 8, sports: 0]<br>
+                                    User B: [books: 7, electronics: 1, clothing: 6, sports: 1]<br>
+                                    <em>Manhattan distance better handles discrete counts</em>
+                                </div>
+                                
+                                <p><strong>Why Manhattan:</strong> Features are counts/frequencies, independent categories</p>
+                            </div>
                         </div>
 
-                        <div class="model-box">
-                            <h3>Computer Vision and Image Processing</h3>
+                        <h3>Healthcare and Medical Diagnosis</h3>
+                        <p>Medical applications require careful consideration of distance metrics, as the choice can impact diagnostic accuracy and patient outcomes.</p>
+
+                        <div class="formula-box">
+                            <h4>Medical Data Types and Metric Selection</h4>
+                            
+                            <h5>Continuous Medical Measurements (Euclidean):</h5>
                             <ul>
-                                <li><strong>Image Segmentation:</strong> Euclidean distance for pixel similarity in RGB space</li>
-                                <li><strong>Feature Matching:</strong> Manhattan distance for robust feature comparison</li>
-                                <li><strong>Object Recognition:</strong> Cosine similarity for normalized feature vectors</li>
-                                <li><strong>Edge Detection:</strong> Gradient-based distance measures</li>
+                                <li><strong>Vital signs:</strong> Blood pressure, heart rate, temperature</li>
+                                <li><strong>Lab values:</strong> Blood glucose, cholesterol, protein levels</li>
+                                <li><strong>Physical measurements:</strong> Height, weight, BMI</li>
+                                <li><strong>Imaging features:</strong> Tumor dimensions, organ volumes</li>
                             </ul>
+                            
+                            <h5>Discrete Medical Data (Manhattan):</h5>
+                            <ul>
+                                <li><strong>Symptom counts:</strong> Number of symptoms present</li>
+                                <li><strong>Medication dosages:</strong> Discrete pill counts</li>
+                                <li><strong>Frequency data:</strong> Episodes per month, visits per year</li>
+                                <li><strong>Severity scales:</strong> Pain scales (1-10), functional scores</li>
+                            </ul>
+                            
+                            <h5>Case Study: Patient Similarity for Treatment Recommendation</h5>
+                            <div class="formula-display">
+                                <strong>Scenario:</strong> Finding similar patients for personalized treatment<br>
+                                <strong>Data:</strong> Mixed continuous (age, BMI, lab values) and discrete (symptom counts, severity scores)<br>
+                                <strong>Solution:</strong> Combine normalized Euclidean for continuous features with Manhattan for discrete features<br>
+                                <strong>Formula:</strong> d_total = w₁ × d_E(continuous) + w₂ × d_M(discrete)
+                            </div>
                         </div>
 
-                        <div class="model-box">
-                            <h3>Natural Language Processing</h3>
-                            <ul>
-                                <li><strong>Document Clustering:</strong> Cosine similarity for TF-IDF vectors</li>
-                                <li><strong>Word Embeddings:</strong> Euclidean distance in high-dimensional spaces</li>
-                                <li><strong>Semantic Similarity:</strong> Specialized distance metrics for word relationships</li>
-                                <li><strong>Topic Modeling:</strong> Distance-based topic assignment</li>
-                            </ul>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Bioinformatics and Genomics</h3>
-                            <ul>
-                                <li><strong>Gene Expression Analysis:</strong> Euclidean distance for expression profiles</li>
-                                <li><strong>Protein Structure Comparison:</strong> RMSD (Root Mean Square Deviation)</li>
-                                <li><strong>Sequence Alignment:</strong> Edit distance for DNA/RNA sequences</li>
-                                <li><strong>Phylogenetic Analysis:</strong> Distance-based evolutionary trees</li>
-                            </ul>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Recommendation Systems</h3>
-                            <ul>
-                                <li><strong>Collaborative Filtering:</strong> Cosine similarity for user-item matrices</li>
-                                <li><strong>Content-Based Filtering:</strong> Euclidean distance for feature vectors</li>
-                                <li><strong>Hybrid Approaches:</strong> Weighted combinations of distance metrics</li>
-                                <li><strong>Real-time Recommendations:</strong> Optimized distance calculations</li>
-                            </ul>
-                        </div>
+                        <h3>Geographic and Location-Based Services</h3>
+                        <p>Geographic applications provide clear intuitive examples of when each distance metric is appropriate.</p>
 
                         <div class="image-container">
-                            <h4>Visualization: Distance Metrics in Action</h4>
-                            <div class="visualization-placeholder">
-                                <p>Interactive examples showing how different distance metrics perform on real-world datasets from various domains</p>
+                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter2/geographic_distance.png') }}" alt="Geographic Distance Comparison" class="tutorial-image">
+                            <p class="image-caption">City map showing Euclidean (straight-line), driving route, and Manhattan grid distances</p>
+                        </div>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Air Travel (Euclidean)</h4>
+                                <p><strong>Application:</strong> Flight routing, airport clustering</p>
+                                <p><strong>Why Euclidean:</strong> Aircraft can travel in straight lines (great circle distances)</p>
+                                <p><strong>Example:</strong> Grouping airports by geographic proximity for hub-and-spoke networks</p>
                             </div>
-                            <p><strong>Domain-Specific Performance:</strong> See how the choice of distance metric affects clustering quality across different application areas.</p>
+                            
+                            <div class="type-card">
+                                <h4>Ground Transportation (Manhattan)</h4>
+                                <p><strong>Application:</strong> Urban delivery, taxi routing</p>
+                                <p><strong>Why Manhattan:</strong> Roads constrain movement to grid-like patterns</p>
+                                <p><strong>Example:</strong> Optimizing delivery routes in downtown areas with grid street layouts</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Service Area Planning</h4>
+                                <p><strong>Application:</strong> Emergency services, retail locations</p>
+                                <p><strong>Metric Choice:</strong> Depends on service type and terrain</p>
+                                <p><strong>Example:</strong> Helicopter emergency services (Euclidean) vs ambulance services (Manhattan/road network)</p>
+                            </div>
+                        </div>
+
+                        <h3>Financial Services and Risk Analysis</h3>
+                        <p>Financial applications require careful metric selection as the choice can significantly impact risk assessment and portfolio optimization.</p>
+
+                        <div class="model-box">
+                            <h4>Portfolio Optimization and Risk Management</h4>
+                            
+                            <h5>Asset Correlation Analysis (Euclidean):</h5>
+                            <ul>
+                                <li><strong>Use Case:</strong> Measuring similarity between asset returns</li>
+                                <li><strong>Features:</strong> Daily returns, volatility, correlation coefficients</li>
+                                <li><strong>Why Euclidean:</strong> Captures overall portfolio risk and return relationships</li>
+                            </ul>
+                            
+                            <h5>Transaction Pattern Analysis (Manhattan):</h5>
+                            <ul>
+                                <li><strong>Use Case:</strong> Fraud detection, customer segmentation</li>
+                                <li><strong>Features:</strong> Transaction counts, frequency, amounts</li>
+                                <li><strong>Why Manhattan:</strong> Robust to outliers, handles discrete transaction patterns</li>
+                            </ul>
+                        </div>
+
+                        <h3>Computer Vision and Image Processing</h3>
+                        <p>Image processing applications demonstrate how different distance metrics capture different aspects of visual similarity.</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Pixel-Level Analysis (Euclidean)</h4>
+                                <p><strong>Use Case:</strong> Image segmentation, color clustering</p>
+                                <p><strong>Features:</strong> RGB values, pixel coordinates</p>
+                                <p><strong>Why Euclidean:</strong> Natural for continuous color space and spatial relationships</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Feature-Based Analysis (Manhattan)</h4>
+                                <p><strong>Use Case:</strong> Robust feature matching, edge detection</p>
+                                <p><strong>Features:</strong> Gradient magnitudes, texture descriptors</p>
+                                <p><strong>Why Manhattan:</strong> Less sensitive to noise, better for discrete features</p>
+                            </div>
                         </div>
                     </div>
 
