@@ -22,7 +22,7 @@
                         <span class="stat-label">Chapters</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number animate-in" data-count="120">120</span>
+                        <span class="stat-number animate-in" data-count="300">300</span>
                         <span class="stat-label">Minutes</span>
                     </div>
                     <div class="stat-item">
@@ -30,7 +30,7 @@
                         <span class="stat-label">Parts</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">Intermediate</span>
+                        <span class="stat-number">Advanced</span>
                         <span class="stat-label">Level</span>
                     </div>
                 </div>
@@ -396,14 +396,33 @@
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Ensure the script runs when DOM is ready
+let statsAnimationInitialized = false;
+
+function initializeStatsAnimation() {
+    if (statsAnimationInitialized) {
+        console.log('Stats animation already initialized, skipping...');
+        return;
+    }
+    
+    console.log('Initializing stats animation...');
+    statsAnimationInitialized = true;
+    
     // Animate stat numbers to prevent NaN issues
     const statNumbers = document.querySelectorAll('.stat-number.animate-in');
+    console.log('Found stat numbers:', statNumbers.length);
     
-    statNumbers.forEach(stat => {
+    statNumbers.forEach((stat, index) => {
         const targetValue = parseInt(stat.getAttribute('data-count'));
+        console.log(`Stat ${index}: target value = ${targetValue}`);
+        
         if (!isNaN(targetValue)) {
-            animateNumber(stat, 0, targetValue, 1500);
+            // Set initial value to 0
+            stat.textContent = '0';
+            // Start animation after a small delay
+            setTimeout(() => {
+                animateNumber(stat, 0, targetValue, 1500);
+            }, index * 200); // Stagger animations
         }
     });
     
@@ -417,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
         });
     });
-});
+}
 
 function animateNumber(element, start, end, duration) {
     const startTime = performance.now();
@@ -441,5 +460,8 @@ function animateNumber(element, start, end, duration) {
     
     requestAnimationFrame(updateNumber);
 }
+
+// Single event listener to prevent multiple executions
+document.addEventListener('DOMContentLoaded', initializeStatsAnimation);
 </script>
 {% endblock %}

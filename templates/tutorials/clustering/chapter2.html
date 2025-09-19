@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Distance Metrics Fundamentals - Comprehensive Clustering Analysis Course</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/clustering" class="azbn-logo">
+                    <img src="/static/images/logo.png" alt="Logo">
+                    <span>Comprehensive Clustering Analysis Course</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="tutorial-main">
+        <div class="azbn-container">
+            <!-- Chapter Header -->
+            <div class="chapter-header">
+                <h1 class="chapter-title">Chapter 2: Distance Metrics Fundamentals</h1>
+                <p class="chapter-subtitle">Master the mathematical foundations of distance metrics, the building blocks of clustering algorithms</p>
+                
+                <!-- Chapter Progress Bar (2/15) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" style="width: 13.33%;"></div>
+                </div>
+                
+                <!-- Chapter Navigation -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/clustering/chapter1" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 1</a>
+                    <a href="/tutorials/clustering/chapter2" class="chapter-nav-btn active">Chapter 2</a>
+                    <a href="/tutorials/clustering/chapter3" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 3</a>
+                    <a href="/tutorials/clustering/chapter4" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 4</a>
+                    <a href="/tutorials/clustering/chapter5" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 5</a>
+                    <a href="/tutorials/clustering/chapter6" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 6</a>
+                    <a href="/tutorials/clustering/chapter7" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 7</a>
+                    <a href="/tutorials/clustering/chapter8" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 8</a>
+                    <a href="/tutorials/clustering/chapter9" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 9</a>
+                    <a href="/tutorials/clustering/chapter10" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 10</a>
+                    <a href="/tutorials/clustering/chapter11" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 11</a>
+                    <a href="/tutorials/clustering/chapter12" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 12</a>
+                    <a href="/tutorials/clustering/chapter13" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 13</a>
+                    <a href="/tutorials/clustering/chapter14" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 14</a>
+                    <a href="/tutorials/clustering/chapter15" class="chapter-nav-btn" onclick="scrollToTop()">Chapter 15</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" style="width: 14.29%;"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="theory">Metric Space Theory</button>
+                    <button class="section-nav-btn" data-section="euclidean">Euclidean Distance</button>
+                    <button class="section-nav-btn" data-section="manhattan">Manhattan Distance</button>
+                    <button class="section-nav-btn" data-section="optimization">Optimization Techniques</button>
+                    <button class="section-nav-btn" data-section="applications">Real-World Applications</button>
+                    <button class="section-nav-btn" data-section="calculator">Interactive Calculator</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+
+            <!-- Learning Objectives -->
+            <div class="learning-objectives-box">
+                <h2>Learning Objectives</h2>
+                <ul>
+                    <li>Understand the mathematical definitions and properties of Euclidean distance</li>
+                    <li>Master Manhattan distance theory and geometric interpretations</li>
+                    <li>Learn formal proofs of metric space properties</li>
+                    <li>Analyze computational complexity and efficiency considerations</li>
+                    <li>Apply distance metrics to real-world clustering problems</li>
+                    <li>Compare and contrast different distance measures through interactive demos</li>
+                    <li>Understand when to choose each metric for specific data types</li>
+                </ul>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="chapter-content">
+                <!-- Metric Space Theory Section -->
+                <div id="theory" class="content-section active">
+                    <h2>Metric Space Theory: The Mathematical Foundation</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Before diving into specific distance metrics, we must understand the mathematical framework that underlies all distance measures in clustering. A metric space provides the formal foundation for measuring similarity and dissimilarity between data points.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Definition of a Metric Space</h3>
+                        <p>A metric space is an ordered pair (X, d) where X is a set and d is a metric on X. A metric d: X × X → ℝ is a function that satisfies four fundamental properties for all x, y, z ∈ X:</p>
+                        
+                        <div class="formula-display">
+                            <h4>1. Non-negativity (Positivity)</h4>
+                            <div class="formula">d(x, y) ≥ 0</div>
+                            <p>The distance between any two points is always non-negative.</p>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>2. Identity of Indiscernibles</h4>
+                            <div class="formula">d(x, y) = 0 ⟺ x = y</div>
+                            <p>The distance is zero if and only if the two points are identical.</p>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>3. Symmetry</h4>
+                            <div class="formula">d(x, y) = d(y, x)</div>
+                            <p>The distance from point x to point y is the same as the distance from y to x.</p>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>4. Triangle Inequality</h4>
+                            <div class="formula">d(x, z) ≤ d(x, y) + d(y, z)</div>
+                            <p>The direct distance between two points is never longer than the sum of distances through any intermediate point.</p>
+                        </div>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>Why Metric Spaces Matter in Clustering</h3>
+                        <p>These four properties ensure that our distance measures behave intuitively and mathematically sound. In clustering algorithms, these properties guarantee:</p>
+                        <ul>
+                            <li><strong>Consistency:</strong> Similar points will always have small distances</li>
+                            <li><strong>Reliability:</strong> Distance calculations are deterministic and reproducible</li>
+                            <li><strong>Efficiency:</strong> Algorithms can make assumptions about distance relationships</li>
+                            <li><strong>Interpretability:</strong> Results can be understood in geometric terms</li>
+                        </ul>
+                    </div>
+
+                    <div class="image-container">
+                        <h4>Visualization: Metric Space Properties</h4>
+                        <div class="visualization-placeholder">
+                            <p>Interactive visualization showing the four metric space properties with geometric examples</p>
+                        </div>
+                        <p><strong>Geometric Interpretation:</strong> Visual demonstration of how the triangle inequality ensures that direct paths are always shortest in metric spaces.</p>
+                    </div>
+                </div>
+
+                <!-- Euclidean Distance Section -->
+                <div id="euclidean" class="content-section">
+                    <h2>Euclidean Distance: The Foundation of Geometric Clustering</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Euclidean distance is the most intuitive and widely used distance metric in clustering. It represents the straight-line distance between two points in multidimensional space, making it the natural choice for many clustering algorithms.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Mathematical Definition</h3>
+                        <div class="formula-display">
+                            <h4>Euclidean Distance Formula</h4>
+                            <div class="formula">d_E(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</div>
+                            <p><strong>Where:</strong></p>
+                            <ul>
+                                <li>x, y are d-dimensional vectors</li>
+                                <li>xᵢ, yᵢ are the i-th components of vectors x and y</li>
+                                <li>d is the dimensionality of the space</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>Vector Notation</h4>
+                            <div class="formula">d_E(x, y) = ||x - y||₂</div>
+                            <p>This represents the L2 norm (Euclidean norm) of the vector difference between x and y.</p>
+                        </div>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>Geometric Interpretation</h3>
+                        <p>In 2D space, Euclidean distance corresponds to the familiar Pythagorean theorem. For points (x₁, y₁) and (x₂, y₂):</p>
+                        <div class="formula-display">
+                            <div class="formula">d = √((x₂ - x₁)² + (y₂ - y₁)²)</div>
+                        </div>
+                        <p>This extends naturally to higher dimensions, where we sum the squared differences across all dimensions and take the square root.</p>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Properties of Euclidean Distance</h3>
+                        <ul>
+                            <li><strong>Scale Sensitivity:</strong> Euclidean distance is sensitive to the scale of features</li>
+                            <li><strong>Rotation Invariant:</strong> Distance remains unchanged under rotations</li>
+                            <li><strong>Translation Invariant:</strong> Distance is unaffected by translations</li>
+                            <li><strong>Computational Complexity:</strong> O(d) for d-dimensional vectors</li>
+                        </ul>
+                    </div>
+
+                    <div class="image-container">
+                        <h4>Visualization: Euclidean Distance in Different Dimensions</h4>
+                        <div class="visualization-placeholder">
+                            <p>Interactive visualization showing Euclidean distance calculations in 2D, 3D, and higher dimensions</p>
+                        </div>
+                        <p><strong>Multi-dimensional Perspective:</strong> See how Euclidean distance scales with dimensionality and understand the geometric intuition behind the formula.</p>
+                    </div>
+                </div>
+
+                <!-- Manhattan Distance Section -->
+                <div id="manhattan" class="content-section">
+                    <h2>Manhattan Distance: The City Block Metric</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Manhattan distance, also known as L1 distance or taxicab distance, measures distance along axes at right angles. It's called "Manhattan distance" because it resembles the path a taxi would take through city streets that are laid out in a grid pattern.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Mathematical Definition</h3>
+                        <div class="formula-display">
+                            <h4>Manhattan Distance Formula</h4>
+                            <div class="formula">d_M(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|</div>
+                            <p><strong>Where:</strong></p>
+                            <ul>
+                                <li>x, y are d-dimensional vectors</li>
+                                <li>|xᵢ - yᵢ| is the absolute difference in dimension i</li>
+                                <li>d is the dimensionality of the space</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>Vector Notation</h4>
+                            <div class="formula">d_M(x, y) = ||x - y||₁</div>
+                            <p>This represents the L1 norm (Manhattan norm) of the vector difference between x and y.</p>
+                        </div>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>Geometric Interpretation</h3>
+                        <p>In 2D space, Manhattan distance represents the sum of horizontal and vertical distances. For points (x₁, y₁) and (x₂, y₂):</p>
+                        <div class="formula-display">
+                            <div class="formula">d = |x₂ - x₁| + |y₂ - y₁|</div>
+                        </div>
+                        <p>Unlike Euclidean distance, Manhattan distance doesn't allow diagonal movement, making it more robust to outliers in individual dimensions.</p>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Properties of Manhattan Distance</h3>
+                        <ul>
+                            <li><strong>Outlier Robustness:</strong> Less sensitive to extreme values in individual dimensions</li>
+                            <li><strong>Feature Independence:</strong> Each dimension contributes independently to the total distance</li>
+                            <li><strong>Computational Efficiency:</strong> O(d) complexity, often faster than Euclidean distance</li>
+                            <li><strong>Discrete Optimization:</strong> Natural choice for integer-valued features</li>
+                        </ul>
+                    </div>
+
+                    <div class="image-container">
+                        <h4>Visualization: Manhattan vs Euclidean Distance</h4>
+                        <div class="visualization-placeholder">
+                            <p>Side-by-side comparison showing Manhattan (L1) and Euclidean (L2) distance paths between the same two points</p>
+                        </div>
+                        <p><strong>Path Comparison:</strong> Visual demonstration of how Manhattan distance follows grid-like paths while Euclidean distance takes the direct route.</p>
+                    </div>
+                </div>
+
+                <!-- Optimization Techniques Section -->
+                <div id="optimization" class="content-section">
+                    <h2>Optimization Techniques for Distance-Based Clustering</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Understanding how distance metrics are optimized in clustering algorithms is crucial for both theoretical understanding and practical implementation. Different optimization techniques are used depending on the clustering algorithm and the specific distance metric employed.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>K-means Optimization with Euclidean Distance</h3>
+                        <div class="formula-display">
+                            <h4>Objective Function</h4>
+                            <div class="formula">J = Σᵢ₌₁ᵏ Σₓ∈Cᵢ ||x - μᵢ||²</div>
+                            <p><strong>Where:</strong></p>
+                            <ul>
+                                <li>k is the number of clusters</li>
+                                <li>Cᵢ is the set of points in cluster i</li>
+                                <li>μᵢ is the centroid of cluster i</li>
+                                <li>||x - μᵢ||² is the squared Euclidean distance</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-display">
+                            <h4>Optimal Centroid Update</h4>
+                            <div class="formula">μᵢ* = (1/|Cᵢ|) Σₓ∈Cᵢ x</div>
+                            <p>The optimal centroid is the arithmetic mean of all points in the cluster, which minimizes the sum of squared Euclidean distances.</p>
+                        </div>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>Gradient Descent for Distance Optimization</h3>
+                        <p>For more complex clustering algorithms, gradient-based optimization can be used to minimize distance-based objective functions:</p>
+                        <div class="formula-display">
+                            <div class="formula">θ_{t+1} = θₜ - α ∇J(θₜ)</div>
+                            <p><strong>Where:</strong></p>
+                            <ul>
+                                <li>θ represents the parameters being optimized</li>
+                                <li>α is the learning rate</li>
+                                <li>∇J(θₜ) is the gradient of the objective function</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Computational Complexity Analysis</h3>
+                        <ul>
+                            <li><strong>Euclidean Distance:</strong> O(d) per pair, O(n²d) for all pairs</li>
+                            <li><strong>Manhattan Distance:</strong> O(d) per pair, O(n²d) for all pairs</li>
+                            <li><strong>Optimization with K-means:</strong> O(nktd) where t is iterations</li>
+                            <li><strong>Memory Requirements:</strong> O(n²) for distance matrix storage</li>
+                        </ul>
+                    </div>
+
+                    <div class="interactive-container">
+                        <h3>Interactive Distance Optimization Demo</h3>
+                        <div class="demo-controls">
+                            <label for="distance-metric">Distance Metric:</label>
+                            <select id="distance-metric">
+                                <option value="euclidean">Euclidean (L2)</option>
+                                <option value="manhattan">Manhattan (L1)</option>
+                            </select>
+                            
+                            <label for="cluster-count">Number of Clusters:</label>
+                            <input type="range" id="cluster-count" min="2" max="8" value="3">
+                            <span id="cluster-count-display">3</span>
+                            
+                            <button onclick="runOptimization()">Run Optimization</button>
+                            <button onclick="resetOptimization()">Reset</button>
+                        </div>
+                        
+                        <div class="metric-visualization" id="optimization-canvas">
+                            <p>Click "Run Optimization" to see how different distance metrics affect clustering results</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-World Applications Section -->
+                <div id="applications" class="content-section">
+                    <h2>Real-World Applications of Distance Metrics</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Distance metrics are fundamental to many real-world applications beyond just clustering. Understanding when and how to apply different distance measures is crucial for practical data science and machine learning projects.</p>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Computer Vision and Image Processing</h3>
+                        <ul>
+                            <li><strong>Image Segmentation:</strong> Euclidean distance for pixel similarity in RGB space</li>
+                            <li><strong>Feature Matching:</strong> Manhattan distance for robust feature comparison</li>
+                            <li><strong>Object Recognition:</strong> Cosine similarity for normalized feature vectors</li>
+                            <li><strong>Edge Detection:</strong> Gradient-based distance measures</li>
+                        </ul>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Natural Language Processing</h3>
+                        <ul>
+                            <li><strong>Document Clustering:</strong> Cosine similarity for TF-IDF vectors</li>
+                            <li><strong>Word Embeddings:</strong> Euclidean distance in high-dimensional spaces</li>
+                            <li><strong>Semantic Similarity:</strong> Specialized distance metrics for word relationships</li>
+                            <li><strong>Topic Modeling:</strong> Distance-based topic assignment</li>
+                        </ul>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Bioinformatics and Genomics</h3>
+                        <ul>
+                            <li><strong>Gene Expression Analysis:</strong> Euclidean distance for expression profiles</li>
+                            <li><strong>Protein Structure Comparison:</strong> RMSD (Root Mean Square Deviation)</li>
+                            <li><strong>Sequence Alignment:</strong> Edit distance for DNA/RNA sequences</li>
+                            <li><strong>Phylogenetic Analysis:</strong> Distance-based evolutionary trees</li>
+                        </ul>
+                    </div>
+
+                    <div class="model-box">
+                        <h3>Recommendation Systems</h3>
+                        <ul>
+                            <li><strong>Collaborative Filtering:</strong> Cosine similarity for user-item matrices</li>
+                            <li><strong>Content-Based Filtering:</strong> Euclidean distance for feature vectors</li>
+                            <li><strong>Hybrid Approaches:</strong> Weighted combinations of distance metrics</li>
+                            <li><strong>Real-time Recommendations:</strong> Optimized distance calculations</li>
+                        </ul>
+                    </div>
+
+                    <div class="image-container">
+                        <h4>Visualization: Distance Metrics in Action</h4>
+                        <div class="visualization-placeholder">
+                            <p>Interactive examples showing how different distance metrics perform on real-world datasets from various domains</p>
+                        </div>
+                        <p><strong>Domain-Specific Performance:</strong> See how the choice of distance metric affects clustering quality across different application areas.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Calculator Section -->
+                <div id="calculator" class="content-section">
+                    <h2>Interactive Distance Calculator</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Experiment with different distance metrics and see how they behave with various data points. This interactive calculator helps you understand the practical differences between Euclidean and Manhattan distances.</p>
+                    </div>
+
+                    <div class="interactive-container">
+                        <h3>Distance Calculator</h3>
+                        
+                        <div class="point-input">
+                            <div>
+                                <label for="point1-x">Point 1 X:</label>
+                                <input type="number" id="point1-x" value="1" step="0.1">
+                            </div>
+                            <div>
+                                <label for="point1-y">Point 1 Y:</label>
+                                <input type="number" id="point1-y" value="1" step="0.1">
+                            </div>
+                            <div>
+                                <label for="point2-x">Point 2 X:</label>
+                                <input type="number" id="point2-x" value="4" step="0.1">
+                            </div>
+                            <div>
+                                <label for="point2-y">Point 2 Y:</label>
+                                <input type="number" id="point2-y" value="5" step="0.1">
+                            </div>
+                        </div>
+                        
+                        <div class="distance-calculator">
+                            <h4>Calculated Distances</h4>
+                            <div id="euclidean-result">
+                                <strong>Euclidean Distance:</strong> <span id="euclidean-value">5.00</span>
+                            </div>
+                            <div id="manhattan-result">
+                                <strong>Manhattan Distance:</strong> <span id="manhattan-value">7.00</span>
+                            </div>
+                            <div id="ratio-result">
+                                <strong>Ratio (Manhattan/Euclidean):</strong> <span id="ratio-value">1.40</span>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-visualization" id="calculator-canvas">
+                            <p>Visual representation of the two points and their distance calculations</p>
+                        </div>
+                    </div>
+
+                    <div class="explanation-box">
+                        <h3>Understanding the Results</h3>
+                        <ul>
+                            <li><strong>Euclidean Distance:</strong> Always represents the shortest path (straight line)</li>
+                            <li><strong>Manhattan Distance:</strong> Represents the sum of horizontal and vertical distances</li>
+                            <li><strong>Ratio Analysis:</strong> The ratio shows how much longer the Manhattan path is compared to the direct Euclidean path</li>
+                            <li><strong>Dimensional Scaling:</strong> Try different point coordinates to see how the relationship changes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 2 Quiz</h2>
+                    
+                    <div class="enhanced-quiz-container">
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: Which property of metric spaces ensures that distance calculations are symmetric?</h4>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Non-negativity</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Identity of indiscernibles</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="correct">
+                                <p>Symmetry</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Triangle inequality</p>
+                            </div>
+                            <div class="enhanced-quiz-explanation">
+                                <p><strong>Correct!</strong> The symmetry property states that d(x, y) = d(y, x), ensuring that the distance from point x to point y is the same as the distance from y to x.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enhanced-quiz-container">
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: What is the main advantage of Manhattan distance over Euclidean distance?</h4>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>It's always faster to compute</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="correct">
+                                <p>It's more robust to outliers in individual dimensions</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>It provides more accurate clustering results</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>It works better in high-dimensional spaces</p>
+                            </div>
+                            <div class="enhanced-quiz-explanation">
+                                <p><strong>Correct!</strong> Manhattan distance is more robust to outliers because it sums absolute differences rather than squared differences, making extreme values in individual dimensions less influential.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enhanced-quiz-container">
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: In K-means clustering, why is the arithmetic mean the optimal centroid when using Euclidean distance?</h4>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Because it's computationally efficient</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Because it balances the cluster sizes</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="correct">
+                                <p>Because it minimizes the sum of squared Euclidean distances</p>
+                            </div>
+                            <div class="enhanced-quiz-option" data-answer="incorrect">
+                                <p>Because it's the most intuitive choice</p>
+                            </div>
+                            <div class="enhanced-quiz-explanation">
+                                <p><strong>Correct!</strong> The arithmetic mean minimizes the sum of squared Euclidean distances from all points in the cluster to the centroid, which is exactly what K-means optimization seeks to achieve.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label"></span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Euclidean Distance</span>
+                <span>Next →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="azbn-footer">
+        <div class="azbn-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Navigation</h3>
+                    <a href="/tutorials/clustering" class="chapter-nav-btn">Back to Tutorial</a>
+                    <a href="/tutorials/clustering/chapter3" class="chapter-nav-btn">Chapter 3: K-means Clustering</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter2.js') }}"></script>
+</body>
+</html>
