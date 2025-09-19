@@ -97,59 +97,148 @@
                 <main class="chapter-main-content">
                     <!-- Minkowski Distance Section -->
                     <div id="minkowski" class="content-section active">
-                        <h2>Minkowski Distance: The Mathematical Generalization</h2>
+                        <h2>Minkowski Distance: The Unifying Framework</h2>
                         
-                        <div class="explanation-box">
-                            <p>The Minkowski distance is a generalized distance metric that unifies Euclidean, Manhattan, and other distance measures under a single mathematical framework. It provides a powerful tool for understanding how different distance metrics behave and allows us to explore the continuum between various distance measures.</p>
-                        </div>
+                        <p>Minkowski distance, named after German mathematician Hermann Minkowski, provides a unified mathematical framework that encompasses virtually all commonly used distance metrics in clustering and machine learning. This powerful generalization allows us to understand the entire spectrum of distance behavior through a single parameterized formula.</p>
 
                         <div class="formula-box">
-                            <h3>Mathematical Definition</h3>
+                            <h3>The Minkowski Distance Formula</h3>
+                            <p>For two points x, y ∈ ℝⁿ, the Minkowski distance of order p (where p ≥ 1) is defined as:</p>
+                            
                             <div class="formula-display">
-                                <h4>Minkowski Distance Formula</h4>
-                                <div class="formula">d_p(x, y) = (Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ)^(1/p)</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>x, y are d-dimensional vectors</li>
-                                    <li>p is the order parameter (p ≥ 1)</li>
-                                    <li>|xᵢ - yᵢ|ᵖ is the p-th power of absolute difference in dimension i</li>
-                                    <li>^(1/p) is the p-th root of the sum</li>
-                                </ul>
+                                <strong>d_p(x, y) = (Σᵢ₌₁ⁿ |xᵢ - yᵢ|ᵖ)^(1/p)</strong>
                             </div>
-
+                            
+                            <p>This can also be expressed using vector notation:</p>
                             <div class="formula-display">
-                                <h4>Vector Notation</h4>
-                                <div class="formula">d_p(x, y) = ||x - y||_p</div>
-                                <p>This represents the Lp norm (Minkowski norm) of the vector difference between x and y.</p>
+                                <strong>d_p(x, y) = ‖x - y‖_p</strong>
+                            </div>
+                            
+                            <p>Where ‖·‖_p denotes the Lp norm of a vector.</p>
+                        </div>
+
+                        <h3>Understanding the Components</h3>
+                        <p>Each element of the Minkowski distance formula carries specific mathematical significance:</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>The Parameter p</h4>
+                                <p><strong>Domain:</strong> p ∈ [1, ∞)</p>
+                                <p><strong>Role:</strong> Controls the "shape" of distance measurement</p>
+                                <p><strong>Effect:</strong> Higher p values emphasize larger differences</p>
+                                <p><strong>Constraint:</strong> Must be ≥ 1 for triangle inequality</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Absolute Differences</h4>
+                                <p><strong>Expression:</strong> |xᵢ - yᵢ|</p>
+                                <p><strong>Purpose:</strong> Ensures non-negativity</p>
+                                <p><strong>Property:</strong> Distance is symmetric</p>
+                                <p><strong>Interpretation:</strong> Component-wise difference magnitude</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Power Operation</h4>
+                                <p><strong>Expression:</strong> |xᵢ - yᵢ|ᵖ</p>
+                                <p><strong>Effect:</strong> Amplifies larger differences when p > 1</p>
+                                <p><strong>Behavior:</strong> Linear when p = 1, quadratic when p = 2</p>
+                                <p><strong>Limit:</strong> Approaches max operation as p → ∞</p>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Root Operation</h4>
+                                <p><strong>Expression:</strong> (...)^(1/p)</p>
+                                <p><strong>Purpose:</strong> Maintains proper scaling</p>
+                                <p><strong>Property:</strong> Ensures homogeneity</p>
+                                <p><strong>Effect:</strong> Balances the power amplification</p>
                             </div>
                         </div>
 
-                        <div class="explanation-box">
-                            <h3>Geometric Interpretation</h3>
-                            <p>The parameter p controls the shape of the "unit circle" in the distance metric. As p changes, the geometric properties of the distance function change dramatically:</p>
-                            <ul>
-                                <li><strong>p = 1:</strong> Manhattan distance (diamond-shaped unit circle)</li>
-                                <li><strong>p = 2:</strong> Euclidean distance (circular unit circle)</li>
-                                <li><strong>p → ∞:</strong> Chebyshev distance (square-shaped unit circle)</li>
-                            </ul>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Properties of Minkowski Distance</h3>
-                            <ul>
-                                <li><strong>Metric Properties:</strong> Satisfies all four metric space axioms for p ≥ 1</li>
-                                <li><strong>Monotonicity:</strong> For fixed points, distance increases as p increases</li>
-                                <li><strong>Continuity:</strong> Continuous function of p for p > 0</li>
-                                <li><strong>Computational Complexity:</strong> O(d) for d-dimensional vectors</li>
-                            </ul>
-                        </div>
+                        <h3>The Parameter Space Landscape</h3>
+                        <p>The parameter p creates a continuous family of distance metrics, each with distinct geometric and analytical properties. Understanding this parameter space is crucial for selecting appropriate metrics for specific applications.</p>
 
                         <div class="image-container">
-                            <h4>Visualization: Minkowski Distance Unit Circles</h4>
-                            <div class="visualization-placeholder">
-                                <p>Interactive visualization showing how the unit circle changes shape as p varies from 1 to infinity</p>
+                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter3/parameter_effect.png') }}" alt="Parameter p Effect on Distance Behavior" class="tutorial-image">
+                            <p class="image-caption">3D surface plot showing how Minkowski distance varies with parameter p and component differences</p>
+                        </div>
+
+                        <h3>Mathematical Properties Overview</h3>
+                        <p>The Minkowski distance family inherits and extends the fundamental properties of metric spaces, with additional structure that varies smoothly with parameter p.</p>
+
+                        <div class="model-box">
+                            <h4>Fundamental Theorem: Minkowski Distances Form a Metric Space</h4>
+                            <p><strong>Theorem:</strong> For any p ≥ 1, the function d_p(x, y) = (Σᵢ |xᵢ - yᵢ|ᵖ)^(1/p) defines a metric on ℝⁿ.</p>
+                            
+                            <p><strong>Proof outline:</strong></p>
+                            <ol>
+                                <li><strong>Non-negativity:</strong> Follows from absolute values and positive powers</li>
+                                <li><strong>Identity:</strong> d_p(x, y) = 0 ⟺ |xᵢ - yᵢ| = 0 ∀i ⟺ x = y</li>
+                                <li><strong>Symmetry:</strong> |xᵢ - yᵢ| = |yᵢ - xᵢ| for all i</li>
+                                <li><strong>Triangle inequality:</strong> Follows from Hölder's inequality</li>
+                            </ol>
+                            
+                            <p><strong>Significance:</strong> This theorem guarantees that all Lp distances are valid metrics, enabling consistent clustering algorithms across the entire parameter space.</p>
+                        </div>
+
+                        <h3>Historical Context and Importance</h3>
+                        <p>Hermann Minkowski introduced this distance concept in the early 20th century as part of his work on the geometry of numbers and later in developing the mathematical foundation for Einstein's special relativity. Today, Minkowski distances are fundamental to:</p>
+
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Machine Learning</h4>
+                                <ul>
+                                    <li>K-nearest neighbors algorithms</li>
+                                    <li>Clustering optimization</li>
+                                    <li>Anomaly detection systems</li>
+                                    <li>Feature space analysis</li>
+                                </ul>
                             </div>
-                            <p><strong>Geometric Evolution:</strong> See how the unit circle transforms from diamond (p=1) to circle (p=2) to square (p=∞) as the parameter changes.</p>
+                            
+                            <div class="type-card">
+                                <h4>Data Science</h4>
+                                <ul>
+                                    <li>Similarity measures</li>
+                                    <li>Dimensionality reduction</li>
+                                    <li>Recommender systems</li>
+                                    <li>Information retrieval</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Scientific Computing</h4>
+                                <ul>
+                                    <li>Numerical optimization</li>
+                                    <li>Approximation theory</li>
+                                    <li>Signal processing</li>
+                                    <li>Image analysis</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Operations Research</h4>
+                                <ul>
+                                    <li>Location optimization</li>
+                                    <li>Facility layout</li>
+                                    <li>Resource allocation</li>
+                                    <li>Network design</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Preview: The Journey Ahead</h3>
+                        <p>This chapter will take you on a comprehensive mathematical journey through the Minkowski distance landscape. You'll discover:</p>
+
+                        <div class="model-box">
+                            <h4>Chapter Roadmap</h4>
+                            <ul>
+                                <li><strong>Mathematical Framework:</strong> Rigorous derivations and proofs of all metric properties</li>
+                                <li><strong>Parameter Analysis:</strong> Deep dive into how p affects distance behavior and clustering results</li>
+                                <li><strong>Special Cases:</strong> Detailed analysis of p = 1, 2, ∞ and their unique properties</li>
+                                <li><strong>Geometric Properties:</strong> Unit ball evolution and shape transformations across parameter space</li>
+                                <li><strong>Convergence Theory:</strong> Limit behavior as p approaches boundary values</li>
+                                <li><strong>Computational Methods:</strong> Efficient algorithms and numerical stability considerations</li>
+                                <li><strong>Interactive Tools:</strong> Hands-on exploration of parameter effects on real data</li>
+                            </ul>
                         </div>
                     </div>
 
