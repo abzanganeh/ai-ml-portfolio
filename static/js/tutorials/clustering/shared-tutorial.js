@@ -421,6 +421,32 @@ function generateSampleData(clusterCount, pointsPerCluster = 20) {
     return data;
 }
 
+function assignPointsToClusters(data, centroids, metric = 'euclidean') {
+    return data.map(point => {
+        let minDistance = Infinity;
+        let assignedCluster = 0;
+        
+        centroids.forEach((centroid, index) => {
+            let distance;
+            if (metric === 'euclidean') {
+                distance = Math.sqrt(Math.pow(point.x - centroid.x, 2) + Math.pow(point.y - centroid.y, 2));
+            } else if (metric === 'manhattan') {
+                distance = Math.abs(point.x - centroid.x) + Math.abs(point.y - centroid.y);
+            } else {
+                // Default to euclidean
+                distance = Math.sqrt(Math.pow(point.x - centroid.x, 2) + Math.pow(point.y - centroid.y, 2));
+            }
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                assignedCluster = index;
+            }
+        });
+        
+        return { ...point, cluster: assignedCluster };
+    });
+}
+
 // Export functions for potential use in other files
 window.showSection = showSection;
 window.navigateSubSection = navigateSubSection;
@@ -431,3 +457,4 @@ window.initializeCentroids = initializeCentroids;
 window.updateCentroids = updateCentroids;
 window.hasConverged = hasConverged;
 window.generateSampleData = generateSampleData;
+window.assignPointsToClusters = assignPointsToClusters;
