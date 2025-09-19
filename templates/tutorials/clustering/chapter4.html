@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: K-means Clustering - Comprehensive Clustering Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/clustering" class="course-link">
+                    <span>Comprehensive Clustering Analysis</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 4: K-means Clustering Algorithm</h1>
+                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                
+                <!-- Chapter Progress Bar (4/15) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 15 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/clustering/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/clustering/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/clustering/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/clustering/chapter4" class="chapter-nav-btn active">Chapter 4</a>
+                    <a href="/tutorials/clustering/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/clustering/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/clustering/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/clustering/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                    <a href="/tutorials/clustering/chapter9" class="chapter-nav-btn">Chapter 9</a>
+                    <a href="/tutorials/clustering/chapter10" class="chapter-nav-btn">Chapter 10</a>
+                    <a href="/tutorials/clustering/chapter11" class="chapter-nav-btn">Chapter 11</a>
+                    <a href="/tutorials/clustering/chapter12" class="chapter-nav-btn">Chapter 12</a>
+                    <a href="/tutorials/clustering/chapter13" class="chapter-nav-btn">Chapter 13</a>
+                    <a href="/tutorials/clustering/chapter14" class="chapter-nav-btn">Chapter 14</a>
+                    <a href="/tutorials/clustering/chapter15" class="chapter-nav-btn">Chapter 15</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.29"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
+                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
+                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
+                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
+                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the K-means algorithm step-by-step process</li>
+                        <li>Master the mathematical foundations and objective function</li>
+                        <li>Learn different initialization methods and their impact</li>
+                        <li>Analyze convergence properties and stopping criteria</li>
+                        <li>Implement K-means from scratch with interactive demos</li>
+                        <li>Compare different distance metrics in K-means clustering</li>
+                        <li>Evaluate clustering quality using various metrics</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Algorithm Overview Section -->
+                    <div id="algorithm" class="content-section active">
+                        <h2>K-means Algorithm Overview</h2>
+                        
+                        <div class="explanation-box">
+                            <p>K-means is one of the most widely used clustering algorithms due to its simplicity, efficiency, and effectiveness. It partitions data into k clusters by minimizing the within-cluster sum of squares (WCSS), making it particularly suitable for spherical clusters of similar sizes.</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Algorithm Steps</h3>
+                            <ol>
+                                <li><strong>Initialize:</strong> Choose k initial centroids randomly or using a specific method</li>
+                                <li><strong>Assign:</strong> Assign each data point to the nearest centroid</li>
+                                <li><strong>Update:</strong> Recalculate centroids as the mean of assigned points</li>
+                                <li><strong>Repeat:</strong> Iterate steps 2-3 until convergence</li>
+                            </ol>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Objective Function</h3>
+                            <div class="formula-display">
+                                <h4>Within-Cluster Sum of Squares (WCSS)</h4>
+                                <div class="formula">J = Σᵢ₌₁ᵏ Σₓ∈Cᵢ ||x - μᵢ||²</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>k is the number of clusters</li>
+                                    <li>Cᵢ is the set of points in cluster i</li>
+                                    <li>μᵢ is the centroid of cluster i</li>
+                                    <li>||x - μᵢ||² is the squared Euclidean distance</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: K-means Iteration Process</h4>
+                            <div class="visualization-placeholder">
+                                <p>Interactive visualization showing K-means algorithm iterations with data points, centroids, and cluster assignments</p>
+                            </div>
+                            <p><strong>Iteration Process:</strong> Watch how centroids move and cluster assignments change with each iteration until convergence.</p>
+                        </div>
+                    </div>
+
+                    <!-- Mathematical Foundation Section -->
+                    <div id="mathematics" class="content-section">
+                        <h2>Mathematical Foundation</h2>
+                        
+                        <div class="explanation-box">
+                            <p>The mathematical foundation of K-means is based on optimization theory, specifically the minimization of the within-cluster sum of squares. Understanding this foundation is crucial for implementing the algorithm correctly and analyzing its properties.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Centroid Update Rule</h3>
+                            <div class="formula-display">
+                                <h4>Optimal Centroid Calculation</h4>
+                                <div class="formula">μᵢ* = (1/|Cᵢ|) Σₓ∈Cᵢ x</div>
+                                <p><strong>Derivation:</strong> Taking the derivative of the objective function with respect to μᵢ and setting it to zero:</p>
+                                <div class="formula">∂J/∂μᵢ = -2 Σₓ∈Cᵢ (x - μᵢ) = 0</div>
+                                <div class="formula">Σₓ∈Cᵢ x = |Cᵢ|μᵢ</div>
+                                <div class="formula">μᵢ = (1/|Cᵢ|) Σₓ∈Cᵢ x</div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Convexity and Local Minima</h3>
+                            <p>The K-means objective function is non-convex, which means the algorithm can get trapped in local minima. This is why initialization is crucial and why multiple runs with different initializations are often recommended.</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Algorithm Properties</h3>
+                            <ul>
+                                <li><strong>Guaranteed Convergence:</strong> The algorithm always converges to a local minimum</li>
+                                <li><strong>Finite Iterations:</strong> Convergence occurs in finite time</li>
+                                <li><strong>Monotonic Decrease:</strong> Objective function never increases</li>
+                                <li><strong>Local Optima:</strong> May not find global optimum</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Initialization Methods Section -->
+                    <div id="initialization" class="content-section">
+                        <h2>Initialization Methods</h2>
+                        
+                        <div class="explanation-box">
+                            <p>The choice of initialization method significantly affects K-means performance. Poor initialization can lead to suboptimal clustering results, while good initialization can improve both convergence speed and final cluster quality.</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Random Initialization</h3>
+                            <ul>
+                                <li><strong>Method:</strong> Randomly select k data points as initial centroids</li>
+                                <li><strong>Pros:</strong> Simple, fast, unbiased</li>
+                                <li><strong>Cons:</strong> Can lead to poor local minima, inconsistent results</li>
+                                <li><strong>Usage:</strong> Often used with multiple runs</li>
+                            </ul>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>K-means++ Initialization</h3>
+                            <ul>
+                                <li><strong>Method:</strong> Probabilistic selection favoring distant points</li>
+                                <li><strong>Algorithm:</strong></li>
+                                <ol>
+                                    <li>Choose first centroid randomly</li>
+                                    <li>For each remaining centroid, choose with probability proportional to squared distance to nearest existing centroid</li>
+                                </ol>
+                                <li><strong>Pros:</strong> Better initialization, faster convergence</li>
+                                <li><strong>Cons:</strong> Slightly more complex</li>
+                            </ul>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>Initialization Comparison Demo</h3>
+                            <div class="demo-controls">
+                                <label for="init-method">Initialization Method:</label>
+                                <select id="init-method">
+                                    <option value="random">Random</option>
+                                    <option value="kmeans++">K-means++</option>
+                                </select>
+                                
+                                <label for="num-clusters-init">Number of Clusters:</label>
+                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
+                                <span id="clusters-init-display">3</span>
+                                
+                                <button onclick="runInitializationDemo()">Run Demo</button>
+                                <button onclick="resetInitializationDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="metric-visualization" id="initialization-canvas">
+                                <p>Click "Run Demo" to compare different initialization methods</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Optimization Process Section -->
+                    <div id="optimization" class="content-section">
+                        <h2>Optimization Process</h2>
+                        
+                        <div class="explanation-box">
+                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Assignment Step</h3>
+                            <div class="formula-display">
+                                <h4>Point-to-Cluster Assignment</h4>
+                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
+                                    <li>μⱼ is the centroid of cluster j</li>
+                                    <li>argmin finds the cluster with minimum distance</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Update Step</h3>
+                            <div class="formula-display">
+                                <h4>Centroid Recalculation</h4>
+                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>Sⱼ is the set of points assigned to cluster j</li>
+                                    <li>|Sⱼ| is the number of points in cluster j</li>
+                                    <li>μⱼ is the new centroid for cluster j</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Optimization Properties</h3>
+                            <ul>
+                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
+                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
+                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
+                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
+                            </ul>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>Step-by-Step Optimization Demo</h3>
+                            <div class="demo-controls">
+                                <button onclick="stepOptimization()">Next Step</button>
+                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
+                                <button onclick="resetOptimization()">Reset</button>
+                            </div>
+                            
+                            <div class="metric-visualization" id="optimization-canvas">
+                                <p>Click "Next Step" to see the optimization process step by step</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Convergence Analysis Section -->
+                    <div id="convergence" class="content-section">
+                        <h2>Convergence Analysis</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h3>Convergence Criteria</h3>
+                            <ul>
+                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
+                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
+                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
+                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Convergence Conditions</h3>
+                            <div class="formula-display">
+                                <h4>Centroid Movement Threshold</h4>
+                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>μᵢ^(t) is centroid i at iteration t</li>
+                                    <li>ε is the convergence threshold (typically 1e-4)</li>
+                                    <li>maxᵢ finds the maximum movement across all centroids</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>Convergence Guarantees</h3>
+                            <p>K-means is guaranteed to converge because:</p>
+                            <ul>
+                                <li>The objective function is bounded below by zero</li>
+                                <li>Each iteration decreases or maintains the objective function</li>
+                                <li>There are only finitely many possible cluster assignments</li>
+                                <li>The algorithm cannot cycle due to strict improvement</li>
+                            </ul>
+                        </div>
+
+                        <div class="image-container">
+                            <h4>Visualization: Convergence Behavior</h4>
+                            <div class="visualization-placeholder">
+                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
+                            </div>
+                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive K-means Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>K-means Clustering Demo</h3>
+                            
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="demo-clusters">Number of Clusters:</label>
+                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
+                                    <span id="demo-clusters-display">3</span>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="demo-init">Initialization:</label>
+                                    <select id="demo-init">
+                                        <option value="random">Random</option>
+                                        <option value="kmeans++">K-means++</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="demo-data">Data Type:</label>
+                                    <select id="demo-data">
+                                        <option value="blobs">Well-separated Blobs</option>
+                                        <option value="random">Random Points</option>
+                                        <option value="moons">Moon-shaped</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-buttons">
+                                    <button onclick="generateDemoData()">Generate Data</button>
+                                    <button onclick="runKmeansDemo()">Run K-means</button>
+                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
+                                    <button onclick="resetDemo()">Reset</button>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-status" id="demo-status">
+                                <p>Click "Generate Data" to start the demo</p>
+                            </div>
+                            
+                            <div class="metric-visualization" id="kmeans-demo-canvas">
+                                <p>Interactive K-means clustering visualization will appear here</p>
+                            </div>
+                            
+                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
+                                <h4>Clustering Metrics</h4>
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <span class="metric-label">WCSS:</span>
+                                        <span class="metric-value" id="wcss-value">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Silhouette:</span>
+                                        <span class="metric-value" id="silhouette-value">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Iterations:</span>
+                                        <span class="metric-value" id="iterations-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 4 Quiz</h2>
+                        
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Between-cluster sum of squares</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>Within-cluster sum of squares (WCSS)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Silhouette coefficient</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Calinski-Harabasz index</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>As the arithmetic mean of all points in the cluster</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>As the median of all points in the cluster</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>As the point closest to the cluster center</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>As a weighted average based on point distances</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It's faster to compute</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It guarantees global optimum</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>It provides better initialization leading to faster convergence</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>It works better with non-spherical clusters</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label"></span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+                <span>Next →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/clustering/chapter3" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 3: Minkowski Distance</a>
+        <a href="/tutorials/clustering/chapter5" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 5: Hierarchical Clustering →</a>
+    </div>
+</body>
+</html>
