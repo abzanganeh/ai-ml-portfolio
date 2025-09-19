@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 12: Gaussian Mixture Models - Comprehensive Clustering Analysis Course</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Chapter 11: DBSCAN - Density-Based Clustering - Comprehensive Clustering Analysis Course</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering-course/clustering-course.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering-course/shared-tutorial.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
     <header class="azbn-header">
-        <nav class="azbn-nav" style="top: 50px;">
-            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
-                <a href="/tutorials/clustering-course" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
-                    <span>Clustering Analysis Course</span>
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/clustering-course" class="course-link">
+                    <img src="/static/images/logo.png" alt="Logo">
+                    <span>Comprehensive Clustering Analysis Course</span>
                 </a>
                 <div class="azbn-links">
                     <a href="/">Home</a>
@@ -26,40 +26,665 @@
         </nav>
     </header>
 
-    <main style="padding-top: 100px;">
-        <div class="clustering-header">
-            <h1>Chapter 12: Gaussian Mixture Models and Expectation-Maximization</h1>
-            <p>Model-based clustering with statistical foundations</p>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 80%;"></div>
-            </div>
-        </div>
-
+    <main class="main-content">
         <section class="azbn-section">
             <div class="azbn-container">
-                <h2>Gaussian Mixture Models</h2>
-                <p>
-                    Gaussian Mixture Models (GMM) assume that data points are generated from a mixture of several Gaussian distributions. 
-                    This provides a probabilistic approach to clustering.
-                </p>
-                
-                <div class="azbn-card">
-                    <h3>Mathematical Foundation</h3>
-                    <p>The probability density function of a GMM is:</p>
-                    <div class="math-formula">p(x) = Σᵢ₌₁ᵏ πᵢ N(x|μᵢ, Σᵢ)</div>
-                    <p>Where πᵢ are the mixing weights, μᵢ are the means, and Σᵢ are the covariance matrices.</p>
+                <!-- Chapter Header -->
+                <div class="chapter-header">
+                    <h1 class="chapter-title">Chapter 11: DBSCAN - Density-Based Clustering</h1>
+                    <p class="chapter-subtitle">Master DBSCAN (Density-Based Spatial Clustering of Applications with Noise), a revolutionary clustering algorithm that discovers clusters of arbitrary shape while automatically identifying outliers through density-based connectivity analysis.</p>
+                    
+                    <!-- Chapter Progress Bar -->
+                    <div class="chapter-progress">
+                        <div class="chapter-progress-fill" style="width: 73.3%;"></div>
+                    </div>
+                    
+                    <!-- Chapter Navigation (All 15 chapters) -->
+                    <div class="chapter-navigation">
+                        <a href="/tutorials/clustering-course/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                        <a href="/tutorials/clustering-course/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                        <a href="/tutorials/clustering-course/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                        <a href="/tutorials/clustering-course/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                        <a href="/tutorials/clustering-course/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                        <a href="/tutorials/clustering-course/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                        <a href="/tutorials/clustering-course/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                        <a href="/tutorials/clustering-course/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                        <a href="/tutorials/clustering-course/chapter9" class="chapter-nav-btn">Chapter 9</a>
+                        <a href="/tutorials/clustering-course/chapter10" class="chapter-nav-btn">Chapter 10</a>
+                        <a href="/tutorials/clustering-course/chapter11" class="chapter-nav-btn active">Chapter 11</a>
+                        <a href="/tutorials/clustering-course/chapter12" class="chapter-nav-btn">Chapter 12</a>
+                        <a href="/tutorials/clustering-course/chapter13" class="chapter-nav-btn">Chapter 13</a>
+                        <a href="/tutorials/clustering-course/chapter14" class="chapter-nav-btn">Chapter 14</a>
+                        <a href="/tutorials/clustering-course/chapter15" class="chapter-nav-btn">Chapter 15</a>
+                    </div>
+                    
+                    <!-- Section Progress Bar -->
+                    <div class="section-progress">
+                        <div class="section-progress-fill" style="width: 12.5%;"></div>
+                    </div>
+                    
+                    <!-- Section Navigation -->
+                    <div class="section-nav">
+                        <button class="active" onclick="showSection('introduction', this)">Introduction</button>
+                        <button onclick="showSection('theory', this)">Mathematical Theory</button>
+                        <button onclick="showSection('algorithm', this)">DBSCAN Algorithm</button>
+                        <button onclick="showSection('parameters', this)">Parameter Selection</button>
+                        <button onclick="showSection('complexity', this)">Complexity Analysis</button>
+                        <button onclick="showSection('variants', this)">Variants & Extensions</button>
+                        <button onclick="showSection('comparison', this)">Method Comparison</button>
+                        <button onclick="showSection('interactive', this)">Interactive Demos</button>
+                        <button onclick="showSection('quiz', this)">Quiz</button>
+                    </div>
                 </div>
 
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-card">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand density-based clustering principles and advantages over partitional methods</li>
+                        <li>Master DBSCAN's mathematical formulation with epsilon-neighborhoods and core points</li>
+                        <li>Learn the complete DBSCAN algorithm with density-reachability concepts</li>
+                        <li>Analyze parameter selection strategies for epsilon and MinPts</li>
+                        <li>Explore computational complexity and optimization techniques</li>
+                        <li>Understand noise handling and outlier detection capabilities</li>
+                        <li>Compare DBSCAN with K-means and hierarchical clustering methods</li>
+                        <li>Apply DBSCAN to real-world problems with irregular cluster shapes</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content -->
+                <main class="chapter-main-content">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="section-content active">
+                        <h2>Density-Based Clustering: A Paradigm Shift</h2>
+                        
+                        <p>DBSCAN (Density-Based Spatial Clustering of Applications with Noise) represents a fundamental departure from traditional clustering approaches. Developed by Ester, Kriegel, Sander, and Xu in 1996, DBSCAN introduces the revolutionary concept that clusters are dense regions of points separated by regions of lower density. This density-based perspective enables the discovery of clusters with arbitrary shapes while automatically identifying outliers as noise.</p>
+
+                        <h3>Core Philosophy: Density Over Distance</h3>
+                        <p>Unlike K-means or hierarchical clustering that rely on distance or similarity measures, DBSCAN defines clusters through local density characteristics.</p>
+
+                        <div class="concepts-grid">
+                            <div class="concept-card-blue">
+                                <h4>Traditional Clustering Limitations</h4>
+                                <ul>
+                                    <li><strong>Shape assumptions:</strong> K-means assumes spherical clusters</li>
+                                    <li><strong>Fixed k:</strong> Must specify number of clusters a priori</li>
+                                    <li><strong>Outlier sensitivity:</strong> Outliers force cluster assignment</li>
+                                    <li><strong>Uniform density:</strong> Assumes clusters have similar densities</li>
+                                    <li><strong>Global metrics:</strong> Use global distance/similarity measures</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="concept-card-green">
+                                <h4>DBSCAN Advantages</h4>
+                                <ul>
+                                    <li><strong>Arbitrary shapes:</strong> Discovers non-spherical, irregular clusters</li>
+                                    <li><strong>Automatic k:</strong> Determines number of clusters automatically</li>
+                                    <li><strong>Noise handling:</strong> Explicitly identifies outliers as noise</li>
+                                    <li><strong>Variable density:</strong> Handles clusters of different densities</li>
+                                    <li><strong>Local analysis:</strong> Uses local density neighborhoods</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="concept-card-yellow">
+                                <h4>Key Concepts</h4>
+                                <ul>
+                                    <li><strong>Epsilon-neighborhood:</strong> Local region around each point</li>
+                                    <li><strong>Core points:</strong> Points in dense regions with many neighbors</li>
+                                    <li><strong>Border points:</strong> Points on cluster boundaries</li>
+                                    <li><strong>Noise points:</strong> Isolated points in sparse regions</li>
+                                    <li><strong>Density connectivity:</strong> Transitive reachability through dense regions</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Intuitive Understanding Through Density</h3>
+                        <p>DBSCAN's density-based approach aligns naturally with human intuition about what constitutes a cluster.</p>
+
+                        <div class="explanation-box">
+                            <h4>Density-Based Cluster Definition</h4>
+                            
+                            <h5>Human Intuition:</h5>
+                            <p>When humans look at scattered points, they naturally group together points that are:</p>
+                            <ul>
+                                <li><strong>Close to each other:</strong> Points within a reasonable distance</li>
+                                <li><strong>Densely packed:</strong> Regions with many nearby points</li>
+                                <li><strong>Connected:</strong> Ability to "walk" between points through dense regions</li>
+                                <li><strong>Separated:</strong> Clear gaps between different groups</li>
+                            </ul>
+                            
+                            <h5>Mathematical Formalization:</h5>
+                            <p>DBSCAN formalizes these intuitions through precise mathematical definitions:</p>
+                            <ul>
+                                <li><strong>ε-neighborhood:</strong> "Close to each other" → points within distance ε</li>
+                                <li><strong>MinPts threshold:</strong> "Densely packed" → at least MinPts neighbors</li>
+                                <li><strong>Density-reachability:</strong> "Connected" → transitive connectivity through core points</li>
+                                <li><strong>Noise identification:</strong> "Separated" → points not reachable from any cluster</li>
+                            </ul>
+                            
+                            <h5>Advantages of Density Perspective:</h5>
+                            <ul>
+                                <li><strong>Natural clusters:</strong> Aligns with human perception of groupings</li>
+                                <li><strong>Robust to shape:</strong> Works for any cluster shape that maintains density</li>
+                                <li><strong>Automatic outlier detection:</strong> Noise emerges naturally from low density</li>
+                                <li><strong>Parameter intuition:</strong> ε and MinPts have clear geometric meanings</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Density-Based vs Distance-Based Clustering</h4>
+                            <p><strong>Image Description:</strong> A side-by-side comparison showing the same dataset with two crescent-shaped clusters that interlock. Left panel shows K-means result with spherical clusters that incorrectly partition the crescents. Right panel shows DBSCAN result correctly identifying the two crescent shapes. Points are colored by cluster membership, with core points shown as larger circles, border points as medium circles, and noise points as small crosses. Epsilon neighborhoods are illustrated around several core points to show density-based connectivity.</p>
+                            <p><em>This demonstrates DBSCAN's ability to find arbitrary-shaped clusters that traditional methods cannot discover</em></p>
+                        </div>
+
+                        <h3>Historical Context and Impact</h3>
+                        <p>DBSCAN's introduction marked a significant shift in clustering research and applications.</p>
+
+                        <div class="explanation-box">
+                            <h4>Historical Development and Influence</h4>
+                            
+                            <h5>Pre-DBSCAN Era (Before 1996):</h5>
+                            <ul>
+                                <li><strong>Dominant paradigms:</strong> K-means, hierarchical clustering</li>
+                                <li><strong>Shape limitations:</strong> Primarily spherical or convex clusters</li>
+                                <li><strong>Noise handling:</strong> Ad-hoc preprocessing or ignored</li>
+                                <li><strong>Parameter selection:</strong> Number of clusters always required</li>
+                            </ul>
+                            
+                            <h5>DBSCAN Innovation (1996):</h5>
+                            <ul>
+                                <li><strong>Density-based formulation:</strong> First practical density-based algorithm</li>
+                                <li><strong>Noise as first-class concept:</strong> Explicit outlier identification</li>
+                                <li><strong>Arbitrary shapes:</strong> Breakthrough in non-convex cluster discovery</li>
+                                <li><strong>Local decision making:</strong> Cluster formation based on local density</li>
+                            </ul>
+                            
+                            <h5>Post-DBSCAN Impact:</h5>
+                            <ul>
+                                <li><strong>Density-based family:</strong> Spawned numerous density-based variants</li>
+                                <li><strong>Real-world applications:</strong> Enabled clustering in domains with irregular shapes</li>
+                                <li><strong>Theoretical foundation:</strong> Established formal framework for density-based clustering</li>
+                                <li><strong>Practical adoption:</strong> Became standard tool in data mining and machine learning</li>
+                            </ul>
+                        </div>
+
+                        <h3>Applications and Use Cases</h3>
+                        <p>DBSCAN's unique capabilities make it particularly suitable for specific types of clustering problems.</p>
+
+                        <div class="explanation-box">
+                            <h4>Optimal Application Domains</h4>
+                            
+                            <h5>Spatial Data Analysis:</h5>
+                            <ul>
+                                <li><strong>Geographic clustering:</strong> Urban planning, demographic analysis</li>
+                                <li><strong>Facility location:</strong> Service area determination, coverage analysis</li>
+                                <li><strong>Epidemiology:</strong> Disease outbreak detection and tracking</li>
+                                <li><strong>Ecology:</strong> Species distribution and habitat analysis</li>
+                            </ul>
+                            
+                            <h5>Anomaly and Outlier Detection:</h5>
+                            <ul>
+                                <li><strong>Fraud detection:</strong> Identifying unusual transaction patterns</li>
+                                <li><strong>Network security:</strong> Intrusion detection in network traffic</li>
+                                <li><strong>Quality control:</strong> Manufacturing defect identification</li>
+                                <li><strong>Medical diagnosis:</strong> Abnormal pattern detection in medical data</li>
+                            </ul>
+                            
+                            <h5>Image and Signal Processing:</h5>
+                            <ul>
+                                <li><strong>Image segmentation:</strong> Identifying objects with irregular boundaries</li>
+                                <li><strong>Computer vision:</strong> Feature grouping and object recognition</li>
+                                <li><strong>Astronomical data:</strong> Galaxy and star cluster identification</li>
+                                <li><strong>Bioinformatics:</strong> Gene expression pattern analysis</li>
+                            </ul>
+                            
+                            <h5>Social Network Analysis:</h5>
+                            <ul>
+                                <li><strong>Community detection:</strong> Identifying social groups with irregular structures</li>
+                                <li><strong>Information diffusion:</strong> Tracking viral content spread patterns</li>
+                                <li><strong>Market segmentation:</strong> Customer groups with complex behaviors</li>
+                                <li><strong>Web analysis:</strong> User behavior pattern identification</li>
+                            </ul>
+                        </div>
+
+                        <h3>DBSCAN vs Other Clustering Methods</h3>
+                        <p>Understanding when to choose DBSCAN over other clustering methods is crucial for effective application.</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Aspect</th>
+                                    <th>DBSCAN</th>
+                                    <th>K-means</th>
+                                    <th>Hierarchical</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Cluster Shape</strong></td>
+                                    <td>Arbitrary shapes, non-convex</td>
+                                    <td>Spherical, convex</td>
+                                    <td>Depends on linkage criterion</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Number of Clusters</strong></td>
+                                    <td>Determined automatically</td>
+                                    <td>Must be specified (k)</td>
+                                    <td>Choose by cutting dendrogram</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Noise Handling</strong></td>
+                                    <td>Explicit noise identification</td>
+                                    <td>All points assigned to clusters</td>
+                                    <td>All points assigned to clusters</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Computational Complexity</strong></td>
+                                    <td>O(n log n) with spatial indexing</td>
+                                    <td>O(nkdt) with iterations</td>
+                                    <td>O(n³) for basic algorithms</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Parameter Sensitivity</strong></td>
+                                    <td>ε and MinPts selection critical</td>
+                                    <td>Initialization and k selection</td>
+                                    <td>Linkage criterion and cut height</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Scalability</strong></td>
+                                    <td>Good with spatial indexing</td>
+                                    <td>Excellent scalability</td>
+                                    <td>Limited by O(n²) memory</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cluster Density</strong></td>
+                                    <td>Handles varying densities</td>
+                                    <td>Assumes similar densities</td>
+                                    <td>Depends on linkage method</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Mathematical Theory Section -->
+                    <div id="theory" class="section-content">
+                        <h2>Mathematical Foundations of DBSCAN</h2>
+                        
+                        <p>DBSCAN's theoretical foundation rests on formal definitions of density, reachability, and connectivity. These mathematical concepts provide precise criteria for cluster formation and enable rigorous analysis of the algorithm's properties and behavior.</p>
+
+                        <h3>Fundamental Definitions</h3>
+                        <p>DBSCAN introduces several key mathematical concepts that formalize the notion of density-based clustering.</p>
+
+                        <div class="formula-box">
+                            <h3>Core Mathematical Definitions</h3>
+                            
+                            <h4>Epsilon-Neighborhood:</h4>
+                            <div class="formula-display">
+                                <strong>N_ε(p) = {q ∈ D | dist(p, q) ≤ ε}</strong>
+                            </div>
+                            <p>The ε-neighborhood of p is the set of all points within distance ε from p, including p itself.</p>
+                            
+                            <h4>Core Point:</h4>
+                            <div class="formula-display">
+                                <strong>|N_ε(p)| ≥ MinPts</strong>
+                            </div>
+                            <p>A point p is a core point if its ε-neighborhood contains at least MinPts points. Core points are in the "interior" of dense regions and serve as seeds for cluster formation.</p>
+                            
+                            <h4>Directly Density-Reachable:</h4>
+                            <p>Point q is directly density-reachable from point p if:</p>
+                            <ul>
+                                <li>q ∈ N_ε(p) (q is in p's ε-neighborhood)</li>
+                                <li>p is a core point</li>
+                            </ul>
+                            <p>This is a one-step relationship: you can reach q from p in one "density step".</p>
+                            
+                            <h4>Density-Reachable:</h4>
+                            <div class="formula-display">
+                                <strong>p = p₁, p₂, ..., pₙ = q</strong>
+                            </div>
+                            <p>Point q is density-reachable from point p if there exists a chain of points such that p_{i+1} is directly density-reachable from p_i for all i = 1, ..., n-1. This creates transitive connectivity through dense regions.</p>
+                            
+                            <h4>Density-Connected:</h4>
+                            <p>Points p and q are density-connected if there exists a point r such that:</p>
+                            <ul>
+                                <li>p is density-reachable from r</li>
+                                <li>q is density-reachable from r</li>
+                            </ul>
+                            <p>This creates symmetric connectivity: if p and q are density-connected, they belong to the same cluster.</p>
+                        </div>
+
+                        <h3>Cluster Definition and Properties</h3>
+                        <p>Using these fundamental concepts, DBSCAN provides a formal mathematical definition of clusters.</p>
+
+                        <div class="explanation-box">
+                            <h4>Formal Cluster Definition</h4>
+                            
+                            <h5>DBSCAN Cluster:</h5>
+                            <p>A cluster C is a non-empty subset of the dataset D such that:</p>
+                            <ol>
+                                <li><strong>Maximality:</strong> For all p, q ∈ D: if p ∈ C and q is density-reachable from p, then q ∈ C</li>
+                                <li><strong>Connectivity:</strong> For all p, q ∈ C: p and q are density-connected</li>
+                            </ol>
+                            
+                            <h5>Point Classification:</h5>
+                            <p>Every point in the dataset falls into exactly one category:</p>
+                            <ul>
+                                <li><strong>Core points:</strong> Interior points of clusters (|N_ε(p)| ≥ MinPts)</li>
+                                <li><strong>Border points:</strong> Non-core points that are density-reachable from core points</li>
+                                <li><strong>Noise points:</strong> Points that are neither core nor border points</li>
+                            </ul>
+                            
+                            <h5>Cluster Properties:</h5>
+                            <ul>
+                                <li><strong>Uniqueness:</strong> Each core point belongs to exactly one cluster</li>
+                                <li><strong>Maximality:</strong> Clusters contain all density-reachable points</li>
+                                <li><strong>Connectedness:</strong> All points in a cluster are density-connected</li>
+                                <li><strong>Separation:</strong> Points in different clusters are not density-connected</li>
+                            </ul>
+                        </div>
+
+                        <h3>Mathematical Properties and Theorems</h3>
+                        <p>DBSCAN's mathematical framework enables formal analysis of its properties and guarantees.</p>
+
+                        <div class="explanation-box">
+                            <h4>Key Theoretical Results</h4>
+                            
+                            <h5>Theorem 1 (Cluster Determinism):</h5>
+                            <p><strong>Statement:</strong> Given parameters ε and MinPts, DBSCAN produces a unique clustering (up to border point assignment).</p>
+                            <p><strong>Proof Sketch:</strong></p>
+                            <ol>
+                                <li>Core points are uniquely determined by ε and MinPts</li>
+                                <li>Density-reachability is deterministic from core points</li>
+                                <li>Clusters are maximal connected components of density-reachable points</li>
+                                <li>Border points may be reachable from multiple clusters (ties broken arbitrarily)</li>
+                            </ol>
+                            
+                            <h5>Theorem 2 (Noise Identification):</h5>
+                            <p><strong>Statement:</strong> A point is classified as noise if and only if it is not density-reachable from any core point.</p>
+                            <p><strong>Implication:</strong> Noise points are precisely those in regions of insufficient density.</p>
+                            
+                            <h5>Theorem 3 (Stability):</h5>
+                            <p><strong>Statement:</strong> Small perturbations in point positions result in small changes to cluster assignments, provided perturbations don't cross decision boundaries.</p>
+                            <p><strong>Practical meaning:</strong> DBSCAN is robust to small amounts of noise in point coordinates.</p>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: DBSCAN Mathematical Concepts</h4>
+                            <p><strong>Image Description:</strong> A detailed diagram showing DBSCAN concepts on a 2D point set. Different point types are marked: core points (large red circles with ε-neighborhoods shown), border points (medium blue circles), and noise points (small gray X's). Arrows show density-reachability chains between points. Different clusters are outlined with colored boundaries. The diagram illustrates how density-connected components form clusters and how isolated points become noise.</p>
+                            <p><em>This demonstrates the mathematical relationships underlying DBSCAN's clustering decisions</em></p>
+                        </div>
+
+                        <h3>Distance Metrics and Their Impact</h3>
+                        <p>The choice of distance metric significantly affects DBSCAN's behavior and the shape of resulting clusters.</p>
+
+                        <div class="explanation-box">
+                            <h4>Distance Metric Considerations</h4>
+                            
+                            <h5>Euclidean Distance (Most Common):</h5>
+                            <div class="formula-display">
+                                <strong>d(p, q) = √(Σᵢ(pᵢ - qᵢ)²)</strong>
+                            </div>
+                            <p><strong>ε-neighborhoods:</strong> Circular regions in 2D, spherical in higher dimensions</p>
+                            <p><strong>Cluster shapes:</strong> Smooth, continuous boundaries</p>
+                            <p><strong>Applications:</strong> Spatial data, continuous features</p>
+                            
+                            <h5>Manhattan Distance:</h5>
+                            <div class="formula-display">
+                                <strong>d(p, q) = Σᵢ|pᵢ - qᵢ|</strong>
+                            </div>
+                            <p><strong>ε-neighborhoods:</strong> Diamond-shaped regions in 2D</p>
+                            <p><strong>Cluster shapes:</strong> Angular, axis-aligned boundaries</p>
+                            <p><strong>Applications:</strong> Grid-based data, discrete features</p>
+                            
+                            <h5>Cosine Distance:</h5>
+                            <div class="formula-display">
+                                <strong>d(p, q) = 1 - (p·q)/(||p|| ||q||)</strong>
+                            </div>
+                            <p><strong>ε-neighborhoods:</strong> Angular sectors from origin</p>
+                            <p><strong>Cluster shapes:</strong> Direction-based clustering</p>
+                            <p><strong>Applications:</strong> Text analysis, high-dimensional sparse data</p>
+                            
+                            <h5>Custom Distance Metrics:</h5>
+                            <ul>
+                                <li><strong>Requirements:</strong> Must satisfy metric properties (if using spatial indexing)</li>
+                                <li><strong>Domain-specific:</strong> Hamming distance for categorical data</li>
+                                <li><strong>Weighted distances:</strong> Feature importance weighting</li>
+                                <li><strong>Non-metric distances:</strong> May require O(n²) complexity</li>
+                            </ul>
+                        </div>
+
+                        <h3>Parameter Interdependence</h3>
+                        <p>The ε and MinPts parameters are not independent; their relationship affects clustering results significantly.</p>
+
+                        <div class="explanation-box">
+                            <h4>ε and MinPts Relationship Analysis</h4>
+                            
+                            <h5>Parameter Effects:</h5>
+                            <table class="comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter Change</th>
+                                        <th>Effect on Clusters</th>
+                                        <th>Effect on Noise</th>
+                                        <th>Use Cases</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Increase ε</strong></td>
+                                        <td>Larger, fewer clusters</td>
+                                        <td>Less noise (more points included)</td>
+                                        <td>Sparse data, large clusters</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Decrease ε</strong></td>
+                                        <td>Smaller, more clusters</td>
+                                        <td>More noise (stricter inclusion)</td>
+                                        <td>Dense data, fine-grained clustering</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Increase MinPts</strong></td>
+                                        <td>More stringent core point criteria</td>
+                                        <td>More noise (higher density threshold)</td>
+                                        <td>Noisy data, avoid spurious clusters</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Decrease MinPts</strong></td>
+                                        <td>More liberal core point criteria</td>
+                                        <td>Less noise (lower density threshold)</td>
+                                        <td>Clean data, detect small clusters</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <h5>Dimensional Scaling:</h5>
+                            <p><strong>High-dimensional challenges:</strong></p>
+                            <ul>
+                                <li>Curse of dimensionality affects ε-neighborhood volumes</li>
+                                <li>Distances become more uniform in high dimensions</li>
+                                <li>MinPts should typically increase with dimensionality</li>
+                                <li>Rule of thumb: MinPts ≥ 2 × dimensions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder sections for other content -->
+                    <div id="algorithm" class="section-content">
+                        <h2>DBSCAN Algorithm</h2>
+                        <p>This section will cover the complete DBSCAN algorithm implementation and analysis.</p>
+                    </div>
+
+                    <div id="parameters" class="section-content">
+                        <h2>Parameter Selection</h2>
+                        <p>This section will cover strategies for selecting optimal ε and MinPts parameters.</p>
+                    </div>
+
+                    <div id="complexity" class="section-content">
+                        <h2>Complexity Analysis</h2>
+                        <p>This section will analyze DBSCAN's computational complexity and optimization techniques.</p>
+                    </div>
+
+                    <div id="variants" class="section-content">
+                        <h2>Variants & Extensions</h2>
+                        <p>This section will cover DBSCAN variants and extensions.</p>
+                    </div>
+
+                    <div id="comparison" class="section-content">
+                        <h2>Method Comparison</h2>
+                        <p>This section will provide detailed comparisons with other clustering methods.</p>
+                    </div>
+
+                    <div id="interactive" class="section-content">
+                        <h2>Interactive Demos</h2>
+                        <p>This section will contain interactive demonstrations of DBSCAN.</p>
+                    </div>
+
+                    <div id="quiz" class="section-content">
+                        <h2>Quiz</h2>
+                        <p>This section will contain quiz questions to test understanding.</p>
+                    </div>
+                </main>
+
+                <!-- Sub-section Navigation Footer -->
+                <div class="sub-section-nav-footer">
+                    <div class="sub-nav-buttons">
+                        <button id="prev-subsection" class="sub-nav-btn prev-btn" onclick="navigateSubSection('prev')" style="display: none;">
+                            <span>← Previous</span>
+                            <span class="sub-nav-label" id="prev-label"></span>
+                        </button>
+                        <button id="next-subsection" class="sub-nav-btn next-btn" onclick="navigateSubSection('next')">
+                            <span class="sub-nav-label" id="next-label">Mathematical Theory</span>
+                            <span>Next →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chapter Navigation Footer -->
                 <div class="chapter-navigation">
-                    <button id="prev-chapter" class="nav-btn secondary" onclick="navigateToPreviousChapter()">
-                        ← Previous Chapter: DBSCAN
-                    </button>
-                    <button id="next-chapter" class="nav-btn primary" onclick="navigateToNextChapter()">
-                        Next Chapter: Mean Shift →
-                    </button>
+                    <a href="/tutorials/clustering-course/chapter10" class="chapter-nav-btn">← Chapter 10</a>
+                    <a href="/tutorials/clustering-course/chapter12" class="chapter-nav-btn">Chapter 12 →</a>
                 </div>
             </div>
         </section>
     </main>
+
+    <footer class="azbn-footer">
+        <div class="azbn-container">
+            <div class="azbn-footer-content">
+                <div class="azbn-footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/#about">About</a></li>
+                        <li><a href="/tutorials/">Tutorials</a></li>
+                        <li><a href="/#projects">Projects</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="azbn-footer-section">
+                    <h3>Social Media</h3>
+                    <div class="azbn-social-links">
+                        <a href="https://linkedin.com/in/alireza-barzin-zanganeh" target="_blank">LinkedIn</a>
+                        <a href="https://github.com/alireza-barzin-zanganeh" target="_blank">GitHub</a>
+                        <a href="https://twitter.com/alireza_barzin" target="_blank">Twitter</a>
+                    </div>
+                </div>
+            </div>
+            <div class="azbn-footer-bottom">
+                <p>&copy; 2024 Alireza Barzin Zanganeh. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Section navigation
+        function showSection(sectionName, clickedElement) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.section-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+            
+            // Update section progress
+            updateSectionProgress(sectionName);
+        }
+
+        function updateSectionProgress(sectionName) {
+            const sections = ['introduction', 'theory', 'algorithm', 'parameters', 'complexity', 'variants', 'comparison', 'interactive', 'quiz'];
+            const currentIndex = sections.indexOf(sectionName);
+            const progress = ((currentIndex + 1) / sections.length) * 100;
+            
+            const progressFill = document.querySelector('.section-progress-fill');
+            if (progressFill) {
+                progressFill.style.width = progress + '%';
+            }
+        }
+
+        // Sub-section navigation
+        function navigateSubSection(direction) {
+            const sections = ['introduction', 'theory', 'algorithm', 'parameters', 'complexity', 'variants', 'comparison', 'interactive', 'quiz'];
+            const currentSection = document.querySelector('.section-content.active');
+            const currentIndex = sections.indexOf(currentSection.id);
+            
+            let newIndex;
+            if (direction === 'prev') {
+                newIndex = currentIndex - 1;
+            } else {
+                newIndex = currentIndex + 1;
+            }
+            
+            if (newIndex >= 0 && newIndex < sections.length) {
+                const newSection = sections[newIndex];
+                const button = document.querySelector(`[onclick*="${newSection}"]`);
+                showSection(newSection, button);
+                updateSubSectionNavigation();
+            }
+        }
+
+        function updateSubSectionNavigation() {
+            const sections = ['introduction', 'theory', 'algorithm', 'parameters', 'complexity', 'variants', 'comparison', 'interactive', 'quiz'];
+            const currentSection = document.querySelector('.section-content.active');
+            const currentIndex = sections.indexOf(currentSection.id);
+            
+            const prevBtn = document.getElementById('prev-subsection');
+            const nextBtn = document.getElementById('next-subsection');
+            const prevLabel = document.getElementById('prev-label');
+            const nextLabel = document.getElementById('next-label');
+            
+            // Update previous button
+            if (currentIndex > 0) {
+                prevBtn.style.display = 'flex';
+                prevLabel.textContent = sections[currentIndex - 1].charAt(0).toUpperCase() + sections[currentIndex - 1].slice(1);
+            } else {
+                prevBtn.style.display = 'none';
+            }
+            
+            // Update next button
+            if (currentIndex < sections.length - 1) {
+                nextBtn.style.display = 'flex';
+                nextLabel.textContent = sections[currentIndex + 1].charAt(0).toUpperCase() + sections[currentIndex + 1].slice(1);
+            } else {
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('introduction');
+            updateSubSectionNavigation();
+        });
+    </script>
 </body>
 </html>

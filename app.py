@@ -333,6 +333,21 @@ def clustering_course_chapter(chapter_num):
     except:
         abort(404)
 
+# New Clustering tutorial chapter routes
+@app.route('/tutorials/clustering/chapter<int:chapter_num>')
+def clustering_chapter(chapter_num):
+    """New Clustering tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 15:
+        abort(404)
+    
+    template_path = f'tutorials/clustering/chapter{chapter_num}.html'
+    
+    # Check if template exists, otherwise 404
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
 @app.route('/blog')
 def blog():
     """Blog listing page"""
