@@ -28,13 +28,24 @@
 - Copying navigation from wrong chapter (e.g., Chapter 3 links in Chapter 5)
 - Forgetting to update JavaScript file references
 - **NOT updating the active class in top navigation** (causes wrong chapter to show as active)
+- **Referencing non-existent JavaScript files** (causes demos to not work)
 - Not testing navigation buttons after creation
+- Not testing interactive demos after creation
+
+### JAVASCRIPT FILE HANDLING
+When creating new chapters that need interactive demos:
+1. **Check if demo functions exist**: Look for functions like `runDemo()`, `generateData()`, etc.
+2. **Use existing JavaScript files**: If demos exist in `chapter4.js`, use that file
+3. **Create new JavaScript files only if needed**: Only create `chapter{N}.js` if you have chapter-specific functions
+4. **Test demos after creation**: Always test that interactive demos work
 
 ### VERIFICATION STEPS
 - Check that Previous button goes to Chapter N-1
 - Check that Next button goes to Chapter N+1
 - Verify chapter titles match actual content
 - Test that all navigation buttons work without 404 errors
+- **Test that interactive demos work** (click demo buttons, check console for errors)
+- Verify JavaScript files exist and are properly referenced
 
 ### EXAMPLE: Creating Chapter 7
 ```html
