@@ -336,52 +336,140 @@
 
                     <!-- Mathematical Properties Section -->
                     <div id="properties" class="content-section">
-                        <h2>Mathematical Properties and Theorems</h2>
+                        <h2>Mathematical Framework and Rigorous Analysis</h2>
                         
-                        <div class="explanation-box">
-                            <p>The Minkowski distance satisfies important mathematical properties that make it suitable for clustering algorithms. Understanding these properties helps us predict how the distance metric will behave in different scenarios.</p>
-                        </div>
+                        <p>The mathematical foundation of Minkowski distance rests on deep results from functional analysis, particularly the theory of Banach spaces and Hölder's inequality. This section provides complete mathematical rigor for understanding why and how Minkowski distances work.</p>
+
+                        <h3>The Lp Norm Space Foundation</h3>
+                        <p>Minkowski distances are intrinsically connected to Lp norm spaces, which form a fundamental structure in functional analysis.</p>
 
                         <div class="formula-box">
-                            <h3>Metric Space Properties</h3>
+                            <h3>Lp Norm Definition and Properties</h3>
+                            <p>For a vector x = (x₁, x₂, ..., xₙ) ∈ ℝⁿ and parameter p ≥ 1, the Lp norm is:</p>
+                            
                             <div class="formula-display">
-                                <h4>Theorem: Minkowski Distance is a Metric</h4>
-                                <p>For p ≥ 1, the Minkowski distance d_p satisfies all four metric space axioms:</p>
+                                <strong>‖x‖_p = (Σᵢ₌₁ⁿ |xᵢ|ᵖ)^(1/p)</strong>
+                            </div>
+                            
+                            <h4>Fundamental Norm Properties:</h4>
+                            <p>Any function ‖·‖: ℝⁿ → ℝ₊ is a norm if it satisfies:</p>
+                            
+                            <div class="formula-box">
                                 <ol>
-                                    <li><strong>Non-negativity:</strong> d_p(x, y) ≥ 0</li>
-                                    <li><strong>Identity:</strong> d_p(x, y) = 0 ⟺ x = y</li>
-                                    <li><strong>Symmetry:</strong> d_p(x, y) = d_p(y, x)</li>
-                                    <li><strong>Triangle Inequality:</strong> d_p(x, z) ≤ d_p(x, y) + d_p(y, z)</li>
+                                    <li><strong>Positive Definiteness:</strong> ‖x‖ ≥ 0, and ‖x‖ = 0 ⟺ x = 0</li>
+                                    <li><strong>Homogeneity:</strong> ‖αx‖ = |α| ‖x‖ for all scalars α</li>
+                                    <li><strong>Triangle Inequality:</strong> ‖x + y‖ ≤ ‖x‖ + ‖y‖</li>
                                 </ol>
                             </div>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Monotonicity Property</h3>
+                            
+                            <p><strong>Connection to Distance:</strong> The Minkowski distance is derived from the Lp norm via:</p>
                             <div class="formula-display">
-                                <h4>Theorem: Distance Monotonicity</h4>
-                                <div class="formula">For fixed x, y and 1 ≤ p₁ ≤ p₂ ≤ ∞: d_{p₁}(x, y) ≤ d_{p₂}(x, y)</div>
-                                <p><strong>Proof Sketch:</strong> This follows from the fact that the p-norm is non-decreasing in p for fixed vectors.</p>
+                                <strong>d_p(x, y) = ‖x - y‖_p</strong>
                             </div>
                         </div>
 
-                        <div class="formula-box">
-                            <h3>Convergence to Chebyshev Distance</h3>
+                        <h3>Hölder's Inequality: The Foundation of Triangle Inequality</h3>
+                        <p>The triangle inequality for Minkowski distances relies on one of the most important inequalities in analysis: Hölder's inequality.</p>
+
+                        <div class="model-box">
+                            <h4>Hölder's Inequality</h4>
+                            <p><strong>Statement:</strong> For p, q > 1 with 1/p + 1/q = 1 (conjugate exponents), and vectors u, v ∈ ℝⁿ:</p>
+                            
                             <div class="formula-display">
-                                <h4>Theorem: Limit Behavior</h4>
-                                <div class="formula">lim_{p→∞} d_p(x, y) = maxᵢ |xᵢ - yᵢ| = d_∞(x, y)</div>
-                                <p><strong>Interpretation:</strong> As p approaches infinity, the Minkowski distance converges to the Chebyshev distance, which considers only the maximum difference across all dimensions.</p>
+                                <strong>Σᵢ₌₁ⁿ |uᵢvᵢ| ≤ ‖u‖_p ‖v‖_q</strong>
+                            </div>
+                            
+                            <p><strong>Special Case (Cauchy-Schwarz):</strong> When p = q = 2:</p>
+                            <div class="formula-display">
+                                <strong>Σᵢ₌₁ⁿ |uᵢvᵢ| ≤ ‖u‖₂ ‖v‖₂</strong>
                             </div>
                         </div>
 
-                        <div class="explanation-box">
-                            <h3>Computational Considerations</h3>
+                        <div class="model-box">
+                            <h4>Proof of Triangle Inequality for Minkowski Distance</h4>
+                            <p><strong>Theorem:</strong> For p ≥ 1, ‖x + y‖_p ≤ ‖x‖_p + ‖y‖_p</p>
+                            
+                            <p><strong>Proof:</strong></p>
+                            <p><strong>Case 1:</strong> p = 1 (trivial case)</p>
+                            <div class="formula-display">
+                                ‖x + y‖₁ = Σᵢ |xᵢ + yᵢ| ≤ Σᵢ (|xᵢ| + |yᵢ|) = ‖x‖₁ + ‖y‖₁
+                            </div>
+                            
+                            <p><strong>Case 2:</strong> p > 1</p>
+                            <p>We need to prove: (Σᵢ |xᵢ + yᵢ|ᵖ)^(1/p) ≤ (Σᵢ |xᵢ|ᵖ)^(1/p) + (Σᵢ |yᵢ|ᵖ)^(1/p)</p>
+                            
+                            <p>Let q = p/(p-1) be the conjugate exponent (so 1/p + 1/q = 1). Note that (p-1)q = p.</p>
+                            
+                            <div class="formula-display">
+                                <p>Start with: Σᵢ |xᵢ + yᵢ|ᵖ = Σᵢ |xᵢ + yᵢ| · |xᵢ + yᵢ|^(p-1)</p>
+                                <p>≤ Σᵢ |xᵢ| · |xᵢ + yᵢ|^(p-1) + Σᵢ |yᵢ| · |xᵢ + yᵢ|^(p-1)</p>
+                            </div>
+                            
+                            <p>Apply Hölder's inequality to each term:</p>
+                            <div class="formula-display">
+                                <p>Σᵢ |xᵢ| · |xᵢ + yᵢ|^(p-1) ≤ (Σᵢ |xᵢ|ᵖ)^(1/p) (Σᵢ |xᵢ + yᵢ|^((p-1)q))^(1/q)</p>
+                                <p>= (Σᵢ |xᵢ|ᵖ)^(1/p) (Σᵢ |xᵢ + yᵢ|ᵖ)^(1/q)</p>
+                            </div>
+                            
+                            <p>Similarly for the second term. Combining and factoring:</p>
+                            <div class="formula-display">
+                                <p>Σᵢ |xᵢ + yᵢ|ᵖ ≤ [(Σᵢ |xᵢ|ᵖ)^(1/p) + (Σᵢ |yᵢ|ᵖ)^(1/p)] (Σᵢ |xᵢ + yᵢ|ᵖ)^(1/q)</p>
+                            </div>
+                            
+                            <p>Divide both sides by (Σᵢ |xᵢ + yᵢ|ᵖ)^(1/q) to get:</p>
+                            <div class="formula-display">
+                                <p>(Σᵢ |xᵢ + yᵢ|ᵖ)^(1-1/q) ≤ (Σᵢ |xᵢ|ᵖ)^(1/p) + (Σᵢ |yᵢ|ᵖ)^(1/p)</p>
+                            </div>
+                            
+                            <p>Since 1 - 1/q = 1/p, we have proven the triangle inequality. ∎</p>
+                        </div>
+
+                        <h3>Norm Equivalence and Relationships</h3>
+                        <p>Understanding relationships between different Lp norms is crucial for comparing Minkowski distances and understanding their relative behavior.</p>
+
+                        <div class="formula-box">
+                            <h4>Fundamental Norm Inequalities</h4>
+                            <p>For any vector x ∈ ℝⁿ and 1 ≤ p ≤ q ≤ ∞:</p>
+                            
+                            <div class="formula-display">
+                                <strong>‖x‖_q ≤ ‖x‖_p ≤ n^(1/p - 1/q) ‖x‖_q</strong>
+                            </div>
+                            
+                            <h5>Specific Important Cases:</h5>
                             <ul>
-                                <li><strong>Integer p:</strong> Most efficient computation, especially for p = 1, 2</li>
-                                <li><strong>Fractional p:</strong> Requires more complex numerical methods</li>
-                                <li><strong>Large p:</strong> Numerical stability issues may arise</li>
-                                <li><strong>p → ∞:</strong> Special handling required for limit case</li>
+                                <li><strong>‖x‖₂ ≤ ‖x‖₁ ≤ √n ‖x‖₂</strong> (Euclidean vs Manhattan)</li>
+                                <li><strong>‖x‖_∞ ≤ ‖x‖₂ ≤ √n ‖x‖_∞</strong> (Chebyshev vs Euclidean)</li>
+                                <li><strong>‖x‖_∞ ≤ ‖x‖₁ ≤ n ‖x‖_∞</strong> (Chebyshev vs Manhattan)</li>
                             </ul>
+                        </div>
+
+                        <h3>Monotonicity and Convergence Properties</h3>
+                        <p>The behavior of Minkowski distances as the parameter p varies is fundamental to understanding their properties.</p>
+
+                        <div class="model-box">
+                            <h4>Monotonicity Theorem</h4>
+                            <p><strong>Theorem:</strong> For fixed vectors x, y ∈ ℝⁿ and 1 ≤ p₁ ≤ p₂ ≤ ∞:</p>
+                            
+                            <div class="formula-display">
+                                <strong>d_{p₁}(x, y) ≤ d_{p₂}(x, y)</strong>
+                            </div>
+                            
+                            <p><strong>Proof:</strong> This follows directly from the norm inequalities above, since d_p(x, y) = ‖x - y‖_p.</p>
+                            
+                            <p><strong>Interpretation:</strong> As p increases, the distance between any two points increases, with the maximum distance achieved at p = ∞ (Chebyshev distance).</p>
+                        </div>
+
+                        <div class="model-box">
+                            <h4>Convergence to Chebyshev Distance</h4>
+                            <p><strong>Theorem:</strong> For any vectors x, y ∈ ℝⁿ:</p>
+                            
+                            <div class="formula-display">
+                                <strong>lim_{p→∞} d_p(x, y) = maxᵢ |xᵢ - yᵢ| = d_∞(x, y)</strong>
+                            </div>
+                            
+                            <p><strong>Proof Sketch:</strong> As p → ∞, the term with the largest |xᵢ - yᵢ| dominates the sum, making the p-th root approach the maximum value.</p>
+                            
+                            <p><strong>Practical Implication:</strong> For very large p, Minkowski distance effectively ignores all dimensions except the one with the maximum difference.</p>
                         </div>
                     </div>
 
