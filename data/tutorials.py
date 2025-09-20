@@ -155,7 +155,7 @@ TUTORIALS_DATA = [
         'slug': 'clustering',
         'description': 'Master clustering algorithms from mathematical foundations to advanced applications. 15 comprehensive chapters covering distance metrics, K-means, hierarchical clustering, DBSCAN, and evaluation techniques.',
         'category': 'Machine Learning',
-        'difficulty': 'intermediate',
+        'difficulty': 'advanced',
         'duration': '300 minutes',
         'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': True,
