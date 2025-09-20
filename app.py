@@ -410,8 +410,48 @@ def contact():
     return render_template('contact.html')
 
 # API Routes
-@app.route('/api/search')
+@app.route('/search')
 def search():
+    """Search page for tutorials, projects, and blog posts"""
+    query = request.args.get('q', '').strip()
+    results = {'tutorials': [], 'projects': [], 'blog_posts': []}
+    
+    if query:
+        query_lower = query.lower()
+        blog_posts = load_blog_data()
+        
+        # Search tutorials from database
+        tutorials_list = Tutorial.query.filter_by(published=True).all()
+        matching_tutorials = [
+            t for t in tutorials_list 
+            if query_lower in t.title.lower() or query_lower in t.description.lower()
+        ]
+        
+        # Search projects from database
+        projects_list = Project.query.filter_by(published=True).all()
+        matching_projects = [
+            p for p in projects_list 
+            if query_lower in p.title.lower() or query_lower in p.description.lower()
+        ]
+        
+        matching_posts = [
+            p for p in blog_posts 
+            if p.published and (query_lower in p.title.lower() or query_lower in p.excerpt.lower())
+        ]
+        
+        results = {
+            'tutorials': matching_tutorials,
+            'projects': matching_projects,
+            'blog_posts': matching_posts
+        }
+    
+    return render_template('search_results.html', 
+                         results=results, 
+                         query=query,
+                         total_results=len(results['tutorials']) + len(results['projects']) + len(results['blog_posts']))
+
+@app.route('/api/search')
+def search_api():
     """Search API for tutorials, projects, and blog posts"""
     query = request.args.get('q', '').lower()
     blog_posts = load_blog_data()
