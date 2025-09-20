@@ -7,8 +7,146 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <style>
+        .visualization-placeholder {
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            border: 2px dashed #999;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #666;
+        }
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        .formula-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .theorem-box {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .algorithm-box {
+            background: #f1f8e9;
+            border-left: 4px solid #689f38;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .kernel-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .convergence-box {
+            background: #fce4ec;
+            border-left: 4px solid #e91e63;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .bandwidth-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+        .quiz-question {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        .learning-objectives-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        .section-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+        .section-nav button {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .section-nav button:hover {
+            background: #e9ecef;
+        }
+        .section-nav button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .mode-seeking-viz {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <header class="azbn-header">
@@ -33,11 +171,11 @@
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 13: Mean Shift Clustering</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <p class="chapter-subtitle">Discover Mean Shift, a versatile density-based clustering algorithm that finds cluster centers by seeking modes in the probability density function</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
+                <!-- Chapter Progress Bar (13/15) -->
                 <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                    <div class="chapter-progress-fill" data-progress="86.67"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +199,19 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="11.11"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="theory">Theory</button>
+                    <button class="section-nav-btn" data-section="kernels">Kernels</button>
+                    <button class="section-nav-btn" data-section="algorithm">Algorithm</button>
+                    <button class="section-nav-btn" data-section="bandwidth">Bandwidth</button>
+                    <button class="section-nav-btn" data-section="applications">Applications</button>
+                    <button class="section-nav-btn" data-section="comparison">Comparison</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demo</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -79,550 +219,1284 @@
 
         <section class="azbn-section">
             <div class="azbn-container">
-                <!-- Learning Objectives -->
                 <div class="learning-objectives-box">
-                    <h2>Learning Objectives</h2>
+                    <h3>Learning Objectives</h3>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand the mode-seeking foundation of Mean Shift clustering</li>
+                        <li>Master kernel density estimation and its role in density-based clustering</li>
+                        <li>Learn the Mean Shift algorithm and its convergence properties</li>
+                        <li>Explore different kernel functions and their characteristics</li>
+                        <li>Analyze bandwidth selection strategies and their impact on results</li>
+                        <li>Compare Mean Shift with other density-based clustering methods</li>
+                        <li>Apply Mean Shift to computer vision and image processing tasks</li>
+                        <li>Understand computational complexity and optimization techniques</li>
                     </ul>
                 </div>
 
-                <!-- Main Content Area -->
-                <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
-                        <h2>Mode-Seeking Clustering</h2>
+                <!-- Introduction Section -->
+                <div id="introduction" class="content-section active">
+                    <h2>Mode-Seeking Clustering</h2>
+                    
+                    <p>Mean Shift is a non-parametric clustering algorithm that identifies cluster centers by seeking modes (local maxima) in the probability density function of the data. Unlike methods that assume specific cluster shapes or require the number of clusters a priori, Mean Shift automatically discovers cluster centers where data points are most densely concentrated.</p>
+
+                    <h3>Core Philosophy: Following the Gradient</h3>
+                    <p>Mean Shift operates on the intuitive principle that cluster centers should be located where data density is highest - the modes of the underlying distribution.</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Traditional Clustering Approaches</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>K-means:</strong> Assumes spherical clusters with predetermined count</li>
+                                <li><strong>DBSCAN:</strong> Uses fixed density threshold parameters</li>
+                                <li><strong>Hierarchical:</strong> Creates tree structure of all possible clusterings</li>
+                                <li><strong>GMM:</strong> Assumes mixture of Gaussian distributions</li>
+                            </ul>
+                        </div>
                         
-                        <p>Mean Shift is a non-parametric clustering algorithm that identifies cluster centers by seeking modes (local maxima) in the probability density function of the data. Unlike methods that assume specific cluster shapes or require the number of clusters a priori, Mean Shift automatically discovers cluster centers where data points are most densely concentrated.</p>
-
-                        <h3>Core Philosophy: Following the Gradient</h3>
-                        <p>Mean Shift operates on the intuitive principle that cluster centers should be located where data density is highest - the modes of the underlying distribution.</p>
-
-                        <div class="unsupervised-types-grid">
-                            <div class="type-card">
-                                <h4>Traditional Clustering Approaches</h4>
-                                <ul>
-                                    <li><strong>K-means:</strong> Assumes spherical clusters with predetermined count</li>
-                                    <li><strong>DBSCAN:</strong> Uses fixed density threshold parameters</li>
-                                    <li><strong>Hierarchical:</strong> Creates tree structure of all possible clusterings</li>
-                                    <li><strong>GMM:</strong> Assumes mixture of Gaussian distributions</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="type-card">
-                                <h4>Mean Shift Advantages</h4>
-                                <ul>
-                                    <li><strong>Non-parametric:</strong> No assumptions about cluster shape or distribution</li>
-                                    <li><strong>Automatic K:</strong> Discovers number of clusters naturally</li>
-                                    <li><strong>Mode-seeking:</strong> Finds natural cluster centers at density peaks</li>
-                                    <li><strong>Robust:</strong> Less sensitive to outliers than centroid-based methods</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="image-container">
-                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter13/mode_seeking_behavior.png') }}" alt="Mode-Seeking Behavior Visualization" class="tutorial-image">
-                            <p class="image-caption">3D visualization showing data points and density surface with animated arrows showing Mean Shift convergence paths</p>
-                        </div>
-
-                        <h3>Historical Development</h3>
-                        <div class="model-box">
-                            <h4>Evolution of Mean Shift</h4>
-                            
-                            <h5>Origins (1975):</h5>
-                            <ul>
-                                <li><strong>Fukunaga & Hostetler:</strong> Introduced basic mean shift concept for mode detection</li>
-                                <li><strong>Mathematical foundation:</strong> Gradient ascent on kernel density estimates</li>
-                                <li><strong>Original application:</strong> Pattern recognition and feature analysis</li>
-                            </ul>
-                            
-                            <h5>Modern Development (1995-2002):</h5>
-                            <ul>
-                                <li><strong>Cheng (1995):</strong> Formalized mean shift as a clustering algorithm</li>
-                                <li><strong>Comaniciu & Meer (2002):</strong> Popularized for computer vision applications</li>
-                                <li><strong>Theoretical analysis:</strong> Convergence properties and bandwidth selection</li>
-                            </ul>
-                            
-                            <h5>Contemporary Applications:</h5>
-                            <ul>
-                                <li><strong>Computer vision:</strong> Object tracking, image segmentation</li>
-                                <li><strong>Machine learning:</strong> General-purpose clustering</li>
-                                <li><strong>Signal processing:</strong> Feature detection and analysis</li>
+                        <div class="azbn-card">
+                            <h4>Mean Shift Advantages</h4>
+                            <ul style="font-size: 0.9rem;">
+                                <li><strong>Non-parametric:</strong> No assumptions about cluster shape or distribution</li>
+                                <li><strong>Automatic K:</strong> Discovers number of clusters naturally</li>
+                                <li><strong>Mode-seeking:</strong> Finds natural cluster centers at density peaks</li>
+                                <li><strong>Robust:</strong> Less sensitive to outliers than centroid-based methods</li>
                             </ul>
                         </div>
                     </div>
 
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Mode-Seeking Behavior</h4>
+                        <p><strong>Interactive Density Surface:</strong> 3D visualization showing data points and the underlying density surface estimated using kernel density estimation. Animated arrows show how Mean Shift iteratively moves points uphill toward density peaks (modes). Different colors highlight the convergence paths from different starting points to their respective modes.</p>
+                    </div>
+
+                    <h3>Historical Development</h3>
+                    <div class="theorem-box">
+                        <h4>Evolution of Mean Shift</h4>
                         
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
+                        <h5>Origins (1975):</h5>
+                        <ul>
+                            <li><strong>Fukunaga & Hostetler:</strong> Introduced basic mean shift concept for mode detection</li>
+                            <li><strong>Mathematical foundation:</strong> Gradient ascent on kernel density estimates</li>
+                            <li><strong>Original application:</strong> Pattern recognition and feature analysis</li>
+                        </ul>
+                        
+                        <h5>Modern Development (1995-2002):</h5>
+                        <ul>
+                            <li><strong>Cheng (1995):</strong> Formalized mean shift as a clustering algorithm</li>
+                            <li><strong>Comaniciu & Meer (2002):</strong> Popularized for computer vision applications</li>
+                            <li><strong>Theoretical analysis:</strong> Convergence properties and bandwidth selection</li>
+                        </ul>
+                        
+                        <h5>Contemporary Applications:</h5>
+                        <ul>
+                            <li><strong>Computer vision:</strong> Object tracking, image segmentation</li>
+                            <li><strong>Machine learning:</strong> General-purpose clustering</li>
+                            <li><strong>Signal processing:</strong> Feature detection and analysis</li>
+                        </ul>
+                    </div>
 
-                        <h3>Random Initialization: The Baseline</h3>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
+                    <h3>Key Concepts Overview</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="azbn-card">
+                            <h4>Kernel Density Estimation</h4>
+                            <p>Estimates the probability density function by placing kernel functions at each data point and summing their contributions.</p>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>Mean Shift Vector</h4>
+                            <p>The direction and magnitude of movement toward higher density, computed as the gradient of the density estimate.</p>
+                        </div>
+                        <div class="azbn-card">
+                            <h4>Bandwidth Parameter</h4>
+                            <p>Controls the smoothness of density estimation and the granularity of discovered clusters.</p>
+                        </div>
+                    </div>
 
-                        <div class="model-box">
-                            <h4>Random Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <h5><strong>Basic Random Selection:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_init(X, k):
-    n, d = X.shape
-    indices = random_sample(n, k)  <span style="color: #1976d2;">// Sample k indices without replacement</span>
-    centroids = X[indices]          <span style="color: #1976d2;">// Select corresponding data points</span>
-    <strong>return</strong> centroids
-                                </div>
-                                
-                                <h5><strong>Random Uniform in Feature Space:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_uniform_init(X, k):
-    n, d = X.shape
-    min_vals = min(X, axis=0)       <span style="color: #1976d2;">// Feature-wise minimum</span>
-    max_vals = max(X, axis=0)       <span style="color: #1976d2;">// Feature-wise maximum</span>
-    centroids = uniform(min_vals, max_vals, size=(k, d))
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages of Random Initialization:</h5>
+                    <h3>Applications and Use Cases</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Computer Vision</h4>
                             <ul>
-                                <li><strong>Simplicity:</strong> Easy to implement and understand</li>
-                                <li><strong>Speed:</strong> O(kd) time complexity</li>
-                                <li><strong>Unbiased:</strong> No assumptions about data structure</li>
-                                <li><strong>Baseline:</strong> Good reference for comparing other methods</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>High variance:</strong> Results vary significantly across runs</li>
-                                <li><strong>Poor clustering:</strong> Often leads to suboptimal solutions</li>
-                                <li><strong>Slow convergence:</strong> May require many iterations</li>
-                                <li><strong>Empty clusters:</strong> Risk of centroids in sparse regions</li>
+                                <li><strong>Object tracking:</strong> Following objects in video sequences</li>
+                                <li><strong>Image segmentation:</strong> Grouping pixels by color and texture</li>
+                                <li><strong>Feature detection:</strong> Finding salient points and regions</li>
+                                <li><strong>Background subtraction:</strong> Identifying moving objects</li>
                             </ul>
                         </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Data Mining and ML</h4>
+                            <ul>
+                                <li><strong>Exploratory analysis:</strong> Discovering natural data groupings</li>
+                                <li><strong>Anomaly detection:</strong> Identifying points far from modes</li>
+                                <li><strong>Preprocessing:</strong> Data cleaning and outlier removal</li>
+                                <li><strong>Feature space analysis:</strong> Understanding data structure</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Signal Processing</h4>
+                            <ul>
+                                <li><strong>Peak detection:</strong> Finding dominant frequencies</li>
+                                <li><strong>Noise reduction:</strong> Smoothing based on local density</li>
+                                <li><strong>Pattern recognition:</strong> Identifying recurring structures</li>
+                                <li><strong>Time series analysis:</strong> Discovering temporal patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
-                        <h3>Furthest-First Heuristic</h3>
-                        <p>This method iteratively selects centroids that are as far as possible from previously selected ones, promoting good coverage of the data space.</p>
+                <!-- Mathematical Theory Section -->
+                <div id="theory" class="content-section">
+                    <h2>Mathematical Foundations</h2>
+                    
+                    <p>Mean Shift is grounded in kernel density estimation and gradient ascent optimization. Understanding these mathematical foundations is essential for effective parameter selection and algorithm customization.</p>
 
-                        <div class="model-box">
-                            <h4>Furthest-First Initialization</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> furthest_first_init(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid randomly</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Iteratively choose furthest points</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        max_distance = -1
-        furthest_idx = -1
-        
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            <span style="color: #1976d2;">// Find minimum distance to existing centroids</span>
-            min_dist = min([distance(X[j], c) <strong>for</strong> c <strong>in</strong> centroids])
-            
-            <strong>if</strong> min_dist > max_distance:
-                max_distance = min_dist
-                furthest_idx = j
-        
-        centroids.append(X[furthest_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
+                    <h3>Kernel Density Estimation</h3>
+                    <p>The foundation of Mean Shift is estimating the probability density function from sample data using kernel methods.</p>
+
+                    <div class="formula-box">
+                        <h4>Kernel Density Estimation Formula</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>For dataset X = {x₁, x₂, ..., xₙ} and kernel function K:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                                <strong>f̂(x) = (1/nh^d) Σᵢ₌₁ⁿ K((x - xᵢ)/h)</strong>
                             </div>
                             
-                            <h5>Advantages:</h5>
+                            <h5>Components:</h5>
                             <ul>
-                                <li><strong>Good coverage:</strong> Centroids spread across data space</li>
-                                <li><strong>Deterministic:</strong> Same result for same first choice</li>
-                                <li><strong>No empty clusters:</strong> Guarantees centroids on data points</li>
-                                <li><strong>Better than random:</strong> Generally produces better initializations</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>Outlier sensitivity:</strong> May select extreme outliers</li>
-                                <li><strong>Computational cost:</strong> O(nk) time complexity</li>
-                                <li><strong>Still suboptimal:</strong> Not guaranteed to find good initializations</li>
-                                <li><strong>First choice matters:</strong> Quality depends on initial random selection</li>
+                                <li><strong>f̂(x):</strong> Estimated density at point x</li>
+                                <li><strong>n:</strong> Number of data points</li>
+                                <li><strong>h:</strong> Bandwidth parameter (smoothing factor)</li>
+                                <li><strong>d:</strong> Dimensionality of data</li>
+                                <li><strong>K(·):</strong> Kernel function (typically symmetric, unimodal)</li>
+                                <li><strong>xᵢ:</strong> Individual data points</li>
                             </ul>
                         </div>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
-                        
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
-
-                        <h3>The K-means++ Algorithm</h3>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> kmeans_plus_plus(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid uniformly at random</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Choose remaining k-1 centroids</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        distances = []
-        
-        <span style="color: #1976d2;">// Compute squared distance to nearest existing centroid</span>
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            min_dist_sq = min([||X[j] - c||² <strong>for</strong> c <strong>in</strong> centroids])
-            distances.append(min_dist_sq)
-        
-        <span style="color: #1976d2;">// Choose next centroid with probability proportional to squared distance</span>
-        probabilities = distances / sum(distances)
-        next_idx = weighted_random_choice(probabilities)
-        centroids.append(X[next_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
+                    <div class="mode-seeking-viz">
+                        <h4>Understanding Density Estimation</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Small Bandwidth (h)</h5>
+                                <p>Sharp, detailed density<br>Many local modes<br>Sensitive to noise</p>
                             </div>
-                            
-                            <h5>Key Insight:</h5>
-                            <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
-                            
-                            <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
-                                <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
-                                    <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
-                                </div>
-                                <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Large Bandwidth (h)</h5>
+                                <p>Smooth, global density<br>Few major modes<br>May oversmooth</p>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                                <h5>Optimal Bandwidth</h5>
+                                <p>Balanced smoothness<br>Meaningful modes<br>Robust to noise</p>
                             </div>
                         </div>
+                    </div>
 
-                        <h3>Theoretical Analysis</h3>
-                        <p>K-means++ comes with strong theoretical guarantees that explain its superior performance.</p>
+                    <h3>Gradient of Density Function</h3>
+                    <p>Mean Shift computes the gradient of the density estimate to determine the direction of steepest ascent toward modes.</p>
 
-                        <div class="model-box">
-                            <h4>K-means++ Approximation Guarantee</h4>
-                            
-                            <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
-                                <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
-                                
-                                <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
-                                
-                                <p>Where OPT is the cost of the optimal k-means clustering.</p>
+                    <div class="formula-box">
+                        <h4>Density Gradient Computation</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>The gradient of the density estimate:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>∇f̂(x) = (1/nh^(d+2)) Σᵢ₌₁ⁿ (xᵢ - x) g(||x - xᵢ||²/h²)</strong>
                             </div>
                             
-                            <h5>Proof Sketch:</h5>
-                            <ol>
-                                <li><strong>Potential function:</strong> Define Φ = Σᵢ D²(xᵢ) as sum of squared distances to nearest centroids</li>
-                                <li><strong>Expected reduction:</strong> Each K-means++ step reduces E[Φ] by a constant factor</li>
-                                <li><strong>Concentration:</strong> Use probability tail bounds to show consistent performance</li>
-                                <li><strong>Optimality bound:</strong> Relate final potential to optimal clustering cost</li>
-                            </ol>
+                            <p>Where g(t) = -K'(t) is the derivative of the kernel function.</p>
                             
-                            <h5>Implications:</h5>
+                            <h5>For the Gaussian Kernel:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>K(t) = exp(-t²/2) → g(t) = exp(-t²/2)</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Mean Shift Vector Derivation</h3>
+                    <p>The mean shift vector points in the direction of maximum density increase and determines the magnitude of each iterative step.</p>
+
+                    <div class="formula-box">
+                        <h4>Mean Shift Vector Formula</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p>The mean shift vector m(x) is proportional to the gradient:</p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>m(x) = [Σᵢ₌₁ⁿ xᵢ g(||x - xᵢ||²/h²)] / [Σᵢ₌₁ⁿ g(||x - xᵢ||²/h²)] - x</strong>
+                            </div>
+                            
+                            <h5>Interpretation:</h5>
                             <ul>
-                                <li><strong>Logarithmic guarantee:</strong> Performance degrades slowly with k</li>
-                                <li><strong>Probabilistic bound:</strong> Guarantee holds in expectation</li>
-                                <li><strong>Initialization only:</strong> Bound applies to initialization, Lloyd's improves it</li>
-                                <li><strong>Practical relevance:</strong> Constant factors are reasonable in practice</li>
+                                <li><strong>Weighted average:</strong> Numerator is weighted sum of nearby points</li>
+                                <li><strong>Local center:</strong> Computes local weighted centroid</li>
+                                <li><strong>Direction:</strong> Vector points toward higher density</li>
+                                <li><strong>Magnitude:</strong> Larger when far from mode</li>
                             </ul>
                         </div>
+                    </div>
 
-                        <div class="interactive-container">
-                            <h3>Initialization Comparison Demo</h3>
-                            <div class="demo-controls">
-                                <label for="init-method">Initialization Method:</label>
-                                <select id="init-method">
-                                    <option value="random">Random</option>
-                                    <option value="kmeans++">K-means++</option>
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Mean Shift Vector Field</h4>
+                        <p><strong>Vector Field Plot:</strong> Shows mean shift vectors at various points in 2D space overlaid on the density surface. Vectors point toward nearby modes with length proportional to the magnitude of density gradient. Interactive controls allow users to adjust bandwidth and see how it affects the vector field and convergence paths.</p>
+                    </div>
+
+                    <h3>Theoretical Properties</h3>
+                    <div class="theorem-box">
+                        <h4>Mathematical Guarantees</h4>
+                        
+                        <h5>Convergence Properties:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Monotonic increase:</strong> Density always increases or stays constant at each step</li>
+                                <li><strong>Bounded sequence:</strong> Iterations remain within convex hull of data</li>
+                                <li><strong>Convergence guarantee:</strong> Algorithm converges to a stationary point</li>
+                                <li><strong>Mode seeking:</strong> Stationary points are local maxima (modes)</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Clustering Properties:</h5>
+                        <ul>
+                            <li><strong>Basin of attraction:</strong> Points converging to same mode form cluster</li>
+                            <li><strong>Automatic K:</strong> Number of modes determines cluster count</li>
+                            <li><strong>Shape flexibility:</strong> No assumptions about cluster geometry</li>
+                            <li><strong>Density-based:</strong> Natural handling of varying cluster densities</li>
+                        </ul>
+                        
+                        <h5>Bandwidth Sensitivity:</h5>
+                        <ul>
+                            <li><strong>Scale parameter:</strong> Controls resolution of density estimation</li>
+                            <li><strong>Bias-variance tradeoff:</strong> Small h (high variance), large h (high bias)</li>
+                            <li><strong>Critical parameter:</strong> Dramatically affects clustering results</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Kernel Functions Section -->
+                <div id="kernels" class="content-section">
+                    <h2>Kernel Functions and Their Properties</h2>
+                    
+                    <p>The choice of kernel function significantly impacts Mean Shift behavior, convergence speed, and clustering quality. Different kernels offer various trade-offs between computational efficiency and density estimation accuracy.</p>
+
+                    <h3>Common Kernel Functions</h3>
+                    <p>Several kernel functions are commonly used in Mean Shift, each with distinct characteristics and computational properties.</p>
+
+                    <div class="kernel-box">
+                        <h4>Popular Kernel Functions</h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Gaussian (Normal) Kernel:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>K(t) = exp(-t²/2)</strong>
+                            </div>
+                            <ul>
+                                <li><strong>Properties:</strong> Smooth, infinite support, differentiable</li>
+                                <li><strong>Advantages:</strong> Excellent theoretical properties, smooth convergence</li>
+                                <li><strong>Disadvantages:</strong> Computationally expensive, considers all points</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Epanechnikov Kernel:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>K(t) = 3/4(1 - t²) if |t| ≤ 1, else 0</strong>
+                            </div>
+                            <ul>
+                                <li><strong>Properties:</strong> Compact support, optimal for density estimation</li>
+                                <li><strong>Advantages:</strong> Computationally efficient, theoretical optimality</li>
+                                <li><strong>Disadvantages:</strong> Not differentiable at boundary</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <h5>Uniform (Flat) Kernel:</h5>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>K(t) = 1/2 if |t| ≤ 1, else 0</strong>
+                            </div>
+                            <ul>
+                                <li><strong>Properties:</strong> Simplest form, constant within bandwidth</li>
+                                <li><strong>Advantages:</strong> Fastest computation, easy implementation</li>
+                                <li><strong>Disadvantages:</strong> Poor density estimation, discontinuous</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Kernel Function Comparison</h4>
+                        <p><strong>Interactive Kernel Viewer:</strong> Plots showing different kernel functions with adjustable bandwidth. Users can see how kernel choice affects the shape of individual kernel contributions and the resulting density surface. Includes animation showing how data points contribute to overall density under different kernels.</p>
+                    </div>
+
+                    <h3>Kernel Properties and Selection</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Computational Efficiency</h4>
+                            <ul>
+                                <li><strong>Compact support:</strong> Kernels with finite range (Epanechnikov, Uniform)</li>
+                                <li><strong>Infinite support:</strong> Consider all points (Gaussian)</li>
+                                <li><strong>Trade-off:</strong> Accuracy vs computational cost</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Smoothness Properties</h4>
+                            <ul>
+                                <li><strong>Differentiability:</strong> Important for convergence analysis</li>
+                                <li><strong>Continuity:</strong> Affects stability of mean shift vectors</li>
+                                <li><strong>Boundary behavior:</strong> How kernel handles edge effects</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Statistical Optimality</h4>
+                            <ul>
+                                <li><strong>MSE minimization:</strong> Epanechnikov optimal for density estimation</li>
+                                <li><strong>Bias-variance:</strong> Different kernels have different trade-offs</li>
+                                <li><strong>Robustness:</strong> Sensitivity to outliers and noise</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Advanced Kernel Considerations</h3>
+                    <div class="theorem-box">
+                        <h4>Practical Kernel Selection</h4>
+                        
+                        <h5>Guidelines for Kernel Choice:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Gaussian:</strong> Best theoretical properties, use when accuracy is paramount</li>
+                                <li><strong>Epanechnikov:</strong> Good balance of efficiency and quality</li>
+                                <li><strong>Uniform:</strong> Fast prototyping and large datasets</li>
+                                <li><strong>Application-specific:</strong> Choose based on computational constraints</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Adaptive Kernels:</h5>
+                        <ul>
+                            <li><strong>Variable bandwidth:</strong> Adapt kernel size to local density</li>
+                            <li><strong>Anisotropic kernels:</strong> Different bandwidths in different directions</li>
+                            <li><strong>Data-driven selection:</strong> Learn kernel parameters from data</li>
+                        </ul>
+                        
+                        <h5>Kernel Combinations:</h5>
+                        <ul>
+                            <li><strong>Product kernels:</strong> Multiply kernels for different features</li>
+                            <li><strong>Weighted combinations:</strong> Mix different kernel types</li>
+                            <li><strong>Hierarchical kernels:</strong> Multiple scales simultaneously</li>
+                        </ul>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Kernel Function Explorer</h4>
+                        <p>Experiment with different kernel functions and see their effects on density estimation:</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="kernel-type">Kernel Type:</label>
+                                <select id="kernel-type" onchange="updateKernelDemo()">
+                                    <option value="gaussian">Gaussian</option>
+                                    <option value="epanechnikov">Epanechnikov</option>
+                                    <option value="uniform">Uniform</option>
+                                    <option value="triangular">Triangular</option>
                                 </select>
-                                
-                                <label for="num-clusters-init">Number of Clusters:</label>
-                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
-                                <span id="clusters-init-display">3</span>
-                                
-                                <button onclick="runInitializationDemo()">Run Demo</button>
-                                <button onclick="resetInitializationDemo()">Reset</button>
                             </div>
-                            
-                            <div class="metric-visualization" id="initialization-canvas">
-                                <p>Click "Run Demo" to compare different initialization methods</p>
+                            <div>
+                                <label for="kernel-bandwidth">Bandwidth: <span id="kernel-bw-val">1.0</span></label>
+                                <input type="range" id="kernel-bandwidth" min="0.2" max="3.0" step="0.2" value="1.0" onchange="updateKernelDemo()">
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 200px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Kernel Function Visualization</strong></p>
+                                <p>Shows kernel shape and resulting density estimation</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Kernel Properties:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Support:</strong> <span id="kernel-support">Infinite</span></div>
+                                <div><strong>Smoothness:</strong> <span id="kernel-smooth">C∞</span></div>
+                                <div><strong>Efficiency:</strong> <span id="kernel-efficiency">Low</span></div>
+                                <div><strong>Optimality:</strong> <span id="kernel-optimal">High</span></div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
+                <!-- Mean Shift Algorithm Section -->
+                <div id="algorithm" class="content-section">
+                    <h2>Mean Shift Algorithm</h2>
+                    
+                    <p>The Mean Shift algorithm iteratively moves each data point toward the mode of its local density function. The algorithm's elegance lies in its simplicity: repeatedly compute the mean shift vector and update the point's position until convergence.</p>
+
+                    <div class="algorithm-box">
+                        <h4>Basic Mean Shift Algorithm</h4>
                         
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Input:</strong> Data points X = {x₁, x₂, ..., xₙ}, bandwidth h, kernel K</p>
+                            <p><strong>Output:</strong> Cluster centers and assignments</p>
+                            
+                            <ol style="margin: 1rem 0;">
+                                <li><strong>Initialize:</strong> Set each point as its own mode candidate</li>
+                                <li><strong>For each point xᵢ:</strong>
+                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                        <li>Set current position y⁽⁰⁾ = xᵢ</li>
+                                        <li>Repeat until convergence:
+                                            <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                                <li>Compute mean shift vector m(y⁽ᵗ⁾)</li>
+                                                <li>Update position: y⁽ᵗ⁺¹⁾ = y⁽ᵗ⁾ + m(y⁽ᵗ⁾)</li>
+                                            </ul>
+                                        </li>
+                                        <li>Record final position as mode for xᵢ</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Group points:</strong> Cluster points with similar modes</li>
+                            </ol>
                         </div>
+                    </div>
 
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
-                            <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <h3>Detailed Algorithm Implementation</h3>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <h4>Pseudocode:</h4>
+                        <pre style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+<strong>function</strong> MeanShift(X, h, kernel=Gaussian, tol=1e-3, max_iter=100):
+    modes = []
+    
+    <strong>for each</strong> point xᵢ in X:
+        y = xᵢ  // Initialize at data point
+        
+        <strong>for</strong> iter = 1 to max_iter:
+            // Compute weights for all points
+            weights = []
+            <strong>for each</strong> point xⱼ in X:
+                distance = ||y - xⱼ|| / h
+                weights.append(kernel(distance))
+            
+            // Compute weighted mean (new position)
+            numerator = Σⱼ weights[j] * xⱼ
+            denominator = Σⱼ weights[j]
+            y_new = numerator / denominator
+            
+            // Check convergence
+            <strong>if</strong> ||y_new - y|| < tol:
+                <strong>break</strong>
+            
+            y = y_new
+        
+        modes.append(y)
+    
+    // Merge similar modes and assign clusters
+    clusters = mergeModes(modes, h)
+    <strong>return</strong> clusters, modes
 
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
+<strong>function</strong> mergeModes(modes, h):
+    // Group modes within bandwidth distance
+    <strong>for each</strong> unique mode m:
+        cluster = [all modes within distance h of m]
+        representative = average(cluster)
+    <strong>return</strong> cluster assignments
+        </pre>
+                    </div>
 
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Algorithm Execution</h4>
+                        <p><strong>Step-by-Step Animation:</strong> Shows Mean Shift algorithm execution with multiple starting points simultaneously. Each point's trajectory is traced as it moves toward its local mode. Different colors show different final clusters. Users can step through iterations or play continuously with speed control.</p>
+                    </div>
+
+                    <h3>Convergence and Stopping Criteria</h3>
+                    <div class="convergence-box">
+                        <h4>Convergence Analysis</h4>
+                        
+                        <h5>Stopping Criteria:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
                             <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
+                                <li><strong>Position change:</strong> ||y⁽ᵗ⁺¹⁾ - y⁽ᵗ⁾|| < ε</li>
+                                <li><strong>Density change:</strong> |f̂(y⁽ᵗ⁺¹⁾) - f̂(y⁽ᵗ⁾)| < δ</li>
+                                <li><strong>Maximum iterations:</strong> Prevent infinite loops</li>
+                                <li><strong>Relative change:</strong> ||Δy|| / ||y|| < tolerance</li>
                             </ul>
                         </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
-                            </div>
-                        </div>
+                        
+                        <h5>Convergence Properties:</h5>
+                        <ul>
+                            <li><strong>Monotonic increase:</strong> Density never decreases along trajectory</li>
+                            <li><strong>Bounded sequence:</strong> All iterates stay within data convex hull</li>
+                            <li><strong>Finite convergence:</strong> Reaches stationary point in finite steps</li>
+                            <li><strong>Mode guarantee:</strong> Converges to local density maximum</li>
+                        </ul>
+                        
+                        <h5>Practical Considerations:</h5>
+                        <ul>
+                            <li><strong>Tolerance selection:</strong> Balance accuracy with computation time</li>
+                            <li><strong>Iteration limits:</strong> Prevent runaway computations</li>
+                            <li><strong>Numerical stability:</strong> Handle edge cases and degeneracies</li>
+                        </ul>
                     </div>
 
-                    <!-- Convergence Analysis Section -->
-                    <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
-                        
-                        <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
+                    <h3>Optimization and Acceleration</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Computational Optimizations</h4>
                             <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
+                                <li><strong>Spatial indexing:</strong> KD-trees for efficient neighbor finding</li>
+                                <li><strong>Early termination:</strong> Stop when density gradient is small</li>
+                                <li><strong>Parallel processing:</strong> Independent point trajectories</li>
+                                <li><strong>Sparse representations:</strong> Skip zero-weight contributions</li>
                             </ul>
                         </div>
-
-                        <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
+                        
+                        <div class="azbn-card">
+                            <h4>Convergence Acceleration</h4>
                             <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
+                                <li><strong>Adaptive step size:</strong> Larger steps when far from mode</li>
+                                <li><strong>Newton's method:</strong> Use second-order information</li>
+                                <li><strong>Momentum terms:</strong> Incorporate previous iteration information</li>
+                                <li><strong>Coarse-to-fine:</strong> Start with large bandwidth, refine</li>
                             </ul>
                         </div>
-
-                        <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
-                            <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
-                            </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
-                        </div>
-                    </div>
-
-                    <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
                         
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
-                            
-                            <div class="demo-controls">
-                                <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
-                                        <option value="random">Random</option>
-                                        <option value="kmeans++">K-means++</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
-                                        <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
-                                </div>
-                            </div>
-                            
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
-                            </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
-                                <div class="metrics-grid">
-                                    <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="azbn-card">
+                            <h4>Memory Optimizations</h4>
+                            <ul>
+                                <li><strong>Incremental updates:</strong> Update positions one at a time</li>
+                                <li><strong>Block processing:</strong> Process subsets of points together</li>
+                                <li><strong>Streaming algorithms:</strong> Handle data larger than memory</li>
+                                <li><strong>Approximate methods:</strong> Trade accuracy for speed</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <!-- Quiz Section -->
-                    <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
+                    <h3>Mode Merging and Cluster Assignment</h3>
+                    <div class="theorem-box">
+                        <h4>From Modes to Clusters</h4>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
+                        <h5>Mode Merging Strategies:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ol>
+                                <li><strong>Distance-based:</strong> Merge modes within distance threshold</li>
+                                <li><strong>Density-based:</strong> Merge modes with similar density values</li>
+                                <li><strong>Basin-based:</strong> Group points by convergence basin</li>
+                                <li><strong>Hierarchical:</strong> Create tree of mode relationships</li>
+                            </ol>
+                        </div>
+                        
+                        <h5>Cluster Assignment Methods:</h5>
+                        <ul>
+                            <li><strong>Nearest mode:</strong> Assign each point to its converged mode</li>
+                            <li><strong>Trajectory clustering:</strong> Group by similar convergence paths</li>
+                            <li><strong>Soft assignment:</strong> Probabilistic membership based on distances</li>
+                            <li><strong>Watershed:</strong> Define cluster boundaries between modes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Bandwidth Selection Section -->
+                <div id="bandwidth" class="content-section">
+                    <h2>Bandwidth Selection</h2>
+                    
+                    <p>Bandwidth selection is the most critical parameter choice in Mean Shift clustering. The bandwidth h controls the scale of density estimation and directly determines the granularity of discovered clusters.</p>
+
+                    <h3>Impact of Bandwidth on Clustering</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Small Bandwidth (h)</h4>
+                            <ul>
+                                <li><strong>Effect:</strong> Many small, tight clusters</li>
+                                <li><strong>Density:</strong> Sharp, detailed estimation</li>
+                                <li><strong>Modes:</strong> Many local maxima detected</li>
+                                <li><strong>Risk:</strong> Overfitting, noise sensitivity</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Large Bandwidth (h)</h4>
+                            <ul>
+                                <li><strong>Effect:</strong> Few large, merged clusters</li>
+                                <li><strong>Density:</strong> Smooth, global estimation</li>
+                                <li><strong>Modes:</strong> Only major peaks detected</li>
+                                <li><strong>Risk:</strong> Undersmoothing, loss of detail</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Optimal Bandwidth</h4>
+                            <ul>
+                                <li><strong>Effect:</strong> Meaningful, stable clusters</li>
+                                <li><strong>Density:</strong> Balanced representation</li>
+                                <li><strong>Modes:</strong> True underlying structure</li>
+                                <li><strong>Goal:</strong> Minimize bias-variance trade-off</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bandwidth-box">
+                        <h4>Bandwidth Selection Methods</h4>
+                        
+                        <h5>Rule-of-Thumb Methods:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <p><strong>Silverman's Rule (for Gaussian kernels):</strong></p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>h = (4σ̂⁵/3n)^(1/5) ≈ 1.06σ̂n^(-1/5)</strong>
+                            </div>
+                            <p>Where σ̂ is the sample standard deviation and n is the number of points.</p>
+                            
+                            <p><strong>Scott's Rule:</strong></p>
+                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                                <strong>h = σ̂n^(-1/(d+4))</strong>
+                            </div>
+                            <p>For d-dimensional data with sample standard deviation σ̂.</p>
+                        </div>
+                        
+                        <h5>Cross-Validation Methods:</h5>
+                        <ul>
+                            <li><strong>Leave-one-out CV:</strong> Optimize likelihood on held-out points</li>
+                            <li><strong>k-fold CV:</strong> Average performance across multiple splits</li>
+                            <li><strong>Plug-in methods:</strong> Estimate optimal bandwidth theoretically</li>
+                            <li><strong>Bootstrap methods:</strong> Use resampling for bandwidth selection</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Bandwidth Effects</h4>
+                        <p><strong>Interactive Bandwidth Explorer:</strong> Shows the same dataset clustered with different bandwidth values. Users can slide through bandwidth values and see how cluster count and structure change. Includes density surface plots showing how bandwidth affects the smoothness of density estimation.</p>
+                    </div>
+
+                    <h3>Advanced Bandwidth Selection</h3>
+                    <div class="theorem-box">
+                        <h4>Sophisticated Selection Strategies</h4>
+                        
+                        <h5>Adaptive Bandwidth:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Local bandwidth:</strong> Different h for each point based on local density</li>
+                                <li><strong>k-nearest neighbor:</strong> Set h as distance to k-th neighbor</li>
+                                <li><strong>Pilot estimation:</strong> Use initial clustering to refine bandwidth</li>
+                                <li><strong>Hierarchical approach:</strong> Multiple bandwidths simultaneously</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Data-Driven Selection:</h5>
+                        <ul>
+                            <li><strong>Clustering stability:</strong> Choose h that gives stable clusters</li>
+                            <li><strong>Information criteria:</strong> Balance fit quality with complexity</li>
+                            <li><strong>Validation metrics:</strong> Use silhouette, gap statistic, etc.</li>
+                            <li><strong>Domain knowledge:</strong> Incorporate application-specific constraints</li>
+                        </ul>
+                        
+                        <h5>Multiscale Analysis:</h5>
+                        <ul>
+                            <li><strong>Bandwidth hierarchy:</strong> Analyze clustering at multiple scales</li>
+                            <li><strong>Scale space theory:</strong> Track cluster evolution across scales</li>
+                            <li><strong>Persistence analysis:</strong> Identify stable clusters across scales</li>
+                        </ul>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Bandwidth Selection Tool</h4>
+                        <p>Explore different bandwidth selection methods and their effects:</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="bandwidth-method">Selection Method:</label>
+                                <select id="bandwidth-method" onchange="updateBandwidthDemo()">
+                                    <option value="silverman">Silverman's Rule</option>
+                                    <option value="scott">Scott's Rule</option>
+                                    <option value="cv">Cross-Validation</option>
+                                    <option value="manual">Manual</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="manual-bandwidth">Manual h: <span id="manual-bw-val">0.5</span></label>
+                                <input type="range" id="manual-bandwidth" min="0.1" max="2.0" step="0.1" value="0.5" 
+                                       onchange="updateBandwidthDemo()" disabled>
+                            </div>
+                            <div>
+                                <label for="data-noise">Data Noise:</label>
+                                <select id="data-noise" onchange="updateBandwidthDemo()">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
                             </div>
                         </div>
-
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
-                                </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Bandwidth Selection Results</strong></p>
+                                <p>Shows optimal bandwidth and resulting clustering</p>
                             </div>
                         </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Selection Results:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Selected h:</strong> <span id="selected-h">0.42</span></div>
+                                <div><strong>Clusters:</strong> <span id="bw-clusters">4</span></div>
+                                <div><strong>Quality score:</strong> <span id="bw-quality">0.73</span></div>
+                                <div><strong>Stability:</strong> <span id="bw-stability">High</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
+                <!-- Applications Section -->
+                <div id="applications" class="content-section">
+                    <h2>Real-World Applications</h2>
+                    
+                    <p>Mean Shift's versatility and robust performance make it valuable across numerous domains, from computer vision to data mining. Its non-parametric nature and automatic cluster discovery are particularly beneficial for exploratory data analysis.</p>
+
+                    <h3>Computer Vision Applications</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Image Segmentation</h4>
+                            <ul>
+                                <li><strong>Color-based:</strong> Group pixels by color similarity in RGB/HSV space</li>
+                                <li><strong>Texture analysis:</strong> Combine color with local texture features</li>
+                                <li><strong>Medical imaging:</strong> Segment organs and tissues in medical scans</li>
+                                <li><strong>Advantage:</strong> No assumption about segment count or shape</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Object Tracking</h4>
+                            <ul>
+                                <li><strong>Feature tracking:</strong> Follow color histograms or feature descriptors</li>
+                                <li><strong>Video surveillance:</strong> Track moving objects in security systems</li>
+                                <li><strong>Sports analysis:</strong> Follow players and ball in sports videos</li>
+                                <li><strong>Advantage:</strong> Robust to partial occlusions and appearance changes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Feature Detection</h4>
+                            <ul>
+                                <li><strong>Interest points:</strong> Find salient image regions</li>
+                                <li><strong>Edge detection:</strong> Identify boundaries and contours</li>
+                                <li><strong>Pattern recognition:</strong> Locate repeated structures</li>
+                                <li><strong>Advantage:</strong> Scale-adaptive feature detection</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Computer Vision Applications</h4>
+                        <p><strong>Multi-Application Demo:</strong> Shows Mean Shift applied to different computer vision tasks. Includes image segmentation with adjustable bandwidth, object tracking in video frames, and feature detection. Users can upload images or use provided examples to see Mean Shift in action.</p>
+                    </div>
+
+                    <h3>Data Mining and Machine Learning</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Exploratory Data Analysis</h4>
+                            <ul>
+                                <li><strong>Natural grouping:</strong> Discover inherent data structure</li>
+                                <li><strong>Outlier detection:</strong> Identify points far from any mode</li>
+                                <li><strong>Dimensionality reduction:</strong> Project to mode locations</li>
+                                <li><strong>Data preprocessing:</strong> Clean data by moving to modes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Market Segmentation</h4>
+                            <ul>
+                                <li><strong>Customer clustering:</strong> Group customers by behavior patterns</li>
+                                <li><strong>Product positioning:</strong> Identify market niches</li>
+                                <li><strong>Price optimization:</strong> Find optimal pricing clusters</li>
+                                <li><strong>Campaign targeting:</strong> Segment audiences for marketing</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Bioinformatics</h4>
+                            <ul>
+                                <li><strong>Gene expression:</strong> Cluster genes with similar profiles</li>
+                                <li><strong>Protein analysis:</strong> Group proteins by structural similarity</li>
+                                <li><strong>Drug discovery:</strong> Identify compound clusters</li>
+                                <li><strong>Phylogenetic analysis:</strong> Study evolutionary relationships</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Case Study: Image Segmentation</h3>
+                    <div class="theorem-box">
+                        <h4>Mean Shift for Image Segmentation</h4>
+                        
+                        <h5>Problem Setup:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Input:</strong> Image with pixels represented in color space (RGB, HSV, Lab)</li>
+                                <li><strong>Goal:</strong> Group pixels into coherent regions (segments)</li>
+                                <li><strong>Challenge:</strong> Unknown number of segments, varying sizes and shapes</li>
+                                <li><strong>Traditional methods:</strong> Require segment count or shape assumptions</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Mean Shift Approach:</h5>
+                        <ol>
+                            <li><strong>Feature space:</strong> Represent each pixel as point in color space</li>
+                            <li><strong>Density estimation:</strong> Apply kernel density estimation</li>
+                            <li><strong>Mode seeking:</strong> Move each pixel toward its local mode</li>
+                            <li><strong>Segmentation:</strong> Pixels converging to same mode form segment</li>
+                        </ol>
+                        
+                        <h5>Advantages:</h5>
+                        <ul>
+                            <li><strong>Automatic:</strong> No need to specify number of segments</li>
+                            <li><strong>Flexible:</strong> Handles arbitrary segment shapes</li>
+                            <li><strong>Robust:</strong> Less sensitive to noise than edge-based methods</li>
+                            <li><strong>Multiscale:</strong> Can analyze at different resolutions</li>
+                        </ul>
+                    </div>
+
+                    <h3>Performance Considerations</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Computational Complexity</h4>
+                            <ul>
+                                <li><strong>Time complexity:</strong> O(T·n²) for T iterations</li>
+                                <li><strong>Space complexity:</strong> O(n) for storing points and modes</li>
+                                <li><strong>Optimization:</strong> Spatial indexing reduces to O(T·n log n)</li>
+                                <li><strong>Parallelization:</strong> Independent point trajectories</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Scalability Solutions</h4>
+                            <ul>
+                                <li><strong>Sampling:</strong> Apply to representative subset</li>
+                                <li><strong>Hierarchical:</strong> Coarse-to-fine processing</li>
+                                <li><strong>Approximate:</strong> Trade accuracy for speed</li>
+                                <li><strong>Streaming:</strong> Online versions for large datasets</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Quality Assessment</h4>
+                            <ul>
+                                <li><strong>Stability:</strong> Consistent results across runs</li>
+                                <li><strong>Robustness:</strong> Performance with noise and outliers</li>
+                                <li><strong>Parameter sensitivity:</strong> Bandwidth selection impact</li>
+                                <li><strong>Validation:</strong> Ground truth comparison when available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method Comparison Section -->
+                <div id="comparison" class="content-section">
+                    <h2>Mean Shift vs Other Clustering Methods</h2>
+                    
+                    <p>Understanding Mean Shift's position in the clustering landscape helps determine when it's the optimal choice versus other methods.</p>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Mean Shift</th>
+                                <th>K-Means</th>
+                                <th>DBSCAN</th>
+                                <th>GMM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cluster Discovery</strong></td>
+                                <td>Automatic mode detection</td>
+                                <td>Fixed k clusters</td>
+                                <td>Density threshold-based</td>
+                                <td>Mixture components</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shape Assumptions</strong></td>
+                                <td>No assumptions</td>
+                                <td>Spherical clusters</td>
+                                <td>Arbitrary shapes</td>
+                                <td>Elliptical clusters</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parameter Sensitivity</strong></td>
+                                <td>Bandwidth h critical</td>
+                                <td>k selection important</td>
+                                <td>ε and MinPts critical</td>
+                                <td>Number of components</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Computational Cost</strong></td>
+                                <td>O(Tn²) iterations</td>
+                                <td>O(nkt) iterations</td>
+                                <td>O(n log n) with indexing</td>
+                                <td>O(tnkd) EM iterations</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Noise Handling</strong></td>
+                                <td>Points far from modes</td>
+                                <td>Forced assignment</td>
+                                <td>Explicit noise detection</td>
+                                <td>Low probability regions</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Convergence</strong></td>
+                                <td>Guaranteed to mode</td>
+                                <td>Local optimum</td>
+                                <td>Deterministic</td>
+                                <td>Local maximum</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Detailed Comparison: Mean Shift vs Density-Based Methods</h3>
+                    <div class="theorem-box">
+                        <h4>Mean Shift vs DBSCAN</h4>
+                        
+                        <h5>Similarities:</h5>
+                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                            <ul>
+                                <li><strong>Density-based:</strong> Both rely on local density estimation</li>
+                                <li><strong>Automatic K:</strong> Neither requires specifying cluster count</li>
+                                <li><strong>Arbitrary shapes:</strong> Can find non-convex clusters</li>
+                                <li><strong>Outlier handling:</strong> Natural identification of noise points</li>
+                            </ul>
+                        </div>
+                        
+                        <h5>Key Differences:</h5>
+                        <ul>
+                            <li><strong>Cluster definition:</strong> Mean Shift uses modes, DBSCAN uses connectivity</li>
+                            <li><strong>Parameters:</strong> Mean Shift has bandwidth h, DBSCAN has ε and MinPts</li>
+                            <li><strong>Algorithm approach:</strong> Mode seeking vs region growing</li>
+                            <li><strong>Computational complexity:</strong> Mean Shift typically more expensive</li>
+                        </ul>
+                        
+                        <h5>When to Choose Each:</h5>
+                        <ul>
+                            <li><strong>Mean Shift:</strong> When seeking natural cluster centers (modes)</li>
+                            <li><strong>DBSCAN:</strong> When connectivity matters more than centrality</li>
+                            <li><strong>Mean Shift:</strong> Computer vision and continuous features</li>
+                            <li><strong>DBSCAN:</strong> Spatial data and explicit noise identification</li>
+                        </ul>
+                    </div>
+
+                    <div class="visualization-placeholder">
+                        <h4>Visualization: Algorithm Comparison</h4>
+                        <p><strong>Side-by-Side Comparison:</strong> Shows Mean Shift, K-means, DBSCAN, and GMM applied to the same datasets with various characteristics: (1) Well-separated clusters, (2) Overlapping clusters, (3) Varying densities, (4) Non-convex shapes. Highlights each method's strengths and weaknesses.</p>
+                    </div>
+
+                    <h3>Selection Guidelines</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                        <div class="azbn-card">
+                            <h4>Choose Mean Shift When:</h4>
+                            <ul>
+                                <li><strong>Mode seeking:</strong> Natural cluster centers are important</li>
+                                <li><strong>Unknown cluster count:</strong> No prior knowledge of K</li>
+                                <li><strong>Flexible shapes:</strong> Non-parametric cluster discovery needed</li>
+                                <li><strong>Computer vision:</strong> Image segmentation or tracking tasks</li>
+                                <li><strong>Robust clustering:</strong> Outliers should not affect cluster centers</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="azbn-card">
+                            <h4>Avoid Mean Shift When:</h4>
+                            <ul>
+                                <li><strong>Large datasets:</strong> Computational cost prohibitive</li>
+                                <li><strong>High dimensions:</strong> Curse of dimensionality affects density estimation</li>
+                                <li><strong>Uniform density:</strong> No clear modes in the data</li>
+                                <li><strong>Real-time applications:</strong> Speed is more important than accuracy</li>
+                                <li><strong>Simple structures:</strong> K-means assumptions are satisfied</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Hybrid Approaches</h3>
+                    <div class="theorem-box">
+                        <h4>Combining Mean Shift with Other Methods</h4>
+                        
+                        <h5>Mean Shift + K-means:</h5>
+                        <ul>
+                            <li><strong>Initialization:</strong> Use Mean Shift modes as K-means starting centers</li>
+                            <li><strong>Refinement:</strong> Apply K-means for final boundary optimization</li>
+                            <li><strong>Advantage:</strong> Automatic K selection with K-means efficiency</li>
+                        </ul>
+                        
+                        <h5>Mean Shift + Hierarchical:</h5>
+                        <ul>
+                            <li><strong>Multi-scale:</strong> Apply Mean Shift at different bandwidths</li>
+                            <li><strong>Tree construction:</strong> Build hierarchy from different scales</li>
+                            <li><strong>Advantage:</strong> Multi-resolution clustering analysis</li>
+                        </ul>
+                        
+                        <h5>Mean Shift + Spectral:</h5>
+                        <ul>
+                            <li><strong>Preprocessing:</strong> Use Mean Shift for initial clustering</li>
+                            <li><strong>Graph construction:</strong> Connect Mean Shift modes</li>
+                            <li><strong>Advantage:</strong> Handle complex topologies better</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Interactive Demo Section -->
+                <div id="interactive" class="content-section">
+                    <h2>Interactive Mean Shift Demo</h2>
+                    
+                    <p>Explore Mean Shift clustering through hands-on demonstrations that illustrate algorithm behavior, parameter effects, and practical applications.</p>
+
+                    <div class="interactive-demo">
+                        <h4>Live Mean Shift Clustering</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="demo-bandwidth">Bandwidth: <span id="demo-bw-val">0.3</span></label>
+                                <input type="range" id="demo-bandwidth" min="0.1" max="1.5" step="0.05" value="0.3" onchange="updateMeanShiftDemo()">
+                            </div>
+                            <div>
+                                <label for="demo-kernel">Kernel:</label>
+                                <select id="demo-kernel" onchange="updateMeanShiftDemo()">
+                                    <option value="gaussian">Gaussian</option>
+                                    <option value="epanechnikov">Epanechnikov</option>
+                                    <option value="uniform">Uniform</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="demo-dataset">Dataset:</label>
+                                <select id="demo-dataset" onchange="updateMeanShiftDemo()">
+                                    <option value="blobs">Gaussian Blobs</option>
+                                    <option value="moons">Two Moons</option>
+                                    <option value="aniso">Anisotropic</option>
+                                    <option value="varied">Varied Density</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 400px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Interactive Mean Shift Visualization</strong></p>
+                                <p>Shows density surface, convergence paths, and final clusters</p>
+                                <p><em>Data points • Convergence trajectories • Final modes (★) • Cluster boundaries</em></p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Clustering Results:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Modes found:</strong> <span id="demo-modes">3</span></div>
+                                <div><strong>Iterations:</strong> <span id="demo-iterations">15</span></div>
+                                <div><strong>Converged points:</strong> <span id="demo-converged">98%</span></div>
+                                <div><strong>Quality score:</strong> <span id="demo-quality">0.82</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h4>Algorithm Step-by-Step</h4>
+                        
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0;">
+                            <button onclick="initializeMeanShift()" class="azbn-btn">Initialize</button>
+                            <button onclick="stepMeanShift()" class="azbn-btn azbn-secondary">Single Step</button>
+                            <button onclick="runMeanShift()" class="azbn-btn azbn-secondary">Run to Convergence</button>
+                            <button onclick="resetMeanShift()" class="azbn-btn azbn-secondary">Reset</button>
+                            <div>
+                                <label for="step-speed">Animation Speed:</label>
+                                <select id="step-speed">
+                                    <option value="slow">Slow</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="fast">Fast</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+                            <div style="background: white; border: 2px dashed #ccc; height: 300px; 
+                                        display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                                <div style="text-align: center;">
+                                    <p><strong>Step-by-Step Mean Shift</strong></p>
+                                    <p>Watch individual points move toward modes</p>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
+                            </div>
+                            
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                                <h5>Algorithm State:</h5>
+                                <div style="font-family: monospace; font-size: 0.9rem;">
+                                    <p><strong>Step:</strong> <span id="step-number">0</span></p>
+                                    <p><strong>Active point:</strong> <span id="active-point">None</span></p>
+                                    <p><strong>Current pos:</strong> <span id="current-pos">-</span></p>
+                                    <p><strong>Mean shift:</strong> <span id="mean-shift-vec">-</span></p>
+                                    <p><strong>Movement:</strong> <span id="movement-size">-</span></p>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
+                                
+                                <div style="margin-top: 1rem;">
+                                    <h6>Progress:</h6>
+                                    <div style="background: white; height: 80px; border: 1px solid #ddd; border-radius: 4px;
+                                                display: flex; align-items: center; justify-content: center; color: #999;">
+                                        Convergence tracking
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </main>
+
+                    <div class="interactive-demo">
+                        <h4>Bandwidth Selection Assistant</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                            <div>
+                                <label for="assist-data">Data Type:</label>
+                                <select id="assist-data" onchange="updateBandwidthAssist()">
+                                    <option value="clustered">Well-Clustered</option>
+                                    <option value="scattered">Scattered</option>
+                                    <option value="hierarchical">Hierarchical</option>
+                                    <option value="noisy">Noisy</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="assist-goal">Clustering Goal:</label>
+                                <select id="assist-goal" onchange="updateBandwidthAssist()">
+                                    <option value="coarse">Coarse Clustering</option>
+                                    <option value="balanced" selected>Balanced</option>
+                                    <option value="fine">Fine-Grained</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="assist-noise">Noise Level:</label>
+                                <select id="assist-noise" onchange="updateBandwidthAssist()">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
+                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
+                            <div style="text-align: center;">
+                                <p><strong>Bandwidth Selection Recommendations</strong></p>
+                                <p>Analysis of different bandwidth values for your scenario</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <h5>Recommendations:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div><strong>Suggested h:</strong> <span id="assist-bandwidth">0.25</span></div>
+                                <div><strong>Method:</strong> <span id="assist-method">Silverman</span></div>
+                                <div><strong>Expected clusters:</strong> <span id="assist-clusters">4-6</span></div>
+                                <div><strong>Confidence:</strong> <span id="assist-confidence">High</span></div>
+                            </div>
+                            <div style="margin-top: 1rem; padding: 0.5rem; background: #e3f2fd; border-radius: 4px;">
+                                <p style="margin: 0; font-size: 0.9rem;" id="assist-advice">
+                                    For balanced clustering with medium noise, try bandwidth around 0.25. This should provide good separation without oversegmentation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Test Your Mean Shift Knowledge</h2>
+                    
+                    <p>Evaluate your understanding of Mean Shift clustering concepts, algorithm details, and practical applications.</p>
+
+                    <div class="quiz-question">
+                        <h4>Question 1: Core Principle</h4>
+                        <p>What is the fundamental principle behind Mean Shift clustering?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q1" value="a" id="q1a">
+                            <label for="q1a">Minimizing within-cluster variance like K-means</label><br>
+                            <input type="radio" name="q1" value="b" id="q1b">
+                            <label for="q1b">Seeking modes (local maxima) in the probability density function</label><br>
+                            <input type="radio" name="q1" value="c" id="q1c">
+                            <label for="q1c">Connecting points within a fixed distance threshold</label><br>
+                            <input type="radio" name="q1" value="d" id="q1d">
+                            <label for="q1d">Maximizing likelihood of Gaussian mixture components</label><br>
+                        </div>
+                        <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 2: Bandwidth Effect</h4>
+                        <p>What happens when the bandwidth parameter h is too small?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q2" value="a" id="q2a">
+                            <label for="q2a">Too few clusters are found, leading to undersmoothing</label><br>
+                            <input type="radio" name="q2" value="b" id="q2b">
+                            <label for="q2b">Too many clusters are found, leading to overfitting and noise sensitivity</label><br>
+                            <input type="radio" name="q2" value="c" id="q2c">
+                            <label for="q2c">The algorithm fails to converge</label><br>
+                            <input type="radio" name="q2" value="d" id="q2d">
+                            <label for="q2d">All points converge to a single cluster</label><br>
+                        </div>
+                        <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 3: Convergence Property</h4>
+                        <p>Which statement about Mean Shift convergence is correct?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q3" value="a" id="q3a">
+                            <label for="q3a">The algorithm may decrease density at some iterations</label><br>
+                            <input type="radio" name="q3" value="b" id="q3b">
+                            <label for="q3b">Convergence is not guaranteed for all kernel functions</label><br>
+                            <input type="radio" name="q3" value="c" id="q3c">
+                            <label for="q3c">Density monotonically increases and convergence to a mode is guaranteed</label><br>
+                            <input type="radio" name="q3" value="d" id="q3d">
+                            <label for="q3c">The algorithm always finds the global density maximum</label><br>
+                        </div>
+                        <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
+                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 4: Kernel Selection</h4>
+                        <p>Which kernel function is theoretically optimal for density estimation?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q4" value="a" id="q4a">
+                            <label for="q4a">Gaussian kernel</label><br>
+                            <input type="radio" name="q4" value="b" id="q4b">
+                            <label for="q4b">Epanechnikov kernel</label><br>
+                            <input type="radio" name="q4" value="c" id="q4c">
+                            <label for="q4c">Uniform kernel</label><br>
+                            <input type="radio" name="q4" value="d" id="q4d">
+                            <label for="q4d">Triangular kernel</label><br>
+                        </div>
+                        <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div class="quiz-question">
+                        <h4>Question 5: Application Domain</h4>
+                        <p>Mean Shift is particularly well-suited for which application?</p>
+                        <div style="margin: 1rem 0;">
+                            <input type="radio" name="q5" value="a" id="q5a">
+                            <label for="q5a">Text classification with high-dimensional sparse features</label><br>
+                            <input type="radio" name="q5" value="b" id="q5b">
+                            <label for="q5b">Image segmentation and computer vision tasks</label><br>
+                            <input type="radio" name="q5" value="c" id="q5c">
+                            <label for="q5c">Real-time clustering of streaming data</label><br>
+                            <input type="radio" name="q5" value="d" id="q5d">
+                            <label for="q5d">Clustering very large datasets with millions of points</label><br>
+                        </div>
+                        <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <div style="margin: 2rem 0; padding: 1rem; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                        <h4>Quiz Score</h4>
+                        <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                        <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter12" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 12: Gaussian Mixture Models</a>
+                    <a href="/tutorials/ml-fundamentals/clustering/chapter14" class="azbn-btn" style="text-decoration: none;">Chapter 14: Clustering Evaluation →</a>
+                </div>
             </div>
         </section>
     </main>
+
 
     <!-- Sub-section Navigation Footer -->
     <div class="sub-section-nav-footer">
@@ -632,7 +1506,7 @@
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
             <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+                <span class="sub-nav-label" id="next-label">Next Section</span>
                 <span>Next →</span>
             </button>
         </div>
@@ -643,5 +1517,6 @@
         <a href="/tutorials/clustering/chapter12" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 12: Gaussian Mixture Models</a>
         <a href="/tutorials/clustering/chapter14" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 14: Clustering Evaluation →</a>
     </div>
+
 </body>
 </html>

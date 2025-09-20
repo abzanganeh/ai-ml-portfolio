@@ -270,58 +270,147 @@
                     <h2>Interactive Clustering Evaluation Demo</h2>
                     
                     <div class="explanation-box">
-                        <p>Experiment with different evaluation metrics and see how they respond to various clustering scenarios.</p>
+                        <p>Explore different validation metrics and their behavior through hands-on demonstrations that illustrate how various factors affect clustering evaluation results.</p>
                     </div>
 
                     <div class="interactive-container">
-                        <h3>Evaluation Metrics Comparison</h3>
+                        <h3>Metric Comparison Dashboard</h3>
                         
                         <div class="demo-controls">
                             <div class="control-group">
-                                <label for="eval-dataset">Dataset Type:</label>
-                                <select id="eval-dataset">
-                                    <option value="wellseparated">Well-separated Clusters</option>
+                                <label for="eval-dataset">Dataset:</label>
+                                <select id="eval-dataset" onchange="updateEvalDemo()">
+                                    <option value="wellseparated">Well-Separated Clusters</option>
                                     <option value="overlapping">Overlapping Clusters</option>
                                     <option value="different-sizes">Different Cluster Sizes</option>
                                     <option value="noisy">Noisy Data</option>
                                 </select>
                             </div>
-                            
                             <div class="control-group">
                                 <label for="eval-algorithm">Algorithm:</label>
-                                <select id="eval-algorithm">
-                                    <option value="kmeans">K-means</option>
+                                <select id="eval-algorithm" onchange="updateEvalDemo()">
+                                    <option value="kmeans">K-Means</option>
                                     <option value="dbscan">DBSCAN</option>
+                                    <option value="hierarchical">Hierarchical</option>
                                     <option value="gmm">Gaussian Mixture</option>
                                 </select>
                             </div>
-                            
                             <div class="control-group">
-                                <label for="eval-clusters">Number of Clusters:</label>
-                                <input type="range" id="eval-clusters" min="2" max="8" value="3">
-                                <span id="eval-k-val">3</span>
+                                <label for="eval-clusters">Number of Clusters: <span id="eval-k-val">3</span></label>
+                                <input type="range" id="eval-clusters" min="2" max="8" step="1" value="3" onchange="updateEvalDemo()">
+                            </div>
+                        </div>
+                        
+                        <div class="visualization-placeholder">
+                            <div style="text-align: center;">
+                                <p><strong>Clustering Result Visualization</strong></p>
+                                <p>Shows clustering result with different validation metrics</p>
                             </div>
                         </div>
                         
                         <div class="metric-results">
-                            <h4>Evaluation Metrics</h4>
+                            <h4>Validation Metrics:</h4>
                             <div class="metric-grid">
-                                <div class="metric-item">
-                                    <strong>Silhouette Coefficient:</strong> <span id="eval-silhouette">0.75</span>
-                                </div>
-                                <div class="metric-item">
-                                    <strong>Davies-Bouldin Index:</strong> <span id="eval-db">0.85</span>
-                                </div>
-                                <div class="metric-item">
-                                    <strong>Calinski-Harabasz Index:</strong> <span id="eval-ch">420.3</span>
-                                </div>
-                                <div class="metric-item">
-                                    <strong>Dunn Index:</strong> <span id="eval-dunn">0.68</span>
+                                <div class="metric-item"><strong>Silhouette:</strong> <span id="eval-silhouette">0.65</span></div>
+                                <div class="metric-item"><strong>Davies-Bouldin:</strong> <span id="eval-db">1.23</span></div>
+                                <div class="metric-item"><strong>Calinski-Harabasz:</strong> <span id="eval-ch">245.7</span></div>
+                                <div class="metric-item"><strong>Dunn Index:</strong> <span id="eval-dunn">0.42</span></div>
+                            </div>
+                            <div class="interpretation">
+                                <p id="eval-interpretation">Good clustering quality with well-separated, compact clusters.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-container">
+                        <h3>Stability Analysis Tool</h3>
+                        
+                        <div class="demo-controls">
+                            <div class="control-group">
+                                <label for="stability-method">Perturbation Type:</label>
+                                <select id="stability-method" onchange="updateStabilityDemo()">
+                                    <option value="bootstrap">Bootstrap Sampling</option>
+                                    <option value="noise">Noise Injection</option>
+                                    <option value="subsample">Feature Subsampling</option>
+                                    <option value="parameters">Parameter Variation</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="stability-runs">Number of Runs: <span id="stability-runs-val">50</span></label>
+                                <input type="range" id="stability-runs" min="10" max="100" step="10" value="50" onchange="updateStabilityDemo()">
+                            </div>
+                            <div class="control-group">
+                                <label for="stability-level">Perturbation Level: <span id="stability-level-val">0.1</span></label>
+                                <input type="range" id="stability-level" min="0.05" max="0.5" step="0.05" value="0.1" onchange="updateStabilityDemo()">
+                            </div>
+                        </div>
+                        
+                        <button onclick="runStabilityAnalysis()" class="azbn-btn">Run Stability Analysis</button>
+                        
+                        <div class="demo-results">
+                            <div class="visualization-placeholder">
+                                <div style="text-align: center;">
+                                    <p><strong>Stability Distribution</strong></p>
+                                    <p>Histogram of ARI values across runs</p>
                                 </div>
                             </div>
                             
-                            <div class="interpretation">
-                                <strong>Interpretation:</strong> <span id="eval-interpretation">Excellent clustering with well-separated, compact clusters.</span>
+                            <div class="metric-results">
+                                <h4>Stability Results:</h4>
+                                <div class="metric-grid">
+                                    <div class="metric-item"><strong>Mean ARI:</strong> <span id="stability-mean">0.78</span></div>
+                                    <div class="metric-item"><strong>Std Dev:</strong> <span id="stability-std">0.12</span></div>
+                                    <div class="metric-item"><strong>Min ARI:</strong> <span id="stability-min">0.52</span></div>
+                                    <div class="metric-item"><strong>Max ARI:</strong> <span id="stability-max">0.94</span></div>
+                                </div>
+                                <div class="interpretation">
+                                    <p id="stability-assessment">High stability - clustering is robust to perturbations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-container">
+                        <h3>Parameter Selection Assistant</h3>
+                        
+                        <div class="demo-controls">
+                            <div class="control-group">
+                                <label for="selection-metric">Selection Method:</label>
+                                <select id="selection-metric" onchange="updateSelectionDemo()">
+                                    <option value="gap">Gap Statistic</option>
+                                    <option value="elbow">Elbow Method</option>
+                                    <option value="silhouette">Silhouette Analysis</option>
+                                    <option value="stability">Stability-based</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="max-k">Maximum K: <span id="max-k-val">10</span></label>
+                                <input type="range" id="max-k" min="5" max="15" step="1" value="10" onchange="updateSelectionDemo()">
+                            </div>
+                            <div class="control-group">
+                                <label for="selection-data">Data Complexity:</label>
+                                <select id="selection-data" onchange="updateSelectionDemo()">
+                                    <option value="simple">Simple Structure</option>
+                                    <option value="moderate">Moderate Complexity</option>
+                                    <option value="complex">Complex Structure</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="visualization-placeholder">
+                            <div style="text-align: center;">
+                                <p><strong>Parameter Selection Curve</strong></p>
+                                <p>Quality metric vs. number of clusters</p>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-results">
+                            <h4>Selection Results:</h4>
+                            <div class="metric-grid">
+                                <div class="metric-item"><strong>Optimal K:</strong> <span id="selection-optimal">4</span></div>
+                                <div class="metric-item"><strong>Quality Score:</strong> <span id="selection-score">0.73</span></div>
+                                <div class="metric-item"><strong>Confidence:</strong> <span id="selection-confidence">High</span></div>
+                                <div class="metric-item"><strong>Alternative K:</strong> <span id="selection-alternative">3, 5</span></div>
                             </div>
                         </div>
                     </div>
