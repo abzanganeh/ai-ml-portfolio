@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter14.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -32,12 +32,12 @@
         <!-- Tutorial Header -->
         <div class="tutorial-header">
             <div class="azbn-container">
-                <h1 class="chapter-title">Chapter 4: K-means Clustering Algorithm</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <h1 class="chapter-title">Chapter 14: Clustering Evaluation</h1>
+                <p class="chapter-subtitle">Master comprehensive evaluation techniques for clustering algorithms and validation methods</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
+                <!-- Chapter Progress Bar (14/15) -->
                 <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                    <div class="chapter-progress-fill" data-progress="93.33"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +61,19 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="11.11"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="internal">Internal Metrics</button>
+                    <button class="section-nav-btn" data-section="external">External Metrics</button>
+                    <button class="section-nav-btn" data-section="relative">Relative Validation</button>
+                    <button class="section-nav-btn" data-section="statistical">Statistical Testing</button>
+                    <button class="section-nav-btn" data-section="stability">Stability Analysis</button>
+                    <button class="section-nav-btn" data-section="practical">Practical Guidelines</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demo</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -79,562 +81,411 @@
 
         <section class="azbn-section">
             <div class="azbn-container">
-                <!-- Learning Objectives -->
-                <div class="learning-objectives-box">
-                    <h2>Learning Objectives</h2>
-                    <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
-                    </ul>
+                <!-- Introduction Section -->
+                <div id="introduction" class="content-section active">
+                    <h2>The Challenge of Clustering Evaluation</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Unlike supervised learning where we have ground truth labels to evaluate performance, clustering evaluation presents unique challenges. We need to assess the quality of clusters without knowing the "correct" answer, making this one of the most critical skills in unsupervised learning.</p>
+                    </div>
+
+                    <div class="learning-objectives-box">
+                        <h3>Learning Objectives</h3>
+                        <ul>
+                            <li>Understand the fundamental challenges in clustering evaluation</li>
+                            <li>Master internal validation metrics (silhouette, Davies-Bouldin, Calinski-Harabasz)</li>
+                            <li>Learn external validation techniques when ground truth is available</li>
+                            <li>Explore relative validation methods for model selection</li>
+                            <li>Apply statistical testing for clustering significance</li>
+                            <li>Develop practical guidelines for real-world clustering evaluation</li>
+                            <li>Compare different validation approaches and their appropriate use cases</li>
+                        </ul>
+                    </div>
+
+                    <div class="important-notes">
+                        <h3>Key Challenges in Clustering Evaluation</h3>
+                        <ul>
+                            <li><strong>No Ground Truth:</strong> Unlike classification, we often don't know the "correct" clusters</li>
+                            <li><strong>Subjective Quality:</strong> What makes a "good" cluster depends on the application</li>
+                            <li><strong>Multiple Valid Solutions:</strong> Different algorithms may find equally valid clusterings</li>
+                            <li><strong>Parameter Sensitivity:</strong> Results depend heavily on algorithm parameters</li>
+                            <li><strong>Dimensionality Effects:</strong> High-dimensional data presents unique challenges</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- Main Content Area -->
-                <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
-                        <h2>The Challenge of Clustering Evaluation</h2>
-                        
-                        <p>Evaluating clustering quality is one of the most challenging aspects of unsupervised learning. Unlike supervised learning where we can measure performance against known targets, clustering evaluation requires sophisticated techniques to assess the meaningfulness and quality of discovered patterns without external references.</p>
-
-                        <h3>Why Clustering Evaluation is Difficult</h3>
-                        <div class="unsupervised-types-grid">
-                            <div class="type-card">
-                                <h4>No Ground Truth</h4>
-                                <ul>
-                                    <li><strong>Unsupervised nature:</strong> No "correct" clustering to compare against</li>
-                                    <li><strong>Subjective quality:</strong> What constitutes a "good" clustering varies by application</li>
-                                    <li><strong>Multiple valid solutions:</strong> Same data may have several meaningful clusterings</li>
-                                    <li><strong>Domain dependence:</strong> Quality criteria change with application context</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="type-card">
-                                <h4>Evaluation Complexity</h4>
-                                <ul>
-                                    <li><strong>Multi-faceted quality:</strong> Compactness, separation, stability, interpretability</li>
-                                    <li><strong>Scale sensitivity:</strong> Metrics may favor certain cluster sizes or counts</li>
-                                    <li><strong>Algorithm bias:</strong> Some metrics favor specific clustering approaches</li>
-                                    <li><strong>Noise handling:</strong> How to account for outliers and noise points</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="type-card">
-                                <h4>Practical Challenges</h4>
-                                <ul>
-                                    <li><strong>Computational cost:</strong> Some metrics expensive for large datasets</li>
-                                    <li><strong>Interpretation difficulty:</strong> Understanding what metric values mean</li>
-                                    <li><strong>Threshold selection:</strong> Determining acceptable quality levels</li>
-                                    <li><strong>Comparative analysis:</strong> Fairly comparing different algorithms</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="image-container">
-                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter14/evaluation_challenges.png') }}" alt="Clustering Evaluation Challenges" class="tutorial-image">
-                            <p class="image-caption">Multi-panel demonstration showing different clustering solutions that optimize different quality criteria</p>
-                        </div>
-
-                        <h3>Types of Clustering Validation</h3>
-                        <p>Clustering validation approaches can be categorized into three main types, each addressing different aspects of clustering quality.</p>
-
-                        <div class="unsupervised-types-grid">
-                            <div class="type-card">
-                                <h4>Internal Validation</h4>
-                                <p><strong>Philosophy:</strong> Evaluate using only the data and clustering results</p>
-                                <ul>
-                                    <li>No external information required</li>
-                                    <li>Focus on cluster compactness and separation</li>
-                                    <li>Examples: Silhouette, Davies-Bouldin Index</li>
-                                </ul>
-                            </div>
-                            <div class="type-card">
-                                <h4>External Validation</h4>
-                                <p><strong>Philosophy:</strong> Compare against external ground truth or reference</p>
-                                <ul>
-                                    <li>Requires known true clustering or class labels</li>
-                                    <li>Measures agreement with reference clustering</li>
-                                    <li>Examples: Adjusted Rand Index, Normalized Mutual Information</li>
-                                </ul>
-                            </div>
-                            <div class="type-card">
-                                <h4>Relative Validation</h4>
-                                <p><strong>Philosophy:</strong> Compare different clustering solutions</p>
-                                <ul>
-                                    <li>Evaluates relative quality between algorithms</li>
-                                    <li>Assesses stability and consistency</li>
-                                    <li>Examples: Stability analysis, consensus clustering</li>
-                                </ul>
-                            </div>
-                        </div>
+                <!-- Internal Metrics Section -->
+                <div id="internal" class="content-section">
+                    <h2>Internal Validation Metrics</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Internal metrics evaluate clustering quality based solely on the data and cluster assignments, without requiring external information. These metrics focus on cluster compactness, separation, and overall structure.</p>
                     </div>
 
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
-                        
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
-
-                        <h3>Random Initialization: The Baseline</h3>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
-
-                        <div class="model-box">
-                            <h4>Random Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <h5><strong>Basic Random Selection:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_init(X, k):
-    n, d = X.shape
-    indices = random_sample(n, k)  <span style="color: #1976d2;">// Sample k indices without replacement</span>
-    centroids = X[indices]          <span style="color: #1976d2;">// Select corresponding data points</span>
-    <strong>return</strong> centroids
-                                </div>
-                                
-                                <h5><strong>Random Uniform in Feature Space:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_uniform_init(X, k):
-    n, d = X.shape
-    min_vals = min(X, axis=0)       <span style="color: #1976d2;">// Feature-wise minimum</span>
-    max_vals = max(X, axis=0)       <span style="color: #1976d2;">// Feature-wise maximum</span>
-    centroids = uniform(min_vals, max_vals, size=(k, d))
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages of Random Initialization:</h5>
-                            <ul>
-                                <li><strong>Simplicity:</strong> Easy to implement and understand</li>
-                                <li><strong>Speed:</strong> O(kd) time complexity</li>
-                                <li><strong>Unbiased:</strong> No assumptions about data structure</li>
-                                <li><strong>Baseline:</strong> Good reference for comparing other methods</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>High variance:</strong> Results vary significantly across runs</li>
-                                <li><strong>Poor clustering:</strong> Often leads to suboptimal solutions</li>
-                                <li><strong>Slow convergence:</strong> May require many iterations</li>
-                                <li><strong>Empty clusters:</strong> Risk of centroids in sparse regions</li>
-                            </ul>
+                    <div class="formula-box">
+                        <h3>Silhouette Coefficient</h3>
+                        <p>The silhouette coefficient measures how similar an object is to its own cluster compared to other clusters.</p>
+                        <div class="formula-display">
+                            <strong>s(i) = (b(i) - a(i)) / max(a(i), b(i))</strong>
                         </div>
-
-                        <h3>Furthest-First Heuristic</h3>
-                        <p>This method iteratively selects centroids that are as far as possible from previously selected ones, promoting good coverage of the data space.</p>
-
-                        <div class="model-box">
-                            <h4>Furthest-First Initialization</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> furthest_first_init(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid randomly</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Iteratively choose furthest points</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        max_distance = -1
-        furthest_idx = -1
-        
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            <span style="color: #1976d2;">// Find minimum distance to existing centroids</span>
-            min_dist = min([distance(X[j], c) <strong>for</strong> c <strong>in</strong> centroids])
-            
-            <strong>if</strong> min_dist > max_distance:
-                max_distance = min_dist
-                furthest_idx = j
-        
-        centroids.append(X[furthest_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages:</h5>
-                            <ul>
-                                <li><strong>Good coverage:</strong> Centroids spread across data space</li>
-                                <li><strong>Deterministic:</strong> Same result for same first choice</li>
-                                <li><strong>No empty clusters:</strong> Guarantees centroids on data points</li>
-                                <li><strong>Better than random:</strong> Generally produces better initializations</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>Outlier sensitivity:</strong> May select extreme outliers</li>
-                                <li><strong>Computational cost:</strong> O(nk) time complexity</li>
-                                <li><strong>Still suboptimal:</strong> Not guaranteed to find good initializations</li>
-                                <li><strong>First choice matters:</strong> Quality depends on initial random selection</li>
-                            </ul>
-                        </div>
+                        <p>Where:</p>
+                        <ul>
+                            <li><strong>a(i):</strong> Average distance from point i to other points in the same cluster</li>
+                            <li><strong>b(i):</strong> Average distance from point i to points in the nearest other cluster</li>
+                        </ul>
+                        <p><strong>Range:</strong> -1 to 1 (higher is better)</p>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
+                    <div class="formula-box">
+                        <h3>Davies-Bouldin Index</h3>
+                        <p>Measures the average similarity between each cluster and its most similar cluster.</p>
+                        <div class="formula-display">
+                            <strong>DB = (1/k) × Σ max[R(i,j)]</strong>
+                        </div>
+                        <p>Where R(i,j) = (S(i) + S(j)) / M(i,j)</p>
+                        <p><strong>Range:</strong> 0 to ∞ (lower is better)</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Calinski-Harabasz Index</h3>
+                        <p>Also known as the Variance Ratio Criterion, measures the ratio of between-cluster to within-cluster variance.</p>
+                        <div class="formula-display">
+                            <strong>CH = [SSB / (k-1)] / [SSW / (n-k)]</strong>
+                        </div>
+                        <p><strong>Range:</strong> 0 to ∞ (higher is better)</p>
+                    </div>
+                </div>
+
+                <!-- External Metrics Section -->
+                <div id="external" class="content-section">
+                    <h2>External Validation Metrics</h2>
+                    
+                    <div class="explanation-box">
+                        <p>External metrics compare clustering results against known ground truth labels. These are the most reliable when available, but require labeled data.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Adjusted Rand Index (ARI)</h3>
+                        <p>Measures the similarity between two clusterings, adjusted for chance.</p>
+                        <div class="formula-display">
+                            <strong>ARI = (RI - E[RI]) / (max(RI) - E[RI])</strong>
+                        </div>
+                        <p><strong>Range:</strong> -1 to 1 (higher is better)</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Normalized Mutual Information (NMI)</h3>
+                        <p>Measures the mutual information between clusterings, normalized by entropy.</p>
+                        <div class="formula-display">
+                            <strong>NMI = 2 × I(U,V) / (H(U) + H(V))</strong>
+                        </div>
+                        <p><strong>Range:</strong> 0 to 1 (higher is better)</p>
+                    </div>
+                </div>
+
+                <!-- Relative Validation Section -->
+                <div id="relative" class="content-section">
+                    <h2>Relative Validation Methods</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Relative validation compares different clustering solutions to select the best one, often used for parameter tuning and model selection.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Gap Statistic</h3>
+                        <p>Compares the within-cluster dispersion of the actual data to that of reference data.</p>
+                        <div class="formula-display">
+                            <strong>Gap(k) = E*[log(Wk)] - log(Wk)</strong>
+                        </div>
+                        <p>Where Wk is the within-cluster sum of squares for k clusters.</p>
+                    </div>
+
+                    <div class="important-notes">
+                        <h3>Elbow Method</h3>
+                        <p>Plot the within-cluster sum of squares (WCSS) against the number of clusters. The "elbow" point indicates the optimal number of clusters.</p>
+                    </div>
+                </div>
+
+                <!-- Statistical Testing Section -->
+                <div id="statistical" class="content-section">
+                    <h2>Statistical Testing for Clustering</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Statistical tests help determine whether observed clustering structure is significantly better than random clustering.</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <h3>Hopkins Statistic</h3>
+                        <p>Tests the spatial randomness of data points.</p>
+                        <div class="formula-display">
+                            <strong>H = Σ u(i) / (Σ u(i) + Σ w(i))</strong>
+                        </div>
+                        <p>Where u(i) and w(i) are distances to nearest neighbors in uniform and actual data.</p>
+                        <p><strong>Range:</strong> 0 to 1 (closer to 1 indicates clustering tendency)</p>
+                    </div>
+                </div>
+
+                <!-- Stability Analysis Section -->
+                <div id="stability" class="content-section">
+                    <h2>Stability Analysis</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Stability analysis evaluates how consistent clustering results are across different data samples or parameter settings.</p>
+                    </div>
+
+                    <div class="important-notes">
+                        <h3>Bootstrap Stability</h3>
+                        <ul>
+                            <li>Generate multiple bootstrap samples from the data</li>
+                            <li>Apply clustering to each sample</li>
+                            <li>Measure consistency across results</li>
+                            <li>High stability indicates robust clustering</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Practical Guidelines Section -->
+                <div id="practical" class="content-section">
+                    <h2>Practical Guidelines</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Real-world clustering evaluation requires a systematic approach combining multiple validation techniques.</p>
+                    </div>
+
+                    <div class="important-notes">
+                        <h3>Evaluation Strategy</h3>
+                        <ol>
+                            <li><strong>Start with Internal Metrics:</strong> Use silhouette, Davies-Bouldin, and Calinski-Harabasz</li>
+                            <li><strong>Apply Relative Validation:</strong> Use elbow method and gap statistic for parameter selection</li>
+                            <li><strong>Test Statistical Significance:</strong> Use Hopkins statistic to verify clustering tendency</li>
+                            <li><strong>Assess Stability:</strong> Use bootstrap or cross-validation</li>
+                            <li><strong>Domain Expert Review:</strong> Validate results with subject matter experts</li>
+                            <li><strong>Business Impact:</strong> Measure downstream task performance</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Interactive Demo Section -->
+                <div id="interactive" class="content-section">
+                    <h2>Interactive Clustering Evaluation Demo</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Experiment with different evaluation metrics and see how they respond to various clustering scenarios.</p>
+                    </div>
+
+                    <div class="interactive-container">
+                        <h3>Evaluation Metrics Comparison</h3>
                         
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
-
-                        <h3>The K-means++ Algorithm</h3>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> kmeans_plus_plus(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid uniformly at random</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Choose remaining k-1 centroids</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        distances = []
-        
-        <span style="color: #1976d2;">// Compute squared distance to nearest existing centroid</span>
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            min_dist_sq = min([||X[j] - c||² <strong>for</strong> c <strong>in</strong> centroids])
-            distances.append(min_dist_sq)
-        
-        <span style="color: #1976d2;">// Choose next centroid with probability proportional to squared distance</span>
-        probabilities = distances / sum(distances)
-        next_idx = weighted_random_choice(probabilities)
-        centroids.append(X[next_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Key Insight:</h5>
-                            <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
-                            
-                            <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
-                                <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
-                                    <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
-                                </div>
-                                <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
-                            </div>
-                        </div>
-
-                        <h3>Theoretical Analysis</h3>
-                        <p>K-means++ comes with strong theoretical guarantees that explain its superior performance.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Approximation Guarantee</h4>
-                            
-                            <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
-                                <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
-                                
-                                <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
-                                
-                                <p>Where OPT is the cost of the optimal k-means clustering.</p>
-                            </div>
-                            
-                            <h5>Proof Sketch:</h5>
-                            <ol>
-                                <li><strong>Potential function:</strong> Define Φ = Σᵢ D²(xᵢ) as sum of squared distances to nearest centroids</li>
-                                <li><strong>Expected reduction:</strong> Each K-means++ step reduces E[Φ] by a constant factor</li>
-                                <li><strong>Concentration:</strong> Use probability tail bounds to show consistent performance</li>
-                                <li><strong>Optimality bound:</strong> Relate final potential to optimal clustering cost</li>
-                            </ol>
-                            
-                            <h5>Implications:</h5>
-                            <ul>
-                                <li><strong>Logarithmic guarantee:</strong> Performance degrades slowly with k</li>
-                                <li><strong>Probabilistic bound:</strong> Guarantee holds in expectation</li>
-                                <li><strong>Initialization only:</strong> Bound applies to initialization, Lloyd's improves it</li>
-                                <li><strong>Practical relevance:</strong> Constant factors are reasonable in practice</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Initialization Comparison Demo</h3>
-                            <div class="demo-controls">
-                                <label for="init-method">Initialization Method:</label>
-                                <select id="init-method">
-                                    <option value="random">Random</option>
-                                    <option value="kmeans++">K-means++</option>
+                        <div class="demo-controls">
+                            <div class="control-group">
+                                <label for="eval-dataset">Dataset Type:</label>
+                                <select id="eval-dataset">
+                                    <option value="wellseparated">Well-separated Clusters</option>
+                                    <option value="overlapping">Overlapping Clusters</option>
+                                    <option value="different-sizes">Different Cluster Sizes</option>
+                                    <option value="noisy">Noisy Data</option>
                                 </select>
-                                
-                                <label for="num-clusters-init">Number of Clusters:</label>
-                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
-                                <span id="clusters-init-display">3</span>
-                                
-                                <button onclick="runInitializationDemo()">Run Demo</button>
-                                <button onclick="resetInitializationDemo()">Reset</button>
                             </div>
                             
-                            <div class="metric-visualization" id="initialization-canvas">
-                                <p>Click "Run Demo" to compare different initialization methods</p>
+                            <div class="control-group">
+                                <label for="eval-algorithm">Algorithm:</label>
+                                <select id="eval-algorithm">
+                                    <option value="kmeans">K-means</option>
+                                    <option value="dbscan">DBSCAN</option>
+                                    <option value="gmm">Gaussian Mixture</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label for="eval-clusters">Number of Clusters:</label>
+                                <input type="range" id="eval-clusters" min="2" max="8" value="3">
+                                <span id="eval-k-val">3</span>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
                         
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
-                            <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
-                            <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
+                        <div class="metric-results">
+                            <h4>Evaluation Metrics</h4>
+                            <div class="metric-grid">
+                                <div class="metric-item">
+                                    <strong>Silhouette Coefficient:</strong> <span id="eval-silhouette">0.75</span>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>Davies-Bouldin Index:</strong> <span id="eval-db">0.85</span>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>Calinski-Harabasz Index:</strong> <span id="eval-ch">420.3</span>
+                                </div>
+                                <div class="metric-item">
+                                    <strong>Dunn Index:</strong> <span id="eval-dunn">0.68</span>
+                                </div>
                             </div>
                             
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
+                            <div class="interpretation">
+                                <strong>Interpretation:</strong> <span id="eval-interpretation">Excellent clustering with well-separated, compact clusters.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div id="quiz" class="content-section">
+                    <h2>Clustering Evaluation Quiz</h2>
+                    
+                    <div class="explanation-box">
+                        <p>Test your understanding of clustering evaluation concepts and techniques.</p>
+                    </div>
+
+                    <div class="enhanced-quiz-container">
+                        <!-- Question 1 -->
+                        <div class="enhanced-quiz-question">
+                            <h3>Question 1: Silhouette Coefficient</h3>
+                            <p><strong>What does a silhouette coefficient of 0.8 indicate?</strong></p>
+                            <div class="enhanced-quiz-options">
+                                <div class="enhanced-quiz-option" data-answer="a">
+                                    <span class="option-letter">a)</span>
+                                    <span class="option-text">Poor clustering quality</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="b">
+                                    <span class="option-letter">b)</span>
+                                    <span class="option-text">Excellent clustering quality</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="c">
+                                    <span class="option-letter">c)</span>
+                                    <span class="option-text">Random clustering</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="d">
+                                    <span class="option-letter">d)</span>
+                                    <span class="option-text">No clustering tendency</span>
+                                </div>
+                            </div>
+                            <div class="enhanced-quiz-explanation" style="display: none;">
+                                <p><strong>Correct Answer: b) Excellent clustering quality</strong></p>
+                                <p>Silhouette coefficient ranges from -1 to 1, where values close to 1 indicate excellent clustering with well-separated, compact clusters.</p>
+                            </div>
+                        </div>
+
+                        <!-- Question 2 -->
+                        <div class="enhanced-quiz-question">
+                            <h3>Question 2: Davies-Bouldin Index</h3>
+                            <p><strong>For the Davies-Bouldin Index, which is better?</strong></p>
+                            <div class="enhanced-quiz-options">
+                                <div class="enhanced-quiz-option" data-answer="a">
+                                    <span class="option-letter">a)</span>
+                                    <span class="option-text">Higher values</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="b">
+                                    <span class="option-letter">b)</span>
+                                    <span class="option-text">Lower values</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="c">
+                                    <span class="option-letter">c)</span>
+                                    <span class="option-text">Values close to 1</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="d">
+                                    <span class="option-letter">d)</span>
+                                    <span class="option-text">Values close to 0</span>
+                                </div>
+                            </div>
+                            <div class="enhanced-quiz-explanation" style="display: none;">
+                                <p><strong>Correct Answer: b) Lower values</strong></p>
+                                <p>The Davies-Bouldin Index measures cluster similarity - lower values indicate better separated, more distinct clusters.</p>
+                            </div>
+                        </div>
+
+                        <!-- Question 3 -->
+                        <div class="enhanced-quiz-question">
+                            <h3>Question 3: External vs Internal Metrics</h3>
+                            <p><strong>When should you use external validation metrics?</strong></p>
+                            <div class="enhanced-quiz-options">
+                                <div class="enhanced-quiz-option" data-answer="a">
+                                    <span class="option-letter">a)</span>
+                                    <span class="option-text">Never, they are unreliable</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="b">
+                                    <span class="option-letter">b)</span>
+                                    <span class="option-text">When you have ground truth labels</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="c">
+                                    <span class="option-letter">c)</span>
+                                    <span class="option-text">Only for supervised learning</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="d">
+                                    <span class="option-letter">d)</span>
+                                    <span class="option-text">When internal metrics fail</span>
+                                </div>
+                            </div>
+                            <div class="enhanced-quiz-explanation" style="display: none;">
+                                <p><strong>Correct Answer: b) When you have ground truth labels</strong></p>
+                                <p>External metrics require known ground truth labels to compare against. They provide the most reliable evaluation when available.</p>
+                            </div>
+                        </div>
+
+                        <!-- Question 4 -->
+                        <div class="enhanced-quiz-question">
+                            <h3>Question 4: Gap Statistic</h3>
+                            <p><strong>What does the Gap Statistic compare?</strong></p>
+                            <div class="enhanced-quiz-options">
+                                <div class="enhanced-quiz-option" data-answer="a">
+                                    <span class="option-letter">a)</span>
+                                    <span class="option-text">Different algorithms</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="b">
+                                    <span class="option-letter">b)</span>
+                                    <span class="option-text">Actual data vs reference data</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="c">
+                                    <span class="option-letter">c)</span>
+                                    <span class="option-text">Internal vs external metrics</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="d">
+                                    <span class="option-letter">d)</span>
+                                    <span class="option-text">Different cluster numbers</span>
+                                </div>
+                            </div>
+                            <div class="enhanced-quiz-explanation" style="display: none;">
+                                <p><strong>Correct Answer: b) Actual data vs reference data</strong></p>
+                                <p>The Gap Statistic compares the within-cluster dispersion of actual data to that of reference (uniform) data to determine optimal cluster number.</p>
+                            </div>
+                        </div>
+
+                        <!-- Question 5 -->
+                        <div class="enhanced-quiz-question">
+                            <h3>Question 5: Stability Analysis</h3>
+                            <p><strong>What does high stability in clustering indicate?</strong></p>
+                            <div class="enhanced-quiz-options">
+                                <div class="enhanced-quiz-option" data-answer="a">
+                                    <span class="option-letter">a)</span>
+                                    <span class="option-text">Poor clustering quality</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="b">
+                                    <span class="option-letter">b)</span>
+                                    <span class="option-text">Robust and reliable clustering</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="c">
+                                    <span class="option-letter">c)</span>
+                                    <span class="option-text">Random clustering</span>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="d">
+                                    <span class="option-letter">d)</span>
+                                    <span class="option-text">Overfitting</span>
+                                </div>
+                            </div>
+                            <div class="enhanced-quiz-explanation" style="display: none;">
+                                <p><strong>Correct Answer: b) Robust and reliable clustering</strong></p>
+                                <p>High stability indicates that clustering results are consistent across different data samples, suggesting robust and reliable cluster structure.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Convergence Analysis Section -->
-                    <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
-                        
-                        <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
-                            <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
-                            </ul>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
-                            <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
-                            </ul>
-                        </div>
-
-                        <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
-                            <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
-                            </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
-                        </div>
+                    <div class="quiz-results" id="quiz-results" style="display: none;">
+                        <div id="score-display"></div>
+                        <div id="detailed-results"></div>
                     </div>
 
-                    <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
-                        
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
-                            
-                            <div class="demo-controls">
-                                <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
-                                        <option value="random">Random</option>
-                                        <option value="kmeans++">K-means++</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
-                                        <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
-                                </div>
-                            </div>
-                            
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
-                            </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
-                                <div class="metrics-grid">
-                                    <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button onclick="checkQuizAnswers()" class="azbn-btn">Submit Quiz and View Results</button>
                     </div>
-
-                    <!-- Quiz Section -->
-                    <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
-                        
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
+                </div>
             </div>
         </section>
     </main>
@@ -647,7 +498,7 @@
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
             <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+                <span class="sub-nav-label" id="next-label">Next Section</span>
                 <span>Next →</span>
             </button>
         </div>
@@ -656,7 +507,8 @@
     <!-- Chapter Navigation Footer -->
     <div class="navigation-buttons">
         <a href="/tutorials/clustering/chapter13" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 13: Mean Shift Clustering</a>
-        <a href="/tutorials/clustering/chapter15" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 15: Advanced Topics →</a>
+        <a href="/tutorials/clustering/chapter15" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 15: Advanced Applications →</a>
     </div>
+
 </body>
 </html>

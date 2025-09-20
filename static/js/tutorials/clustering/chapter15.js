@@ -1,7 +1,7 @@
-// Chapter 15: Advanced Topics & Applications - JavaScript functionality
+// Chapter 15: Advanced Applications and Case Studies - JavaScript functionality
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Chapter 15: Advanced Topics & Applications loaded');
+    console.log('Chapter 15: Advanced Applications and Case Studies loaded');
     
     // Initialize quiz functionality
     initializeQuiz();
