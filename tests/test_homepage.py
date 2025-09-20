@@ -20,8 +20,8 @@ class TestHomepage:
         
         # Check for hero section and title from your template
         expect(page.locator(".hero")).to_be_visible()
-        expect(page.locator("h1.hero-title")).to_contain_text("Machine Learning & Data Science Portfolio")
-        expect(page.locator(".hero-subtitle")).to_contain_text("Transforming data into insights")
+        expect(page.locator("h1.hero-title")).to_contain_text("AI/ML Engineer & Applied Scientist Portfolio")
+        expect(page.locator(".hero-subtitle")).to_contain_text("Building intelligent systems that solve real-world problems through data science and machine learning")
         
         # Check hero action buttons
         expect(page.locator('.hero-actions a[href="/projects/"]')).to_be_visible()
