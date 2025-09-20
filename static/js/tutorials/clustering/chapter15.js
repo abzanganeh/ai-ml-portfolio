@@ -3,31 +3,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Chapter 15: Advanced Topics & Applications loaded');
     
-    // Initialize with default section
-    showSection('algorithm');
-    updateSubSectionNavigation(['algorithm', 'mathematics', 'optimization', 'convergence', 'demo', 'quiz'], 0);
+    // Initialize quiz functionality
+    initializeQuiz();
 });
-
-// Section navigation functionality
-function showSection(sectionName, clickedElement) {
-    // Hide all sections
-    document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.remove('active');
-    });
-    
-    // Show selected section
-    document.getElementById(sectionName).classList.add('active');
-    
-    // Update navigation buttons
-    document.querySelectorAll('.section-nav button').forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Add active class to clicked button
-    if (clickedElement) {
-        clickedElement.classList.add('active');
-    }
-}
 
 // Quiz functionality
 function checkQuizAnswers() {
@@ -148,47 +126,11 @@ function checkQuizAnswers() {
     document.getElementById('quiz-results').scrollIntoView({ behavior: 'smooth' });
 }
 
-// Sub-section navigation functionality
-function navigateSubSection(direction) {
-    const sections = ['algorithm', 'mathematics', 'optimization', 'convergence', 'demo', 'quiz'];
-    const currentSection = document.querySelector('.content-section.active').id;
-    const currentIndex = sections.indexOf(currentSection);
-    
-    if (direction === 'next' && currentIndex < sections.length - 1) {
-        const nextSection = sections[currentIndex + 1];
-        showSection(nextSection, document.querySelector(`button[onclick*="${nextSection}"]`));
-    } else if (direction === 'prev' && currentIndex > 0) {
-        const prevSection = sections[currentIndex - 1];
-        showSection(prevSection, document.querySelector(`button[onclick*="${prevSection}"]`));
-    }
-    
-    // Update navigation button labels
-    updateSubSectionNavigation(sections, currentIndex);
-}
-
-function updateSubSectionNavigation(sections, currentIndex) {
-    const prevBtn = document.getElementById('prev-subsection');
-    const nextBtn = document.getElementById('next-subsection');
-    const prevLabel = document.getElementById('prev-label');
-    const nextLabel = document.getElementById('next-label');
-    
-    if (currentIndex > 0) {
-        prevBtn.style.display = 'block';
-        prevLabel.textContent = sections[currentIndex - 1].charAt(0).toUpperCase() + sections[currentIndex - 1].slice(1);
-    } else {
-        prevBtn.style.display = 'none';
-    }
-    
-    if (currentIndex < sections.length - 1) {
-        nextBtn.style.display = 'block';
-        nextLabel.textContent = sections[currentIndex + 1].charAt(0).toUpperCase() + sections[currentIndex + 1].slice(1);
-    } else {
-        nextBtn.style.display = 'none';
-    }
+// Quiz initialization
+function initializeQuiz() {
+    console.log('Initializing Chapter 15 quiz functionality...');
+    // Quiz functionality is handled by the enhanced-quiz-option click events in shared-tutorial.js
 }
 
 // Make functions globally available
-window.showSection = showSection;
 window.checkQuizAnswers = checkQuizAnswers;
-window.navigateSubSection = navigateSubSection;
-window.updateSubSectionNavigation = updateSubSectionNavigation;
