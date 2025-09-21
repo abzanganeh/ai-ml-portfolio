@@ -7,146 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <style>
-        .visualization-placeholder {
-            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-            border: 2px dashed #999;
-            padding: 2rem;
-            text-align: center;
-            border-radius: 8px;
-            margin: 1rem 0;
-            font-style: italic;
-            color: #666;
-        }
-        .interactive-demo {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-        }
-        .formula-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .theorem-box {
-            background: #f3e5f5;
-            border-left: 4px solid #9c27b0;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .algorithm-box {
-            background: #f1f8e9;
-            border-left: 4px solid #689f38;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .kernel-box {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .convergence-box {
-            background: #fce4ec;
-            border-left: 4px solid #e91e63;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .bandwidth-box {
-            background: #e8f5e8;
-            border-left: 4px solid #4caf50;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-        .comparison-table th, .comparison-table td {
-            border: 1px solid #ddd;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        .comparison-table th {
-            background-color: #f5f5f5;
-            font-weight: bold;
-        }
-        .quiz-question {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            padding: 1rem;
-            border-radius: 6px;
-            margin: 1rem 0;
-        }
-        .learning-objectives-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-        .section-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin: 2rem 0;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 1rem;
-        }
-        .section-nav button {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        .section-nav button:hover {
-            background: #e9ecef;
-        }
-        .section-nav button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        .content-section {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-        .content-section.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .mode-seeking-viz {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 1rem;
-            margin: 1rem 0;
-            text-align: center;
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter13.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -242,10 +104,10 @@
                     <h3>Core Philosophy: Following the Gradient</h3>
                     <p>Mean Shift operates on the intuitive principle that cluster centers should be located where data density is highest - the modes of the underlying distribution.</p>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit">
                         <div class="azbn-card">
                             <h4>Traditional Clustering Approaches</h4>
-                            <ul style="font-size: 0.9rem;">
+                            <ul class="small-list">
                                 <li><strong>K-means:</strong> Assumes spherical clusters with predetermined count</li>
                                 <li><strong>DBSCAN:</strong> Uses fixed density threshold parameters</li>
                                 <li><strong>Hierarchical:</strong> Creates tree structure of all possible clusterings</li>
@@ -255,7 +117,7 @@
                         
                         <div class="azbn-card">
                             <h4>Mean Shift Advantages</h4>
-                            <ul style="font-size: 0.9rem;">
+                            <ul class="small-list">
                                 <li><strong>Non-parametric:</strong> No assumptions about cluster shape or distribution</li>
                                 <li><strong>Automatic K:</strong> Discovers number of clusters naturally</li>
                                 <li><strong>Mode-seeking:</strong> Finds natural cluster centers at density peaks</li>
@@ -296,7 +158,7 @@
                     </div>
 
                     <h3>Key Concepts Overview</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div class="grid-auto-fit-small">
                         <div class="azbn-card">
                             <h4>Kernel Density Estimation</h4>
                             <p>Estimates the probability density function by placing kernel functions at each data point and summing their contributions.</p>
@@ -312,7 +174,7 @@
                     </div>
 
                     <h3>Applications and Use Cases</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit-medium">
                         <div class="azbn-card">
                             <h4>Computer Vision</h4>
                             <ul>
@@ -357,9 +219,9 @@
                     <div class="formula-box">
                         <h4>Kernel Density Estimation Formula</h4>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <p>For dataset X = {x₁, x₂, ..., xₙ} and kernel function K:</p>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                            <div class="centered-text">
                                 <strong>f̂(x) = (1/nh^d) Σᵢ₌₁ⁿ K((x - xᵢ)/h)</strong>
                             </div>
                             
@@ -377,16 +239,16 @@
 
                     <div class="mode-seeking-viz">
                         <h4>Understanding Density Estimation</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
-                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                        <div class="grid-auto-fit-large">
+                            <div class="light-gray-box">
                                 <h5>Small Bandwidth (h)</h5>
                                 <p>Sharp, detailed density<br>Many local modes<br>Sensitive to noise</p>
                             </div>
-                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                            <div class="light-gray-box">
                                 <h5>Large Bandwidth (h)</h5>
                                 <p>Smooth, global density<br>Few major modes<br>May oversmooth</p>
                             </div>
-                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px;">
+                            <div class="light-gray-box">
                                 <h5>Optimal Bandwidth</h5>
                                 <p>Balanced smoothness<br>Meaningful modes<br>Robust to noise</p>
                             </div>
@@ -399,16 +261,16 @@
                     <div class="formula-box">
                         <h4>Density Gradient Computation</h4>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <p>The gradient of the density estimate:</p>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>∇f̂(x) = (1/nh^(d+2)) Σᵢ₌₁ⁿ (xᵢ - x) g(||x - xᵢ||²/h²)</strong>
                             </div>
                             
                             <p>Where g(t) = -K'(t) is the derivative of the kernel function.</p>
                             
                             <h5>For the Gaussian Kernel:</h5>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>K(t) = exp(-t²/2) → g(t) = exp(-t²/2)</strong>
                             </div>
                         </div>
@@ -420,9 +282,9 @@
                     <div class="formula-box">
                         <h4>Mean Shift Vector Formula</h4>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <p>The mean shift vector m(x) is proportional to the gradient:</p>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>m(x) = [Σᵢ₌₁ⁿ xᵢ g(||x - xᵢ||²/h²)] / [Σᵢ₌₁ⁿ g(||x - xᵢ||²/h²)] - x</strong>
                             </div>
                             
@@ -446,7 +308,7 @@
                         <h4>Mathematical Guarantees</h4>
                         
                         <h5>Convergence Properties:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Monotonic increase:</strong> Density always increases or stays constant at each step</li>
                                 <li><strong>Bounded sequence:</strong> Iterations remain within convex hull of data</li>
@@ -484,9 +346,9 @@
                     <div class="kernel-box">
                         <h4>Popular Kernel Functions</h4>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <h5>Gaussian (Normal) Kernel:</h5>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>K(t) = exp(-t²/2)</strong>
                             </div>
                             <ul>
@@ -496,9 +358,9 @@
                             </ul>
                         </div>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <h5>Epanechnikov Kernel:</h5>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>K(t) = 3/4(1 - t²) if |t| ≤ 1, else 0</strong>
                             </div>
                             <ul>
@@ -508,9 +370,9 @@
                             </ul>
                         </div>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <h5>Uniform (Flat) Kernel:</h5>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>K(t) = 1/2 if |t| ≤ 1, else 0</strong>
                             </div>
                             <ul>
@@ -527,7 +389,7 @@
                     </div>
 
                     <h3>Kernel Properties and Selection</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit">
                         <div class="azbn-card">
                             <h4>Computational Efficiency</h4>
                             <ul>
@@ -561,7 +423,7 @@
                         <h4>Practical Kernel Selection</h4>
                         
                         <h5>Guidelines for Kernel Choice:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Gaussian:</strong> Best theoretical properties, use when accuracy is paramount</li>
                                 <li><strong>Epanechnikov:</strong> Good balance of efficiency and quality</li>
@@ -589,7 +451,7 @@
                         <h4>Kernel Function Explorer</h4>
                         <p>Experiment with different kernel functions and see their effects on density estimation:</p>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div class="grid-auto-fit-large">
                             <div>
                                 <label for="kernel-type">Kernel Type:</label>
                                 <select id="kernel-type" onchange="updateKernelDemo()">
@@ -605,17 +467,16 @@
                             </div>
                         </div>
                         
-                        <div style="background: white; border: 2px dashed #ccc; height: 200px; margin: 1rem 0; 
-                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                            <div style="text-align: center;">
+                        <div class="visualization-dashed">
+                            <div class="centered-content">
                                 <p><strong>Kernel Function Visualization</strong></p>
                                 <p>Shows kernel shape and resulting density estimation</p>
                             </div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                        <div class="demo-metrics">
                             <h5>Kernel Properties:</h5>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            <div class="demo-metrics-grid">
                                 <div><strong>Support:</strong> <span id="kernel-support">Infinite</span></div>
                                 <div><strong>Smoothness:</strong> <span id="kernel-smooth">C∞</span></div>
                                 <div><strong>Efficiency:</strong> <span id="kernel-efficiency">Low</span></div>
@@ -634,17 +495,17 @@
                     <div class="algorithm-box">
                         <h4>Basic Mean Shift Algorithm</h4>
                         
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <p><strong>Input:</strong> Data points X = {x₁, x₂, ..., xₙ}, bandwidth h, kernel K</p>
                             <p><strong>Output:</strong> Cluster centers and assignments</p>
                             
-                            <ol style="margin: 1rem 0;">
+                            <ol class="ordered-list">
                                 <li><strong>Initialize:</strong> Set each point as its own mode candidate</li>
                                 <li><strong>For each point xᵢ:</strong>
-                                    <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                    <ul class="nested-list">
                                         <li>Set current position y⁽⁰⁾ = xᵢ</li>
                                         <li>Repeat until convergence:
-                                            <ul style="margin: 0.5rem 0 0.5rem 1.5rem;">
+                                            <ul class="nested-list">
                                                 <li>Compute mean shift vector m(y⁽ᵗ⁾)</li>
                                                 <li>Update position: y⁽ᵗ⁺¹⁾ = y⁽ᵗ⁾ + m(y⁽ᵗ⁾)</li>
                                             </ul>
@@ -658,9 +519,9 @@
                     </div>
 
                     <h3>Detailed Algorithm Implementation</h3>
-                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                    <div class="demo-metrics">
                         <h4>Pseudocode:</h4>
-                        <pre style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <pre class="white-box">
 <strong>function</strong> MeanShift(X, h, kernel=Gaussian, tol=1e-3, max_iter=100):
     modes = []
     
@@ -710,7 +571,7 @@
                         <h4>Convergence Analysis</h4>
                         
                         <h5>Stopping Criteria:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Position change:</strong> ||y⁽ᵗ⁺¹⁾ - y⁽ᵗ⁾|| < ε</li>
                                 <li><strong>Density change:</strong> |f̂(y⁽ᵗ⁺¹⁾) - f̂(y⁽ᵗ⁾)| < δ</li>
@@ -736,7 +597,7 @@
                     </div>
 
                     <h3>Optimization and Acceleration</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit">
                         <div class="azbn-card">
                             <h4>Computational Optimizations</h4>
                             <ul>
@@ -773,7 +634,7 @@
                         <h4>From Modes to Clusters</h4>
                         
                         <h5>Mode Merging Strategies:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ol>
                                 <li><strong>Distance-based:</strong> Merge modes within distance threshold</li>
                                 <li><strong>Density-based:</strong> Merge modes with similar density values</li>
@@ -799,7 +660,7 @@
                     <p>Bandwidth selection is the most critical parameter choice in Mean Shift clustering. The bandwidth h controls the scale of density estimation and directly determines the granularity of discovered clusters.</p>
 
                     <h3>Impact of Bandwidth on Clustering</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit-small">
                         <div class="azbn-card">
                             <h4>Small Bandwidth (h)</h4>
                             <ul>
@@ -835,15 +696,15 @@
                         <h4>Bandwidth Selection Methods</h4>
                         
                         <h5>Rule-of-Thumb Methods:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <p><strong>Silverman's Rule (for Gaussian kernels):</strong></p>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>h = (4σ̂⁵/3n)^(1/5) ≈ 1.06σ̂n^(-1/5)</strong>
                             </div>
                             <p>Where σ̂ is the sample standard deviation and n is the number of points.</p>
                             
                             <p><strong>Scott's Rule:</strong></p>
-                            <div style="text-align: center; margin: 1rem 0; font-size: 1.1rem;">
+                            <div class="centered-text-small">
                                 <strong>h = σ̂n^(-1/(d+4))</strong>
                             </div>
                             <p>For d-dimensional data with sample standard deviation σ̂.</p>
@@ -868,7 +729,7 @@
                         <h4>Sophisticated Selection Strategies</h4>
                         
                         <h5>Adaptive Bandwidth:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Local bandwidth:</strong> Different h for each point based on local density</li>
                                 <li><strong>k-nearest neighbor:</strong> Set h as distance to k-th neighbor</li>
@@ -897,7 +758,7 @@
                         <h4>Bandwidth Selection Tool</h4>
                         <p>Explore different bandwidth selection methods and their effects:</p>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div class="grid-auto-fit-large">
                             <div>
                                 <label for="bandwidth-method">Selection Method:</label>
                                 <select id="bandwidth-method" onchange="updateBandwidthDemo()">
@@ -922,17 +783,16 @@
                             </div>
                         </div>
                         
-                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
-                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                            <div style="text-align: center;">
+                        <div class="visualization-dashed">
+                            <div class="centered-content">
                                 <p><strong>Bandwidth Selection Results</strong></p>
                                 <p>Shows optimal bandwidth and resulting clustering</p>
                             </div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                        <div class="demo-metrics">
                             <h5>Selection Results:</h5>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            <div class="demo-metrics-grid">
                                 <div><strong>Selected h:</strong> <span id="selected-h">0.42</span></div>
                                 <div><strong>Clusters:</strong> <span id="bw-clusters">4</span></div>
                                 <div><strong>Quality score:</strong> <span id="bw-quality">0.73</span></div>
@@ -949,7 +809,7 @@
                     <p>Mean Shift's versatility and robust performance make it valuable across numerous domains, from computer vision to data mining. Its non-parametric nature and automatic cluster discovery are particularly beneficial for exploratory data analysis.</p>
 
                     <h3>Computer Vision Applications</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit-medium">
                         <div class="azbn-card">
                             <h4>Image Segmentation</h4>
                             <ul>
@@ -987,7 +847,7 @@
                     </div>
 
                     <h3>Data Mining and Machine Learning</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit-medium">
                         <div class="azbn-card">
                             <h4>Exploratory Data Analysis</h4>
                             <ul>
@@ -1024,7 +884,7 @@
                         <h4>Mean Shift for Image Segmentation</h4>
                         
                         <h5>Problem Setup:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Input:</strong> Image with pixels represented in color space (RGB, HSV, Lab)</li>
                                 <li><strong>Goal:</strong> Group pixels into coherent regions (segments)</li>
@@ -1051,7 +911,7 @@
                     </div>
 
                     <h3>Performance Considerations</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit">
                         <div class="azbn-card">
                             <h4>Computational Complexity</h4>
                             <ul>
@@ -1151,7 +1011,7 @@
                         <h4>Mean Shift vs DBSCAN</h4>
                         
                         <h5>Similarities:</h5>
-                        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <div class="white-box">
                             <ul>
                                 <li><strong>Density-based:</strong> Both rely on local density estimation</li>
                                 <li><strong>Automatic K:</strong> Neither requires specifying cluster count</li>
@@ -1183,7 +1043,7 @@
                     </div>
 
                     <h3>Selection Guidelines</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div class="grid-auto-fit-medium">
                         <div class="azbn-card">
                             <h4>Choose Mean Shift When:</h4>
                             <ul>
@@ -1243,7 +1103,7 @@
                     <div class="interactive-demo">
                         <h4>Live Mean Shift Clustering</h4>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div class="grid-auto-fit-large">
                             <div>
                                 <label for="demo-bandwidth">Bandwidth: <span id="demo-bw-val">0.3</span></label>
                                 <input type="range" id="demo-bandwidth" min="0.1" max="1.5" step="0.05" value="0.3" onchange="updateMeanShiftDemo()">
@@ -1267,18 +1127,26 @@
                             </div>
                         </div>
                         
-                        <div style="background: white; border: 2px dashed #ccc; height: 400px; margin: 1rem 0; 
-                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                            <div style="text-align: center;">
+                        <div class="centered-text">
+                            <button onclick="generateMeanShiftVisualization()" class="btn-generate">
+                                Generate Visualization
+                            </button>
+                            <button onclick="resetMeanShiftDemo()" class="btn-reset">
+                                Reset
+                            </button>
+                        </div>
+                        
+                        <div id="kmeans-demo-canvas" class="visualization-dashed-large">
+                            <div class="centered-content">
                                 <p><strong>Interactive Mean Shift Visualization</strong></p>
                                 <p>Shows density surface, convergence paths, and final clusters</p>
                                 <p><em>Data points • Convergence trajectories • Final modes (★) • Cluster boundaries</em></p>
                             </div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                        <div class="demo-metrics">
                             <h5>Clustering Results:</h5>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            <div class="demo-metrics-grid">
                                 <div><strong>Modes found:</strong> <span id="demo-modes">3</span></div>
                                 <div><strong>Iterations:</strong> <span id="demo-iterations">15</span></div>
                                 <div><strong>Converged points:</strong> <span id="demo-converged">98%</span></div>
@@ -1290,7 +1158,7 @@
                     <div class="interactive-demo">
                         <h4>Algorithm Step-by-Step</h4>
                         
-                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0;">
+                        <div class="flex-gap">
                             <button onclick="initializeMeanShift()" class="azbn-btn">Initialize</button>
                             <button onclick="stepMeanShift()" class="azbn-btn azbn-secondary">Single Step</button>
                             <button onclick="runMeanShift()" class="azbn-btn azbn-secondary">Run to Convergence</button>
@@ -1305,18 +1173,17 @@
                             </div>
                         </div>
                         
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
-                            <div style="background: white; border: 2px dashed #ccc; height: 300px; 
-                                        display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                                <div style="text-align: center;">
+                        <div class="demo-layout">
+                            <div id="step-by-step-canvas" class="visualization-dashed">
+                                <div class="centered-content">
                                     <p><strong>Step-by-Step Mean Shift</strong></p>
                                     <p>Watch individual points move toward modes</p>
                                 </div>
                             </div>
                             
-                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                            <div class="demo-metrics">
                                 <h5>Algorithm State:</h5>
-                                <div style="font-family: monospace; font-size: 0.9rem;">
+                                <div class="monospace">
                                     <p><strong>Step:</strong> <span id="step-number">0</span></p>
                                     <p><strong>Active point:</strong> <span id="active-point">None</span></p>
                                     <p><strong>Current pos:</strong> <span id="current-pos">-</span></p>
@@ -1324,9 +1191,9 @@
                                     <p><strong>Movement:</strong> <span id="movement-size">-</span></p>
                                 </div>
                                 
-                                <div style="margin-top: 1rem;">
+                                <div class="margin-top">
                                     <h6>Progress:</h6>
-                                    <div style="background: white; height: 80px; border: 1px solid #ddd; border-radius: 4px;
+                                    <div id="convergence-tracking" style="background: white; height: 80px; border: 1px solid #ddd; border-radius: 4px;
                                                 display: flex; align-items: center; justify-content: center; color: #999;">
                                         Convergence tracking
                                     </div>
@@ -1338,7 +1205,7 @@
                     <div class="interactive-demo">
                         <h4>Bandwidth Selection Assistant</h4>
                         
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                        <div class="grid-auto-fit-large">
                             <div>
                                 <label for="assist-data">Data Type:</label>
                                 <select id="assist-data" onchange="updateBandwidthAssist()">
@@ -1366,24 +1233,23 @@
                             </div>
                         </div>
                         
-                        <div style="background: white; border: 2px dashed #ccc; height: 250px; margin: 1rem 0; 
-                                    display: flex; align-items: center; justify-content: center; color: #666; border-radius: 8px;">
-                            <div style="text-align: center;">
+                        <div id="bandwidth-assistant-canvas" class="visualization-dashed">
+                            <div class="centered-content">
                                 <p><strong>Bandwidth Selection Recommendations</strong></p>
                                 <p>Analysis of different bandwidth values for your scenario</p>
                             </div>
                         </div>
                         
-                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px;">
+                        <div class="demo-metrics">
                             <h5>Recommendations:</h5>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                            <div class="demo-metrics-grid">
                                 <div><strong>Suggested h:</strong> <span id="assist-bandwidth">0.25</span></div>
                                 <div><strong>Method:</strong> <span id="assist-method">Silverman</span></div>
                                 <div><strong>Expected clusters:</strong> <span id="assist-clusters">4-6</span></div>
                                 <div><strong>Confidence:</strong> <span id="assist-confidence">High</span></div>
                             </div>
-                            <div style="margin-top: 1rem; padding: 0.5rem; background: #e3f2fd; border-radius: 4px;">
-                                <p style="margin: 0; font-size: 0.9rem;" id="assist-advice">
+                            <div class="advice-box">
+                                <p class="monospace" id="assist-advice">
                                     For balanced clustering with medium noise, try bandwidth around 0.25. This should provide good separation without oversegmentation.
                                 </p>
                             </div>
@@ -1397,10 +1263,10 @@
                     
                     <p>Evaluate your understanding of Mean Shift clustering concepts, algorithm details, and practical applications.</p>
 
-                    <div class="quiz-question">
+                    <div class="enhanced-quiz-question">
                         <h4>Question 1: Core Principle</h4>
                         <p>What is the fundamental principle behind Mean Shift clustering?</p>
-                        <div style="margin: 1rem 0;">
+                        <div class="margin-top">
                             <input type="radio" name="q1" value="a" id="q1a">
                             <label for="q1a">Minimizing within-cluster variance like K-means</label><br>
                             <input type="radio" name="q1" value="b" id="q1b">
@@ -1411,13 +1277,13 @@
                             <label for="q1d">Maximizing likelihood of Gaussian mixture components</label><br>
                         </div>
                         <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
-                        <div id="q1-result" style="margin-top: 1rem;"></div>
+                        <div id="q1-result" class="margin-top"></div>
                     </div>
 
-                    <div class="quiz-question">
+                    <div class="enhanced-quiz-question">
                         <h4>Question 2: Bandwidth Effect</h4>
                         <p>What happens when the bandwidth parameter h is too small?</p>
-                        <div style="margin: 1rem 0;">
+                        <div class="margin-top">
                             <input type="radio" name="q2" value="a" id="q2a">
                             <label for="q2a">Too few clusters are found, leading to undersmoothing</label><br>
                             <input type="radio" name="q2" value="b" id="q2b">
@@ -1428,13 +1294,13 @@
                             <label for="q2d">All points converge to a single cluster</label><br>
                         </div>
                         <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
-                        <div id="q2-result" style="margin-top: 1rem;"></div>
+                        <div id="q2-result" class="margin-top"></div>
                     </div>
 
-                    <div class="quiz-question">
+                    <div class="enhanced-quiz-question">
                         <h4>Question 3: Convergence Property</h4>
                         <p>Which statement about Mean Shift convergence is correct?</p>
-                        <div style="margin: 1rem 0;">
+                        <div class="margin-top">
                             <input type="radio" name="q3" value="a" id="q3a">
                             <label for="q3a">The algorithm may decrease density at some iterations</label><br>
                             <input type="radio" name="q3" value="b" id="q3b">
@@ -1445,13 +1311,13 @@
                             <label for="q3c">The algorithm always finds the global density maximum</label><br>
                         </div>
                         <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
-                        <div id="q3-result" style="margin-top: 1rem;"></div>
+                        <div id="q3-result" class="margin-top"></div>
                     </div>
 
-                    <div class="quiz-question">
+                    <div class="enhanced-quiz-question">
                         <h4>Question 4: Kernel Selection</h4>
                         <p>Which kernel function is theoretically optimal for density estimation?</p>
-                        <div style="margin: 1rem 0;">
+                        <div class="margin-top">
                             <input type="radio" name="q4" value="a" id="q4a">
                             <label for="q4a">Gaussian kernel</label><br>
                             <input type="radio" name="q4" value="b" id="q4b">
@@ -1462,13 +1328,13 @@
                             <label for="q4d">Triangular kernel</label><br>
                         </div>
                         <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
-                        <div id="q4-result" style="margin-top: 1rem;"></div>
+                        <div id="q4-result" class="margin-top"></div>
                     </div>
 
-                    <div class="quiz-question">
+                    <div class="enhanced-quiz-question">
                         <h4>Question 5: Application Domain</h4>
                         <p>Mean Shift is particularly well-suited for which application?</p>
-                        <div style="margin: 1rem 0;">
+                        <div class="margin-top">
                             <input type="radio" name="q5" value="a" id="q5a">
                             <label for="q5a">Text classification with high-dimensional sparse features</label><br>
                             <input type="radio" name="q5" value="b" id="q5b">
@@ -1479,19 +1345,14 @@
                             <label for="q5d">Clustering very large datasets with millions of points</label><br>
                         </div>
                         <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
-                        <div id="q5-result" style="margin-top: 1rem;"></div>
+                        <div id="q5-result" class="margin-top"></div>
                     </div>
 
-                    <div style="margin: 2rem 0; padding: 1rem; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                    <div class="quiz-section">
                         <h4>Quiz Score</h4>
                         <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
                         <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                     </div>
-                </div>
-
-                <div class="navigation-buttons">
-                    <a href="/tutorials/ml-fundamentals/clustering/chapter12" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Chapter 12: Gaussian Mixture Models</a>
-                    <a href="/tutorials/ml-fundamentals/clustering/chapter14" class="azbn-btn" style="text-decoration: none;">Chapter 14: Clustering Evaluation →</a>
                 </div>
             </div>
         </section>
@@ -1516,6 +1377,8 @@
     <div class="navigation-buttons">
         <a href="/tutorials/clustering/chapter12" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 12: Gaussian Mixture Models</a>
         <a href="/tutorials/clustering/chapter14" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 14: Clustering Evaluation →</a>
+    </div>
+
     </div>
 
 </body>

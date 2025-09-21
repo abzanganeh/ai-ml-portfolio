@@ -43,6 +43,9 @@ function updateEvalDemo() {
     document.getElementById('eval-ch').textContent = (scenario.ch * algEffect).toFixed(1);
     document.getElementById('eval-dunn').textContent = (scenario.dunn * algEffect).toFixed(2);
     document.getElementById('eval-interpretation').textContent = scenario.interp;
+    
+    // Create visualization
+    createEvalVisualization(dataset.value, algorithm.value, parseInt(clusters.value));
 }
 
 // Update stability demo
@@ -81,6 +84,9 @@ function runStabilityAnalysis() {
                       'Low stability - clustering is sensitive to perturbations.';
     
     document.getElementById('stability-assessment').textContent = assessment;
+    
+    // Create visualization
+    createStabilityVisualization();
 }
 
 // Update selection demo
@@ -107,6 +113,9 @@ function updateSelectionDemo() {
     document.getElementById('selection-score').textContent = (factor.score * methodEffect).toFixed(2);
     document.getElementById('selection-confidence').textContent = factor.confidence;
     document.getElementById('selection-alternative').textContent = factor.alternatives;
+    
+    // Create visualization
+    createSelectionVisualization();
 }
 
 // Quiz functionality
@@ -190,6 +199,393 @@ function checkQuizAnswers() {
     
     // Scroll to results
     document.getElementById('quiz-results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ===== VISUALIZATION FUNCTIONS =====
+
+// Create evaluation visualization
+function createEvalVisualization(dataset, algorithm, k) {
+    const container = document.getElementById('eval-visualization');
+    if (!container) return;
+    
+    // Clear previous content
+    container.innerHTML = '';
+    
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 400;
+    canvas.style.border = '1px solid #ddd';
+    canvas.style.borderRadius = '8px';
+    canvas.style.backgroundColor = '#fafafa';
+    container.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Generate sample data based on dataset type
+    const data = generateSampleData(dataset, k);
+    
+    // Draw the visualization
+    drawClusteringVisualization(ctx, data, algorithm, k);
+}
+
+// Generate sample data for visualization
+function generateSampleData(dataset, k) {
+    const data = [];
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    for (let i = 0; i < k; i++) {
+        const cluster = [];
+        const centerX = 100 + (i % 3) * 200;
+        const centerY = 100 + Math.floor(i / 3) * 150;
+        
+        let spread = 30;
+        let count = 50;
+        
+        // Adjust based on dataset type
+        switch(dataset) {
+            case 'wellseparated':
+                spread = 25;
+                count = 60;
+                break;
+            case 'overlapping':
+                spread = 45;
+                count = 40;
+                break;
+            case 'different-sizes':
+                spread = 20 + i * 10;
+                count = 30 + i * 20;
+                break;
+            case 'noisy':
+                spread = 40;
+                count = 35;
+                break;
+        }
+        
+        for (let j = 0; j < count; j++) {
+            const x = centerX + (Math.random() - 0.5) * spread * 2;
+            const y = centerY + (Math.random() - 0.5) * spread * 2;
+            cluster.push({ x, y, cluster: i, color: colors[i % colors.length] });
+        }
+        
+        data.push(...cluster);
+    }
+    
+    // Add noise for noisy dataset
+    if (dataset === 'noisy') {
+        for (let i = 0; i < 20; i++) {
+            data.push({
+                x: Math.random() * 600,
+                y: Math.random() * 400,
+                cluster: -1,
+                color: '#999'
+            });
+        }
+    }
+    
+    return data;
+}
+
+// Draw clustering visualization
+function drawClusteringVisualization(ctx, data, algorithm, k) {
+    // Clear canvas
+    ctx.clearRect(0, 0, 600, 400);
+    
+    // Draw background
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, 600, 400);
+    
+    // Draw grid
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 600; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 400);
+        ctx.stroke();
+    }
+    for (let i = 0; i <= 400; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(600, i);
+        ctx.stroke();
+    }
+    
+    // Draw data points
+    data.forEach(point => {
+        ctx.fillStyle = point.color;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+    
+    // Draw cluster centers for k-means
+    if (algorithm === 'kmeans') {
+        const centers = calculateCenters(data, k);
+        centers.forEach((center, i) => {
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Draw center label
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText(`C${i+1}`, center.x + 10, center.y - 10);
+        });
+    }
+    
+    // Draw title
+    ctx.fillStyle = '#333';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(`${algorithm.toUpperCase()} Clustering (k=${k})`, 20, 30);
+    
+    // Draw legend
+    ctx.font = '12px Arial';
+    ctx.fillText('Dataset: ' + document.getElementById('eval-dataset').selectedOptions[0].text, 20, 50);
+}
+
+// Calculate cluster centers
+function calculateCenters(data, k) {
+    const centers = [];
+    const clusters = {};
+    
+    // Group data by cluster
+    data.forEach(point => {
+        if (point.cluster >= 0) {
+            if (!clusters[point.cluster]) {
+                clusters[point.cluster] = [];
+            }
+            clusters[point.cluster].push(point);
+        }
+    });
+    
+    // Calculate centers
+    for (let i = 0; i < k; i++) {
+        if (clusters[i] && clusters[i].length > 0) {
+            const centerX = clusters[i].reduce((sum, p) => sum + p.x, 0) / clusters[i].length;
+            const centerY = clusters[i].reduce((sum, p) => sum + p.y, 0) / clusters[i].length;
+            centers.push({ x: centerX, y: centerY });
+        }
+    }
+    
+    return centers;
+}
+
+// Create stability visualization
+function createStabilityVisualization() {
+    const container = document.getElementById('stability-visualization');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 500;
+    canvas.height = 300;
+    canvas.style.border = '1px solid #ddd';
+    canvas.style.borderRadius = '8px';
+    canvas.style.backgroundColor = '#fafafa';
+    container.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Generate stability data
+    const runs = parseInt(document.getElementById('stability-runs').value);
+    const level = parseFloat(document.getElementById('stability-level').value);
+    
+    const ariValues = [];
+    for (let i = 0; i < runs; i++) {
+        ariValues.push(0.6 + Math.random() * 0.3 + (Math.random() - 0.5) * level);
+    }
+    
+    drawStabilityHistogram(ctx, ariValues);
+}
+
+// Draw stability histogram
+function drawStabilityHistogram(ctx, values) {
+    ctx.clearRect(0, 0, 500, 300);
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, 500, 300);
+    
+    // Calculate histogram
+    const bins = 10;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const binWidth = (max - min) / bins;
+    const histogram = new Array(bins).fill(0);
+    
+    values.forEach(value => {
+        const bin = Math.min(Math.floor((value - min) / binWidth), bins - 1);
+        histogram[bin]++;
+    });
+    
+    const maxCount = Math.max(...histogram);
+    
+    // Draw histogram
+    ctx.fillStyle = '#4ecdc4';
+    histogram.forEach((count, i) => {
+        const x = 50 + (i * 400) / bins;
+        const height = (count / maxCount) * 200;
+        const y = 250 - height;
+        
+        ctx.fillRect(x, y, 400 / bins - 2, height);
+    });
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 250);
+    ctx.lineTo(450, 250);
+    ctx.moveTo(50, 50);
+    ctx.lineTo(50, 250);
+    ctx.stroke();
+    
+    // Draw labels
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText('ARI Values', 200, 290);
+    
+    ctx.save();
+    ctx.translate(20, 150);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Frequency', 0, 0);
+    ctx.restore();
+    
+    // Draw mean line
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+    const meanX = 50 + ((mean - min) / (max - min)) * 400;
+    
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(meanX, 50);
+    ctx.lineTo(meanX, 250);
+    ctx.stroke();
+    
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText(`Mean: ${mean.toFixed(3)}`, meanX + 5, 40);
+}
+
+// Create parameter selection visualization
+function createSelectionVisualization() {
+    const container = document.getElementById('selection-visualization');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 500;
+    canvas.height = 300;
+    canvas.style.border = '1px solid #ddd';
+    canvas.style.borderRadius = '8px';
+    canvas.style.backgroundColor = '#fafafa';
+    container.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    const maxK = parseInt(document.getElementById('max-k').value);
+    const method = document.getElementById('selection-metric').value;
+    
+    drawParameterSelectionCurve(ctx, maxK, method);
+}
+
+// Draw parameter selection curve
+function drawParameterSelectionCurve(ctx, maxK, method) {
+    ctx.clearRect(0, 0, 500, 300);
+    ctx.fillStyle = '#fafafa';
+    ctx.fillRect(0, 0, 500, 300);
+    
+    // Generate curve data
+    const kValues = [];
+    const scores = [];
+    
+    for (let k = 2; k <= maxK; k++) {
+        kValues.push(k);
+        let score;
+        
+        switch(method) {
+            case 'gap':
+                score = Math.exp(-Math.abs(k - 4) * 0.3) + Math.random() * 0.1;
+                break;
+            case 'elbow':
+                score = 1 / (1 + Math.abs(k - 3) * 0.2) + Math.random() * 0.05;
+                break;
+            case 'silhouette':
+                score = Math.exp(-Math.abs(k - 4) * 0.4) + Math.random() * 0.08;
+                break;
+            default:
+                score = Math.random() * 0.5 + 0.3;
+        }
+        
+        scores.push(score);
+    }
+    
+    // Draw curve
+    ctx.strokeStyle = '#4ecdc4';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    kValues.forEach((k, i) => {
+        const x = 50 + (i * 400) / (kValues.length - 1);
+        const y = 250 - (scores[i] * 180);
+        
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    
+    ctx.stroke();
+    
+    // Draw points
+    ctx.fillStyle = '#4ecdc4';
+    kValues.forEach((k, i) => {
+        const x = 50 + (i * 400) / (kValues.length - 1);
+        const y = 250 - (scores[i] * 180);
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 250);
+    ctx.lineTo(450, 250);
+    ctx.moveTo(50, 50);
+    ctx.lineTo(50, 250);
+    ctx.stroke();
+    
+    // Draw labels
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText('Number of Clusters (k)', 200, 290);
+    
+    ctx.save();
+    ctx.translate(20, 150);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(`${method.toUpperCase()} Score`, 0, 0);
+    ctx.restore();
+    
+    // Highlight optimal k
+    const optimalIndex = scores.indexOf(Math.max(...scores));
+    const optimalX = 50 + (optimalIndex * 400) / (kValues.length - 1);
+    const optimalY = 250 - (scores[optimalIndex] * 180);
+    
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(optimalX, optimalY, 8, 0, 2 * Math.PI);
+    ctx.stroke();
+    
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText(`Optimal k = ${kValues[optimalIndex]}`, optimalX + 10, optimalY - 10);
 }
 
 // Make functions globally available

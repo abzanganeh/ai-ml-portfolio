@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter12.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -29,15 +29,13 @@
     </header>
 
     <main class="main-content">
-        <!-- Tutorial Header -->
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 12: Gaussian Mixture Models</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <p class="chapter-subtitle">Master probabilistic clustering with Gaussian mixtures, EM algorithm, and model selection techniques</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
-                <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                <div class="chapter-progress" data-progress="80.00">
+                    <div class="chapter-progress-fill"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +59,18 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="12.5"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="theory">Theory</button>
+                    <button class="section-nav-btn" data-section="em-algorithm">EM Algorithm</button>
+                    <button class="section-nav-btn" data-section="convergence">Convergence</button>
+                    <button class="section-nav-btn" data-section="model-selection">Model Selection</button>
+                    <button class="section-nav-btn" data-section="comparison">Comparison</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demo</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -79,24 +78,26 @@
 
         <section class="azbn-section">
             <div class="azbn-container">
+
                 <!-- Learning Objectives -->
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand the probabilistic foundation of Gaussian Mixture Models</li>
+                        <li>Master multivariate Gaussian distributions and mixture model theory</li>
+                        <li>Learn the Expectation-Maximization (EM) algorithm step by step</li>
+                        <li>Analyze convergence properties and parameter estimation</li>
+                        <li>Explore model selection techniques for determining optimal components</li>
+                        <li>Compare GMMs with hard clustering methods like K-means</li>
+                        <li>Apply GMMs to real-world probabilistic clustering problems</li>
+                        <li>Understand soft clustering and uncertainty quantification</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>Probabilistic Clustering with Gaussian Mixtures</h2>
                         
                         <p>Gaussian Mixture Models represent a fundamental shift from deterministic to probabilistic clustering. Instead of assigning each point to exactly one cluster, GMMs model the data as arising from a mixture of Gaussian distributions, providing soft cluster assignments with uncertainty measures.</p>
@@ -127,8 +128,10 @@
                         </div>
 
                         <div class="image-container">
-                            <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter12/hard_vs_soft_clustering.png') }}" alt="Hard vs Soft Clustering Comparison" class="tutorial-image">
-                            <p class="image-caption">Interactive comparison showing K-means hard assignments vs GMM soft assignments on the same dataset</p>
+                            <div class="visualization-placeholder">
+                                <h4>Visualization: Hard vs Soft Clustering</h4>
+                                <p><strong>Interactive Comparison:</strong> Side-by-side view showing K-means hard assignments vs GMM soft assignments on the same dataset. The GMM visualization shows probability contours and uncertainty regions, while K-means shows discrete cluster boundaries. Points are colored by their strongest cluster membership but with transparency indicating uncertainty.</p>
+                            </div>
                         </div>
 
                         <h3>Core Concepts of Gaussian Mixtures</h3>
@@ -148,7 +151,7 @@
                         </div>
 
                         <h3>Advantages of Probabilistic Modeling</h3>
-                        <div class="model-box">
+                        <div class="important-notes">
                             <h4>Benefits of the GMM Approach</h4>
                             
                             <h5>Uncertainty Quantification:</h5>
@@ -158,410 +161,678 @@
                                 <li><strong>Model uncertainty:</strong> Assess confidence in the overall model</li>
                             </ul>
                             
-                            <h5>Flexible Cluster Shapes:</h5>
+                            <h5>Flexible Modeling:</h5>
                             <ul>
-                                <li><strong>Elliptical clusters:</strong> Can model elongated or oriented clusters</li>
-                                <li><strong>Varying sizes:</strong> Different components can have different scales</li>
-                                <li><strong>Overlapping regions:</strong> Natural handling of cluster overlap</li>
+                                <li><strong>Elliptical clusters:</strong> Different shapes and orientations</li>
+                                <li><strong>Varying sizes:</strong> Clusters can have different scales</li>
+                                <li><strong>Unequal weights:</strong> Some clusters can be more prevalent</li>
                             </ul>
                             
-                            <h5>Statistical Foundation:</h5>
+                            <h5>Principled Framework:</h5>
                             <ul>
-                                <li><strong>Generative model:</strong> Can generate new samples from the model</li>
-                                <li><strong>Density estimation:</strong> Provides probability density at any point</li>
-                                <li><strong>Model selection:</strong> Statistical criteria for choosing number of components</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
-                        
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
-
-                        <h3>Random Initialization: The Baseline</h3>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
-
-                        <div class="model-box">
-                            <h4>Random Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <h5><strong>Basic Random Selection:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_init(X, k):
-    n, d = X.shape
-    indices = random_sample(n, k)  <span style="color: #1976d2;">// Sample k indices without replacement</span>
-    centroids = X[indices]          <span style="color: #1976d2;">// Select corresponding data points</span>
-    <strong>return</strong> centroids
-                                </div>
-                                
-                                <h5><strong>Random Uniform in Feature Space:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_uniform_init(X, k):
-    n, d = X.shape
-    min_vals = min(X, axis=0)       <span style="color: #1976d2;">// Feature-wise minimum</span>
-    max_vals = max(X, axis=0)       <span style="color: #1976d2;">// Feature-wise maximum</span>
-    centroids = uniform(min_vals, max_vals, size=(k, d))
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages of Random Initialization:</h5>
-                            <ul>
-                                <li><strong>Simplicity:</strong> Easy to implement and understand</li>
-                                <li><strong>Speed:</strong> O(kd) time complexity</li>
-                                <li><strong>Unbiased:</strong> No assumptions about data structure</li>
-                                <li><strong>Baseline:</strong> Good reference for comparing other methods</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>High variance:</strong> Results vary significantly across runs</li>
-                                <li><strong>Poor clustering:</strong> Often leads to suboptimal solutions</li>
-                                <li><strong>Slow convergence:</strong> May require many iterations</li>
-                                <li><strong>Empty clusters:</strong> Risk of centroids in sparse regions</li>
+                                <li><strong>Statistical foundation:</strong> Grounded in probability theory</li>
+                                <li><strong>Model selection:</strong> Principled methods for choosing complexity</li>
+                                <li><strong>Generative model:</strong> Can generate new samples</li>
                             </ul>
                         </div>
 
-                        <h3>Furthest-First Heuristic</h3>
-                        <p>This method iteratively selects centroids that are as far as possible from previously selected ones, promoting good coverage of the data space.</p>
-
-                        <div class="model-box">
-                            <h4>Furthest-First Initialization</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> furthest_first_init(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid randomly</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Iteratively choose furthest points</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        max_distance = -1
-        furthest_idx = -1
-        
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            <span style="color: #1976d2;">// Find minimum distance to existing centroids</span>
-            min_dist = min([distance(X[j], c) <strong>for</strong> c <strong>in</strong> centroids])
-            
-            <strong>if</strong> min_dist > max_distance:
-                max_distance = min_dist
-                furthest_idx = j
-        
-        centroids.append(X[furthest_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
+                        <h3>Applications and Use Cases</h3>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Image and Signal Processing</h4>
+                                <ul>
+                                    <li><strong>Image segmentation:</strong> Pixel clustering with uncertainty</li>
+                                    <li><strong>Color quantization:</strong> Reducing color palettes</li>
+                                    <li><strong>Background subtraction:</strong> Modeling scene backgrounds</li>
+                                    <li><strong>Speech recognition:</strong> Modeling phoneme distributions</li>
+                                </ul>
                             </div>
                             
-                            <h5>Advantages:</h5>
-                            <ul>
-                                <li><strong>Good coverage:</strong> Centroids spread across data space</li>
-                                <li><strong>Deterministic:</strong> Same result for same first choice</li>
-                                <li><strong>No empty clusters:</strong> Guarantees centroids on data points</li>
-                                <li><strong>Better than random:</strong> Generally produces better initializations</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>Outlier sensitivity:</strong> May select extreme outliers</li>
-                                <li><strong>Computational cost:</strong> O(nk) time complexity</li>
-                                <li><strong>Still suboptimal:</strong> Not guaranteed to find good initializations</li>
-                                <li><strong>First choice matters:</strong> Quality depends on initial random selection</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
-                        
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
-
-                        <h3>The K-means++ Algorithm</h3>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> kmeans_plus_plus(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid uniformly at random</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Choose remaining k-1 centroids</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        distances = []
-        
-        <span style="color: #1976d2;">// Compute squared distance to nearest existing centroid</span>
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            min_dist_sq = min([||X[j] - c||² <strong>for</strong> c <strong>in</strong> centroids])
-            distances.append(min_dist_sq)
-        
-        <span style="color: #1976d2;">// Choose next centroid with probability proportional to squared distance</span>
-        probabilities = distances / sum(distances)
-        next_idx = weighted_random_choice(probabilities)
-        centroids.append(X[next_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
+                            <div class="type-card">
+                                <h4>Finance and Economics</h4>
+                                <ul>
+                                    <li><strong>Risk modeling:</strong> Portfolio risk assessment</li>
+                                    <li><strong>Market segmentation:</strong> Customer behavior modeling</li>
+                                    <li><strong>Anomaly detection:</strong> Identifying unusual transactions</li>
+                                    <li><strong>Economic forecasting:</strong> Modeling economic regimes</li>
+                                </ul>
                             </div>
                             
-                            <h5>Key Insight:</h5>
-                            <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
-                            
-                            <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
-                                <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
-                                    <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
-                                </div>
-                                <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
-                            </div>
-                        </div>
-
-                        <h3>Theoretical Analysis</h3>
-                        <p>K-means++ comes with strong theoretical guarantees that explain its superior performance.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Approximation Guarantee</h4>
-                            
-                            <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
-                                <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
-                                
-                                <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
-                                
-                                <p>Where OPT is the cost of the optimal k-means clustering.</p>
-                            </div>
-                            
-                            <h5>Proof Sketch:</h5>
-                            <ol>
-                                <li><strong>Potential function:</strong> Define Φ = Σᵢ D²(xᵢ) as sum of squared distances to nearest centroids</li>
-                                <li><strong>Expected reduction:</strong> Each K-means++ step reduces E[Φ] by a constant factor</li>
-                                <li><strong>Concentration:</strong> Use probability tail bounds to show consistent performance</li>
-                                <li><strong>Optimality bound:</strong> Relate final potential to optimal clustering cost</li>
-                            </ol>
-                            
-                            <h5>Implications:</h5>
-                            <ul>
-                                <li><strong>Logarithmic guarantee:</strong> Performance degrades slowly with k</li>
-                                <li><strong>Probabilistic bound:</strong> Guarantee holds in expectation</li>
-                                <li><strong>Initialization only:</strong> Bound applies to initialization, Lloyd's improves it</li>
-                                <li><strong>Practical relevance:</strong> Constant factors are reasonable in practice</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Initialization Comparison Demo</h3>
-                            <div class="demo-controls">
-                                <label for="init-method">Initialization Method:</label>
-                                <select id="init-method">
-                                    <option value="random">Random</option>
-                                    <option value="kmeans++">K-means++</option>
-                                </select>
-                                
-                                <label for="num-clusters-init">Number of Clusters:</label>
-                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
-                                <span id="clusters-init-display">3</span>
-                                
-                                <button onclick="runInitializationDemo()">Run Demo</button>
-                                <button onclick="resetInitializationDemo()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="initialization-canvas">
-                                <p>Click "Run Demo" to compare different initialization methods</p>
+                            <div class="type-card">
+                                <h4>Bioinformatics and Medicine</h4>
+                                <ul>
+                                    <li><strong>Gene expression:</strong> Identifying gene clusters</li>
+                                    <li><strong>Medical diagnosis:</strong> Symptom pattern recognition</li>
+                                    <li><strong>Drug discovery:</strong> Molecular similarity modeling</li>
+                                    <li><strong>Population genetics:</strong> Ancestry inference</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
+                    <!-- Theory Section -->
+                    <div id="theory" class="content-section">
+                        <h2>Mathematical Foundations</h2>
                         
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
-                        </div>
+                        <p>Gaussian Mixture Models are built on the foundation of multivariate Gaussian distributions and probability theory. Understanding these mathematical concepts is crucial for effective application and parameter interpretation.</p>
+
+                        <h3>Multivariate Gaussian Distribution</h3>
+                        <p>The building block of GMMs is the multivariate Gaussian distribution, which generalizes the familiar bell curve to multiple dimensions.</p>
 
                         <div class="formula-box">
-                            <h3>Assignment Step</h3>
+                            <h4>Multivariate Gaussian Probability Density</h4>
+                            
                             <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
+                                <p>For a d-dimensional vector <strong>x</strong> with mean <strong>μ</strong> and covariance matrix <strong>Σ</strong>:</p>
+                                <strong>{% raw %}𝒩(x|μ, Σ) = (2π)^(-d/2) |Σ|^(-1/2) exp(-½(x-μ)ᵀΣ⁻¹(x-μ)){% endraw %}</strong>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Key Components:</h5>
                                 <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
+                                    <li><strong>μ (mean vector):</strong> Center location of the distribution</li>
+                                    <li><strong>Σ (covariance matrix):</strong> Shape, size, and orientation</li>
+                                    <li><strong>|Σ| (determinant):</strong> Normalization factor for volume</li>
+                                    <li><strong>Σ⁻¹ (inverse):</strong> Precision matrix for distance calculation</li>
                                 </ul>
                             </div>
                         </div>
 
+                        <h3>Mixture Model Formulation</h3>
+                        <p>A Gaussian Mixture Model combines multiple Gaussian distributions with mixing weights to model complex data distributions.</p>
+
                         <div class="formula-box">
-                            <h3>Update Step</h3>
+                            <h4>GMM Probability Density</h4>
+                            
                             <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
-                            <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
+                                <p>A mixture of K Gaussian components:</p>
+                                <strong>{% raw %}p(x) = Σᵢ₌₁ᴷ πᵢ 𝒩(x|μᵢ, Σᵢ){% endraw %}</strong>
                             </div>
                             
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
+                            <div class="explanation-box">
+                                <h5>Parameters:</h5>
+                                <ul>
+                                    <li><strong>K:</strong> Number of mixture components</li>
+                                    <li><strong>πᵢ:</strong> Mixing weights (πᵢ ≥ 0, Σπᵢ = 1)</li>
+                                    <li><strong>μᵢ:</strong> Mean vector for component i</li>
+                                    <li><strong>Σᵢ:</strong> Covariance matrix for component i</li>
+                                </ul>
+                            </div>
+                            
+                            <h4>Posterior Probabilities (Responsibilities)</h4>
+                            <div class="formula-display">
+                                <p>Probability that point x belongs to component k:</p>
+                                <strong>{% raw %}γ(zₖ) = πₖ𝒩(x|μₖ, Σₖ) / Σⱼ₌₁ᴷ πⱼ𝒩(x|μⱼ, Σⱼ){% endraw %}</strong>
+                            </div>
+                            <p>This gives us soft cluster assignments with uncertainty quantification.</p>
+                        </div>
+
+                        <div class="image-container">
+                            <div class="visualization-placeholder">
+                                <h4>Visualization: GMM Components and Mixing</h4>
+                                <p><strong>Interactive 3D Surface:</strong> Shows individual Gaussian components and their weighted combination forming the mixture distribution. Users can adjust mixing weights and see how the overall distribution changes. Includes 2D contour plots showing how different covariance matrices create different cluster shapes.</p>
+                            </div>
+                        </div>
+
+                        <h3>Likelihood and Log-Likelihood</h3>
+                        <p>Parameter estimation in GMMs relies on maximizing the likelihood of the observed data under the model.</p>
+
+                        <div class="formula-box">
+                            <h4>Likelihood Functions</h4>
+                            
+                            <div class="formula-display">
+                                <p>For N data points, the likelihood is:</p>
+                                <strong>{% raw %}L(θ) = ∏ᵢ₌₁ᴺ p(xᵢ|θ) = ∏ᵢ₌₁ᴺ Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ){% endraw %}</strong>
+                            </div>
+                            
+                            <div class="formula-display">
+                                <p>Log-likelihood (easier to optimize):</p>
+                                <strong>{% raw %}ℓ(θ) = Σᵢ₌₁ᴺ log(Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ)){% endraw %}</strong>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <p><strong>Why log-likelihood?</strong> The log function converts products to sums, making optimization more numerically stable and computationally efficient.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Convergence Analysis Section -->
+                    <!-- EM Algorithm Section -->
+                    <div id="em-algorithm" class="content-section">
+                        <h2>The Expectation-Maximization Algorithm</h2>
+                        
+                        <p>The EM algorithm is an iterative method for finding maximum likelihood estimates in models with latent variables. For GMMs, it alternates between computing posterior probabilities (E-step) and updating parameters (M-step).</p>
+
+                        <h3>Algorithm Overview</h3>
+                        <p>EM elegantly handles the coupling between parameters by introducing latent variables representing cluster assignments.</p>
+
+                        <div class="algorithm-box">
+                            <h4>EM Algorithm Structure</h4>
+                            
+                            <div class="algorithm-display">
+                                <ol>
+                                    <li><strong>Initialize:</strong> Set initial values for θ⁽⁰⁾ = {π₁⁽⁰⁾, μ₁⁽⁰⁾, Σ₁⁽⁰⁾, ..., πₖ⁽⁰⁾, μₖ⁽⁰⁾, Σₖ⁽⁰⁾}</li>
+                                    <li><strong>Repeat until convergence:</strong>
+                                        <ul>
+                                            <li><strong>E-step:</strong> Compute posterior probabilities γᵢₖ⁽ᵗ⁾</li>
+                                            <li><strong>M-step:</strong> Update parameters θ⁽ᵗ⁺¹⁾ using γᵢₖ⁽ᵗ⁾</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Output:</strong> Final parameter estimates θ*</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <h3>E-Step: Computing Responsibilities</h3>
+                        <p>The Expectation step computes the posterior probability that each data point belongs to each component.</p>
+
+                        <div class="formula-box">
+                            <h4>E-Step Computations</h4>
+                            
+                            <div class="formula-display">
+                                <p>For each data point xᵢ and component k, compute:</p>
+                                <strong>{% raw %}γᵢₖ⁽ᵗ⁾ = πₖ⁽ᵗ⁻¹⁾𝒩(xᵢ|μₖ⁽ᵗ⁻¹⁾, Σₖ⁽ᵗ⁻¹⁾) / Σⱼ₌₁ᴷ πⱼ⁽ᵗ⁻¹⁾𝒩(xᵢ|μⱼ⁽ᵗ⁻¹⁾, Σⱼ⁽ᵗ⁻¹⁾){% endraw %}</strong>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Interpretation:</h5>
+                                <ul>
+                                    <li><strong>γᵢₖ:</strong> "Responsibility" of component k for point xᵢ</li>
+                                    <li><strong>Soft assignment:</strong> Values between 0 and 1</li>
+                                    <li><strong>Normalization:</strong> Σₖγᵢₖ = 1 for each point i</li>
+                                    <li><strong>Uncertainty:</strong> Multiple components can have non-zero responsibility</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>M-Step: Parameter Updates</h3>
+                        <p>The Maximization step updates model parameters using the computed responsibilities as weighted assignments.</p>
+
+                        <div class="formula-box">
+                            <h4>M-Step Parameter Updates</h4>
+                            
+                            <div class="formula-display">
+                                <h5>Effective Sample Size:</h5>
+                                <strong>{% raw %}Nₖ⁽ᵗ⁾ = Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾{% endraw %}</strong>
+                            </div>
+                            
+                            <div class="formula-display">
+                                <h5>Mixing Weights:</h5>
+                                <strong>{% raw %}πₖ⁽ᵗ⁾ = Nₖ⁽ᵗ⁾ / n{% endraw %}</strong>
+                            </div>
+                            
+                            <div class="formula-display">
+                                <h5>Means:</h5>
+                                <strong>{% raw %}μₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ xᵢ{% endraw %}</strong>
+                            </div>
+                            
+                            <div class="formula-display">
+                                <h5>Covariances:</h5>
+                                <strong>{% raw %}Σₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ (xᵢ - μₖ⁽ᵗ⁾)(xᵢ - μₖ⁽ᵗ⁾)ᵀ{% endraw %}</strong>
+                            </div>
+                        </div>
+
+                        <div class="image-container">
+                            <div class="visualization-placeholder">
+                                <h4>Visualization: EM Algorithm Iterations</h4>
+                                <p><strong>Animated EM Process:</strong> Step-by-step visualization showing how EM converges. Shows initial random parameters, then alternates between E-step (updating point colors/transparency based on responsibilities) and M-step (moving cluster centers and reshaping ellipses). Includes log-likelihood plot showing monotonic increase.</p>
+                            </div>
+                        </div>
+
+                        <h3>Complete EM Algorithm Implementation</h3>
+                        <div class="code-block">
+                            <h4>Pseudocode:</h4>
+                            <pre><strong>function</strong> GMM_EM(X, K, max_iter=100, tol=1e-6):
+    // Initialize parameters
+    π ← uniform distribution over K components
+    μ ← K random points from X  
+    Σ ← K identity matrices
+    
+    <strong>for</strong> iter = 1 to max_iter:
+        // E-step: Compute responsibilities
+        <strong>for</strong> i = 1 to n:
+            <strong>for</strong> k = 1 to K:
+                γᵢₖ ← πₖ * N(xᵢ|μₖ, Σₖ) / Σⱼ πⱼ * N(xᵢ|μⱼ, Σⱼ)
+        
+        // M-step: Update parameters  
+        <strong>for</strong> k = 1 to K:
+            Nₖ ← Σᵢ γᵢₖ
+            πₖ ← Nₖ / n
+            μₖ ← (1/Nₖ) Σᵢ γᵢₖ * xᵢ
+            Σₖ ← (1/Nₖ) Σᵢ γᵢₖ * (xᵢ - μₖ)(xᵢ - μₖ)ᵀ
+        
+        // Check convergence
+        <strong>if</strong> |ℓ⁽ᵗ⁾ - ℓ⁽ᵗ⁻¹⁾| < tol:
+            <strong>break</strong>
+    
+    <strong>return</strong> π, μ, Σ, γ</pre>
+                        </div>
+
+                        <h3>Implementation Considerations</h3>
+                        <div class="important-notes">
+                            <h4>Practical EM Implementation</h4>
+                            
+                            <h5>Numerical Stability:</h5>
+                            <ul>
+                                <li><strong>Regularization:</strong> Add small values to diagonal of covariance matrices</li>
+                                <li><strong>Log-space computation:</strong> Work in log probabilities to avoid underflow</li>
+                                <li><strong>Numerical conditioning:</strong> Check matrix condition numbers</li>
+                            </ul>
+                            
+                            <h5>Initialization Strategies:</h5>
+                            <ul>
+                                <li><strong>K-means initialization:</strong> Start with K-means cluster centers</li>
+                                <li><strong>Random restarts:</strong> Run multiple times with different initializations</li>
+                                <li><strong>Data-driven init:</strong> Choose initial centers from data points</li>
+                            </ul>
+                            
+                            <h5>Convergence Monitoring:</h5>
+                            <ul>
+                                <li><strong>Log-likelihood:</strong> Monitor monotonic increase</li>
+                                <li><strong>Parameter change:</strong> Check parameter stability</li>
+                                <li><strong>Maximum iterations:</strong> Prevent infinite loops</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Convergence Section -->
                     <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
+                        <h2>Convergence and Parameter Estimation</h2>
                         
-                        <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
-                        </div>
+                        <p>Understanding EM convergence properties is crucial for reliable parameter estimation and model validation in Gaussian Mixture Models.</p>
 
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
+                        <div class="important-notes">
+                            <h4>EM Convergence Guarantees</h4>
+                            
+                            <h5>Theoretical Properties:</h5>
+                            <div class="explanation-box">
+                                <ul>
+                                    <li><strong>Monotonic increase:</strong> ℓ⁽ᵗ⁺¹⁾ ≥ ℓ⁽ᵗ⁾ (log-likelihood never decreases)</li>
+                                    <li><strong>Bounded convergence:</strong> Algorithm converges to local maximum</li>
+                                    <li><strong>No guarantee of global optimum:</strong> May converge to local maxima</li>
+                                    <li><strong>Rate of convergence:</strong> Generally linear, can be slow near convergence</li>
+                                </ul>
+                            </div>
+                            
+                            <h5>Convergence Criteria:</h5>
                             <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
+                                <li><strong>Log-likelihood change:</strong> |ℓ⁽ᵗ⁾ - ℓ⁽ᵗ⁻¹⁾| < ε</li>
+                                <li><strong>Parameter change:</strong> ||θ⁽ᵗ⁾ - θ⁽ᵗ⁻¹⁾|| < δ</li>
+                                <li><strong>Maximum iterations:</strong> Prevent infinite loops</li>
+                                <li><strong>Responsibility stability:</strong> Changes in γᵢₖ below threshold</li>
                             </ul>
                         </div>
 
-                        <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
-                                <p><strong>Where:</strong></p>
+                        <h3>Dealing with Convergence Issues</h3>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Singular Covariance Matrices</h4>
                                 <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
+                                    <li><strong>Problem:</strong> Matrix becomes non-invertible</li>
+                                    <li><strong>Cause:</strong> All responsibility concentrated on few points</li>
+                                    <li><strong>Solution:</strong> Regularization, minimum eigenvalue constraints</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Local Maxima</h4>
+                                <ul>
+                                    <li><strong>Problem:</strong> Algorithm stuck in suboptimal solution</li>
+                                    <li><strong>Cause:</strong> Poor initialization or complex likelihood surface</li>
+                                    <li><strong>Solution:</strong> Multiple random restarts, better initialization</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Slow Convergence</h4>
+                                <ul>
+                                    <li><strong>Problem:</strong> Many iterations needed for convergence</li>
+                                    <li><strong>Cause:</strong> Components with very different scales</li>
+                                    <li><strong>Solution:</strong> Adaptive step sizes, acceleration methods</li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
+                        <div class="image-container">
+                            <div class="visualization-placeholder">
+                                <h4>Visualization: Convergence Analysis</h4>
+                                <p><strong>Multi-panel Dashboard:</strong> Shows log-likelihood progression, parameter trajectories, and responsibility evolution during EM iterations. Includes examples of good convergence, local maxima trapping, and numerical issues. Users can adjust initialization and see different convergence behaviors.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Selection Section -->
+                    <div id="model-selection" class="content-section">
+                        <h2>Model Selection and Complexity</h2>
+                        
+                        <p>Determining the optimal number of components K is crucial for GMM performance. Too few components underfit the data, while too many components lead to overfitting and poor generalization.</p>
+
+                        <h3>The Model Selection Challenge</h3>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Underfitting (K too small)</h4>
+                                <ul>
+                                    <li><strong>Symptoms:</strong> Poor data fit, high bias</li>
+                                    <li><strong>Indicators:</strong> Low log-likelihood, large residuals</li>
+                                    <li><strong>Solution:</strong> Increase number of components</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Overfitting (K too large)</h4>
+                                <ul>
+                                    <li><strong>Symptoms:</strong> Perfect training fit, poor generalization</li>
+                                    <li><strong>Indicators:</strong> Singular covariances, unstable parameters</li>
+                                    <li><strong>Solution:</strong> Decrease components or regularize</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Information Criteria</h3>
+                        <p>Information criteria balance model fit with complexity by penalizing the number of parameters.</p>
+
+                        <div class="formula-box">
+                            <h4>Model Selection Criteria</h4>
+                            
+                            <div class="formula-display">
+                                <h5>Akaike Information Criterion (AIC):</h5>
+                                <strong>{% raw %}AIC = -2ℓ(θ̂) + 2p{% endraw %}</strong>
+                            </div>
+                            
+                            <div class="formula-display">
+                                <h5>Bayesian Information Criterion (BIC):</h5>
+                                <strong>{% raw %}BIC = -2ℓ(θ̂) + p log(n){% endraw %}</strong>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Parameter Count for GMM:</h5>
+                                <p>For K components in d dimensions:</p>
+                                <ul>
+                                    <li><strong>Mixing weights:</strong> K-1 parameters</li>
+                                    <li><strong>Means:</strong> K×d parameters</li>
+                                    <li><strong>Covariances:</strong> K×d(d+1)/2 parameters (full)</li>
+                                    <li><strong>Total:</strong> p = (K-1) + Kd + Kd(d+1)/2</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="image-container">
+                            <div class="visualization-placeholder">
+                                <h4>Visualization: Model Selection Curves</h4>
+                                <p><strong>Interactive Model Selection:</strong> Shows log-likelihood, AIC, and BIC curves as functions of K. Users can see how different criteria suggest different optimal values. Includes visualization of fitted models for different K values to show underfitting and overfitting effects.</p>
+                            </div>
+                        </div>
+
+                        <h3>Cross-Validation Approaches</h3>
+                        <div class="important-notes">
+                            <h4>Validation-Based Model Selection</h4>
+                            
+                            <h5>K-Fold Cross-Validation:</h5>
+                            <div class="explanation-box">
+                                <ol>
+                                    <li>Split data into K folds</li>
+                                    <li>For each number of components m:
+                                        <ul>
+                                            <li>Train GMM on K-1 folds</li>
+                                            <li>Evaluate likelihood on held-out fold</li>
+                                            <li>Average across all folds</li>
+                                        </ul>
+                                    </li>
+                                    <li>Select m with highest average likelihood</li>
+                                </ol>
+                            </div>
+                            
+                            <h5>Advantages and Limitations:</h5>
                             <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
+                                <li><strong>Pros:</strong> Direct generalization assessment, less prone to overfitting</li>
+                                <li><strong>Cons:</strong> Computationally expensive, sensitive to data splitting</li>
+                                <li><strong>Recommendation:</strong> Use for final model validation</li>
+                            </ul>
+                        </div>
+
+                        <h3>Alternative Selection Methods</h3>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Silhouette Analysis</h4>
+                                <ul>
+                                    <li><strong>Method:</strong> Measure cluster cohesion and separation</li>
+                                    <li><strong>Advantage:</strong> Intuitive interpretation</li>
+                                    <li><strong>Limitation:</strong> Requires hard cluster assignments</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Gap Statistic</h4>
+                                <ul>
+                                    <li><strong>Method:</strong> Compare to null reference distribution</li>
+                                    <li><strong>Advantage:</strong> Principled statistical test</li>
+                                    <li><strong>Limitation:</strong> Assumes specific null model</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Minimum Description Length</h4>
+                                <ul>
+                                    <li><strong>Method:</strong> Balance encoding cost with fit quality</li>
+                                    <li><strong>Advantage:</strong> Information-theoretic foundation</li>
+                                    <li><strong>Limitation:</strong> Complex to compute and interpret</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Section -->
+                    <div id="comparison" class="content-section">
+                        <h2>GMM vs Other Clustering Methods</h2>
+                        
+                        <p>Understanding when to use GMMs requires comparing their strengths and limitations with other clustering approaches.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspect</th>
+                                        <th>GMM</th>
+                                        <th>K-Means</th>
+                                        <th>DBSCAN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Clustering Type</strong></td>
+                                        <td>Soft/probabilistic</td>
+                                        <td>Hard/deterministic</td>
+                                        <td>Hard with noise detection</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cluster Shape</strong></td>
+                                        <td>Elliptical, flexible orientation</td>
+                                        <td>Spherical</td>
+                                        <td>Arbitrary shapes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Model Assumptions</strong></td>
+                                        <td>Gaussian distributions</td>
+                                        <td>Spherical clusters, equal variance</td>
+                                        <td>Density-based connectivity</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Parameter Selection</strong></td>
+                                        <td>Number of components K</td>
+                                        <td>Number of clusters K</td>
+                                        <td>Epsilon and MinPts</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Uncertainty Quantification</strong></td>
+                                        <td>Explicit probabilities</td>
+                                        <td>None</td>
+                                        <td>None (hard assignments)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Outlier Handling</strong></td>
+                                        <td>Low probability assignments</td>
+                                        <td>Forced cluster assignment</td>
+                                        <td>Explicit noise detection</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Detailed Comparison: GMM vs K-Means</h3>
+                        <div class="important-notes">
+                            <h4>Relationship Between GMM and K-Means</h4>
+                            
+                            <h5>Special Case Connection:</h5>
+                            <div class="explanation-box">
+                                <p>K-means can be viewed as a special case of GMM:</p>
+                                <ul>
+                                    <li><strong>Equal mixing weights:</strong> πₖ = 1/K for all k</li>
+                                    <li><strong>Spherical covariances:</strong> Σₖ = σ²I for all k</li>
+                                    <li><strong>Hard assignments:</strong> σ² → 0 limit gives hard clustering</li>
+                                </ul>
+                            </div>
+                            
+                            <h5>When to Choose GMM over K-Means:</h5>
+                            <ul>
+                                <li><strong>Need uncertainty:</strong> Want membership probabilities</li>
+                                <li><strong>Non-spherical clusters:</strong> Elliptical or elongated shapes</li>
+                                <li><strong>Unequal cluster sizes:</strong> Natural variation in cluster prevalence</li>
+                                <li><strong>Generative modeling:</strong> Need to generate new samples</li>
+                            </ul>
+                            
+                            <h5>When K-Means is Preferable:</h5>
+                            <ul>
+                                <li><strong>Large datasets:</strong> K-means is much faster</li>
+                                <li><strong>Spherical clusters:</strong> Assumptions are met</li>
+                                <li><strong>Simple requirements:</strong> Hard assignments sufficient</li>
+                                <li><strong>Interpretability:</strong> Cluster centers more intuitive</li>
                             </ul>
                         </div>
 
                         <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
                             <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
+                                <h4>Visualization: Method Comparison on Various Datasets</h4>
+                                <p><strong>Multi-Algorithm Comparison:</strong> Shows GMM, K-means, and DBSCAN results on different synthetic datasets: (1) Well-separated spherical clusters, (2) Overlapping elliptical clusters, (3) Clusters with different densities, (4) Non-convex shapes. Demonstrates each method's strengths and limitations.</p>
                             </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+                        </div>
+
+                        <h3>GMM Applications and Advantages</h3>
+                        <div class="unsupervised-types-grid">
+                            <div class="type-card">
+                                <h4>Probabilistic Benefits</h4>
+                                <ul>
+                                    <li><strong>Uncertainty quantification:</strong> Know confidence in assignments</li>
+                                    <li><strong>Outlier detection:</strong> Points with low probability in all components</li>
+                                    <li><strong>Model comparison:</strong> Principled selection criteria</li>
+                                    <li><strong>Bayesian integration:</strong> Natural extension to Bayesian methods</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="type-card">
+                                <h4>Modeling Flexibility</h4>
+                                <ul>
+                                    <li><strong>Cluster shapes:</strong> Elliptical with arbitrary orientation</li>
+                                    <li><strong>Cluster sizes:</strong> Different scales and prevalences</li>
+                                    <li><strong>Generative capability:</strong> Sample from learned distribution</li>
+                                    <li><strong>Missing data:</strong> Can handle incomplete observations</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
+                    <div id="interactive" class="content-section">
+                        <h2>Interactive GMM Demonstration</h2>
                         
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
-                        </div>
+                        <p>Explore Gaussian Mixture Models through interactive demonstrations that show parameter effects, EM convergence, and model selection.</p>
 
-                        <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
+                        <div class="interactive-demo">
+                            <h4>Live GMM Fitting</h4>
                             
                             <div class="demo-controls">
                                 <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
+                                    <label for="gmm-components">Components: <span id="gmm-comp-val">3</span></label>
+                                    <input type="range" id="gmm-components" min="1" max="6" step="1" value="3" onchange="updateGMMDemo()">
                                 </div>
-                                
                                 <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
-                                        <option value="random">Random</option>
-                                        <option value="kmeans++">K-means++</option>
+                                    <label for="gmm-dataset">Dataset:</label>
+                                    <select id="gmm-dataset" onchange="updateGMMDemo()">
+                                        <option value="overlapping">Overlapping Gaussians</option>
+                                        <option value="separated">Well-Separated</option>
+                                        <option value="elongated">Elongated Clusters</option>
+                                        <option value="mixed">Mixed Sizes</option>
                                     </select>
                                 </div>
-                                
                                 <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
-                                        <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
+                                    <label for="covariance-type">Covariance:</label>
+                                    <select id="covariance-type" onchange="updateGMMDemo()">
+                                        <option value="full">Full</option>
+                                        <option value="diagonal">Diagonal</option>
+                                        <option value="spherical">Spherical</option>
+                                        <option value="tied">Tied</option>
                                     </select>
                                 </div>
-                                
-                                <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
+                            </div>
+                            
+                            <div style="text-align: center; margin: 1rem 0;">
+                                <button onclick="generateGMMVisualization()" style="background: var(--dill-green); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; cursor: pointer; margin: 0 0.5rem;">
+                                    Generate Visualization
+                                </button>
+                                <button onclick="resetGMMDemo()" style="background: #6c757d; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; cursor: pointer; margin: 0 0.5rem;">
+                                    Reset
+                                </button>
+                            </div>
+                            
+                            <div class="demo-visualization">
+                                <div id="gmm-demo-canvas" class="visualization-placeholder">
+                                    <h4>Interactive GMM Visualization</h4>
+                                    <p>Shows probability contours, data points with soft assignments</p>
+                                    <p><em>Ellipses show 1σ, 2σ confidence regions • Point transparency indicates membership probability</em></p>
                                 </div>
                             </div>
                             
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
-                            </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
+                            <div class="demo-metrics">
+                                <h5>Model Information:</h5>
                                 <div class="metrics-grid">
-                                    <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
+                                    <div><strong>Log-likelihood:</strong> <span id="gmm-loglik">-1245.6</span></div>
+                                    <div><strong>AIC:</strong> <span id="gmm-aic">2567.2</span></div>
+                                    <div><strong>BIC:</strong> <span id="gmm-bic">2634.8</span></div>
+                                    <div><strong>Parameters:</strong> <span id="gmm-params">23</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h4>EM Algorithm Convergence</h4>
+                            
+                            <div class="demo-controls">
+                                <button onclick="startEM()" class="azbn-btn">Start EM</button>
+                                <button onclick="stepEM()" class="azbn-btn azbn-secondary">Single Step</button>
+                                <button onclick="resetEM()" class="azbn-btn azbn-secondary">Reset</button>
+                                <div class="control-group">
+                                    <label for="em-speed">Speed:</label>
+                                    <select id="em-speed">
+                                        <option value="slow">Slow</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="fast">Fast</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-layout">
+                                <div class="demo-visualization">
+                                    <div id="em-demo-canvas" class="visualization-placeholder">
+                                        <h4>EM Algorithm Progress</h4>
+                                        <p>Watch clusters evolve through iterations</p>
                                     </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
+                                </div>
+                                
+                                <div class="demo-status">
+                                    <h5>EM Status:</h5>
+                                    <div class="status-info">
+                                        <p><strong>Iteration:</strong> <span id="em-iteration">0</span></p>
+                                        <p><strong>Log-likelihood:</strong> <span id="em-loglik">-</span></p>
+                                        <p><strong>Change:</strong> <span id="em-change">-</span></p>
+                                        <p><strong>Status:</strong> <span id="em-status">Ready</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -570,69 +841,109 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
+                        <h2>Test Your GMM Knowledge</h2>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
+                        <p>Evaluate your understanding of Gaussian Mixture Models, EM algorithm, and probabilistic clustering concepts.</p>
+
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: GMM Components</h4>
+                            <p>In a Gaussian Mixture Model, what does each mixture component represent?</p>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q1" value="a" id="q1a"> A single data point in the dataset</label>
                             </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q1" value="b" id="q1b"> A multivariate Gaussian distribution with its own parameters</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q1" value="c" id="q1c"> A cluster centroid like in K-means</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q1" value="d" id="q1d"> A distance threshold for clustering</label>
+                            </div>
+                            <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q1-result" class="quiz-result"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: EM Algorithm Steps</h4>
+                            <p>What does the E-step in the EM algorithm compute?</p>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q2" value="a" id="q2a"> The optimal model parameters</label>
                             </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q2" value="b" id="q2b"> The posterior probabilities (responsibilities) for each data point</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q2" value="c" id="q2c"> The log-likelihood of the current model</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q2" value="d" id="q2d"> The number of components needed</label>
+                            </div>
+                            <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q2-result" class="quiz-result"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: Model Selection</h4>
+                            <p>Which information criterion is generally more conservative (prefers simpler models)?</p>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q3" value="a" id="q3a"> AIC (Akaike Information Criterion)</label>
                             </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q3" value="b" id="q3b"> BIC (Bayesian Information Criterion)</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q3" value="c" id="q3c"> Both are equally conservative</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q3" value="d" id="q3d"> Neither - they both prefer complex models</label>
+                            </div>
+                            <button onclick="checkAnswer(3, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q3-result" class="quiz-result"></div>
+                        </div>
+
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 4: Soft vs Hard Clustering</h4>
+                            <p>What is the main advantage of GMM's soft clustering over K-means' hard clustering?</p>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q4" value="a" id="q4a"> GMM is always faster than K-means</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q4" value="b" id="q4b"> GMM provides uncertainty quantification and membership probabilities</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q4" value="c" id="q4c"> GMM can only find spherical clusters</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q4" value="d" id="q4d"> GMM doesn't require parameter selection</label>
+                            </div>
+                            <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q4-result" class="quiz-result"></div>
+                        </div>
+
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 5: EM Convergence</h4>
+                            <p>Which statement about EM algorithm convergence is correct?</p>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q5" value="a" id="q5a"> EM always converges to the global maximum</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q5" value="b" id="q5b"> Log-likelihood monotonically increases and EM converges to a local maximum</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q5" value="c" id="q5c"> EM can decrease the log-likelihood in some iterations</label>
+                            </div>
+                            <div class="enhanced-quiz-option">
+                                <label><input type="radio" name="q5" value="d" id="q5d"> EM convergence is not guaranteed</label>
+                            </div>
+                            <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q5-result" class="quiz-result"></div>
+                        </div>
+
+                        <div class="quiz-score">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                            <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                         </div>
                     </div>
                 </main>
@@ -640,24 +951,26 @@
         </section>
     </main>
 
-    <!-- Sub-section Navigation Footer -->
-    <div class="sub-section-nav-footer">
-        <div class="sub-nav-buttons">
-            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
-                <span>← Previous</span>
-                <span class="sub-nav-label" id="prev-label"></span>
-            </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
-                <span>Next →</span>
-            </button>
+    <footer class="azbn-footer">
+        <div class="azbn-container">
+            <div class="sub-section-nav-footer">
+                <div class="sub-nav-buttons">
+                    <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+                        <span>← Previous</span>
+                        <span class="sub-nav-label" id="prev-label"></span>
+                    </button>
+                    <button id="next-subsection" class="sub-nav-btn next-btn">
+                        <span class="sub-nav-label" id="next-label">Theory</span>
+                        <span>Next →</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons">
+                <a href="/tutorials/clustering/chapter11" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 11: DBSCAN</a>
+                <a href="/tutorials/clustering/chapter13" class="azbn-btn azbn-primary" onclick="scrollToTop()">Chapter 13: Mean Shift →</a>
+            </div>
         </div>
-    </div>
-
-    <!-- Chapter Navigation Footer -->
-    <div class="navigation-buttons">
-        <a href="/tutorials/clustering/chapter11" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 11: DBSCAN Clustering</a>
-        <a href="/tutorials/clustering/chapter13" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 13: Mean Shift Clustering →</a>
-    </div>
+    </footer>
 </body>
 </html>

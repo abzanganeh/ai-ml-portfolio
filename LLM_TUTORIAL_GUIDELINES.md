@@ -211,6 +211,14 @@
 - Provide clear instructions
 - Test all functionality before completion
 
+### Visualization Requirements (CRITICAL):
+- **Container IDs**: All visualization containers MUST have proper IDs (e.g., `id="kmeans-demo-canvas"`)
+- **JavaScript Functions**: Must use `document.getElementById()` to find containers
+- **Generate Buttons**: Interactive demos should have "Generate Visualization" buttons
+- **SVG Approach**: Use SVG elements for visualizations (not Canvas) for better compatibility
+- **Data Points**: Visualizations should show actual data points with different colors for clusters
+- **Reset Functionality**: Include reset buttons to restore placeholder content
+
 ### Navigation:
 - All navigation must work correctly
 - Progress bars must update properly
@@ -229,6 +237,8 @@
 8. **Inconsistent styling** - Use the established color palette and classes
 9. **Broken navigation** - Test all navigation functionality
 10. **Missing interactive elements** - Ensure all demos work properly
+11. **Missing visualization container IDs** - All demo containers must have proper IDs
+12. **Visualization functions not finding containers** - Use getElementById() with correct IDs
 
 ## 🚨 Chapter 2 & 3 Issues Analysis (LEARN FROM THIS)
 
