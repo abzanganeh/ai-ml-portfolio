@@ -1,334 +1,747 @@
-// Chapter 7: Distance Metrics and Similarity
+// Chapter 7: Optimal K Selection
 // Interactive Demo JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
-    initializeDistanceDemo();
+    initializeChapter7Demos();
 });
 
-// Demo functions for HTML onclick compatibility
-function runInitializationDemo() {
-    const canvas = document.getElementById('distance-canvas');
-    if (canvas) {
-        canvas.innerHTML = '<p>Distance metrics demo would appear here</p>';
-    }
+// Initialize all Chapter 7 demos
+function initializeChapter7Demos() {
+    // Initialize range sliders
+    initializeRangeSliders();
+    
+    // Initialize demo controls
+    initializeDemoControls();
 }
 
-function resetInitializationDemo() {
-    const canvas = document.getElementById('distance-canvas');
-    if (canvas) {
-        canvas.innerHTML = '<p>Click "Run Demo" to see distance comparison</p>';
-    }
-}
-
-// Initialize distance metrics demo
-function initializeDistanceDemo() {
-    const generateBtn = document.getElementById('generate-distance-demo');
-    const metricSelect = document.getElementById('distance-metric');
-    const datasetSelect = document.getElementById('dataset-type');
-
-    if (generateBtn) {
-        generateBtn.addEventListener('click', function() {
-            generateDistanceVisualization();
+// Initialize range sliders with display updates
+function initializeRangeSliders() {
+    // Elbow demo slider
+    const elbowMaxK = document.getElementById('elbow-max-k');
+    const elbowMaxKDisplay = document.getElementById('elbow-max-k-display');
+    if (elbowMaxK && elbowMaxKDisplay) {
+        elbowMaxK.addEventListener('input', function() {
+            elbowMaxKDisplay.textContent = this.value;
         });
     }
-
-    if (metricSelect) {
-        metricSelect.addEventListener('change', function() {
-            generateDistanceVisualization();
+    
+    // Silhouette demo slider
+    const silhouetteK = document.getElementById('silhouette-k');
+    const silhouetteKDisplay = document.getElementById('silhouette-k-display');
+    if (silhouetteK && silhouetteKDisplay) {
+        silhouetteK.addEventListener('input', function() {
+            silhouetteKDisplay.textContent = this.value;
         });
     }
-
-    if (datasetSelect) {
-        datasetSelect.addEventListener('change', function() {
-            generateDistanceVisualization();
+    
+    // K-means demo slider
+    const demoClusters = document.getElementById('demo-clusters');
+    const demoClustersDisplay = document.getElementById('demo-clusters-display');
+    if (demoClusters && demoClustersDisplay) {
+        demoClusters.addEventListener('input', function() {
+            demoClustersDisplay.textContent = this.value;
         });
     }
-
-    // Generate initial visualization
-    generateDistanceVisualization();
 }
 
-// Generate distance metrics visualization
-function generateDistanceVisualization() {
-    const metric = document.getElementById('distance-metric')?.value || 'euclidean';
-    const datasetType = document.getElementById('dataset-type')?.value || 'blobs';
-    
-    // Generate data points
-    const dataPoints = generateDataset(datasetType);
-    
-    // Draw data points
-    drawDataPoints(dataPoints);
-    
-    // Calculate and display distances
-    calculateAndDisplayDistances(dataPoints, metric);
+// Initialize demo controls
+function initializeDemoControls() {
+    // Auto-generate initial demos
+    setTimeout(() => {
+        generateElbowDemo();
+        generateSilhouetteDemo();
+        generateDemoData();
+    }, 500);
 }
 
-// Generate different types of datasets
-function generateDataset(type) {
-    switch (type) {
-        case 'blobs':
-            return generateBlobClusters();
-        case 'linear':
-            return generateLinearData();
-        case 'categorical':
-            return generateCategoricalData();
-        case 'mixed':
-            return generateMixedData();
-        default:
-            return generateBlobClusters();
+// ===== ELBOW METHOD DEMO =====
+
+function generateElbowDemo() {
+    const dataset = document.getElementById('elbow-dataset')?.value || 'blobs';
+    const maxK = parseInt(document.getElementById('elbow-max-k')?.value || 10);
+    
+    // Generate WCSS data
+    const wcssData = generateWCSSData(dataset, maxK);
+    
+    // Draw elbow plot
+    drawElbowPlot(wcssData);
+    
+    // Draw clustering result
+    drawElbowClusters(dataset, findOptimalK(wcssData));
+}
+
+function resetElbowDemo() {
+    const elbowPlot = document.getElementById('elbow-plot');
+    const elbowClusters = document.getElementById('elbow-clusters');
+    
+    if (elbowPlot) {
+        elbowPlot.innerHTML = '<text x="200" y="150" text-anchor="middle" fill="#666">Click "Generate Elbow Plot" to start</text>';
+    }
+    
+    if (elbowClusters) {
+        elbowClusters.innerHTML = '<text x="200" y="150" text-anchor="middle" fill="#666">Clustering result will appear here</text>';
     }
 }
 
-function generateBlobClusters() {
-    const points = [];
-    const centers = [
-        { x: 2, y: 2 },
-        { x: 6, y: 3 },
-        { x: 4, y: 6 }
-    ];
+function generateWCSSData(datasetType, maxK) {
+    const wcssData = [];
     
-    centers.forEach((center, i) => {
-        for (let j = 0; j < 15; j++) {
-            const angle = Math.random() * 2 * Math.PI;
-            const radius = Math.random() * 1.5;
-            const x = center.x + radius * Math.cos(angle);
-            const y = center.y + radius * Math.sin(angle);
-            points.push({ x, y, cluster: i, label: `Point ${points.length + 1}` });
-        }
-    });
+    // Simulate realistic WCSS values that decrease with k
+    let baseWCSS = 1000;
     
-    return points;
-}
-
-function generateLinearData() {
-    const points = [];
-    for (let i = 0; i < 30; i++) {
-        const x = Math.random() * 8;
-        const y = 0.5 * x + Math.random() * 2 - 1; // Linear relationship with noise
-        points.push({ x, y, cluster: 0, label: `Point ${i + 1}` });
+    for (let k = 1; k <= maxK; k++) {
+        // WCSS decreases with k, with diminishing returns
+        const reduction = Math.pow(k, -0.8) * 200;
+        const noise = (Math.random() - 0.5) * 20;
+        const wcss = Math.max(baseWCSS - reduction + noise, 50);
+        
+        wcssData.push({ k: k, wcss: wcss });
+        baseWCSS = wcss;
     }
-    return points;
+    
+    return wcssData;
 }
 
-function generateCategoricalData() {
-    const points = [];
-    const categories = ['A', 'B', 'C'];
-    for (let i = 0; i < 30; i++) {
-        const category = categories[Math.floor(Math.random() * categories.length)];
-        const x = Math.random() * 8;
-        const y = Math.random() * 8;
-        points.push({ x, y, category, cluster: 0, label: `Point ${i + 1}` });
-    }
-    return points;
-}
-
-function generateMixedData() {
-    const points = [];
-    for (let i = 0; i < 20; i++) {
-        const x = Math.random() * 8;
-        const y = Math.random() * 8;
-        const category = Math.random() > 0.5 ? 'Type1' : 'Type2';
-        points.push({ x, y, category, cluster: 0, label: `Point ${i + 1}` });
-    }
-    return points;
-}
-
-// Draw data points on canvas
-function drawDataPoints(points) {
-    const canvas = document.getElementById('data-canvas');
-    if (!canvas) return;
+function drawElbowPlot(wcssData) {
+    const svg = document.getElementById('elbow-plot');
+    if (!svg) return;
     
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    const width = 400;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
     
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
+    // Clear previous content
+    svg.innerHTML = '';
     
-    // Set up scaling
-    const margin = 40;
-    const scaleX = (width - 2 * margin) / 8;
-    const scaleY = (height - 2 * margin) / 8;
+    // Set up scales
+    const xScale = (width - margin.left - margin.right) / (wcssData.length - 1);
+    const maxWCSS = Math.max(...wcssData.map(d => d.wcss));
+    const minWCSS = Math.min(...wcssData.map(d => d.wcss));
+    const yScale = (height - margin.top - margin.bottom) / (maxWCSS - minWCSS);
     
     // Draw axes
-    ctx.strokeStyle = '#ccc';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(margin, margin);
-    ctx.lineTo(margin, height - margin);
-    ctx.lineTo(width - margin, height - margin);
-    ctx.stroke();
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', margin.left);
+    xAxis.setAttribute('y1', height - margin.bottom);
+    xAxis.setAttribute('x2', width - margin.right);
+    xAxis.setAttribute('y2', height - margin.bottom);
+    xAxis.setAttribute('stroke', '#333');
+    xAxis.setAttribute('stroke-width', '2');
+    svg.appendChild(xAxis);
+    
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', margin.left);
+    yAxis.setAttribute('y1', margin.top);
+    yAxis.setAttribute('x2', margin.left);
+    yAxis.setAttribute('y2', height - margin.bottom);
+    yAxis.setAttribute('stroke', '#333');
+    yAxis.setAttribute('stroke-width', '2');
+    svg.appendChild(yAxis);
+    
+    // Draw WCSS line
+    const pathData = wcssData.map((d, i) => {
+        const x = margin.left + i * xScale;
+        const y = height - margin.bottom - (d.wcss - minWCSS) * yScale;
+        return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ');
+    
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathData);
+    path.setAttribute('stroke', '#1976d2');
+    path.setAttribute('stroke-width', '3');
+    path.setAttribute('fill', 'none');
+    svg.appendChild(path);
     
     // Draw points
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
-    points.forEach((point, index) => {
-        const x = margin + point.x * scaleX;
-        const y = height - margin - point.y * scaleY;
+    wcssData.forEach((d, i) => {
+        const x = margin.left + i * xScale;
+        const y = height - margin.bottom - (d.wcss - minWCSS) * yScale;
         
-        ctx.fillStyle = colors[point.cluster % colors.length];
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, 2 * Math.PI);
-        ctx.fill();
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', '4');
+        circle.setAttribute('fill', '#1976d2');
+        svg.appendChild(circle);
         
-        // Draw label
-        ctx.fillStyle = '#333';
-        ctx.font = '10px Arial';
-        ctx.fillText(point.label, x + 6, y - 6);
+        // Add labels
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x);
+        text.setAttribute('y', y - 10);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-size', '12');
+        text.setAttribute('fill', '#333');
+        text.textContent = d.k;
+        svg.appendChild(text);
+    });
+    
+    // Highlight optimal k
+    const optimalK = findOptimalK(wcssData);
+    const optimalIndex = optimalK - 1;
+    const optimalX = margin.left + optimalIndex * xScale;
+    const optimalY = height - margin.bottom - (wcssData[optimalIndex].wcss - minWCSS) * yScale;
+    
+    const optimalCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    optimalCircle.setAttribute('cx', optimalX);
+    optimalCircle.setAttribute('cy', optimalY);
+    optimalCircle.setAttribute('r', '6');
+    optimalCircle.setAttribute('fill', '#ff6b6b');
+    optimalCircle.setAttribute('stroke', '#fff');
+    optimalCircle.setAttribute('stroke-width', '2');
+    svg.appendChild(optimalCircle);
+    
+    // Add labels
+    const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    xLabel.setAttribute('x', width / 2);
+    xLabel.setAttribute('y', height - 5);
+    xLabel.setAttribute('text-anchor', 'middle');
+    xLabel.setAttribute('font-size', '14');
+    xLabel.setAttribute('fill', '#333');
+    xLabel.textContent = 'Number of Clusters (k)';
+    svg.appendChild(xLabel);
+    
+    const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    yLabel.setAttribute('x', 15);
+    yLabel.setAttribute('y', height / 2);
+    yLabel.setAttribute('text-anchor', 'middle');
+    yLabel.setAttribute('font-size', '14');
+    yLabel.setAttribute('fill', '#333');
+    yLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
+    yLabel.textContent = 'WCSS';
+    svg.appendChild(yLabel);
+}
+
+function drawElbowClusters(datasetType, k) {
+    const svg = document.getElementById('elbow-clusters');
+    if (!svg) return;
+    
+    const width = 400;
+    const height = 300;
+    const margin = 20;
+    
+    // Clear previous content
+    svg.innerHTML = '';
+    
+    // Generate cluster data
+    const clusters = generateClusterData(datasetType, k);
+    
+    // Draw clusters
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    clusters.forEach((cluster, clusterIndex) => {
+        cluster.points.forEach(point => {
+            const x = margin + (point.x / 8) * (width - 2 * margin);
+            const y = margin + (point.y / 8) * (height - 2 * margin);
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '3');
+            circle.setAttribute('fill', colors[clusterIndex % colors.length]);
+            svg.appendChild(circle);
+        });
+        
+        // Draw centroid
+        const centroidX = margin + (cluster.centroid.x / 8) * (width - 2 * margin);
+        const centroidY = margin + (cluster.centroid.y / 8) * (height - 2 * margin);
+        
+        const centroid = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        centroid.setAttribute('cx', centroidX);
+        centroid.setAttribute('cy', centroidY);
+        centroid.setAttribute('r', '6');
+        centroid.setAttribute('fill', colors[clusterIndex % colors.length]);
+        centroid.setAttribute('stroke', '#fff');
+        centroid.setAttribute('stroke-width', '2');
+        svg.appendChild(centroid);
     });
 }
 
-// Calculate and display distances
-function calculateAndDisplayDistances(points, metric) {
-    const distanceContainer = document.getElementById('distance-results');
-    if (!distanceContainer) return;
+function findOptimalK(wcssData) {
+    // Simple elbow detection: find the point with maximum second derivative
+    let maxCurvature = 0;
+    let optimalK = 2;
     
-    let html = '<h4>Distance Calculations:</h4>';
-    html += '<div class="distance-grid">';
-    
-    // Calculate distances between first few points
-    const numPoints = Math.min(5, points.length);
-    for (let i = 0; i < numPoints; i++) {
-        for (let j = i + 1; j < numPoints; j++) {
-            const distance = calculateDistance(points[i], points[j], metric);
-            html += `
-                <div class="distance-item">
-                    <strong>${points[i].label} ↔ ${points[j].label}:</strong>
-                    <span class="distance-value">${distance.toFixed(3)}</span>
-                </div>
-            `;
+    for (let i = 1; i < wcssData.length - 1; i++) {
+        const curvature = Math.abs(wcssData[i-1].wcss - 2*wcssData[i].wcss + wcssData[i+1].wcss);
+        if (curvature > maxCurvature) {
+            maxCurvature = curvature;
+            optimalK = wcssData[i].k;
         }
     }
     
-    html += '</div>';
-    
-    // Add metric information
-    html += `<div class="metric-info">
-        <h5>Metric: ${getMetricName(metric)}</h5>
-        <p>${getMetricDescription(metric)}</p>
-    </div>`;
-    
-    distanceContainer.innerHTML = html;
+    return optimalK;
 }
 
-// Calculate distance between two points
-function calculateDistance(point1, point2, metric) {
-    switch (metric) {
-        case 'euclidean':
-            return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
-        case 'manhattan':
-            return Math.abs(point1.x - point2.x) + Math.abs(point1.y - point2.y);
-        case 'minkowski':
-            const p = 3; // Minkowski parameter
-            return Math.pow(Math.pow(Math.abs(point1.x - point2.x), p) + Math.pow(Math.abs(point1.y - point2.y), p), 1/p);
-        case 'cosine':
-            const dotProduct = point1.x * point2.x + point1.y * point2.y;
-            const magnitude1 = Math.sqrt(point1.x ** 2 + point1.y ** 2);
-            const magnitude2 = Math.sqrt(point2.x ** 2 + point2.y ** 2);
-            return 1 - (dotProduct / (magnitude1 * magnitude2));
-        case 'chebyshev':
-            return Math.max(Math.abs(point1.x - point2.x), Math.abs(point1.y - point2.y));
-        default:
-            return Math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2);
+// ===== SILHOUETTE ANALYSIS DEMO =====
+
+function generateSilhouetteDemo() {
+    const dataset = document.getElementById('silhouette-dataset')?.value || 'blobs';
+    const k = parseInt(document.getElementById('silhouette-k')?.value || 3);
+    
+    // Generate silhouette data
+    const silhouetteData = generateSilhouetteData(dataset, k);
+    
+    // Draw silhouette plot
+    drawSilhouettePlot(silhouetteData);
+    
+    // Draw clustering visualization
+    drawSilhouetteClusters(dataset, k);
+    
+    // Update metrics
+    updateSilhouetteMetrics(silhouetteData);
+}
+
+function resetSilhouetteDemo() {
+    const silhouettePlot = document.getElementById('silhouette-plot');
+    const silhouetteClusters = document.getElementById('silhouette-clusters');
+    
+    if (silhouettePlot) {
+        silhouettePlot.innerHTML = '<text x="200" y="150" text-anchor="middle" fill="#666">Click "Generate Analysis" to start</text>';
+    }
+    
+    if (silhouetteClusters) {
+        silhouetteClusters.innerHTML = '<text x="200" y="150" text-anchor="middle" fill="#666">Clustering visualization will appear here</text>';
+    }
+    
+    // Reset metrics
+    document.getElementById('avg-silhouette').textContent = '-';
+    document.getElementById('best-cluster').textContent = '-';
+    document.getElementById('worst-cluster').textContent = '-';
+}
+
+function generateSilhouetteData(datasetType, k) {
+    const clusters = generateClusterData(datasetType, k);
+    const silhouetteData = [];
+    
+    clusters.forEach((cluster, clusterIndex) => {
+        cluster.points.forEach(point => {
+            // Calculate silhouette coefficient for this point
+            const silhouette = calculateSilhouetteCoefficient(point, cluster, clusters);
+            silhouetteData.push({
+                cluster: clusterIndex,
+                silhouette: silhouette,
+                point: point
+            });
+        });
+    });
+    
+    return silhouetteData;
+}
+
+function calculateSilhouetteCoefficient(point, ownCluster, allClusters) {
+    // Simplified silhouette calculation
+    const intraClusterDist = calculateAverageDistance(point, ownCluster.points);
+    const interClusterDists = allClusters
+        .filter(c => c !== ownCluster)
+        .map(c => calculateAverageDistance(point, c.points));
+    
+    const minInterClusterDist = Math.min(...interClusterDists);
+    
+    if (intraClusterDist === 0 && minInterClusterDist === 0) {
+        return 0;
+    }
+    
+    return (minInterClusterDist - intraClusterDist) / Math.max(intraClusterDist, minInterClusterDist);
+}
+
+function calculateAverageDistance(point, otherPoints) {
+    if (otherPoints.length === 0) return 0;
+    
+    const totalDist = otherPoints.reduce((sum, otherPoint) => {
+        return sum + Math.sqrt((point.x - otherPoint.x) ** 2 + (point.y - otherPoint.y) ** 2);
+    }, 0);
+    
+    return totalDist / otherPoints.length;
+}
+
+function drawSilhouettePlot(silhouetteData) {
+    const svg = document.getElementById('silhouette-plot');
+    if (!svg) return;
+    
+    const width = 400;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    
+    // Clear previous content
+    svg.innerHTML = '';
+    
+    // Group by cluster
+    const clusters = {};
+    silhouetteData.forEach(d => {
+        if (!clusters[d.cluster]) {
+            clusters[d.cluster] = [];
+        }
+        clusters[d.cluster].push(d);
+    });
+    
+    // Sort each cluster by silhouette value
+    Object.keys(clusters).forEach(clusterKey => {
+        clusters[clusterKey].sort((a, b) => a.silhouette - b.silhouette);
+    });
+    
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+    let yOffset = 0;
+    
+    Object.keys(clusters).forEach((clusterKey, clusterIndex) => {
+        const clusterData = clusters[clusterKey];
+        const barHeight = 20;
+        const barSpacing = 2;
+        
+        clusterData.forEach((d, pointIndex) => {
+            const x = margin.left + (d.silhouette + 1) * (width - margin.left - margin.right) / 2;
+            const y = margin.top + yOffset + pointIndex * (barHeight + barSpacing);
+            const barWidth = Math.abs(d.silhouette) * (width - margin.left - margin.right) / 2;
+            
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', d.silhouette < 0 ? x - barWidth : x);
+            rect.setAttribute('y', y);
+            rect.setAttribute('width', barWidth);
+            rect.setAttribute('height', barHeight);
+            rect.setAttribute('fill', colors[clusterIndex % colors.length]);
+            rect.setAttribute('opacity', '0.7');
+            svg.appendChild(rect);
+        });
+        
+        yOffset += clusterData.length * (barHeight + barSpacing) + 10;
+    });
+    
+    // Draw zero line
+    const zeroLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    zeroLine.setAttribute('x1', margin.left + (width - margin.left - margin.right) / 2);
+    zeroLine.setAttribute('y1', margin.top);
+    zeroLine.setAttribute('x2', margin.left + (width - margin.left - margin.right) / 2);
+    zeroLine.setAttribute('y2', height - margin.bottom);
+    zeroLine.setAttribute('stroke', '#333');
+    zeroLine.setAttribute('stroke-width', '2');
+    zeroLine.setAttribute('stroke-dasharray', '5,5');
+    svg.appendChild(zeroLine);
+    
+    // Add labels
+    const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    xLabel.setAttribute('x', width / 2);
+    xLabel.setAttribute('y', height - 5);
+    xLabel.setAttribute('text-anchor', 'middle');
+    xLabel.setAttribute('font-size', '14');
+    xLabel.setAttribute('fill', '#333');
+    xLabel.textContent = 'Silhouette Coefficient';
+    svg.appendChild(xLabel);
+}
+
+function drawSilhouetteClusters(datasetType, k) {
+    // Reuse the cluster drawing function from elbow demo
+    drawElbowClusters(datasetType, k);
+}
+
+function updateSilhouetteMetrics(silhouetteData) {
+    const avgSilhouette = silhouetteData.reduce((sum, d) => sum + d.silhouette, 0) / silhouetteData.length;
+    
+    // Group by cluster to find best and worst
+    const clusters = {};
+    silhouetteData.forEach(d => {
+        if (!clusters[d.cluster]) {
+            clusters[d.cluster] = [];
+        }
+        clusters[d.cluster].push(d.silhouette);
+    });
+    
+    const clusterAverages = Object.keys(clusters).map(clusterKey => {
+        const clusterSilhouettes = clusters[clusterKey];
+        return clusterSilhouettes.reduce((sum, s) => sum + s, 0) / clusterSilhouettes.length;
+    });
+    
+    const bestCluster = Math.max(...clusterAverages);
+    const worstCluster = Math.min(...clusterAverages);
+    
+    document.getElementById('avg-silhouette').textContent = avgSilhouette.toFixed(3);
+    document.getElementById('best-cluster').textContent = bestCluster.toFixed(3);
+    document.getElementById('worst-cluster').textContent = worstCluster.toFixed(3);
+}
+
+// ===== K-MEANS DEMO =====
+
+function generateDemoData() {
+    const dataType = document.getElementById('demo-data')?.value || 'blobs';
+    const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
+    
+    // Generate and display data
+    const clusters = generateClusterData(dataType, k);
+    drawKMeansDemo(clusters, false);
+    
+    // Update status
+    const status = document.getElementById('demo-status');
+    if (status) {
+        status.innerHTML = `<p>Data generated with ${k} clusters. Click "Run K-means" to start clustering.</p>`;
     }
 }
 
-// Get metric name
-function getMetricName(metric) {
-    const names = {
-        'euclidean': 'Euclidean Distance',
-        'manhattan': 'Manhattan Distance',
-        'minkowski': 'Minkowski Distance (p=3)',
-        'cosine': 'Cosine Distance',
-        'chebyshev': 'Chebyshev Distance'
-    };
-    return names[metric] || 'Unknown Metric';
+function runKmeansDemo() {
+    const dataType = document.getElementById('demo-data')?.value || 'blobs';
+    const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
+    const initMethod = document.getElementById('demo-init')?.value || 'random';
+    
+    // Generate data and run K-means
+    const clusters = generateClusterData(dataType, k);
+    const result = runKMeansAlgorithm(clusters, k, initMethod);
+    
+    // Display result
+    drawKMeansDemo(result.clusters, true);
+    updateKMeansMetrics(result);
+    
+    // Update status
+    const status = document.getElementById('demo-status');
+    if (status) {
+        status.innerHTML = `<p>K-means completed in ${result.iterations} iterations. WCSS: ${result.wcss.toFixed(2)}</p>`;
+    }
 }
 
-// Get metric description
-function getMetricDescription(metric) {
-    const descriptions = {
-        'euclidean': 'Straight-line distance between two points. Most common for continuous numerical data.',
-        'manhattan': 'Sum of absolute differences. Good for data with outliers and categorical-like behavior.',
-        'minkowski': 'Generalization of Euclidean and Manhattan distances. Parameter p controls the shape.',
-        'cosine': 'Measures the angle between vectors. Good for high-dimensional data and text analysis.',
-        'chebyshev': 'Maximum difference across all dimensions. Useful for chess-like movements.'
-    };
-    return descriptions[metric] || 'No description available.';
+function stepKmeansDemo() {
+    // For now, just run the full algorithm
+    runKmeansDemo();
+}
+
+function resetDemo() {
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    const metrics = document.getElementById('demo-metrics');
+    const status = document.getElementById('demo-status');
+    
+    if (canvas) {
+        canvas.innerHTML = '<p>Click "Generate Data" to start the demo</p>';
+    }
+    
+    if (metrics) {
+        metrics.style.display = 'none';
+    }
+    
+    if (status) {
+        status.innerHTML = '<p>Click "Generate Data" to start the demo</p>';
+    }
+}
+
+function drawKMeansDemo(clusters, showCentroids) {
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    if (!canvas) return;
+    
+    const width = 400;
+    const height = 300;
+    const margin = 20;
+    
+    // Create SVG if it doesn't exist
+    let svg = canvas.querySelector('svg');
+    if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', width);
+        svg.setAttribute('height', height);
+        canvas.innerHTML = '';
+        canvas.appendChild(svg);
+    } else {
+        svg.innerHTML = '';
+    }
+    
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    clusters.forEach((cluster, clusterIndex) => {
+        cluster.points.forEach(point => {
+            const x = margin + (point.x / 8) * (width - 2 * margin);
+            const y = margin + (point.y / 8) * (height - 2 * margin);
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '3');
+            circle.setAttribute('fill', colors[clusterIndex % colors.length]);
+            svg.appendChild(circle);
+        });
+        
+        if (showCentroids) {
+            const centroidX = margin + (cluster.centroid.x / 8) * (width - 2 * margin);
+            const centroidY = margin + (cluster.centroid.y / 8) * (height - 2 * margin);
+            
+            const centroid = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            centroid.setAttribute('cx', centroidX);
+            centroid.setAttribute('cy', centroidY);
+            centroid.setAttribute('r', '6');
+            centroid.setAttribute('fill', colors[clusterIndex % colors.length]);
+            centroid.setAttribute('stroke', '#fff');
+            centroid.setAttribute('stroke-width', '2');
+            svg.appendChild(centroid);
+        }
+    });
+}
+
+function runKMeansAlgorithm(initialClusters, k, initMethod) {
+    // Simplified K-means implementation
+    let clusters = JSON.parse(JSON.stringify(initialClusters)); // Deep copy
+    let iterations = 0;
+    let converged = false;
+    
+    while (!converged && iterations < 50) {
+        iterations++;
+        
+        // Update centroids
+        clusters.forEach(cluster => {
+            if (cluster.points.length > 0) {
+                cluster.centroid.x = cluster.points.reduce((sum, p) => sum + p.x, 0) / cluster.points.length;
+                cluster.centroid.y = cluster.points.reduce((sum, p) => sum + p.y, 0) / cluster.points.length;
+            }
+        });
+        
+        // Reassign points (simplified - just keep current assignments for demo)
+        converged = true; // Simplified convergence
+    }
+    
+    // Calculate WCSS
+    let wcss = 0;
+    clusters.forEach(cluster => {
+        cluster.points.forEach(point => {
+            const dist = Math.sqrt((point.x - cluster.centroid.x) ** 2 + (point.y - cluster.centroid.y) ** 2);
+            wcss += dist ** 2;
+        });
+    });
+    
+    return { clusters, iterations, wcss };
+}
+
+function updateKMeansMetrics(result) {
+    const metrics = document.getElementById('demo-metrics');
+    if (metrics) {
+        metrics.style.display = 'block';
+        document.getElementById('wcss-value').textContent = result.wcss.toFixed(2);
+        document.getElementById('iterations-value').textContent = result.iterations;
+        
+        // Calculate silhouette score (simplified)
+        const silhouetteScore = 0.5 + Math.random() * 0.3; // Placeholder
+        document.getElementById('silhouette-value').textContent = silhouetteScore.toFixed(3);
+    }
+}
+
+// ===== UTILITY FUNCTIONS =====
+
+function generateClusterData(datasetType, k) {
+    const clusters = [];
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+    
+    switch (datasetType) {
+        case 'blobs':
+            // Generate well-separated blob clusters
+            for (let i = 0; i < k; i++) {
+                const centerX = 1 + (i % 3) * 3;
+                const centerY = 1 + Math.floor(i / 3) * 3;
+                const points = [];
+                
+                for (let j = 0; j < 15; j++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const radius = Math.random() * 1.5;
+                    points.push({
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle)
+                    });
+                }
+                
+                clusters.push({
+                    points: points,
+                    centroid: { x: centerX, y: centerY }
+                });
+            }
+            break;
+            
+        case 'random':
+            // Generate random points
+            const allPoints = [];
+            for (let i = 0; i < 45; i++) {
+                allPoints.push({
+                    x: Math.random() * 8,
+                    y: Math.random() * 8
+                });
+            }
+            
+            // Distribute points among clusters
+            const pointsPerCluster = Math.floor(allPoints.length / k);
+            for (let i = 0; i < k; i++) {
+                const startIdx = i * pointsPerCluster;
+                const endIdx = i === k - 1 ? allPoints.length : (i + 1) * pointsPerCluster;
+                const clusterPoints = allPoints.slice(startIdx, endIdx);
+                
+                const centroidX = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                const centroidY = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+                
+                clusters.push({
+                    points: clusterPoints,
+                    centroid: { x: centroidX, y: centroidY }
+                });
+            }
+            break;
+            
+        case 'moons':
+            // Generate moon-shaped clusters
+            for (let i = 0; i < k; i++) {
+                const points = [];
+                const centerX = 2 + i * 2;
+                const centerY = 4;
+                
+                for (let j = 0; j < 15; j++) {
+                    const angle = Math.random() * Math.PI;
+                    const radius = 1 + Math.random() * 0.5;
+                    points.push({
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle) * 0.5
+                    });
+                }
+                
+                clusters.push({
+                    points: points,
+                    centroid: { x: centerX, y: centerY }
+                });
+            }
+            break;
+    }
+    
+    return clusters;
 }
 
 // Quiz functionality
-function checkQuizAnswers() {
-    const correctAnswers = {
-        'q1': 'a',
-        'q2': 'b', 
-        'q3': 'c',
-        'q4': 'a',
-        'q5': 'b'
-    };
-
-    const explanations = {
-        'q1': 'Euclidean distance is calculated as the square root of the sum of squared differences between corresponding coordinates.',
-        'q2': 'Manhattan distance is calculated as the sum of absolute differences between corresponding coordinates.',
-        'q3': 'Cosine similarity measures the angle between vectors, making it useful for high-dimensional data and text analysis.',
-        'q4': 'Minkowski distance is a generalization that includes Euclidean (p=2) and Manhattan (p=1) as special cases.',
-        'q5': 'The choice of distance metric significantly affects clustering results, as different metrics capture different notions of similarity.'
-    };
-
-    // Collect user answers
-    let userAnswers = {};
-    let score = 0;
+window.checkAnswer = function(questionNum, correctAnswer) {
+    console.log('checkAnswer called');
+    const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+    const resultDiv = document.getElementById(`q${questionNum}-result`);
     
-    for (let i = 1; i <= 5; i++) {
-        const questionName = 'q' + i;
-        const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-        if (selectedOption) {
-            userAnswers[questionName] = selectedOption.value;
-            if (selectedOption.value === correctAnswers[questionName]) {
-                score++;
-            }
-        }
+    if (!selectedAnswer) {
+        resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
+        return;
     }
-
-    // Display results
-    const percentage = Math.round((score / 5) * 100);
-    let performanceLevel = '';
     
-    if (percentage >= 90) {
-        performanceLevel = 'Excellent';
-    } else if (percentage >= 80) {
-        performanceLevel = 'Very Good';
-    } else if (percentage >= 70) {
-        performanceLevel = 'Good';
-    } else if (percentage >= 60) {
-        performanceLevel = 'Fair';
+    const isCorrect = selectedAnswer.value === correctAnswer;
+    
+    if (isCorrect) {
+        resultDiv.innerHTML = '<p style="color: green;">✓ Correct!</p>';
     } else {
-        performanceLevel = 'Needs Improvement';
+        resultDiv.innerHTML = '<p style="color: red;">✗ Incorrect. Try again!</p>';
     }
-
-    document.getElementById('score-display').innerHTML = 
-        `Score: ${score}/5 (${percentage}%) - ${performanceLevel}`;
-
-    // Show detailed results
-    let detailedHTML = '<h4>Detailed Results:</h4>';
-    for (let i = 1; i <= 5; i++) {
-        const questionName = 'q' + i;
-        const userAnswer = userAnswers[questionName] || 'Not answered';
-        const correctAnswer = correctAnswers[questionName];
-        const isCorrect = userAnswer === correctAnswer;
-        
-        detailedHTML += `
-            <div style="background: ${isCorrect ? '#e8f5e8' : '#ffebee'}; border: 1px solid ${isCorrect ? '#4caf50' : '#f44336'}; border-radius: 6px; padding: 1rem; margin: 0.5rem 0;">
-                <strong>Question ${i}:</strong> ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
-                <br><small>Your answer: ${userAnswer} | Correct answer: ${correctAnswer}</small>
-                <br><em>${explanations[questionName]}</em>
-            </div>
-        `;
-    }
-
-    document.getElementById('detailed-results').innerHTML = detailedHTML;
-    document.getElementById('quiz-results').style.display = 'block';
     
-    // Scroll to results
-    document.getElementById('quiz-results').scrollIntoView({ behavior: 'smooth' });
-}
+    updateQuizScore();
+};
 
+window.updateQuizScore = function() {
+    const correct = document.querySelectorAll('[id$="-result"] p[style*="green"]').length;
+    const scoreElement = document.getElementById('quiz-score');
+    if (scoreElement) {
+        scoreElement.textContent = correct;
+    }
+};
+
+window.resetQuiz = function() {
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.checked = false;
+    });
+    document.querySelectorAll('[id$="-result"]').forEach(div => {
+        div.innerHTML = '';
+    });
+    const scoreElement = document.getElementById('quiz-score');
+    if (scoreElement) {
+        scoreElement.textContent = '0';
+    }
+};
+
+// Scroll to top function for navigation
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter3.js') }}"></script>
 </head>
 <body>
@@ -665,69 +666,65 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 3 Quiz</h2>
+                        <h2>Test Your Minkowski Distance Knowledge</h2>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the mathematical definition of Minkowski distance?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>d_p(x, y) = (Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ)^(1/p)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>d_p(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>d_p(x, y) = maxᵢ |xᵢ - yᵢ|</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>d_p(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> The Minkowski distance formula includes the p-th root of the sum of p-th powers of absolute differences, making it a proper generalization of distance metrics.</p>
-                                </div>
+                        <p>Evaluate your understanding of Minkowski distance, mathematical properties, and parameter effects.</p>
+
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: Mathematical Definition</h4>
+                            <p>What is the mathematical definition of Minkowski distance?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">d_p(x, y) = (Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ)^(1/p)</label><br>
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">d_p(x, y) = Σᵢ₌₁ᵈ |xᵢ - yᵢ|ᵖ</label><br>
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">d_p(x, y) = maxᵢ |xᵢ - yᵢ|</label><br>
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">d_p(x, y) = √(Σᵢ₌₁ᵈ (xᵢ - yᵢ)²)</label><br>
                             </div>
+                            <button onclick="checkAnswer(1, 'a')" class="azbn-btn">Check Answer</button>
+                            <div id="q1-result" class="margin-top"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: What happens to Minkowski distance as p approaches infinity?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It approaches zero</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It approaches the Euclidean distance</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It approaches the Chebyshev distance (maximum difference)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It becomes undefined</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> As p approaches infinity, the Minkowski distance converges to the Chebyshev distance, which considers only the maximum difference across all dimensions.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: Limit Behavior</h4>
+                            <p>What happens to Minkowski distance as p approaches infinity?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">It approaches zero</label><br>
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">It approaches the Euclidean distance</label><br>
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">It approaches the Chebyshev distance (maximum difference)</label><br>
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">It becomes undefined</label><br>
                             </div>
+                            <button onclick="checkAnswer(2, 'c')" class="azbn-btn">Check Answer</button>
+                            <div id="q2-result" class="margin-top"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: Which p-value is most robust to outliers in clustering?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>p = 1 (Manhattan distance)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>p = 2 (Euclidean distance)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>p = 5</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>p = ∞ (Chebyshev distance)</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Manhattan distance (p=1) is most robust to outliers because it sums absolute differences rather than squared differences, making extreme values less influential.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: Robustness</h4>
+                            <p>Which p-value is most robust to outliers in clustering?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">p = 1 (Manhattan distance)</label><br>
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">p = 2 (Euclidean distance)</label><br>
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">p = 5</label><br>
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">p = ∞ (Chebyshev distance)</label><br>
                             </div>
+                            <button onclick="checkAnswer(3, 'a')" class="azbn-btn">Check Answer</button>
+                            <div id="q3-result" class="margin-top"></div>
+                        </div>
+
+                        <div class="quiz-section">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 3</p>
+                            <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                         </div>
                     </div>
                 </main>

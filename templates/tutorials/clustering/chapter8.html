@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter8.js') }}"></script>
 </head>
 <body>
@@ -1112,133 +1113,99 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Quiz</h2>
+                        <h2>Test Your Hierarchical Clustering Knowledge</h2>
                         
-                        <p>Test your understanding of hierarchical clustering theory with these comprehensive questions covering the key concepts discussed in this chapter.</p>
+                        <p>Evaluate your understanding of hierarchical clustering theory, linkage methods, and computational properties.</p>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 1: Agglomerative Clustering</h3>
-                                <p>What is the main characteristic of agglomerative hierarchical clustering?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="a">
-                                        <span class="option-text">It starts with all points in separate clusters and merges them iteratively</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="b">
-                                        <span class="option-text">It starts with one cluster and splits it iteratively</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="c">
-                                        <span class="option-text">It uses a fixed number of clusters from the beginning</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="d">
-                                        <span class="option-text">It only works with categorical data</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: Agglomerative Clustering</h4>
+                            <p>What is the main characteristic of agglomerative hierarchical clustering?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">It starts with all points in separate clusters and merges them iteratively</label><br>
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">It starts with one cluster and splits it iteratively</label><br>
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">It uses a fixed number of clusters from the beginning</label><br>
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">It only works with categorical data</label><br>
                             </div>
+                            <button onclick="checkAnswer(1, 'a')" class="azbn-btn">Check Answer</button>
+                            <div id="q1-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 2: Linkage Criteria</h3>
-                                <p>Which linkage criterion is most sensitive to outliers?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="a">
-                                        <span class="option-text">Single linkage</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="b">
-                                        <span class="option-text">Complete linkage</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="c">
-                                        <span class="option-text">Average linkage</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="d">
-                                        <span class="option-text">Ward's method</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: Linkage Criteria</h4>
+                            <p>Which linkage criterion is most sensitive to outliers?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">Single linkage</label><br>
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">Complete linkage</label><br>
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">Average linkage</label><br>
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">Ward's method</label><br>
                             </div>
+                            <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q2-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 3: Time Complexity</h3>
-                                <p>What is the time complexity of standard agglomerative hierarchical clustering?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="a">
-                                        <span class="option-text">O(n log n)</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="b">
-                                        <span class="option-text">O(n²)</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="c">
-                                        <span class="option-text">O(n² log n)</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="d">
-                                        <span class="option-text">O(n³)</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: Time Complexity</h4>
+                            <p>What is the time complexity of standard agglomerative hierarchical clustering?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">O(n log n)</label><br>
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">O(n²)</label><br>
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">O(n² log n)</label><br>
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">O(n³)</label><br>
                             </div>
+                            <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
+                            <div id="q3-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 4: Dendrogram Properties</h3>
-                                <p>What property makes dendrograms useful for understanding cluster relationships?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="a">
-                                        <span class="option-text">They show the complete hierarchy of cluster merges</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="b">
-                                        <span class="option-text">They only show the final clustering result</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="c">
-                                        <span class="option-text">They work only with binary data</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="d">
-                                        <span class="option-text">They require pre-specified number of clusters</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 4: Dendrogram Properties</h4>
+                            <p>What property makes dendrograms useful for understanding cluster relationships?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q4" value="a" id="q4a">
+                                <label for="q4a">They show the complete hierarchy of cluster merges</label><br>
+                                <input type="radio" name="q4" value="b" id="q4b">
+                                <label for="q4b">They only show the final clustering result</label><br>
+                                <input type="radio" name="q4" value="c" id="q4c">
+                                <label for="q4c">They work only with binary data</label><br>
+                                <input type="radio" name="q4" value="d" id="q4d">
+                                <label for="q4d">They require pre-specified number of clusters</label><br>
                             </div>
+                            <button onclick="checkAnswer(4, 'a')" class="azbn-btn">Check Answer</button>
+                            <div id="q4-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 5: Ward's Method</h3>
-                                <p>What does Ward's method minimize when merging clusters?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="a">
-                                        <span class="option-text">The maximum distance between cluster points</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="b">
-                                        <span class="option-text">The increase in within-cluster sum of squares</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="c">
-                                        <span class="option-text">The average distance between clusters</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="d">
-                                        <span class="option-text">The minimum distance between cluster centroids</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 5: Ward's Method</h4>
+                            <p>What does Ward's method minimize when merging clusters?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q5" value="a" id="q5a">
+                                <label for="q5a">The maximum distance between cluster points</label><br>
+                                <input type="radio" name="q5" value="b" id="q5b">
+                                <label for="q5b">The increase in within-cluster sum of squares</label><br>
+                                <input type="radio" name="q5" value="c" id="q5c">
+                                <label for="q5c">The average distance between clusters</label><br>
+                                <input type="radio" name="q5" value="d" id="q5d">
+                                <label for="q5d">The minimum distance between cluster centroids</label><br>
                             </div>
+                            <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q5-result" class="margin-top"></div>
+                        </div>
 
-                            <button class="demo-button" onclick="checkQuizAnswers()">Submit Answers</button>
-                            
-                            <div id="quiz-results" class="quiz-score-container" style="display: none;">
-                                <h3>Quiz Results</h3>
-                                <div id="quiz-score"></div>
-                                <div id="quiz-feedback"></div>
-                            </div>
+                        <div class="quiz-section">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                            <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                         </div>
                     </div>
                 </div>

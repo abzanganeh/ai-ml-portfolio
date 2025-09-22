@@ -247,7 +247,7 @@
     
     <strong>return</strong> optimal_k, wcss_values, wcss_std</code></pre>
                             </div>
-                    </div>
+                        </div>
 
                         <h3>Advantages and Limitations</h3>
                         <p>Understanding when the Elbow Method works well and when it may fail.</p>
@@ -285,101 +285,6 @@
                             <h4>Visualization: Elbow Method Example</h4>
                             <p><strong>Image Description:</strong> A comprehensive elbow method visualization showing WCSS values plotted against k (number of clusters) from k=1 to k=10. The plot clearly shows the characteristic "elbow" shape with a sharp decrease in WCSS for small k values, followed by a more gradual decline. The optimal k=3 is highlighted at the elbow point where the rate of improvement begins to level off. Additional panels show the second derivative curve for automated elbow detection and confidence intervals from multiple runs.</p>
                             <p><em>This demonstrates the classic elbow pattern used for optimal k selection</em></p>
-                        </div>
-                    </div>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
-
-                        <div class="model-box">
-                            <h4>Random Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <h5><strong>Basic Random Selection:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_init(X, k):
-    n, d = X.shape
-    indices = random_sample(n, k)  <span style="color: #1976d2;">// Sample k indices without replacement</span>
-    centroids = X[indices]          <span style="color: #1976d2;">// Select corresponding data points</span>
-    <strong>return</strong> centroids
-                                </div>
-                                
-                                <h5><strong>Random Uniform in Feature Space:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_uniform_init(X, k):
-    n, d = X.shape
-    min_vals = min(X, axis=0)       <span style="color: #1976d2;">// Feature-wise minimum</span>
-    max_vals = max(X, axis=0)       <span style="color: #1976d2;">// Feature-wise maximum</span>
-    centroids = uniform(min_vals, max_vals, size=(k, d))
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages of Random Initialization:</h5>
-                            <ul>
-                                <li><strong>Simplicity:</strong> Easy to implement and understand</li>
-                                <li><strong>Speed:</strong> O(kd) time complexity</li>
-                                <li><strong>Unbiased:</strong> No assumptions about data structure</li>
-                                <li><strong>Baseline:</strong> Good reference for comparing other methods</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>High variance:</strong> Results vary significantly across runs</li>
-                                <li><strong>Poor clustering:</strong> Often leads to suboptimal solutions</li>
-                                <li><strong>Slow convergence:</strong> May require many iterations</li>
-                                <li><strong>Empty clusters:</strong> Risk of centroids in sparse regions</li>
-                            </ul>
-                        </div>
-
-                        <h3>Furthest-First Heuristic</h3>
-                        <p>This method iteratively selects centroids that are as far as possible from previously selected ones, promoting good coverage of the data space.</p>
-
-                        <div class="model-box">
-                            <h4>Furthest-First Initialization</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> furthest_first_init(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid randomly</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Iteratively choose furthest points</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        max_distance = -1
-        furthest_idx = -1
-        
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            <span style="color: #1976d2;">// Find minimum distance to existing centroids</span>
-            min_dist = min([distance(X[j], c) <strong>for</strong> c <strong>in</strong> centroids])
-            
-            <strong>if</strong> min_dist > max_distance:
-                max_distance = min_dist
-                furthest_idx = j
-        
-        centroids.append(X[furthest_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Advantages:</h5>
-                            <ul>
-                                <li><strong>Good coverage:</strong> Centroids spread across data space</li>
-                                <li><strong>Deterministic:</strong> Same result for same first choice</li>
-                                <li><strong>No empty clusters:</strong> Guarantees centroids on data points</li>
-                                <li><strong>Better than random:</strong> Generally produces better initializations</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>Outlier sensitivity:</strong> May select extreme outliers</li>
-                                <li><strong>Computational cost:</strong> O(nk) time complexity</li>
-                                <li><strong>Still suboptimal:</strong> Not guaranteed to find good initializations</li>
-                                <li><strong>First choice matters:</strong> Quality depends on initial random selection</li>
-                            </ul>
                         </div>
                     </div>
 
@@ -514,106 +419,6 @@
                             <h4>Visualization: Silhouette Analysis</h4>
                             <p><strong>Image Description:</strong> A comprehensive silhouette analysis visualization with three panels. Left: Silhouette plot showing individual point coefficients organized by cluster, with cluster averages and overall average marked. Center: Silhouette scores vs k plot showing the optimal k=3 with highest average silhouette score. Right: 2D scatter plot of the data colored by cluster assignments, demonstrating the cluster separation that leads to high silhouette scores.</p>
                             <p><em>This demonstrates how silhouette analysis provides detailed cluster quality assessment</em></p>
-                        </div>
-                    </div>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Initialization Algorithm</h4>
-                            
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> kmeans_plus_plus(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid uniformly at random</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Choose remaining k-1 centroids</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        distances = []
-        
-        <span style="color: #1976d2;">// Compute squared distance to nearest existing centroid</span>
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            min_dist_sq = min([||X[j] - c||² <strong>for</strong> c <strong>in</strong> centroids])
-            distances.append(min_dist_sq)
-        
-        <span style="color: #1976d2;">// Choose next centroid with probability proportional to squared distance</span>
-        probabilities = distances / sum(distances)
-        next_idx = weighted_random_choice(probabilities)
-        centroids.append(X[next_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
-                            </div>
-                            
-                            <h5>Key Insight:</h5>
-                            <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
-                            
-                            <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
-                                <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
-                                    <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
-                                </div>
-                                <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
-                            </div>
-                        </div>
-
-                        <h3>Theoretical Analysis</h3>
-                        <p>K-means++ comes with strong theoretical guarantees that explain its superior performance.</p>
-
-                        <div class="model-box">
-                            <h4>K-means++ Approximation Guarantee</h4>
-                            
-                            <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
-                                <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
-                                
-                                <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
-                                
-                                <p>Where OPT is the cost of the optimal k-means clustering.</p>
-                            </div>
-                            
-                            <h5>Proof Sketch:</h5>
-                            <ol>
-                                <li><strong>Potential function:</strong> Define Φ = Σᵢ D²(xᵢ) as sum of squared distances to nearest centroids</li>
-                                <li><strong>Expected reduction:</strong> Each K-means++ step reduces E[Φ] by a constant factor</li>
-                                <li><strong>Concentration:</strong> Use probability tail bounds to show consistent performance</li>
-                                <li><strong>Optimality bound:</strong> Relate final potential to optimal clustering cost</li>
-                            </ol>
-                            
-                            <h5>Implications:</h5>
-                            <ul>
-                                <li><strong>Logarithmic guarantee:</strong> Performance degrades slowly with k</li>
-                                <li><strong>Probabilistic bound:</strong> Guarantee holds in expectation</li>
-                                <li><strong>Initialization only:</strong> Bound applies to initialization, Lloyd's improves it</li>
-                                <li><strong>Practical relevance:</strong> Constant factors are reasonable in practice</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Initialization Comparison Demo</h3>
-                            <div class="demo-controls">
-                                <label for="init-method">Initialization Method:</label>
-                                <select id="init-method">
-                                    <option value="random">Random</option>
-                                    <option value="kmeans++">K-means++</option>
-                                </select>
-                                
-                                <label for="num-clusters-init">Number of Clusters:</label>
-                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
-                                <span id="clusters-init-display">3</span>
-                                
-                                <button onclick="runInitializationDemo()">Run Demo</button>
-                                <button onclick="resetInitializationDemo()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="initialization-canvas">
-                                <p>Click "Run Demo" to compare different initialization methods</p>
-                            </div>
                         </div>
                     </div>
 
@@ -852,8 +657,8 @@
                                     <span id="elbow-max-k-display">10</span>
                                 </div>
                                 
-                                <button class="demo-button" onclick="generateElbowDemo()">Generate Elbow Plot</button>
-                                <button class="demo-button" onclick="resetElbowDemo()">Reset</button>
+                                <button class="azbn-btn" onclick="generateElbowDemo()">Generate Elbow Plot</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetElbowDemo()">Reset</button>
                             </div>
                             
                             <div class="visualization-container">
@@ -887,8 +692,8 @@
                                     <span id="silhouette-k-display">3</span>
                                 </div>
                                 
-                                <button class="demo-button" onclick="generateSilhouetteDemo()">Generate Analysis</button>
-                                <button class="demo-button" onclick="resetSilhouetteDemo()">Reset</button>
+                                <button class="azbn-btn" onclick="generateSilhouetteDemo()">Generate Analysis</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetSilhouetteDemo()">Reset</button>
                             </div>
                             
                             <div class="visualization-container">
@@ -949,10 +754,10 @@
                                 </div>
                                 
                                 <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
+                                    <button class="azbn-btn" onclick="generateDemoData()">Generate Data</button>
+                                    <button class="azbn-btn" onclick="runKmeansDemo()">Run K-means</button>
+                                    <button class="azbn-btn azbn-secondary" onclick="stepKmeansDemo()">Step-by-Step</button>
+                                    <button class="azbn-btn azbn-secondary" onclick="resetDemo()">Reset</button>
                                 </div>
                             </div>
                             
@@ -986,199 +791,101 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Quiz</h2>
+                        <h2>Test Your K-Selection Knowledge</h2>
                         
-                        <p>Test your understanding of optimal K selection methods with these comprehensive questions covering the key concepts discussed in this chapter.</p>
+                        <p>Evaluate your understanding of optimal K selection methods, mathematical foundations, and practical applications.</p>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 1: Elbow Method</h3>
-                                <p>What does the "elbow" in the Elbow Method represent?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="a">
-                                        <span class="option-text">The point where WCSS stops decreasing</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="b">
-                                        <span class="option-text">The point where diminishing returns in WCSS reduction become apparent</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="c">
-                                        <span class="option-text">The maximum value of WCSS</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q1" value="d">
-                                        <span class="option-text">The point where WCSS increases</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: Elbow Method</h4>
+                            <p>What does the "elbow" in the Elbow Method represent?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">The point where WCSS stops decreasing</label><br>
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">The point where diminishing returns in WCSS reduction become apparent</label><br>
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">The maximum value of WCSS</label><br>
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">The point where WCSS increases</label><br>
                             </div>
+                            <button onclick="checkAnswer(1, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q1-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 2: Silhouette Analysis</h3>
-                                <p>What does a silhouette coefficient of 0.8 for a data point indicate?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="a">
-                                        <span class="option-text">The point is poorly clustered</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="b">
-                                        <span class="option-text">The point is well-clustered with good separation from other clusters</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="c">
-                                        <span class="option-text">The point is on the cluster boundary</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q2" value="d">
-                                        <span class="option-text">The point should be assigned to a different cluster</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: Silhouette Analysis</h4>
+                            <p>What does a silhouette coefficient of 0.8 for a data point indicate?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">The point is poorly clustered</label><br>
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">The point is well-clustered with good separation from other clusters</label><br>
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">The point is on the cluster boundary</label><br>
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">The point should be assigned to a different cluster</label><br>
                             </div>
+                            <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q2-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 3: Gap Statistic</h3>
-                                <p>What does the Gap Statistic compare to determine optimal k?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="a">
-                                        <span class="option-text">WCSS values for different k</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="b">
-                                        <span class="option-text">Silhouette scores for different k</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="c">
-                                        <span class="option-text">Observed clustering quality against expected quality from random data</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q3" value="d">
-                                        <span class="option-text">Between-cluster distances</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: Gap Statistic</h4>
+                            <p>What does the Gap Statistic compare to determine optimal k?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">WCSS values for different k</label><br>
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">Silhouette scores for different k</label><br>
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">Observed clustering quality against expected quality from random data</label><br>
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">Between-cluster distances</label><br>
                             </div>
+                            <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
+                            <div id="q3-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 4: Information Criteria</h3>
-                                <p>Which information criterion is more conservative in model selection?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="a">
-                                        <span class="option-text">AIC (Akaike Information Criterion)</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="b">
-                                        <span class="option-text">BIC (Bayesian Information Criterion)</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="c">
-                                        <span class="option-text">Both are equally conservative</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q4" value="d">
-                                        <span class="option-text">Neither is conservative</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 4: Information Criteria</h4>
+                            <p>Which information criterion is more conservative in model selection?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q4" value="a" id="q4a">
+                                <label for="q4a">AIC (Akaike Information Criterion)</label><br>
+                                <input type="radio" name="q4" value="b" id="q4b">
+                                <label for="q4b">BIC (Bayesian Information Criterion)</label><br>
+                                <input type="radio" name="q4" value="c" id="q4c">
+                                <label for="q4c">Both are equally conservative</label><br>
+                                <input type="radio" name="q4" value="d" id="q4d">
+                                <label for="q4d">Neither is conservative</label><br>
                             </div>
+                            <button onclick="checkAnswer(4, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q4-result" class="margin-top"></div>
+                        </div>
 
-                            <div class="enhanced-quiz-question">
-                                <h3>Question 5: Cross-Validation</h3>
-                                <p>What is the main challenge in applying cross-validation to clustering?</p>
-                                <div class="enhanced-quiz-options">
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="a">
-                                        <span class="option-text">Clustering is too fast to require validation</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="b">
-                                        <span class="option-text">There are no ground truth labels to validate against</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="c">
-                                        <span class="option-text">Cross-validation cannot be applied to unsupervised learning</span>
-                                    </label>
-                                    <label class="enhanced-quiz-option">
-                                        <input type="radio" name="q5" value="d">
-                                        <span class="option-text">Clustering algorithms are deterministic</span>
-                                    </label>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 5: Cross-Validation</h4>
+                            <p>What is the main challenge in applying cross-validation to clustering?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q5" value="a" id="q5a">
+                                <label for="q5a">Clustering is too fast to require validation</label><br>
+                                <input type="radio" name="q5" value="b" id="q5b">
+                                <label for="q5b">There are no ground truth labels to validate against</label><br>
+                                <input type="radio" name="q5" value="c" id="q5c">
+                                <label for="q5c">Cross-validation cannot be applied to unsupervised learning</label><br>
+                                <input type="radio" name="q5" value="d" id="q5d">
+                                <label for="q5d">Clustering algorithms are deterministic</label><br>
                             </div>
+                            <button onclick="checkAnswer(5, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q5-result" class="margin-top"></div>
+                        </div>
 
-                            <button class="demo-button" onclick="checkQuizAnswers()">Submit Answers</button>
-                            
-                            <div id="quiz-results" class="quiz-score-container" style="display: none;">
-                                <h3>Quiz Results</h3>
-                                <div id="quiz-score"></div>
-                                <div id="quiz-feedback"></div>
-                            </div>
+                        <div class="quiz-section">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                            <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                         </div>
                     </div>
-                        <h2>Chapter 4 Quiz</h2>
-                        
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </main>
             </div>
@@ -1206,3 +913,4 @@
     </div>
 </body>
 </html>
+

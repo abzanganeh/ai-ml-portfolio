@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter2.js') }}"></script>
 </head>
 <body>
@@ -687,69 +688,65 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 2 Quiz</h2>
+                        <h2>Test Your Distance Metrics Knowledge</h2>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: Which property of metric spaces ensures that distance calculations are symmetric?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Non-negativity</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Identity of indiscernibles</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Symmetry</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Triangle inequality</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> The symmetry property states that d(x, y) = d(y, x), ensuring that the distance from point x to point y is the same as the distance from y to x.</p>
-                                </div>
+                        <p>Evaluate your understanding of distance metrics, mathematical properties, and their applications in clustering.</p>
+
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 1: Metric Properties</h4>
+                            <p>Which property of metric spaces ensures that distance calculations are symmetric?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q1" value="a" id="q1a">
+                                <label for="q1a">Non-negativity</label><br>
+                                <input type="radio" name="q1" value="b" id="q1b">
+                                <label for="q1b">Identity of indiscernibles</label><br>
+                                <input type="radio" name="q1" value="c" id="q1c">
+                                <label for="q1c">Symmetry</label><br>
+                                <input type="radio" name="q1" value="d" id="q1d">
+                                <label for="q1d">Triangle inequality</label><br>
                             </div>
+                            <button onclick="checkAnswer(1, 'c')" class="azbn-btn">Check Answer</button>
+                            <div id="q1-result" class="margin-top"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 2: What is the main advantage of Manhattan distance over Euclidean distance?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's always faster to compute</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It's more robust to outliers in individual dimensions</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It provides more accurate clustering results</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better in high-dimensional spaces</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Manhattan distance is more robust to outliers because it sums absolute differences rather than squared differences, making extreme values in individual dimensions less influential.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 2: Manhattan Distance</h4>
+                            <p>What is the main advantage of Manhattan distance over Euclidean distance?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q2" value="a" id="q2a">
+                                <label for="q2a">It's always faster to compute</label><br>
+                                <input type="radio" name="q2" value="b" id="q2b">
+                                <label for="q2b">It's more robust to outliers in individual dimensions</label><br>
+                                <input type="radio" name="q2" value="c" id="q2c">
+                                <label for="q2c">It provides more accurate clustering results</label><br>
+                                <input type="radio" name="q2" value="d" id="q2d">
+                                <label for="q2d">It works better in high-dimensional spaces</label><br>
                             </div>
+                            <button onclick="checkAnswer(2, 'b')" class="azbn-btn">Check Answer</button>
+                            <div id="q2-result" class="margin-top"></div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 3: In K-means clustering, why is the arithmetic mean the optimal centroid when using Euclidean distance?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Because it's computationally efficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Because it balances the cluster sizes</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Because it minimizes the sum of squared Euclidean distances</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Because it's the most intuitive choice</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> The arithmetic mean minimizes the sum of squared Euclidean distances from all points in the cluster to the centroid, which is exactly what K-means optimization seeks to achieve.</p>
-                                </div>
+                        <div class="enhanced-quiz-question">
+                            <h4>Question 3: K-means Centroid</h4>
+                            <p>In K-means clustering, why is the arithmetic mean the optimal centroid when using Euclidean distance?</p>
+                            <div class="margin-top">
+                                <input type="radio" name="q3" value="a" id="q3a">
+                                <label for="q3a">Because it's computationally efficient</label><br>
+                                <input type="radio" name="q3" value="b" id="q3b">
+                                <label for="q3b">Because it balances the cluster sizes</label><br>
+                                <input type="radio" name="q3" value="c" id="q3c">
+                                <label for="q3c">Because it minimizes the sum of squared Euclidean distances</label><br>
+                                <input type="radio" name="q3" value="d" id="q3d">
+                                <label for="q3d">Because it's the most intuitive choice</label><br>
                             </div>
+                            <button onclick="checkAnswer(3, 'c')" class="azbn-btn">Check Answer</button>
+                            <div id="q3-result" class="margin-top"></div>
+                        </div>
+
+                        <div class="quiz-section">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 3</p>
+                            <button onclick="resetQuiz()" class="azbn-btn azbn-secondary">Reset Quiz</button>
                         </div>
                     </div>
                 </main>
