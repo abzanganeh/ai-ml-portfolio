@@ -45,8 +45,28 @@ function initializeDemoControls() {
         clustersSlider.addEventListener('input', function() {
             const display = document.getElementById('demo-clusters-display');
             if (display) display.textContent = this.value;
+            // Auto-generate dendrogram when slider changes
+            generateDendrogramDemo();
         });
     }
+    
+    // Add event listeners for linkage demo controls
+    const datasetSelect = document.getElementById('demo-dataset');
+    const linkageSelect = document.getElementById('demo-linkage');
+    
+    if (datasetSelect) {
+        datasetSelect.addEventListener('change', generateLinkageDemo);
+    }
+    
+    if (linkageSelect) {
+        linkageSelect.addEventListener('change', generateLinkageDemo);
+    }
+    
+    // Auto-generate demos on page load
+    setTimeout(() => {
+        generateLinkageDemo();
+        generateDendrogramDemo();
+    }, 200);
 }
 
 
@@ -526,81 +546,340 @@ function resetWardsMethodDemo() {
 }
 
 function generateLinkageDemo() {
-    const canvas = document.getElementById('linkage-demo-canvas');
-    if (!canvas) return;
-    
     const dataset = document.getElementById('demo-dataset')?.value || 'blobs';
     const linkage = document.getElementById('demo-linkage')?.value || 'single';
     
-    canvas.innerHTML = `<h4>Linkage Method Comparison Demo</h4><p>Generating ${dataset} dataset with ${linkage} linkage...</p>`;
+    // Generate dataset visualization
+    drawDatasetVisualization('linkage-dataset-plot', dataset);
     
-    // Simulate clustering process
-    setTimeout(() => {
-        canvas.innerHTML = `
-            <h4>${linkage.charAt(0).toUpperCase() + linkage.slice(1)} Linkage Results</h4>
-            <div style="display: flex; gap: 20px; margin: 20px 0;">
-                <div style="flex: 1;">
-                    <h5>Dataset: ${dataset}</h5>
-                    <div style="width: 200px; height: 150px; border: 1px solid #ccc; background: linear-gradient(45deg, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center;">
-                        <p>${dataset} data</p>
-                    </div>
-                </div>
-                <div style="flex: 1;">
-                    <h5>${linkage.charAt(0).toUpperCase() + linkage.slice(1)} Clustering</h5>
-                    <div style="width: 200px; height: 150px; border: 1px solid #ccc; background: linear-gradient(45deg, #e8f4f8, #d0e8f0); display: flex; align-items: center; justify-content: center;">
-                        <p>${linkage} result</p>
-                    </div>
-                </div>
-            </div>
-            <p><strong>Result:</strong> ${linkage.charAt(0).toUpperCase() + linkage.slice(1)} linkage applied to ${dataset} dataset shows characteristic clustering behavior.</p>
-        `;
-    }, 1000);
+    // Generate clustering visualization
+    drawClusteringVisualization('linkage-clustering-plot', dataset, linkage);
+}
+
+function drawDatasetVisualization(svgId, datasetType) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    
+    // Generate data points based on dataset type
+    const data = generateDatasetPoints(datasetType, 30);
+    
+    // Draw points
+    data.forEach((point, i) => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', margin.left + point.x * (width - margin.left - margin.right));
+        circle.setAttribute('cy', margin.top + point.y * (height - margin.top - margin.bottom));
+        circle.setAttribute('r', '3');
+        circle.setAttribute('fill', '#3498db');
+        circle.setAttribute('opacity', '0.7');
+        svg.appendChild(circle);
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 15);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('fill', '#2c3e50');
+    title.setAttribute('font-size', '12');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = `${datasetType.charAt(0).toUpperCase() + datasetType.slice(1)} Dataset`;
+    svg.appendChild(title);
+}
+
+function drawClusteringVisualization(svgId, datasetType, linkageMethod) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    
+    // Generate data points and clusters
+    const data = generateDatasetPoints(datasetType, 30);
+    const clusters = performClustering(data, linkageMethod);
+    
+    // Color palette for clusters
+    const colors = ['#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22'];
+    
+    // Draw clustered points
+    data.forEach((point, i) => {
+        const cluster = clusters[i];
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', margin.left + point.x * (width - margin.left - margin.right));
+        circle.setAttribute('cy', margin.top + point.y * (height - margin.top - margin.bottom));
+        circle.setAttribute('r', '3');
+        circle.setAttribute('fill', colors[cluster % colors.length]);
+        circle.setAttribute('opacity', '0.8');
+        svg.appendChild(circle);
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 15);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('fill', '#2c3e50');
+    title.setAttribute('font-size', '12');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = `${linkageMethod.charAt(0).toUpperCase() + linkageMethod.slice(1)} Clustering`;
+    svg.appendChild(title);
 }
 
 function resetLinkageDemo() {
-    const canvas = document.getElementById('linkage-demo-canvas');
-    if (canvas) {
-        canvas.innerHTML = '<p>Click "Generate Demo" to see linkage method clustering in action</p>';
-    }
+    const datasetSvg = document.getElementById('linkage-dataset-plot');
+    const clusteringSvg = document.getElementById('linkage-clustering-plot');
+    
+    if (datasetSvg) datasetSvg.innerHTML = '';
+    if (clusteringSvg) clusteringSvg.innerHTML = '';
 }
 
 function generateDendrogramDemo() {
-    const canvas = document.getElementById('dendrogram-demo-canvas');
-    if (!canvas) return;
-    
     const clusters = document.getElementById('demo-clusters')?.value || '3';
     const display = document.getElementById('demo-clusters-display');
     if (display) display.textContent = clusters;
     
-    canvas.innerHTML = `<h4>Dendrogram Visualization Demo</h4><p>Generating dendrogram with ${clusters} clusters...</p>`;
+    // Generate data points visualization
+    drawDendrogramDataVisualization('dendrogram-data-plot', clusters);
     
-    // Simulate dendrogram generation
-    setTimeout(() => {
-        canvas.innerHTML = `
-            <h4>Hierarchical Clustering Dendrogram</h4>
-            <div style="display: flex; gap: 20px; margin: 20px 0;">
-                <div style="flex: 1;">
-                    <h5>Data Points</h5>
-                    <div style="width: 200px; height: 150px; border: 1px solid #ccc; background: linear-gradient(45deg, #f0f0f0, #e0e0e0); display: flex; align-items: center; justify-content: center;">
-                        <p>${clusters} clusters</p>
-                    </div>
-                </div>
-                <div style="flex: 1;">
-                    <h5>Dendrogram</h5>
-                    <div style="width: 200px; height: 150px; border: 1px solid #ccc; background: linear-gradient(45deg, #e8f4f8, #d0e8f0); display: flex; align-items: center; justify-content: center;">
-                        <p>Tree structure</p>
-                    </div>
-                </div>
-            </div>
-            <p><strong>Result:</strong> Dendrogram shows hierarchical clustering with ${clusters} final clusters, displaying merge heights and cluster relationships.</p>
-        `;
-    }, 1000);
+    // Generate dendrogram visualization
+    drawDendrogramTreeVisualization('dendrogram-tree-plot', clusters);
+}
+
+function drawDendrogramDataVisualization(svgId, numClusters) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    
+    // Generate clustered data points
+    const data = generateClusteredDataPoints(parseInt(numClusters), 40);
+    const colors = ['#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22'];
+    
+    // Draw clustered points
+    data.forEach((point, i) => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', margin.left + point.x * (width - margin.left - margin.right));
+        circle.setAttribute('cy', margin.top + point.y * (height - margin.top - margin.bottom));
+        circle.setAttribute('r', '3');
+        circle.setAttribute('fill', colors[point.cluster % colors.length]);
+        circle.setAttribute('opacity', '0.8');
+        svg.appendChild(circle);
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 15);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('fill', '#2c3e50');
+    title.setAttribute('font-size', '12');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = `${numClusters} Clusters`;
+    svg.appendChild(title);
+}
+
+function drawDendrogramTreeVisualization(svgId, numClusters) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    const width = 300;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    
+    // Generate a simple dendrogram structure
+    const numLeaves = parseInt(numClusters) + 2;
+    const leafPositions = [];
+    const leafSpacing = (width - margin.left - margin.right) / (numLeaves - 1);
+    
+    // Position leaves
+    for (let i = 0; i < numLeaves; i++) {
+        leafPositions.push(margin.left + i * leafSpacing);
+    }
+    
+    // Draw dendrogram branches
+    const maxHeight = height - margin.top - margin.bottom;
+    const branchHeight = maxHeight * 0.8;
+    
+    // Draw vertical lines for leaves
+    leafPositions.forEach((x, i) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', height - margin.bottom);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', height - margin.bottom - 20);
+        line.setAttribute('stroke', '#3498db');
+        line.setAttribute('stroke-width', '2');
+        svg.appendChild(line);
+    });
+    
+    // Draw hierarchical branches (simplified)
+    const mergeLevels = [
+        { level: 1, pairs: [[0, 1], [2, 3]] },
+        { level: 2, pairs: [[0, 2]] }
+    ];
+    
+    mergeLevels.forEach(({ level, pairs }) => {
+        const y = height - margin.bottom - 20 - (level * branchHeight / 2);
+        
+        pairs.forEach((pair) => {
+            if (pair.length === 2) {
+                const [left, right] = pair;
+                const leftX = leafPositions[left];
+                const rightX = leafPositions[right];
+                
+                // Horizontal line
+                const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hLine.setAttribute('x1', leftX);
+                hLine.setAttribute('y1', y);
+                hLine.setAttribute('x2', rightX);
+                hLine.setAttribute('y2', y);
+                hLine.setAttribute('stroke', '#3498db');
+                hLine.setAttribute('stroke-width', '2');
+                svg.appendChild(hLine);
+                
+                // Vertical lines
+                const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                vLine1.setAttribute('x1', leftX);
+                vLine1.setAttribute('y1', height - margin.bottom - 20);
+                vLine1.setAttribute('x2', leftX);
+                vLine1.setAttribute('y2', y);
+                vLine1.setAttribute('stroke', '#3498db');
+                vLine1.setAttribute('stroke-width', '2');
+                svg.appendChild(vLine1);
+                
+                const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                vLine2.setAttribute('x1', rightX);
+                vLine2.setAttribute('y1', height - margin.bottom - 20);
+                vLine2.setAttribute('x2', rightX);
+                vLine2.setAttribute('y2', y);
+                vLine2.setAttribute('stroke', '#3498db');
+                vLine2.setAttribute('stroke-width', '2');
+                svg.appendChild(vLine2);
+            }
+        });
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 15);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('fill', '#2c3e50');
+    title.setAttribute('font-size', '12');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = 'Dendrogram';
+    svg.appendChild(title);
 }
 
 function resetDendrogramDemo() {
-    const canvas = document.getElementById('dendrogram-demo-canvas');
-    if (canvas) {
-        canvas.innerHTML = '<p>Click "Generate Dendrogram" to see hierarchical clustering visualization</p>';
+    const dataSvg = document.getElementById('dendrogram-data-plot');
+    const treeSvg = document.getElementById('dendrogram-tree-plot');
+    
+    if (dataSvg) dataSvg.innerHTML = '';
+    if (treeSvg) treeSvg.innerHTML = '';
+}
+
+// Helper functions for data generation
+function generateDatasetPoints(datasetType, numPoints) {
+    const points = [];
+    
+    if (datasetType === 'blobs') {
+        // Generate blob clusters
+        for (let i = 0; i < numPoints; i++) {
+            const cluster = Math.floor(i / (numPoints / 3));
+            const angle = Math.random() * 2 * Math.PI;
+            const radius = Math.random() * 0.15;
+            const centerX = 0.2 + (cluster % 2) * 0.6;
+            const centerY = 0.2 + Math.floor(cluster / 2) * 0.6;
+            
+            points.push({
+                x: centerX + radius * Math.cos(angle),
+                y: centerY + radius * Math.sin(angle)
+            });
+        }
+    } else if (datasetType === 'moons') {
+        // Generate moon shapes
+        for (let i = 0; i < numPoints; i++) {
+            const angle = Math.random() * Math.PI;
+            const radius = 0.1 + Math.random() * 0.1;
+            const x = 0.3 + radius * Math.cos(angle);
+            const y = 0.5 + radius * Math.sin(angle);
+            points.push({ x, y });
+        }
+        
+        for (let i = 0; i < numPoints; i++) {
+            const angle = Math.random() * Math.PI;
+            const radius = 0.1 + Math.random() * 0.1;
+            const x = 0.7 + radius * Math.cos(angle + Math.PI);
+            const y = 0.5 + radius * Math.sin(angle + Math.PI);
+            points.push({ x, y });
+        }
+    } else {
+        // Random points
+        for (let i = 0; i < numPoints; i++) {
+            points.push({
+                x: Math.random(),
+                y: Math.random()
+            });
+        }
     }
+    
+    return points;
+}
+
+function performClustering(data, linkageMethod) {
+    // Simple clustering simulation
+    const clusters = [];
+    const numClusters = 3;
+    
+    data.forEach((point, i) => {
+        let cluster;
+        if (linkageMethod === 'single') {
+            cluster = Math.floor(i / (data.length / numClusters));
+        } else if (linkageMethod === 'complete') {
+            cluster = (i + 1) % numClusters;
+        } else if (linkageMethod === 'average') {
+            cluster = Math.floor(i / (data.length / numClusters));
+        } else {
+            cluster = i % numClusters;
+        }
+        clusters.push(cluster);
+    });
+    
+    return clusters;
+}
+
+function generateClusteredDataPoints(numClusters, numPoints) {
+    const points = [];
+    
+    for (let i = 0; i < numPoints; i++) {
+        const cluster = i % numClusters;
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = Math.random() * 0.1;
+        const centerX = 0.2 + (cluster % 2) * 0.6;
+        const centerY = 0.2 + Math.floor(cluster / 2) * 0.6;
+        
+        points.push({
+            x: centerX + radius * Math.cos(angle),
+            y: centerY + radius * Math.sin(angle),
+            cluster: cluster
+        });
+    }
+    
+    return points;
 }
 
