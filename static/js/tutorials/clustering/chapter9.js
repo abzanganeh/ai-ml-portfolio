@@ -669,6 +669,12 @@ function drawDendrogramDataVisualization(svgId, numClusters) {
     
     // Draw clustered points
     data.forEach((point, i) => {
+        // Safety check for NaN values
+        if (isNaN(point.x) || isNaN(point.y)) {
+            console.warn('Skipping point with NaN coordinates:', point);
+            return;
+        }
+        
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', margin.left + point.x * (width - margin.left - margin.right));
         circle.setAttribute('cy', margin.top + point.y * (height - margin.top - margin.bottom));
@@ -700,8 +706,8 @@ function drawDendrogramTreeVisualization(svgId, numClusters) {
     const height = 250;
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     
-    // Generate a proper dendrogram structure with more leaves
-    const numLeaves = Math.max(8, parseInt(numClusters) * 2);
+    // Generate dendrogram with leaves matching the number of clusters
+    const numLeaves = parseInt(numClusters);
     const leafPositions = [];
     const leafSpacing = (width - margin.left - margin.right) / (numLeaves - 1);
     
@@ -725,129 +731,87 @@ function drawDendrogramTreeVisualization(svgId, numClusters) {
         svg.appendChild(line);
     });
     
-    // Draw hierarchical branches with proper structure
-    const mergeLevels = [
-        { level: 1, pairs: [[0, 1], [2, 3], [4, 5], [6, 7]] },
-        { level: 2, pairs: [[0, 2], [4, 6]] },
-        { level: 3, pairs: [[0, 4]] }
-    ];
-    
-    // Only show merge levels up to the selected number of clusters
-    const maxLevel = Math.min(mergeLevels.length, Math.max(1, 4 - parseInt(numClusters) + 1));
-    
-    for (let level = 1; level <= maxLevel; level++) {
-        const y = height - margin.bottom - 15 - (level * branchHeight / 3);
+    // Draw hierarchical branches based on number of clusters
+    if (numClusters >= 2) {
+        // First level merge
+        const y1 = height - margin.bottom - 15 - (branchHeight / 3);
+        const leftX = leafPositions[0];
+        const rightX = leafPositions[1];
         
-        if (level === 1) {
-            // First level merges
-            const pairs = [[0, 1], [2, 3], [4, 5], [6, 7]];
-            pairs.forEach(([left, right]) => {
-                if (left < numLeaves && right < numLeaves) {
-                    const leftX = leafPositions[left];
-                    const rightX = leafPositions[right];
-                    
-                    // Horizontal line
-                    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    hLine.setAttribute('x1', leftX);
-                    hLine.setAttribute('y1', y);
-                    hLine.setAttribute('x2', rightX);
-                    hLine.setAttribute('y2', y);
-                    hLine.setAttribute('stroke', '#3498db');
-                    hLine.setAttribute('stroke-width', '2');
-                    svg.appendChild(hLine);
-                    
-                    // Vertical lines
-                    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine1.setAttribute('x1', leftX);
-                    vLine1.setAttribute('y1', height - margin.bottom - 15);
-                    vLine1.setAttribute('x2', leftX);
-                    vLine1.setAttribute('y2', y);
-                    vLine1.setAttribute('stroke', '#3498db');
-                    vLine1.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine1);
-                    
-                    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine2.setAttribute('x1', rightX);
-                    vLine2.setAttribute('y1', height - margin.bottom - 15);
-                    vLine2.setAttribute('x2', rightX);
-                    vLine2.setAttribute('y2', y);
-                    vLine2.setAttribute('stroke', '#3498db');
-                    vLine2.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine2);
-                }
-            });
-        } else if (level === 2) {
-            // Second level merges
-            const pairs = [[1, 3], [5, 7]];
-            pairs.forEach(([left, right]) => {
-                if (left < numLeaves && right < numLeaves) {
-                    const leftX = leafPositions[left];
-                    const rightX = leafPositions[right];
-                    
-                    // Horizontal line
-                    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    hLine.setAttribute('x1', leftX);
-                    hLine.setAttribute('y1', y);
-                    hLine.setAttribute('x2', rightX);
-                    hLine.setAttribute('y2', y);
-                    hLine.setAttribute('stroke', '#3498db');
-                    hLine.setAttribute('stroke-width', '2');
-                    svg.appendChild(hLine);
-                    
-                    // Vertical lines
-                    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine1.setAttribute('x1', leftX);
-                    vLine1.setAttribute('y1', height - margin.bottom - 15 - (branchHeight / 3));
-                    vLine1.setAttribute('x2', leftX);
-                    vLine1.setAttribute('y2', y);
-                    vLine1.setAttribute('stroke', '#3498db');
-                    vLine1.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine1);
-                    
-                    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine2.setAttribute('x1', rightX);
-                    vLine2.setAttribute('y1', height - margin.bottom - 15 - (branchHeight / 3));
-                    vLine2.setAttribute('x2', rightX);
-                    vLine2.setAttribute('y2', y);
-                    vLine2.setAttribute('stroke', '#3498db');
-                    vLine2.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine2);
-                }
-            });
-        } else if (level === 3) {
-            // Final merge
-            const leftX = leafPositions[3];
-            const rightX = leafPositions[7];
-            
-            // Horizontal line
-            const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            hLine.setAttribute('x1', leftX);
-            hLine.setAttribute('y1', y);
-            hLine.setAttribute('x2', rightX);
-            hLine.setAttribute('y2', y);
-            hLine.setAttribute('stroke', '#3498db');
-            hLine.setAttribute('stroke-width', '2');
-            svg.appendChild(hLine);
-            
-            // Vertical lines
-            const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            vLine1.setAttribute('x1', leftX);
-            vLine1.setAttribute('y1', height - margin.bottom - 15 - (2 * branchHeight / 3));
-            vLine1.setAttribute('x2', leftX);
-            vLine1.setAttribute('y2', y);
-            vLine1.setAttribute('stroke', '#3498db');
-            vLine1.setAttribute('stroke-width', '2');
-            svg.appendChild(vLine1);
-            
-            const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            vLine2.setAttribute('x1', rightX);
-            vLine2.setAttribute('y1', height - margin.bottom - 15 - (2 * branchHeight / 3));
-            vLine2.setAttribute('x2', rightX);
-            vLine2.setAttribute('y2', y);
-            vLine2.setAttribute('stroke', '#3498db');
-            vLine2.setAttribute('stroke-width', '2');
-            svg.appendChild(vLine2);
-        }
+        // Horizontal line
+        const hLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        hLine1.setAttribute('x1', leftX);
+        hLine1.setAttribute('y1', y1);
+        hLine1.setAttribute('x2', rightX);
+        hLine1.setAttribute('y2', y1);
+        hLine1.setAttribute('stroke', '#3498db');
+        hLine1.setAttribute('stroke-width', '2');
+        svg.appendChild(hLine1);
+        
+        // Vertical lines
+        const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vLine1.setAttribute('x1', leftX);
+        vLine1.setAttribute('y1', height - margin.bottom - 15);
+        vLine1.setAttribute('x2', leftX);
+        vLine1.setAttribute('y2', y1);
+        vLine1.setAttribute('stroke', '#3498db');
+        vLine1.setAttribute('stroke-width', '2');
+        svg.appendChild(vLine1);
+        
+        const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vLine2.setAttribute('x1', rightX);
+        vLine2.setAttribute('y1', height - margin.bottom - 15);
+        vLine2.setAttribute('x2', rightX);
+        vLine2.setAttribute('y2', y1);
+        vLine2.setAttribute('stroke', '#3498db');
+        vLine2.setAttribute('stroke-width', '2');
+        svg.appendChild(vLine2);
+        
+        // Center vertical line
+        const centerX = (leftX + rightX) / 2;
+        const centerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        centerLine.setAttribute('x1', centerX);
+        centerLine.setAttribute('y1', y1);
+        centerLine.setAttribute('y2', y1 - 20);
+        centerLine.setAttribute('stroke', '#3498db');
+        centerLine.setAttribute('stroke-width', '2');
+        svg.appendChild(centerLine);
+    }
+    
+    if (numClusters >= 3) {
+        // Second level merge
+        const y2 = height - margin.bottom - 15 - (2 * branchHeight / 3);
+        const leftX = leafPositions[0];
+        const rightX = leafPositions[2];
+        
+        // Horizontal line
+        const hLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        hLine2.setAttribute('x1', leftX);
+        hLine2.setAttribute('y1', y2);
+        hLine2.setAttribute('x2', rightX);
+        hLine2.setAttribute('y2', y2);
+        hLine2.setAttribute('stroke', '#3498db');
+        hLine2.setAttribute('stroke-width', '2');
+        svg.appendChild(hLine2);
+        
+        // Vertical lines
+        const vLine3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vLine3.setAttribute('x1', leftX);
+        vLine3.setAttribute('y1', height - margin.bottom - 15 - (branchHeight / 3));
+        vLine3.setAttribute('x2', leftX);
+        vLine3.setAttribute('y2', y2);
+        vLine3.setAttribute('stroke', '#3498db');
+        vLine3.setAttribute('stroke-width', '2');
+        svg.appendChild(vLine3);
+        
+        const vLine4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        vLine4.setAttribute('x1', rightX);
+        vLine4.setAttribute('y1', height - margin.bottom - 15);
+        vLine4.setAttribute('x2', rightX);
+        vLine4.setAttribute('y2', y2);
+        vLine4.setAttribute('stroke', '#3498db');
+        vLine4.setAttribute('stroke-width', '2');
+        svg.appendChild(vLine4);
     }
     
     // Add title
@@ -944,7 +908,7 @@ function generateClusteredDataPoints(numClusters, numPoints) {
     const points = [];
     const pointsPerCluster = Math.floor(numPoints / numClusters);
     
-    // Define cluster centers in a grid pattern
+    // Define cluster centers with some overlap potential
     const clusterCenters = [];
     const cols = Math.ceil(Math.sqrt(numClusters));
     const rows = Math.ceil(numClusters / cols);
@@ -952,12 +916,13 @@ function generateClusteredDataPoints(numClusters, numPoints) {
     for (let i = 0; i < numClusters; i++) {
         const row = Math.floor(i / cols);
         const col = i % cols;
-        const centerX = 0.15 + (col / (cols - 1)) * 0.7;
-        const centerY = 0.15 + (row / (rows - 1)) * 0.7;
+        // Fix division by zero when numClusters = 1
+        const centerX = cols === 1 ? 0.5 : 0.2 + (col / (cols - 1)) * 0.6;
+        const centerY = rows === 1 ? 0.5 : 0.2 + (row / (rows - 1)) * 0.6;
         clusterCenters.push({ x: centerX, y: centerY });
     }
     
-    // Generate points for each cluster
+    // Generate points for each cluster with more realistic spread
     for (let cluster = 0; cluster < numClusters; cluster++) {
         const center = clusterCenters[cluster];
         const clusterPoints = cluster === numClusters - 1 ? 
@@ -965,8 +930,8 @@ function generateClusteredDataPoints(numClusters, numPoints) {
             
         for (let i = 0; i < clusterPoints; i++) {
             const angle = Math.random() * 2 * Math.PI;
-            // Tighter clusters with smaller radius
-            const radius = Math.random() * 0.08 + Math.random() * 0.02;
+            // More realistic cluster spread with some overlap
+            const radius = Math.random() * 0.12 + Math.random() * 0.05;
             
             points.push({
                 x: center.x + radius * Math.cos(angle),
