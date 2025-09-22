@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter5.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -33,11 +33,11 @@
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 5: K-Means Clustering Theory</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <p class="chapter-subtitle">Master the mathematical foundations, algorithms, and theoretical properties of K-means clustering</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
+                <!-- Chapter Progress Bar (5/15) -->
                 <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                    <div class="chapter-progress-fill" data-progress="33.33"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +61,19 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="11.11"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="objective">Objective Function</button>
+                    <button class="section-nav-btn" data-section="algorithm">Lloyd's Algorithm</button>
+                    <button class="section-nav-btn" data-section="convergence">Convergence Theory</button>
+                    <button class="section-nav-btn" data-section="complexity">Computational Analysis</button>
+                    <button class="section-nav-btn" data-section="variants">Variants & Extensions</button>
+                    <button class="section-nav-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demo</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -83,20 +85,22 @@
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand the mathematical foundations of K-means clustering</li>
+                        <li>Master the objective function and optimization problem</li>
+                        <li>Learn Lloyd's algorithm and its implementation details</li>
+                        <li>Analyze convergence properties and theoretical guarantees</li>
+                        <li>Understand computational complexity and performance analysis</li>
+                        <li>Explore algorithmic variants and extensions</li>
+                        <li>Implement K-means with practical considerations</li>
+                        <li>Experiment with K-means through interactive demonstrations</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
-                <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                <div class="tutorial-content">
+                    <main class="chapter-main-content">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>K-Means: The Foundation of Partitional Clustering</h2>
                         
                         <p>K-means clustering stands as one of the most fundamental and widely-used unsupervised learning algorithms. Introduced by Stuart Lloyd at Bell Labs in 1957, it represents the archetypal partitional clustering method that seeks to divide data into k distinct, non-overlapping clusters by minimizing within-cluster variance.</p>
@@ -277,7 +281,7 @@
                     </div>
 
                     <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
+                    <div id="objective" class="content-section">
                         <h2>Mathematical Deep Dive: The K-Means Objective Function</h2>
                         
                         <p>The objective function is the heart of K-means clustering, defining precisely what we want to optimize. Understanding its mathematical properties, geometric interpretation, and relationship to other clustering criteria is crucial for mastering the algorithm.</p>
@@ -358,7 +362,7 @@
                     </div>
 
                     <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
+                    <div id="algorithm" class="content-section">
                         <h2>Lloyd's Algorithm: The K-Means Workhorse</h2>
                         
                         <p>Lloyd's algorithm, also known as the K-means algorithm, is an iterative expectation-maximization style procedure that alternates between two steps: assigning points to clusters and updating cluster centers. Despite its simplicity, the algorithm has elegant mathematical properties and guaranteed convergence.</p>
@@ -475,65 +479,6 @@
                         </div>
                     </div>
 
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
-                        
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
-                            <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
-                            <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Convergence Analysis Section -->
                     <div id="convergence" class="content-section">
@@ -587,8 +532,214 @@
                         </div>
                     </div>
 
+                    <!-- Variants & Extensions Section -->
+                    <div id="variants" class="content-section">
+                        <h2>Variants and Extensions of K-Means</h2>
+                        
+                        <p>While standard K-means is powerful, numerous variants and extensions have been developed to address specific limitations and improve performance in various scenarios.</p>
+
+                        <h3>K-Medoids (PAM)</h3>
+                        <p>K-medoids uses actual data points as cluster centers instead of centroids, making it more robust to outliers.</p>
+
+                        <div class="algorithm-box">
+                            <h4>K-Medoids Algorithm</h4>
+                            <ul>
+                                <li><strong>Medoid selection:</strong> Choose actual data points as cluster centers</li>
+                                <li><strong>Robust to outliers:</strong> Less sensitive to extreme values</li>
+                                <li><strong>Arbitrary distance metrics:</strong> Works with any distance measure</li>
+                                <li><strong>Higher computational cost:</strong> O(n²) complexity</li>
+                            </ul>
+                        </div>
+
+                        <h3>Fuzzy C-Means</h3>
+                        <p>Allows data points to belong to multiple clusters with different membership degrees.</p>
+
+                        <div class="model-box">
+                            <h4>Fuzzy C-Means Features</h4>
+                            <ul>
+                                <li><strong>Soft clustering:</strong> Points can belong to multiple clusters</li>
+                                <li><strong>Membership degrees:</strong> Probabilistic cluster assignments</li>
+                                <li><strong>Robust to noise:</strong> Less sensitive to outliers</li>
+                                <li><strong>Overlapping clusters:</strong> Handles ambiguous boundaries</li>
+                            </ul>
+                        </div>
+
+                        <h3>K-Means++</h3>
+                        <p>Improved initialization method that provides better starting points for K-means.</p>
+
+                        <div class="explanation-box">
+                            <h4>K-Means++ Initialization</h4>
+                            <ul>
+                                <li><strong>Probabilistic selection:</strong> Choose initial centroids based on distance</li>
+                                <li><strong>Better convergence:</strong> Faster convergence to good solutions</li>
+                                <li><strong>Theoretical guarantees:</strong> O(log k) approximation ratio</li>
+                                <li><strong>Widely adopted:</strong> Default in most implementations</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: K-Means Variants Comparison</h4>
+                            <p><strong>Image Description:</strong> A comparison of different K-means variants showing their performance on the same dataset. Left panel: Standard K-means with centroid-based clusters. Center panel: K-medoids with actual data points as centers. Right panel: Fuzzy C-means showing soft boundaries and membership degrees.</p>
+                            <p><em>This demonstrates the trade-offs between different K-means approaches</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Implementation Section -->
+                    <div id="implementation" class="content-section">
+                        <h2>Practical Implementation Considerations</h2>
+                        
+                        <p>Implementing K-means effectively requires careful consideration of various practical aspects that can significantly impact performance and results.</p>
+
+                        <h3>Initialization Strategies</h3>
+                        <div class="explanation-box">
+                            <h4>Initialization Best Practices</h4>
+                            <ul>
+                                <li><strong>Multiple runs:</strong> Run algorithm multiple times with different initializations</li>
+                                <li><strong>K-means++:</strong> Use probabilistic initialization for better starting points</li>
+                                <li><strong>Random sampling:</strong> Simple but effective for many cases</li>
+                                <li><strong>Domain knowledge:</strong> Use prior knowledge when available</li>
+                            </ul>
+                        </div>
+
+                        <h3>Stopping Criteria</h3>
+                        <p>Determining when the algorithm has converged is crucial for efficiency and accuracy.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Criterion</th>
+                                        <th>Advantages</th>
+                                        <th>Disadvantages</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Centroid Movement</strong></td>
+                                        <td>Intuitive, geometric meaning</td>
+                                        <td>May not reflect objective improvement</td>
+                                        <td>General purpose</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Objective Change</strong></td>
+                                        <td>Direct optimization measure</td>
+                                        <td>May be noisy</td>
+                                        <td>Optimization focus</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Assignment Stability</strong></td>
+                                        <td>Reflects clustering stability</td>
+                                        <td>May converge slowly</td>
+                                        <td>Stability focus</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Maximum Iterations</strong></td>
+                                        <td>Guaranteed termination</td>
+                                        <td>May stop too early or late</td>
+                                        <td>Time-constrained</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Numerical Stability</h3>
+                        <p>Handling edge cases and numerical precision issues in real implementations.</p>
+
+                        <div class="model-box">
+                            <h4>Stability Considerations</h4>
+                            <ul>
+                                <li><strong>Empty clusters:</strong> Handle clusters with no assigned points</li>
+                                <li><strong>Duplicate points:</strong> Manage identical data points</li>
+                                <li><strong>Floating-point precision:</strong> Use appropriate tolerance values</li>
+                                <li><strong>Memory efficiency:</strong> Optimize for large datasets</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Computational Analysis Section -->
+                    <div id="complexity" class="content-section">
+                        <h2>Computational Analysis</h2>
+                        
+                        <div class="explanation-box">
+                            <p>Understanding the computational complexity of K-means is crucial for practical applications, especially when dealing with large datasets or real-time constraints.</p>
+                        </div>
+
+                        <h3>Time Complexity Analysis</h3>
+                        <div class="model-box">
+                            <h4>Per-Iteration Complexity</h4>
+                            <ul>
+                                <li><strong>Assignment Step:</strong> O(nk) - assign n points to k clusters</li>
+                                <li><strong>Update Step:</strong> O(n) - recalculate k centroids</li>
+                                <li><strong>Total per iteration:</strong> O(nk)</li>
+                            </ul>
+                        </div>
+
+                        <div class="algorithm-box">
+                            <h4>Overall Complexity</h4>
+                            <ul>
+                                <li><strong>Best case:</strong> O(nk) - converges in 1 iteration</li>
+                                <li><strong>Average case:</strong> O(nkt) - t iterations to converge</li>
+                                <li><strong>Worst case:</strong> O(nk²) - exponential convergence</li>
+                                <li><strong>Space complexity:</strong> O(n + k) - store points and centroids</li>
+                            </ul>
+                        </div>
+
+                        <h3>Scalability Considerations</h3>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Dataset Size</th>
+                                        <th>Time (seconds)</th>
+                                        <th>Memory (MB)</th>
+                                        <th>Recommendations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Small (n < 1K)</strong></td>
+                                        <td>< 0.1</td>
+                                        <td>< 1</td>
+                                        <td>Standard implementation</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Medium (1K < n < 100K)</strong></td>
+                                        <td>0.1 - 10</td>
+                                        <td>1 - 100</td>
+                                        <td>Optimized implementation</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Large (100K < n < 1M)</strong></td>
+                                        <td>10 - 1000</td>
+                                        <td>100 - 1000</td>
+                                        <td>Mini-batch K-means</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Very Large (n > 1M)</strong></td>
+                                        <td>> 1000</td>
+                                        <td>> 1000</td>
+                                        <td>Distributed implementation</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Performance Optimization</h3>
+                        <div class="explanation-box">
+                            <h4>Optimization Strategies</h4>
+                            <ul>
+                                <li><strong>Vectorization:</strong> Use matrix operations for distance calculations</li>
+                                <li><strong>Early stopping:</strong> Stop when improvement is minimal</li>
+                                <li><strong>Smart initialization:</strong> K-means++ reduces iterations</li>
+                                <li><strong>Memory optimization:</strong> Process data in chunks</li>
+                                <li><strong>Parallel processing:</strong> Distribute computation across cores</li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
+                    <div id="interactive" class="content-section">
                         <h2>Interactive K-means Demo</h2>
                         
                         <div class="explanation-box">
@@ -725,7 +876,8 @@
                             </div>
                         </div>
                     </div>
-                </main>
+                    </main>
+                </div>
             </div>
         </section>
     </main>
@@ -737,8 +889,8 @@
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Objective Function</span>
                 <span>Next →</span>
             </button>
         </div>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter7.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -32,12 +32,12 @@
         <!-- Tutorial Header -->
         <div class="tutorial-header">
             <div class="azbn-container">
-                <h1 class="chapter-title">Chapter 4: K-means Clustering Algorithm</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <h1 class="chapter-title">Chapter 7: Optimal K Selection</h1>
+                <p class="chapter-subtitle">Master the mathematical techniques for determining the optimal number of clusters in K-means clustering</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
+                <!-- Chapter Progress Bar (7/15) -->
                 <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                    <div class="chapter-progress-fill" data-progress="46.67"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +61,19 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="11.11"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="elbow">Elbow Method</button>
+                    <button class="section-nav-btn" data-section="silhouette">Silhouette Analysis</button>
+                    <button class="section-nav-btn" data-section="gap">Gap Statistic</button>
+                    <button class="section-nav-btn" data-section="information">Information Criteria</button>
+                    <button class="section-nav-btn" data-section="validation">Cross-Validation</button>
+                    <button class="section-nav-btn" data-section="comparison">Method Comparison</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -83,20 +85,21 @@
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand the mathematical challenges of optimal K selection</li>
+                        <li>Master the Elbow Method and its mathematical foundations</li>
+                        <li>Learn Silhouette Analysis for cluster validation</li>
+                        <li>Explore the Gap Statistic and its statistical principles</li>
+                        <li>Understand Information Criteria (AIC, BIC) for model selection</li>
+                        <li>Apply Cross-Validation techniques to clustering problems</li>
+                        <li>Compare different K-selection methods and their trade-offs</li>
+                        <li>Implement K-selection algorithms with interactive demonstrations</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>The Optimal K Problem: Choosing the Right Number of Clusters</h2>
                         
                         <p>One of the most challenging aspects of K-means clustering is determining the optimal number of clusters k. Unlike supervised learning where performance can be evaluated against known labels, clustering requires internal validation criteria to assess the quality of different clustering solutions. This chapter explores mathematically rigorous approaches to solve this fundamental problem.</p>
@@ -156,7 +159,7 @@
                                     <li><strong>TSS:</strong> Total Sum of Squares (constant for given data)</li>
                                     <li><strong>WCSS(k):</strong> Within-Cluster Sum of Squares for k clusters</li>
                                     <li><strong>BSS(k):</strong> Between-Cluster Sum of Squares for k clusters</li>
-                                </ul>
+                            </ul>
                             </div>
                             
                             <h5>The Fundamental Trade-off:</h5>
@@ -177,13 +180,113 @@
                         <p>K-selection methods can be categorized by their underlying mathematical principles and computational approaches.</p>
                     </div>
 
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
+                    <!-- Elbow Method Section -->
+                    <div id="elbow" class="content-section">
+                        <h2>The Elbow Method: Detecting Diminishing Returns</h2>
                         
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
+                        <p>The Elbow Method is one of the most intuitive and widely-used approaches for determining optimal k. Based on the principle of diminishing returns, it identifies the point where increasing k yields progressively smaller improvements in clustering quality, typically visualized as an "elbow" in the WCSS vs k plot.</p>
 
-                        <h3>Random Initialization: The Baseline</h3>
+                        <h3>Mathematical Foundation</h3>
+                        <p>The Elbow Method relies on analyzing the rate of change in the objective function as k increases.</p>
+
+                        <div class="explanation-box">
+                            <h4>Elbow Method Mathematical Framework</h4>
+                            
+                            <h5>Within-Cluster Sum of Squares (WCSS):</h5>
+                            <div class="formula-display">
+                                <strong>WCSS(k) = Σⱼ₌₁ᵏ Σₓᵢ∈Cⱼ ||xᵢ - μⱼ||²</strong>
+                            </div>
+                            
+                            <h5>Rate of Improvement:</h5>
+                            <p>The improvement gained by adding one more cluster:</p>
+                            <div class="formula-display">
+                                <strong>Δ(k) = WCSS(k-1) - WCSS(k)</strong>
+                            </div>
+                            
+                            <h5>Second Derivative (Curvature):</h5>
+                            <p>The rate of change in improvement:</p>
+                            <div class="formula-display">
+                                <strong>Δ²(k) = Δ(k-1) - Δ(k) = WCSS(k-2) - 2·WCSS(k-1) + WCSS(k)</strong>
+                            </div>
+                            
+                            <h5>Elbow Detection Criteria:</h5>
+                            <ul>
+                                <li><strong>Visual inspection:</strong> Identify sharp bend in WCSS curve</li>
+                                <li><strong>Maximum curvature:</strong> k* = argmax[k] |Δ²(k)|</li>
+                                <li><strong>Percentage threshold:</strong> k where improvement drops below threshold</li>
+                                <li><strong>Knee detection algorithms:</strong> Automated elbow identification</li>
+                            </ul>
+                        </div>
+
+                        <h3>Algorithm Implementation</h3>
+                        <p>A systematic approach to implementing the Elbow Method with proper statistical considerations.</p>
+
+                        <div class="algorithm-box">
+                            <h4>Complete Elbow Method Algorithm</h4>
+                            
+                            <div class="code-box">
+                                <pre><code><strong>function</strong> elbow_method(X, k_range, n_runs=10):
+    wcss_values = []
+    wcss_std = []
+    
+    <strong>for</strong> k in k_range:
+        k_wcss = []
+        
+        <strong>for</strong> run in range(n_runs):
+            # Multiple runs for stability
+            centroids = initialize_centroids(X, k)
+            clusters = kmeans(X, centroids)
+            wcss = calculate_wcss(X, clusters)
+            k_wcss.append(wcss)
+        
+        wcss_values.append(mean(k_wcss))
+        wcss_std.append(std(k_wcss))
+    
+    # Find elbow point
+    optimal_k = detect_elbow(k_range, wcss_values)
+    
+    <strong>return</strong> optimal_k, wcss_values, wcss_std</code></pre>
+                            </div>
+                    </div>
+
+                        <h3>Advantages and Limitations</h3>
+                        <p>Understanding when the Elbow Method works well and when it may fail.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Advantages</th>
+                                        <th>Limitations</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Intuitive and easy to understand</td>
+                                        <td>Subjective elbow identification</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Computationally efficient</td>
+                                        <td>May not work with unclear elbows</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Works well with spherical clusters</td>
+                                        <td>Sensitive to data scaling</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Provides visual validation</td>
+                                        <td>Less effective with overlapping clusters</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Elbow Method Example</h4>
+                            <p><strong>Image Description:</strong> A comprehensive elbow method visualization showing WCSS values plotted against k (number of clusters) from k=1 to k=10. The plot clearly shows the characteristic "elbow" shape with a sharp decrease in WCSS for small k values, followed by a more gradual decline. The optimal k=3 is highlighted at the elbow point where the rate of improvement begins to level off. Additional panels show the second derivative curve for automated elbow detection and confidence intervals from multiple runs.</p>
+                            <p><em>This demonstrates the classic elbow pattern used for optimal k selection</em></p>
+                        </div>
+                    </div>
                         <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
 
                         <div class="model-box">
@@ -280,13 +383,139 @@
                         </div>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
+                    <!-- Silhouette Analysis Section -->
+                    <div id="silhouette" class="content-section">
+                        <h2>Silhouette Analysis: Measuring Cluster Quality</h2>
                         
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
+                        <p>Silhouette Analysis provides a comprehensive method for evaluating both individual data points and overall clustering quality. Unlike the Elbow Method, which focuses solely on within-cluster variance, Silhouette Analysis considers both cluster cohesion and separation, providing a more nuanced view of clustering performance.</p>
 
-                        <h3>The K-means++ Algorithm</h3>
+                        <h3>Mathematical Foundation</h3>
+                        <p>The silhouette coefficient quantifies how well each point fits within its assigned cluster compared to other clusters.</p>
+
+                        <div class="explanation-box">
+                            <h4>Silhouette Coefficient Mathematics</h4>
+                            
+                            <h5>Individual Point Silhouette:</h5>
+                            <p>For each point i, calculate:</p>
+                            <div class="formula-display">
+                                <strong>s(i) = (b(i) - a(i)) / max(a(i), b(i))</strong>
+                            </div>
+                            
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>a(i)</strong> = average distance to points in the same cluster (cohesion)</li>
+                                <li><strong>b(i)</strong> = minimum average distance to points in other clusters (separation)</li>
+                            </ul>
+                            
+                            <h5>Cluster Silhouette:</h5>
+                            <div class="formula-display">
+                                <strong>S(C) = (1/|C|) Σᵢ∈C s(i)</strong>
+                            </div>
+                            
+                            <h5>Overall Silhouette Score:</h5>
+                            <div class="formula-display">
+                                <strong>S = (1/n) Σᵢ₌₁ⁿ s(i)</strong>
+                            </div>
+                            
+                            <h5>Interpretation:</h5>
+                            <ul>
+                                <li><strong>s(i) ≈ 1:</strong> Point is well-clustered (far from neighboring clusters)</li>
+                                <li><strong>s(i) ≈ 0:</strong> Point is on or very close to decision boundary</li>
+                                <li><strong>s(i) < 0:</strong> Point might be assigned to wrong cluster</li>
+                            </ul>
+                        </div>
+
+                        <h3>Algorithm Implementation</h3>
+                        <p>Step-by-step implementation of silhouette analysis for optimal k selection.</p>
+
+                        <div class="algorithm-box">
+                            <h4>Silhouette Analysis Algorithm</h4>
+                            
+                            <div class="code-box">
+                                <pre><code><strong>function</strong> silhouette_analysis(X, k_range):
+    silhouette_scores = []
+    
+    <strong>for</strong> k in k_range:
+        # Perform clustering
+        clusters = kmeans(X, k)
+        
+        # Calculate silhouette for each point
+        point_silhouettes = []
+        <strong>for</strong> i in range(len(X)):
+            a_i = average_intra_cluster_distance(X[i], clusters)
+            b_i = min_average_inter_cluster_distance(X[i], clusters)
+            
+            <strong>if</strong> a_i == 0 and b_i == 0:
+                s_i = 0
+            <strong>else</strong>:
+                s_i = (b_i - a_i) / max(a_i, b_i)
+            
+            point_silhouettes.append(s_i)
+        
+        # Average silhouette score
+        avg_silhouette = mean(point_silhouettes)
+        silhouette_scores.append(avg_silhouette)
+    
+    # Find k with maximum silhouette score
+    optimal_k = k_range[argmax(silhouette_scores)]
+    
+    <strong>return</strong> optimal_k, silhouette_scores</code></pre>
+                            </div>
+                        </div>
+
+                        <h3>Advanced Silhouette Techniques</h3>
+                        <p>Enhanced methods for more robust silhouette analysis.</p>
+
+                        <div class="model-box">
+                            <h4>Silhouette Plot Analysis</h4>
+                            <ul>
+                                <li><strong>Individual point analysis:</strong> Identify poorly clustered points</li>
+                                <li><strong>Cluster comparison:</strong> Compare cluster quality within same k</li>
+                                <li><strong>Thickness analysis:</strong> Evaluate cluster size consistency</li>
+                                <li><strong>Below-average detection:</strong> Identify problematic clusters</li>
+                            </ul>
+                        </div>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Silhouette Range</th>
+                                        <th>Interpretation</th>
+                                        <th>Cluster Quality</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0.7 - 1.0</td>
+                                        <td>Strong, well-separated clusters</td>
+                                        <td>Excellent</td>
+                                    </tr>
+                                    <tr>
+                                        <td>0.5 - 0.7</td>
+                                        <td>Reasonable clustering structure</td>
+                                        <td>Good</td>
+                                    </tr>
+                                    <tr>
+                                        <td>0.25 - 0.5</td>
+                                        <td>Weak clustering structure</td>
+                                        <td>Fair</td>
+                                    </tr>
+                                    <tr>
+                                        <td>< 0.25</td>
+                                        <td>No substantial clustering structure</td>
+                                        <td>Poor</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Silhouette Analysis</h4>
+                            <p><strong>Image Description:</strong> A comprehensive silhouette analysis visualization with three panels. Left: Silhouette plot showing individual point coefficients organized by cluster, with cluster averages and overall average marked. Center: Silhouette scores vs k plot showing the optimal k=3 with highest average silhouette score. Right: 2D scatter plot of the data colored by cluster assignments, demonstrating the cluster separation that leads to high silhouette scores.</p>
+                            <p><em>This demonstrates how silhouette analysis provides detailed cluster quality assessment</em></p>
+                        </div>
+                    </div>
                         <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
 
                         <div class="model-box">
@@ -388,124 +617,308 @@
                         </div>
                     </div>
 
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
+                    <!-- Gap Statistic Section -->
+                    <div id="gap" class="content-section">
+                        <h2>Gap Statistic: A Statistical Approach to K-Selection</h2>
                         
                         <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
+                            <p>The Gap Statistic, introduced by Tibshirani, Walther, and Hastie (2001), provides a principled statistical method for estimating the optimal number of clusters by comparing the within-cluster dispersion of the data to that expected under a null reference distribution.</p>
                         </div>
 
                         <div class="formula-box">
-                            <h3>Assignment Step</h3>
+                            <h3>Gap Statistic Formula</h3>
                             <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
+                                <h4>Gap Definition</h4>
+                                <div class="formula">Gap(k) = E[log(W_k*)] - log(W_k)</div>
                                 <p><strong>Where:</strong></p>
                                 <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
+                                    <li>W_k is the within-cluster sum of squares for k clusters</li>
+                                    <li>W_k* is the expected WCSS under null reference distribution</li>
+                                    <li>E[·] denotes expectation over reference datasets</li>
                                 </ul>
                             </div>
                         </div>
 
                         <div class="formula-box">
-                            <h3>Update Step</h3>
+                            <h3>Optimal K Selection</h3>
                             <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
+                                <h4>Selection Criterion</h4>
+                                <div class="formula">k* = smallest k such that Gap(k) ≥ Gap(k+1) - s_{k+1}</div>
                                 <p><strong>Where:</strong></p>
                                 <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
+                                    <li>s_k is the standard error of the gap statistic</li>
+                                    <li>This ensures statistical significance of the gap</li>
+                                    <li>Provides conservative estimate of optimal k</li>
                                 </ul>
                             </div>
                         </div>
 
                         <div class="model-box">
-                            <h3>Optimization Properties</h3>
+                            <h3>Gap Statistic Properties</h3>
                             <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
+                                <li><strong>Statistical Foundation:</strong> Based on formal hypothesis testing</li>
+                                <li><strong>Reference Distribution:</strong> Compares to uniform random data</li>
+                                <li><strong>Conservative Estimate:</strong> Tends to select smaller k values</li>
+                                <li><strong>Computational Cost:</strong> Requires multiple reference datasets</li>
                             </ul>
                         </div>
 
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
+                        <div class="algorithm-box">
+                            <h3>Gap Statistic Algorithm</h3>
+                            <div class="code-box">
+                                <pre><code><strong>function</strong> gap_statistic(X, k_max, B=50):
+    <span class="comment"># For each k, compute gap statistic</span>
+    <strong>for</strong> k <strong>in</strong> range(1, k_max+1):
+        <span class="comment"># Compute actual WCSS</span>
+        W_k = compute_wcss(X, k)
+        
+        <span class="comment"># Generate B reference datasets</span>
+        W_k_refs = []
+        <strong>for</strong> b <strong>in</strong> range(B):
+            X_ref = generate_uniform_reference(X)
+            W_k_ref = compute_wcss(X_ref, k)
+            W_k_refs.append(log(W_k_ref))
+        
+        <span class="comment"># Compute gap and standard error</span>
+        E_log_W_k = mean(W_k_refs)
+        gap_k = E_log_W_k - log(W_k)
+        s_k = std(W_k_refs) * sqrt(1 + 1/B)
+        
+    <span class="comment"># Find optimal k</span>
+    <strong>return</strong> find_optimal_k(gaps, standard_errors)</code></pre>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Convergence Analysis Section -->
-                    <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
+                    <!-- Information Criteria Section -->
+                    <div id="information" class="content-section">
+                        <h2>Information Criteria: AIC and BIC for Cluster Selection</h2>
                         
                         <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
+                            <p>Information criteria, originally developed for model selection in statistics, can be adapted for clustering to provide principled methods for choosing the optimal number of clusters. These criteria balance model fit against complexity, penalizing solutions with too many clusters.</p>
                         </div>
 
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
-                            <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
-                            </ul>
-                        </div>
-
+                        <h3>Akaike Information Criterion (AIC)</h3>
                         <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
+                            <h4>AIC for Clustering</h4>
                             <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
+                                <div class="formula">AIC(k) = -2·log(L) + 2·p</div>
                                 <p><strong>Where:</strong></p>
                                 <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
+                                    <li>L is the likelihood of the clustering model</li>
+                                    <li>p is the number of parameters (typically k·d + k for centroids and cluster sizes)</li>
+                                    <li>Lower AIC values indicate better models</li>
+                            </ul>
+                            </div>
+                        </div>
+
+                        <h3>Bayesian Information Criterion (BIC)</h3>
+                        <div class="formula-box">
+                            <h4>BIC for Clustering</h4>
+                            <div class="formula-display">
+                                <div class="formula">BIC(k) = -2·log(L) + p·log(n)</div>
+                                <p><strong>Where:</strong></p>
+                                <ul>
+                                    <li>n is the number of data points</li>
+                                    <li>BIC penalizes complexity more heavily than AIC</li>
+                                    <li>Tends to select smaller k values</li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
+                        <div class="model-box">
+                            <h3>Practical Considerations</h3>
                             <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
+                                <li><strong>Likelihood Estimation:</strong> Requires assuming a probability model (e.g., Gaussian mixture)</li>
+                                <li><strong>Parameter Counting:</strong> Must carefully count degrees of freedom</li>
+                                <li><strong>AIC vs BIC:</strong> AIC tends to select more clusters, BIC is more conservative</li>
+                                <li><strong>Computational Efficiency:</strong> Fast to compute once likelihood is available</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Cross-Validation Section -->
+                    <div id="validation" class="content-section">
+                        <h2>Cross-Validation for Clustering</h2>
+                        
+                        <p>Cross-validation techniques adapted for clustering problems provide robust methods for optimal k selection by evaluating clustering stability across different data subsets.</p>
+
+                        <h3>Challenges in Clustering Cross-Validation</h3>
+                        <p>Traditional cross-validation requires adaptation for unsupervised learning.</p>
+
+                        <div class="explanation-box">
+                            <h4>Clustering Cross-Validation Methods</h4>
+                            <ul>
+                                <li><strong>Stability-based validation:</strong> Measure clustering consistency across subsamples</li>
+                                <li><strong>Prediction strength:</strong> Evaluate cluster membership prediction accuracy</li>
+                                <li><strong>Bootstrap validation:</strong> Use resampling to assess clustering robustness</li>
+                                <li><strong>Cross-validation stability:</strong> Compare clusterings from different data splits</li>
                             </ul>
                         </div>
 
-                        <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
                             <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
+                            <h4>Visualization: Cross-Validation Results</h4>
+                            <p><strong>Image Description:</strong> Cross-validation stability scores plotted against k, showing how clustering consistency varies with the number of clusters. Higher stability scores indicate more robust clustering solutions.</p>
+                            <p><em>This demonstrates stability-based k selection using cross-validation</em></p>
                             </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+                    </div>
+
+                    <!-- Method Comparison Section -->
+                    <div id="comparison" class="content-section">
+                        <h2>Method Comparison and Selection Guidelines</h2>
+                        
+                        <p>Different k-selection methods have varying strengths and weaknesses. Understanding when to use each method is crucial for effective clustering analysis.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Best Use Cases</th>
+                                        <th>Limitations</th>
+                                        <th>Computational Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Elbow Method</strong></td>
+                                        <td>Well-separated spherical clusters</td>
+                                        <td>Subjective elbow detection</td>
+                                        <td>Low</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Silhouette Analysis</strong></td>
+                                        <td>Clusters with good separation</td>
+                                        <td>Sensitive to cluster shape</td>
+                                        <td>Medium</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gap Statistic</strong></td>
+                                        <td>Statistical significance testing</td>
+                                        <td>Computationally expensive</td>
+                                        <td>High</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Information Criteria</strong></td>
+                                        <td>Model selection framework</td>
+                                        <td>Assumes specific distributions</td>
+                                        <td>Medium</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cross-Validation</strong></td>
+                                        <td>Stability assessment</td>
+                                        <td>Complex implementation</td>
+                                        <td>High</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h3>Practical Guidelines</h3>
+                        <div class="model-box">
+                            <h4>Method Selection Strategy</h4>
+                            <ol>
+                                <li><strong>Start with Elbow Method:</strong> Quick initial assessment</li>
+                                <li><strong>Validate with Silhouette:</strong> Detailed quality analysis</li>
+                                <li><strong>Use Gap Statistic:</strong> For statistical significance</li>
+                                <li><strong>Apply multiple methods:</strong> Consensus-based selection</li>
+                                <li><strong>Consider domain knowledge:</strong> Practical constraints</li>
+                            </ol>
                         </div>
                     </div>
 
                     <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
+                    <div id="interactive" class="content-section">
+                        <h2>Interactive K-Selection Demos</h2>
                         
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
+                        <p>Explore optimal k selection methods through interactive demonstrations. Compare different approaches and understand their behavior on various datasets.</p>
+
+                        <h3>Demo 1: Elbow Method Visualization</h3>
+                        <div class="interactive-container">
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="elbow-dataset">Dataset:</label>
+                                    <select id="elbow-dataset">
+                                        <option value="blobs">Blob Clusters</option>
+                                        <option value="moons">Moon Shapes</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="random">Random Points</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="elbow-max-k">Maximum K:</label>
+                                    <input type="range" id="elbow-max-k" min="5" max="15" value="10">
+                                    <span id="elbow-max-k-display">10</span>
+                                </div>
+                                
+                                <button class="demo-button" onclick="generateElbowDemo()">Generate Elbow Plot</button>
+                                <button class="demo-button" onclick="resetElbowDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>WCSS vs K Plot</h4>
+                                    <svg id="elbow-plot" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Optimal Clustering Result</h4>
+                                    <svg id="elbow-clusters" width="400" height="300"></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3>Demo 2: Silhouette Analysis Comparison</h3>
+                        <div class="interactive-container">
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="silhouette-dataset">Dataset:</label>
+                                    <select id="silhouette-dataset">
+                                        <option value="blobs">Blob Clusters</option>
+                                        <option value="moons">Moon Shapes</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="random">Random Points</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="silhouette-k">Number of Clusters:</label>
+                                    <input type="range" id="silhouette-k" min="2" max="8" value="3">
+                                    <span id="silhouette-k-display">3</span>
+                                </div>
+                                
+                                <button class="demo-button" onclick="generateSilhouetteDemo()">Generate Analysis</button>
+                                <button class="demo-button" onclick="resetSilhouetteDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>Silhouette Plot</h4>
+                                    <svg id="silhouette-plot" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Clustering Visualization</h4>
+                                    <svg id="silhouette-clusters" width="400" height="300"></svg>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-metrics">
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-label">Average Silhouette Score</div>
+                                        <div class="metric-value" id="avg-silhouette">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Best Cluster Quality</div>
+                                        <div class="metric-value" id="best-cluster">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Worst Cluster Quality</div>
+                                        <div class="metric-value" id="worst-cluster">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         </div>
 
                         <div class="interactive-container">
@@ -573,6 +986,135 @@
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
+                        <h2>Quiz</h2>
+                        
+                        <p>Test your understanding of optimal K selection methods with these comprehensive questions covering the key concepts discussed in this chapter.</p>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 1: Elbow Method</h3>
+                                <p>What does the "elbow" in the Elbow Method represent?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span class="option-text">The point where WCSS stops decreasing</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span class="option-text">The point where diminishing returns in WCSS reduction become apparent</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span class="option-text">The maximum value of WCSS</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span class="option-text">The point where WCSS increases</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 2: Silhouette Analysis</h3>
+                                <p>What does a silhouette coefficient of 0.8 for a data point indicate?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span class="option-text">The point is poorly clustered</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span class="option-text">The point is well-clustered with good separation from other clusters</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span class="option-text">The point is on the cluster boundary</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span class="option-text">The point should be assigned to a different cluster</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 3: Gap Statistic</h3>
+                                <p>What does the Gap Statistic compare to determine optimal k?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="a">
+                                        <span class="option-text">WCSS values for different k</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="b">
+                                        <span class="option-text">Silhouette scores for different k</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="c">
+                                        <span class="option-text">Observed clustering quality against expected quality from random data</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="d">
+                                        <span class="option-text">Between-cluster distances</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 4: Information Criteria</h3>
+                                <p>Which information criterion is more conservative in model selection?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="a">
+                                        <span class="option-text">AIC (Akaike Information Criterion)</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="b">
+                                        <span class="option-text">BIC (Bayesian Information Criterion)</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="c">
+                                        <span class="option-text">Both are equally conservative</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="d">
+                                        <span class="option-text">Neither is conservative</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 5: Cross-Validation</h3>
+                                <p>What is the main challenge in applying cross-validation to clustering?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="a">
+                                        <span class="option-text">Clustering is too fast to require validation</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="b">
+                                        <span class="option-text">There are no ground truth labels to validate against</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="c">
+                                        <span class="option-text">Cross-validation cannot be applied to unsupervised learning</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="d">
+                                        <span class="option-text">Clustering algorithms are deterministic</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button class="demo-button" onclick="checkQuizAnswers()">Submit Answers</button>
+                            
+                            <div id="quiz-results" class="quiz-score-container" style="display: none;">
+                                <h3>Quiz Results</h3>
+                                <div id="quiz-score"></div>
+                                <div id="quiz-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
                         <h2>Chapter 4 Quiz</h2>
                         
                         <div class="enhanced-quiz-container">
@@ -650,8 +1192,8 @@
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Elbow Method</span>
                 <span>Next →</span>
             </button>
         </div>

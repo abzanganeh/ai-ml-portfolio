@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter9.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -33,7 +33,7 @@
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 9: Linkage Criteria Methods</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <p class="chapter-subtitle">Master the mathematical foundations and practical implications of different linkage criteria: single, complete, average, Ward's method, and their impact on cluster formation</p>
                 
                 <!-- Chapter Progress Bar (4/15) -->
                 <div class="chapter-progress">
@@ -66,12 +66,14 @@
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="single">Single Linkage</button>
+                    <button class="section-nav-btn" data-section="complete">Complete Linkage</button>
+                    <button class="section-nav-btn" data-section="average">Average Linkage</button>
+                    <button class="section-nav-btn" data-section="ward">Ward's Method</button>
+                    <button class="section-nav-btn" data-section="other">Other Methods</button>
+                    <button class="section-nav-btn" data-section="comparison">Method Comparison</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -83,20 +85,21 @@
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand mathematical formulations of all major linkage criteria</li>
+                        <li>Analyze the computational complexity of each linkage method</li>
+                        <li>Master single linkage and its connection to minimum spanning trees</li>
+                        <li>Learn complete linkage and its compactness properties</li>
+                        <li>Explore average linkage and UPGMA statistical foundations</li>
+                        <li>Deep dive into Ward's method and variance minimization</li>
+                        <li>Compare linkage methods and understand when to use each</li>
+                        <li>Implement efficient algorithms for linkage computation</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>Linkage Criteria: The Heart of Hierarchical Clustering</h2>
                         
                         <p>Linkage criteria define how to measure the distance or dissimilarity between clusters, fundamentally determining the structure and properties of the resulting hierarchy. The choice of linkage criterion has profound effects on cluster shape, computational complexity, and the ability to recover different types of cluster structures. This chapter provides comprehensive mathematical analysis of the major linkage methods and practical guidance for selection.</p>
@@ -104,7 +107,7 @@
                         <h3>Mathematical Framework for Linkage Criteria</h3>
                         <p>All linkage methods can be understood within a unified mathematical framework that defines inter-cluster distance functions.</p>
 
-                        <div class="formula-box">
+                        <div class="explanation-box">
                             <h4>General Linkage Framework</h4>
                             
                             <h5>Basic Setup:</h5>
@@ -127,21 +130,226 @@
                                 <li><strong>Symmetry:</strong> D(A,B) = D(B,A) always holds</li>
                                 <li><strong>Reducibility:</strong> Can compute distances incrementally as clusters merge</li>
                                 <li><strong>Space complexity:</strong> Only need to store inter-cluster distances</li>
+                                </ul>
+                            </div>
+                            
+                        <h3>Classification of Linkage Methods</h3>
+                        <p>Linkage criteria can be classified by their mathematical properties and the types of cluster structures they favor.</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Linkage Method</th>
+                                    <th>Mathematical Definition</th>
+                                    <th>Lance-Williams Parameters</th>
+                                    <th>Key Characteristics</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Single (Minimum)</strong></td>
+                                    <td>min{d(a,b) : a∈A, b∈B}</td>
+                                    <td>αₐ=αᵦ=0.5, β=0, γ=-0.5</td>
+                                    <td>Chaining, elongated clusters</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Complete (Maximum)</strong></td>
+                                    <td>max{d(a,b) : a∈A, b∈B}</td>
+                                    <td>αₐ=αᵦ=0.5, β=0, γ=0.5</td>
+                                    <td>Compact, spherical clusters</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Average (UPGMA)</strong></td>
+                                    <td>(1/|A||B|)Σₐ∈ₐ Σᵦ∈ᵦ d(a,b)</td>
+                                    <td>αₐ=|A|/(|A|+|B|), αᵦ=|B|/(|A|+|B|), β=γ=0</td>
+                                    <td>Balanced, moderate compactness</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ward's Method</strong></td>
+                                    <td>Increase in within-cluster sum of squares</td>
+                                    <td>αₐ=(|A|+|C|)/(|A|+|B|+|C|), similar for αᵦ</td>
+                                    <td>Spherical, equal-sized clusters</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Centroid</strong></td>
+                                    <td>d(μₐ, μᵦ) where μ is centroid</td>
+                                    <td>αₐ=|A|/(|A|+|B|), αᵦ=|B|/(|A|+|B|), β=-αₐαᵦ</td>
+                                    <td>Can violate monotonicity</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Computational Complexity Overview</h3>
+                        <p>Different linkage criteria have varying computational requirements, affecting their scalability to large datasets.</p>
+
+                        <div class="explanation-box">
+                            <h4>Complexity Analysis Summary</h4>
+                            
+                            <h5>Time Complexity (Basic Algorithms):</h5>
+                            <ul>
+                                <li><strong>Single/Complete/Average:</strong> O(n³) using naive approach</li>
+                                <li><strong>Single (optimized):</strong> O(n² log n) using MST algorithms</li>
+                                <li><strong>Ward's method:</strong> O(n³) for basic implementation</li>
+                                <li><strong>SLINK/CLINK:</strong> O(n²) for single/complete linkage</li>
+                                </ul>
+                            
+                            <h5>Space Complexity:</h5>
+                            <ul>
+                                <li><strong>Distance matrix:</strong> O(n²) for storing all pairwise distances</li>
+                                <li><strong>Optimized storage:</strong> O(n) for certain algorithms (SLINK)</li>
+                                <li><strong>Dendrogram storage:</strong> O(n) for final tree structure</li>
+                            </ul>
+                            
+                            <h5>Practical Scalability:</h5>
+                            <ul>
+                                <li><strong>Small datasets (n < 1,000):</strong> All methods feasible</li>
+                                <li><strong>Medium datasets (1,000 < n < 10,000):</strong> Use optimized algorithms</li>
+                                <li><strong>Large datasets (n > 10,000):</strong> Consider approximation methods</li>
+                                </ul>
+                            </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Linkage Criteria Comparison</h4>
+                            <p><strong>Image Description:</strong> A 2x3 grid showing the same 2D dataset clustered with different linkage criteria. Each panel shows the resulting dendrogram cut at the same height to produce 3 clusters, with different colors for each cluster. Top row: Single linkage (elongated clusters following data streams), Complete linkage (compact spherical clusters), Average linkage (balanced moderate clusters). Bottom row: Ward's method (equal-sized spherical clusters), Centroid linkage (irregular boundaries), and a comparison panel showing all cluster boundaries overlaid with different line styles.</p>
+                            <p><em>This demonstrates how different linkage criteria produce fundamentally different cluster structures from the same data</em></p>
+                        </div>
+
+                        <h3>Linkage Selection Guidelines</h3>
+                        <p>Choosing the appropriate linkage criterion depends on data characteristics, cluster shape expectations, and computational constraints.</p>
+
+                        <div class="grid-auto-fit">
+                            <div class="azbn-card">
+                                <h4>Data Characteristics</h4>
+                                <ul class="small-list">
+                                    <li><strong>Well-separated spherical clusters:</strong> Complete linkage or Ward's method</li>
+                                    <li><strong>Elongated or irregular clusters:</strong> Single linkage</li>
+                                    <li><strong>Mixed cluster shapes:</strong> Average linkage</li>
+                                    <li><strong>Noisy data with outliers:</strong> Complete or Ward's method</li>
+                                    <li><strong>Different cluster densities:</strong> Single linkage</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="azbn-card">
+                                <h4>Computational Considerations</h4>
+                                <ul class="small-list">
+                                    <li><strong>Large datasets:</strong> Single linkage with MST optimization</li>
+                                    <li><strong>Memory constraints:</strong> SLINK/CLINK algorithms</li>
+                                    <li><strong>Real-time applications:</strong> Precomputed distance matrices</li>
+                                    <li><strong>Approximate clustering:</strong> Sampling-based methods</li>
+                                    <li><strong>Parallel processing:</strong> Divisible linkage criteria</li>
+                                </ul>
+                                </div>
+                            
+                            <div class="azbn-card">
+                                <h4>Application Domains</h4>
+                                <ul class="small-list">
+                                    <li><strong>Phylogenetics:</strong> UPGMA (average linkage)</li>
+                                    <li><strong>Image segmentation:</strong> Ward's method</li>
+                                    <li><strong>Social network analysis:</strong> Single linkage</li>
+                                    <li><strong>Market segmentation:</strong> Ward's method</li>
+                                    <li><strong>Gene expression analysis:</strong> Average or complete linkage</li>
+                                </ul>
+                            </div>
+                        </div>
+                            </div>
+                            
+                    <!-- Single Linkage Section -->
+                    <div id="single" class="content-section">
+                        <h2>Single Linkage: Nearest Neighbor Clustering</h2>
+                        
+                        <p>Single linkage, also known as the nearest neighbor or minimum method, defines the distance between clusters as the minimum distance between any two points in different clusters. This criterion tends to create elongated clusters and is particularly effective at detecting arbitrarily shaped clusters and cluster chains.</p>
+
+                        <h3>Mathematical Definition and Properties</h3>
+                        <p>Single linkage has a simple yet powerful mathematical formulation with deep connections to graph theory.</p>
+
+                        <div class="explanation-box">
+                            <h4>Single Linkage Mathematical Framework</h4>
+                            
+                            <h5>Basic Definition:</h5>
+                            <div class="formula-display">
+                                <p>For clusters A and B, the single linkage distance is:</p>
+                                <strong>D_single(A, B) = min{d(a, b) : a ∈ A, b ∈ B}</strong>
+                                <p>Where d(a, b) is the distance between individual points a and b.</p>
+                            </div>
+                            
+                            <h5>Lance-Williams Parameters:</h5>
+                            <div class="formula-display">
+                                <p>For updating distances when merging clusters A and B:</p>
+                                <ul>
+                                    <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting of both clusters</li>
+                                    <li><strong>β = 0:</strong> No dependency on distance between merged clusters</li>
+                                    <li><strong>γ = -0.5:</strong> Takes minimum of the two distances</li>
+                                </ul>
+                                <p>Resulting update formula:</p>
+                                <strong>D(A∪B, C) = 0.5·D(A,C) + 0.5·D(B,C) - 0.5·|D(A,C) - D(B,C)|</strong>
+                            </div>
+                            
+                            <h5>Equivalent Formulation:</h5>
+                                <div class="formula-display">
+                                <p>The Lance-Williams formula simplifies to:</p>
+                                <strong>D(A∪B, C) = min{D(A,C), D(B,C)}</strong>
+                                <p>This shows that single linkage always takes the minimum distance.</p>
+                                </div>
+                            </div>
+
+                        <h3>Connection to Minimum Spanning Trees</h3>
+                        <p>Single linkage has a fundamental equivalence to minimum spanning tree algorithms, providing both theoretical insights and computational advantages.</p>
+
+                        <div class="theorem-box">
+                            <h4>MST-Single Linkage Equivalence Theorem</h4>
+                            
+                            <h5>Main Result:</h5>
+                            <div class="formula-display">
+                                <p><strong>Theorem:</strong> Single linkage hierarchical clustering is equivalent to finding the minimum spanning tree of the complete graph and removing edges in decreasing order of weight.</p>
+                        </div>
+                            
+                            <h5>Proof Sketch:</h5>
+                            <ol>
+                                <li><strong>MST construction:</strong> Build MST using Kruskal's or Prim's algorithm</li>
+                                <li><strong>Edge removal:</strong> Remove edges in decreasing order of weight</li>
+                                <li><strong>Connected components:</strong> At each step, connected components form clusters</li>
+                                <li><strong>Equivalence:</strong> This produces identical hierarchy to single linkage</li>
+                            </ol>
+                            
+                            <h5>Algorithmic Implications:</h5>
+                            <ul>
+                                <li><strong>Computational efficiency:</strong> Can use O(n² log n) MST algorithms</li>
+                                <li><strong>Space efficiency:</strong> Store only MST edges, not full distance matrix</li>
+                                <li><strong>Theoretical analysis:</strong> Leverage MST properties for clustering analysis</li>
+                            </ul>
+                    </div>
+
+                        <h3>Chaining Phenomenon</h3>
+                        <p>Single linkage's tendency to create chain-like clusters is both its strength and weakness, depending on the application.</p>
+
+                        <div class="explanation-box">
+                            <h4>Understanding the Chaining Effect</h4>
+                            
+                            <h5>Mechanism:</h5>
+                            <p>Single linkage connects clusters through their closest points, which can create long chains of connected points even when the overall clusters are far apart.</p>
+                            
+                            <h5>When Chaining is Beneficial:</h5>
+                            <ul>
+                                <li><strong>Elongated natural clusters:</strong> Rivers, roads, mountain ridges</li>
+                                <li><strong>Network structures:</strong> Social networks, protein interactions</li>
+                                <li><strong>Irregular cluster shapes:</strong> Non-convex or curved clusters</li>
+                                <li><strong>Variable density clusters:</strong> Clusters with different densities</li>
+                            </ul>
+                            
+                            <h5>When Chaining is Problematic:</h5>
+                            <ul>
+                                <li><strong>Well-separated spherical clusters:</strong> Will be incorrectly merged</li>
+                                <li><strong>Noisy data:</strong> Noise points create unwanted connections</li>
+                                <li><strong>Outliers:</strong> Single outliers can bridge distinct clusters</li>
+                                <li><strong>Uniform cluster expectations:</strong> When expecting compact, similar-sized clusters</li>
                             </ul>
                         </div>
 
-                        <h3>Classification of Linkage Methods</h3>
-                        <p>Linkage criteria can be classified by their mathematical properties and the types of cluster structures they favor.</p>
-                    </div>
-
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
-                        
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
-
-                        <h3>Random Initialization: The Baseline</h3>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Single Linkage Behavior</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid demonstrating single linkage characteristics. Top-left: Two well-separated circular clusters with a few noise points creating a bridge between them. Top-right: Single linkage dendrogram showing these getting merged at a low height due to the bridge. Bottom-left: Elongated crescent-shaped clusters that naturally chain together. Bottom-right: Single linkage successfully identifying the crescent structure where other methods might fail. Each visualization includes merge order annotations and distance measurements.</p>
+                            <p><em>This shows both the strength (handling irregular shapes) and weakness (chaining effect) of single linkage</em></p>
+                        </div>
 
                         <div class="model-box">
                             <h4>Random Initialization Algorithm</h4>
@@ -237,14 +445,76 @@
                         </div>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
+                    <!-- Complete Linkage Section -->
+                    <div id="complete" class="content-section">
+                        <h2>Complete Linkage: Maximum Distance Clustering</h2>
                         
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
+                        <p>Complete linkage, also known as the maximum or furthest neighbor method, defines the distance between clusters as the maximum distance between any two points in different clusters. This criterion creates compact, spherical clusters and is robust to outliers and noise.</p>
 
-                        <h3>The K-means++ Algorithm</h3>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
+                        <h3>Mathematical Definition and Properties</h3>
+                        <p>Complete linkage provides a conservative approach to cluster merging, ensuring that all points in merged clusters are relatively close to each other.</p>
+
+                        <div class="explanation-box">
+                            <h4>Complete Linkage Mathematical Framework</h4>
+                            
+                            <h5>Basic Definition:</h5>
+                            <div class="formula-display">
+                                <p>For clusters A and B, the complete linkage distance is:</p>
+                                <strong>D_complete(A, B) = max{d(a, b) : a ∈ A, b ∈ B}</strong>
+                                <p>Where d(a, b) is the distance between individual points a and b.</p>
+                            </div>
+                            
+                            <h5>Lance-Williams Parameters:</h5>
+                            <div class="formula-display">
+                                <p>For updating distances when merging clusters A and B:</p>
+                                <ul>
+                                    <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting of both clusters</li>
+                                    <li><strong>β = 0:</strong> No dependency on distance between merged clusters</li>
+                                    <li><strong>γ = 0.5:</strong> Takes maximum of the two distances</li>
+                                </ul>
+                                <p>Resulting update formula:</p>
+                                <strong>D(A∪B, C) = 0.5·D(A,C) + 0.5·D(B,C) + 0.5·|D(A,C) - D(B,C)|</strong>
+                            </div>
+                            
+                            <h5>Equivalent Formulation:</h5>
+                            <div class="formula-display">
+                                <p>The Lance-Williams formula simplifies to:</p>
+                                <strong>D(A∪B, C) = max{D(A,C), D(B,C)}</strong>
+                                <p>This shows that complete linkage always takes the maximum distance.</p>
+                            </div>
+                        </div>
+
+                        <h3>Compact Cluster Formation</h3>
+                        <p>Complete linkage's conservative merging strategy leads to the formation of compact, well-separated clusters.</p>
+
+                        <div class="explanation-box">
+                            <h4>Understanding Compact Cluster Formation</h4>
+                            
+                            <h5>Mechanism:</h5>
+                            <p>Complete linkage only merges clusters when the maximum distance between any two points in the merged cluster remains small, ensuring tight cluster boundaries.</p>
+                            
+                            <h5>Advantages of Compact Clusters:</h5>
+                            <ul>
+                                <li><strong>Well-defined boundaries:</strong> Clear separation between clusters</li>
+                                <li><strong>Robust to outliers:</strong> Outliers don't affect cluster merging decisions</li>
+                                <li><strong>Equal-sized clusters:</strong> Tends to create clusters of similar sizes</li>
+                                <li><strong>Interpretable results:</strong> Clusters have clear geometric meaning</li>
+                            </ul>
+                            
+                            <h5>When Complete Linkage is Ideal:</h5>
+                            <ul>
+                                <li><strong>Spherical cluster expectations:</strong> When clusters are expected to be roughly spherical</li>
+                                <li><strong>Noisy data:</strong> When data contains outliers or noise points</li>
+                                <li><strong>Well-separated clusters:</strong> When clusters are clearly distinct</li>
+                                <li><strong>Equal importance:</strong> When all points within a cluster should be similar</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Complete Linkage Behavior</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid demonstrating complete linkage characteristics. Top-left: Three well-separated circular clusters with some noise points. Top-right: Complete linkage dendrogram showing clear separation between clusters with high merge heights. Bottom-left: Comparison showing how complete linkage creates compact clusters while single linkage would chain them together. Bottom-right: Cluster boundaries showing tight, spherical formations with clear separation.</p>
+                            <p><em>This demonstrates complete linkage's strength in creating compact, well-separated clusters</em></p>
+                        </div>
 
                         <div class="model-box">
                             <h4>K-means++ Initialization Algorithm</h4>
@@ -346,253 +616,674 @@
                     </div>
 
                     <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
+                    <div id="average" class="content-section">
+                        <h2>Average Linkage: Balanced Clustering</h2>
+                        
+                        <p>Average linkage, also known as UPGMA (Unweighted Pair Group Method with Arithmetic Mean), defines the distance between clusters as the average distance between all pairs of points in different clusters. This method provides a balanced approach between single and complete linkage.</p>
+
+                        <h3>Mathematical Definition and Properties</h3>
+                        <p>Average linkage offers a compromise between the extremes of single and complete linkage, providing moderate cluster compactness.</p>
                         
                         <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
+                            <h4>Average Linkage Mathematical Framework</h4>
+                            
+                            <h5>Basic Definition:</h5>
+                            <div class="formula-display">
+                                <p>For clusters A and B, the average linkage distance is:</p>
+                                <strong>D_average(A, B) = (1/|A||B|) Σ_{a∈A} Σ_{b∈B} d(a, b)</strong>
+                                <p>Where |A| and |B| are the sizes of clusters A and B, and d(a, b) is the distance between points a and b.</p>
                         </div>
 
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
+                            <h5>Lance-Williams Parameters:</h5>
                             <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
+                                <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
+                                    <li><strong>αₐ = |A|/(|A|+|B|):</strong> Proportional to cluster A size</li>
+                                    <li><strong>αᵦ = |B|/(|A|+|B|):</strong> Proportional to cluster B size</li>
+                                    <li><strong>β = 0:</strong> No dependency on distance between merged clusters</li>
+                                    <li><strong>γ = 0:</strong> No absolute difference term</li>
                                 </ul>
+                                <p>Resulting update formula:</p>
+                                <strong>D(A∪B, C) = (|A|/(|A|+|B|))·D(A,C) + (|B|/(|A|+|B|))·D(B,C)</strong>
+                            </div>
+                            
+                            <h5>Weighted Average Interpretation:</h5>
+                            <div class="formula-display">
+                                <p>The update formula shows that average linkage uses a weighted average where larger clusters have more influence on the resulting distance.</p>
                             </div>
                         </div>
 
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
+                        <h3>UPGMA and Phylogenetic Applications</h3>
+                        <p>Average linkage has deep roots in phylogenetic analysis and evolutionary biology, where it's known as UPGMA.</p>
 
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
+                        <div class="explanation-box">
+                            <h4>UPGMA in Phylogenetic Analysis</h4>
+                            
+                            <h5>Historical Context:</h5>
+                            <p>UPGMA was originally developed for constructing phylogenetic trees from genetic distance data, making it one of the oldest hierarchical clustering methods.</p>
+                            
+                            <h5>Key Assumptions:</h5>
                             <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
+                                <li><strong>Molecular clock:</strong> Assumes constant rate of evolution</li>
+                                <li><strong>Ultrametric property:</strong> All leaves are equidistant from root</li>
+                                <li><strong>Additive distances:</strong> Distances satisfy triangle inequality</li>
+                            </ul>
+                            
+                            <h5>Modern Applications:</h5>
+                            <ul>
+                                <li><strong>Gene expression analysis:</strong> Clustering genes with similar expression patterns</li>
+                                <li><strong>Taxonomic classification:</strong> Organizing species by genetic similarity</li>
+                                <li><strong>Protein family analysis:</strong> Grouping related protein sequences</li>
+                                <li><strong>Microbiome studies:</strong> Analyzing bacterial community structures</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Average Linkage Behavior</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid demonstrating average linkage characteristics. Top-left: Mixed cluster shapes with varying densities. Top-right: Average linkage dendrogram showing moderate merge heights between single and complete linkage. Bottom-left: Comparison of cluster boundaries showing balanced compactness. Bottom-right: Phylogenetic tree example showing UPGMA application to genetic data with equal branch lengths from root.</p>
+                            <p><em>This demonstrates average linkage's balanced approach and its phylogenetic applications</em></p>
+                        </div>
+
+                        <h3>Computational Complexity and Efficiency</h3>
+                        <p>Average linkage has moderate computational requirements compared to other linkage methods.</p>
+
+                        <div class="explanation-box">
+                            <h4>Complexity Analysis</h4>
+                            
+                            <h5>Time Complexity:</h5>
+                            <div class="formula-display">
+                                <p><strong>O(n² log n):</strong> For n data points</p>
+                                <ul>
+                                    <li>Initial distance matrix: O(n²)</li>
+                                    <li>n-1 merge operations: O(n log n) with efficient data structures</li>
+                                    <li>Distance updates: O(n) per merge</li>
+                                </ul>
+                            </div>
+                            
+                            <h5>Space Complexity:</h5>
+                            <div class="formula-display">
+                                <p><strong>O(n²):</strong> For storing the distance matrix</p>
+                        </div>
+
+                            <h5>Memory Optimization Strategies:</h5>
+                            <ul>
+                                <li><strong>Lazy evaluation:</strong> Compute distances on-demand</li>
+                                <li><strong>Chunked processing:</strong> Process data in batches</li>
+                                <li><strong>Approximate methods:</strong> Use sampling for large datasets</li>
+                            </ul>
+                        </div>
+
+                        <h3>Advantages and Limitations</h3>
+                        <p>Average linkage provides a balanced approach with specific strengths and weaknesses.</p>
+
+                        <div class="explanation-box">
+                            <h4>Advantages of Average Linkage</h4>
+                            <ul>
+                                <li><strong>Balanced clustering:</strong> Compromise between single and complete linkage</li>
+                                <li><strong>Robust to outliers:</strong> Less sensitive than single linkage</li>
+                                <li><strong>Biological relevance:</strong> Natural for phylogenetic applications</li>
+                                <li><strong>Interpretable results:</strong> Clear cluster boundaries</li>
+                                <li><strong>Size-aware:</strong> Larger clusters have more influence</li>
+                            </ul>
+                            
+                            <h4>Limitations of Average Linkage</h4>
+                            <ul>
+                                <li><strong>Computational cost:</strong> More expensive than single linkage</li>
+                                <li><strong>Memory requirements:</strong> Needs full distance matrix</li>
+                                <li><strong>Chaining tendency:</strong> Can still create elongated clusters</li>
+                                <li><strong>Parameter sensitivity:</strong> Results depend on distance metric choice</li>
                             </ul>
                         </div>
 
                         <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
+                            <h3>Average Linkage Clustering Demo</h3>
                             <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
+                                <button onclick="generateAverageLinkageDemo()">Generate Demo</button>
+                                <button onclick="resetAverageLinkageDemo()">Reset</button>
                             </div>
                             
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
+                            <div class="metric-visualization" id="average-linkage-canvas">
+                                <p>Click "Generate Demo" to see average linkage clustering in action</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Convergence Analysis Section -->
-                    <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
+                    <!-- Ward's Method Section -->
+                    <div id="ward" class="content-section">
+                        <h2>Ward's Method: Variance Minimization</h2>
+                        
+                        <p>Ward's method, also known as minimum variance clustering, merges clusters that result in the smallest increase in within-cluster variance. This method is particularly effective for creating compact, spherical clusters and is widely used in practice.</p>
+
+                        <h3>Mathematical Foundation</h3>
+                        <p>Ward's method minimizes the increase in within-cluster sum of squares (WSS) when merging clusters.</p>
                         
                         <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
-                            <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
-                            </ul>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
+                            <h4>Ward's Method Mathematical Framework</h4>
+                            
+                            <h5>Objective Function:</h5>
                             <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
-                                <p><strong>Where:</strong></p>
+                                <p>Ward's method minimizes the increase in within-cluster sum of squares:</p>
+                                <strong>ΔWSS(A,B) = WSS(A∪B) - WSS(A) - WSS(B)</strong>
+                                <p>Where WSS(C) = Σ_{x∈C} ||x - μ_C||² is the within-cluster sum of squares for cluster C.</p>
+                        </div>
+
+                            <h5>Simplified Formula:</h5>
+                            <div class="formula-display">
+                                <p>The increase in WSS can be simplified to:</p>
+                                <strong>ΔWSS(A,B) = (|A|·|B|)/(|A|+|B|) · ||μ_A - μ_B||²</strong>
+                                <p>Where |A| and |B| are cluster sizes, and μ_A, μ_B are cluster centroids.</p>
+                        </div>
+
+                            <h5>Lance-Williams Parameters:</h5>
+                            <div class="formula-display">
+                                <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
+                                    <li><strong>αₐ = (|A|+|C|)/(|A|+|B|+|C|):</strong> Size-weighted coefficient</li>
+                                    <li><strong>αᵦ = (|B|+|C|)/(|A|+|B|+|C|):</strong> Size-weighted coefficient</li>
+                                    <li><strong>β = -|C|/(|A|+|B|+|C|):</strong> Negative coefficient for cluster C</li>
+                                    <li><strong>γ = 0:</strong> No absolute difference term</li>
                                 </ul>
                             </div>
                         </div>
 
+                        <h3>Variance Minimization Properties</h3>
+                        <p>Ward's method has unique properties that make it particularly effective for certain types of data.</p>
+
                         <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
+                            <h4>Key Properties of Ward's Method</h4>
+                            
+                            <h5>Variance Minimization:</h5>
                             <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
+                                <li><strong>Optimal merging:</strong> Always merges clusters that minimize variance increase</li>
+                                <li><strong>Compact clusters:</strong> Tends to create spherical, well-separated clusters</li>
+                                <li><strong>Size sensitivity:</strong> Larger clusters have more influence on merging decisions</li>
+                                <li><strong>Monotonic increase:</strong> Merge heights always increase (ultrametric property)</li>
+                            </ul>
+                            
+                            <h5>Geometric Interpretation:</h5>
+                            <ul>
+                                <li><strong>Centroid-based:</strong> Focuses on distances between cluster centroids</li>
+                                <li><strong>Size weighting:</strong> Accounts for cluster sizes in distance calculations</li>
+                                <li><strong>Variance preservation:</strong> Maintains low within-cluster variance</li>
                             </ul>
                         </div>
 
-                        <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
+                        <h3>Advantages and Applications</h3>
+                        <p>Ward's method is particularly well-suited for specific types of clustering problems.</p>
+
+                        <div class="explanation-box">
+                            <h4>When to Use Ward's Method</h4>
+                            
+                            <h5>Ideal Conditions:</h5>
+                            <ul>
+                                <li><strong>Spherical clusters:</strong> When clusters are expected to be roughly spherical</li>
+                                <li><strong>Similar cluster sizes:</strong> When clusters should be of similar sizes</li>
+                                <li><strong>Well-separated data:</strong> When clusters are clearly distinct</li>
+                                <li><strong>Low noise:</strong> When data has minimal outliers</li>
+                            </ul>
+                            
+                            <h5>Common Applications:</h5>
+                            <ul>
+                                <li><strong>Market segmentation:</strong> Customer clustering based on behavior</li>
+                                <li><strong>Image segmentation:</strong> Grouping similar pixels in images</li>
+                                <li><strong>Gene expression analysis:</strong> Clustering genes with similar expression patterns</li>
+                                <li><strong>Social network analysis:</strong> Identifying communities in networks</li>
+                            </ul>
+                        </div>
+
                             <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
+                            <h4>Visualization: Ward's Method Behavior</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid demonstrating Ward's method characteristics. Top-left: Well-separated spherical clusters of similar sizes. Top-right: Ward's method dendrogram showing gradual increase in merge heights with compact cluster formation. Bottom-left: Comparison showing how Ward's method creates more balanced clusters than other linkage methods. Bottom-right: Variance plot showing how within-cluster variance increases minimally with each merge.</p>
+                            <p><em>This demonstrates Ward's method's strength in creating compact, balanced clusters</em></p>
                             </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+
+                        <div class="interactive-container">
+                            <h3>Ward's Method Clustering Demo</h3>
+                            <div class="demo-controls">
+                                <button onclick="generateWardsMethodDemo()">Generate Demo</button>
+                                <button onclick="resetWardsMethodDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="metric-visualization" id="wards-method-canvas">
+                                <p>Click "Generate Demo" to see Ward's method clustering in action</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
+                    <!-- Other Methods Section -->
+                    <div id="other" class="content-section">
+                        <h2>Other Linkage Methods</h2>
+                        
+                        <p>Beyond the fundamental linkage methods, several specialized approaches have been developed for specific clustering scenarios and data types.</p>
+
+                        <h3>Centroid Linkage</h3>
+                        <p>Centroid linkage defines the distance between clusters as the distance between their centroids.</p>
                         
                         <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
+                            <h4>Centroid Linkage Characteristics</h4>
+                            
+                            <h5>Mathematical Definition:</h5>
+                            <div class="formula-display">
+                                <p>For clusters A and B with centroids μ_A and μ_B:</p>
+                                <strong>D_centroid(A, B) = ||μ_A - μ_B||</strong>
+                                <p>Where ||·|| is the Euclidean distance between centroids.</p>
                         </div>
 
-                        <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
+                            <h5>Lance-Williams Parameters:</h5>
+                            <div class="formula-display">
+                                <ul>
+                                    <li><strong>αₐ = |A|/(|A|+|B|):</strong> Size-weighted coefficient</li>
+                                    <li><strong>αᵦ = |B|/(|A|+|B|):</strong> Size-weighted coefficient</li>
+                                    <li><strong>β = -|A||B|/(|A|+|B|)²:</strong> Negative size interaction term</li>
+                                    <li><strong>γ = 0:</strong> No absolute difference term</li>
+                                </ul>
+                            </div>
                             
-                            <div class="demo-controls">
-                                <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
+                            <h5>Properties:</h5>
+                            <ul>
+                                <li><strong>Non-monotonic:</strong> Merge heights may decrease (inversion possible)</li>
+                                <li><strong>Size-sensitive:</strong> Larger clusters have more influence</li>
+                                <li><strong>Centroid-focused:</strong> Ignores cluster shape and spread</li>
+                            </ul>
                                 </div>
                                 
+                        <h3>Median Linkage</h3>
+                        <p>Median linkage, also known as WPGMA (Weighted Pair Group Method with Arithmetic Mean), is similar to average linkage but treats all clusters equally regardless of size.</p>
+
+                        <div class="explanation-box">
+                            <h4>Median Linkage Characteristics</h4>
+                            
+                            <h5>Mathematical Definition:</h5>
+                            <div class="formula-display">
+                                <p>For clusters A and B, the median linkage distance is:</p>
+                                <strong>D_median(A, B) = (1/2) · [D(A,C) + D(B,C)]</strong>
+                                <p>This is a simple average of the distances to cluster C.</p>
+                                </div>
+                                
+                            <h5>Lance-Williams Parameters:</h5>
+                            <div class="formula-display">
+                                <ul>
+                                    <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting for both clusters</li>
+                                    <li><strong>β = 0:</strong> No dependency on distance between merged clusters</li>
+                                    <li><strong>γ = 0:</strong> No absolute difference term</li>
+                                </ul>
+                                </div>
+                                
+                            <h5>Properties:</h5>
+                            <ul>
+                                <li><strong>Size-independent:</strong> Treats all clusters equally</li>
+                                <li><strong>Simple computation:</strong> Easy to implement and understand</li>
+                                <li><strong>Balanced approach:</strong> Compromise between single and complete linkage</li>
+                            </ul>
+                            </div>
+                            
+                        <h3>Flexible Linkage</h3>
+                        <p>Flexible linkage is a parameterized method that allows tuning between different linkage behaviors.</p>
+
+                        <div class="explanation-box">
+                            <h4>Flexible Linkage Framework</h4>
+                            
+                            <h5>General Formula:</h5>
+                            <div class="formula-display">
+                                <p>Flexible linkage uses the Lance-Williams formula with:</p>
+                                <strong>αₐ = αᵦ = (1-β)/2, γ = 0</strong>
+                                <p>Where β is a parameter controlling the linkage behavior.</p>
+                            </div>
+                            
+                            <h5>Parameter Effects:</h5>
+                            <ul>
+                                <li><strong>β = -1:</strong> Equivalent to single linkage</li>
+                                <li><strong>β = 0:</strong> Equivalent to average linkage</li>
+                                <li><strong>β = 1:</strong> Equivalent to complete linkage</li>
+                                <li><strong>β = 0.25:</strong> Common default value</li>
+                            </ul>
+                            
+                            <h5>Advantages:</h5>
+                            <ul>
+                                <li><strong>Tunable behavior:</strong> Can be adjusted for specific data</li>
+                                <li><strong>Unified framework:</strong> Generalizes other linkage methods</li>
+                                <li><strong>Empirical optimization:</strong> Can be tuned based on validation</li>
+                            </ul>
+                            </div>
+                            
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Other Linkage Methods</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid comparing different linkage methods. Top-left: Centroid linkage showing non-monotonic dendrogram with inversions. Top-right: Median linkage showing balanced clustering behavior. Bottom-left: Flexible linkage with different β values showing tunable behavior. Bottom-right: Comparison table showing properties of all linkage methods.</p>
+                            <p><em>This demonstrates the variety and flexibility of linkage methods</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Method Comparison Section -->
+                    <div id="comparison" class="content-section">
+                        <h2>Method Comparison</h2>
+                        
+                        <p>Understanding the differences between linkage methods is crucial for selecting the most appropriate approach for your specific clustering problem.</p>
+
+                        <h3>Comparative Analysis</h3>
+                        <p>Each linkage method has distinct characteristics that make it suitable for different types of data and clustering objectives.</p>
+
+                        <div class="explanation-box">
+                            <h4>Linkage Method Properties Comparison</h4>
+                            
+                            <div class="comparison-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Method</th>
+                                            <th>Cluster Shape</th>
+                                            <th>Chaining</th>
+                                            <th>Outlier Sensitivity</th>
+                                            <th>Computational Cost</th>
+                                            <th>Best For</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Single Linkage</strong></td>
+                                            <td>Elongated, irregular</td>
+                                            <td>High</td>
+                                            <td>Very sensitive</td>
+                                            <td>Low</td>
+                                            <td>Non-spherical clusters</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Complete Linkage</strong></td>
+                                            <td>Compact, spherical</td>
+                                            <td>Low</td>
+                                            <td>Robust</td>
+                                            <td>High</td>
+                                            <td>Well-separated clusters</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Average Linkage</strong></td>
+                                            <td>Balanced</td>
+                                            <td>Moderate</td>
+                                            <td>Moderate</td>
+                                            <td>High</td>
+                                            <td>General purpose</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ward's Method</strong></td>
+                                            <td>Compact, spherical</td>
+                                            <td>Low</td>
+                                            <td>Robust</td>
+                                            <td>High</td>
+                                            <td>Similar-sized clusters</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Centroid Linkage</strong></td>
+                                            <td>Variable</td>
+                                            <td>Moderate</td>
+                                            <td>Moderate</td>
+                                            <td>Medium</td>
+                                            <td>Size-aware clustering</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <h3>Selection Guidelines</h3>
+                        <p>Choosing the right linkage method depends on your data characteristics and clustering objectives.</p>
+
+                        <div class="explanation-box">
+                            <h4>Method Selection Criteria</h4>
+                            
+                            <h5>Data Characteristics:</h5>
+                            <ul>
+                                <li><strong>Cluster shape:</strong> Spherical vs. elongated vs. irregular</li>
+                                <li><strong>Cluster size:</strong> Similar vs. varying sizes</li>
+                                <li><strong>Noise level:</strong> Clean data vs. noisy data with outliers</li>
+                                <li><strong>Separation:</strong> Well-separated vs. overlapping clusters</li>
+                            </ul>
+                            
+                            <h5>Application Requirements:</h5>
+                            <ul>
+                                <li><strong>Interpretability:</strong> Need for clear cluster boundaries</li>
+                                <li><strong>Computational resources:</strong> Time and memory constraints</li>
+                                <li><strong>Domain knowledge:</strong> Biological, social, or business context</li>
+                                <li><strong>Validation needs:</strong> Requirements for robust clustering</li>
+                            </ul>
+                        </div>
+
+                        <h3>Performance Considerations</h3>
+                        <p>Different linkage methods have varying computational requirements and performance characteristics.</p>
+
+                        <div class="explanation-box">
+                            <h4>Computational Complexity Comparison</h4>
+                            
+                            <div class="comparison-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Method</th>
+                                            <th>Time Complexity</th>
+                                            <th>Space Complexity</th>
+                                            <th>Memory Usage</th>
+                                            <th>Scalability</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Single Linkage</strong></td>
+                                            <td>O(n²)</td>
+                                            <td>O(n)</td>
+                                            <td>Low</td>
+                                            <td>Good</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Complete Linkage</strong></td>
+                                            <td>O(n² log n)</td>
+                                            <td>O(n²)</td>
+                                            <td>High</td>
+                                            <td>Poor</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Average Linkage</strong></td>
+                                            <td>O(n² log n)</td>
+                                            <td>O(n²)</td>
+                                            <td>High</td>
+                                            <td>Poor</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ward's Method</strong></td>
+                                            <td>O(n² log n)</td>
+                                            <td>O(n²)</td>
+                                            <td>High</td>
+                                            <td>Poor</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Centroid Linkage</strong></td>
+                                            <td>O(n² log n)</td>
+                                            <td>O(n²)</td>
+                                            <td>Medium</td>
+                                            <td>Moderate</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Method Comparison</h4>
+                            <p><strong>Image Description:</strong> A 2x3 grid showing the same dataset clustered with different linkage methods. Top row: Single linkage (elongated clusters), Complete linkage (compact clusters), Average linkage (balanced clusters). Bottom row: Ward's method (spherical clusters), Centroid linkage (size-aware clusters), and a comparison dendrogram showing different merge patterns.</p>
+                            <p><em>This demonstrates how different linkage methods produce different clustering results on the same data</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demos Section -->
+                    <div id="interactive" class="content-section">
+                        <h2>Interactive Demos</h2>
+                        
+                        <p>Explore different linkage methods through interactive demonstrations that show how each method behaves on various types of data.</p>
+
+                        <div class="interactive-container">
+                            <h3>Linkage Method Comparison Demo</h3>
+                            <div class="demo-controls">
                                 <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
-                                        <option value="random">Random</option>
-                                        <option value="kmeans++">K-means++</option>
+                                    <label for="demo-dataset">Dataset Type:</label>
+                                    <select id="demo-dataset">
+                                        <option value="blobs">Well-separated Blobs</option>
+                                        <option value="moons">Moon-shaped</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="noisy">Noisy Data</option>
                                     </select>
                                 </div>
                                 
                                 <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
-                                        <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
+                                    <label for="demo-linkage">Linkage Method:</label>
+                                    <select id="demo-linkage">
+                                        <option value="single">Single Linkage</option>
+                                        <option value="complete">Complete Linkage</option>
+                                        <option value="average">Average Linkage</option>
+                                        <option value="ward">Ward's Method</option>
                                     </select>
                                 </div>
                                 
                                 <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
+                                    <button onclick="generateLinkageDemo()">Generate Demo</button>
+                                    <button onclick="resetLinkageDemo()">Reset</button>
                                 </div>
                             </div>
                             
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
+                            <div class="metric-visualization" id="linkage-demo-canvas">
+                                <p>Click "Generate Demo" to see linkage method clustering in action</p>
                             </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
-                                <div class="metrics-grid">
-                                    <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
-                                    </div>
-                                    <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
-                                    </div>
+                        </div>
+
+                        <div class="interactive-container">
+                            <h3>Dendrogram Visualization Demo</h3>
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="demo-clusters">Number of Clusters:</label>
+                                    <input type="range" id="demo-clusters" min="2" max="10" value="3">
+                                    <span id="demo-clusters-display">3</span>
                                 </div>
+                                
+                                <div class="control-buttons">
+                                    <button onclick="generateDendrogramDemo()">Generate Dendrogram</button>
+                                    <button onclick="resetDendrogramDemo()">Reset</button>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-visualization" id="dendrogram-demo-canvas">
+                                <p>Click "Generate Dendrogram" to see hierarchical clustering visualization</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
+                        <h2>Chapter 9 Quiz</h2>
                         
                         <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
+                                <h4>Question 1: Which linkage method is most prone to chaining?</h4>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
+                                    <p>Complete linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
+                                    <p>Single linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
+                                    <p>Average linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
+                                    <p>Ward's method</p>
                                 </div>
                                 <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
+                                    <p><strong>Correct!</strong> Single linkage is most prone to chaining because it only considers the minimum distance between clusters, which can lead to elongated cluster formations.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
+                                <h4>Question 2: What does Ward's method minimize?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Maximum distance between clusters</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Average distance between clusters</p>
+                                </div>
                                 <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
+                                    <p>Increase in within-cluster variance</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
+                                    <p>Total number of clusters</p>
                                 </div>
                                 <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
+                                    <p><strong>Correct!</strong> Ward's method minimizes the increase in within-cluster sum of squares (WSS) when merging clusters, leading to compact, spherical clusters.</p>
                                 </div>
                             </div>
                         </div>
 
                         <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
+                                <h4>Question 3: Which linkage method is most robust to outliers?</h4>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
+                                    <p>Single linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
+                                    <p>Complete linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
+                                    <p>Average linkage</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Centroid linkage</p>
                                 </div>
                                 <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
+                                    <p><strong>Correct!</strong> Complete linkage is most robust to outliers because it considers the maximum distance between clusters, making it less sensitive to individual outlier points.</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 4: What is the time complexity of most linkage methods?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>O(n log n)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>O(n²)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>O(n² log n)</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>O(n³)</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> Most linkage methods have O(n² log n) time complexity due to the need to compute and update the full distance matrix for n-1 merge operations.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="enhanced-quiz-container">
+                            <div class="enhanced-quiz-question">
+                                <h4>Question 5: Which linkage method is also known as UPGMA?</h4>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Single linkage</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Complete linkage</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="correct">
+                                    <p>Average linkage</p>
+                                </div>
+                                <div class="enhanced-quiz-option" data-answer="incorrect">
+                                    <p>Ward's method</p>
+                                </div>
+                                <div class="enhanced-quiz-explanation">
+                                    <p><strong>Correct!</strong> Average linkage is also known as UPGMA (Unweighted Pair Group Method with Arithmetic Mean) and has its origins in phylogenetic analysis.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz-score-container">
+                            <button onclick="checkQuizAnswers()" class="demo-button">Submit Answers</button>
+                            <div id="quiz-results" class="quiz-results"></div>
                         </div>
                     </div>
                 </main>
@@ -621,3 +1312,4 @@
     </div>
 </body>
 </html>
+

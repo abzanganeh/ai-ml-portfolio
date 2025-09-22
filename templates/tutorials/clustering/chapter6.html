@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter6.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -32,12 +32,12 @@
         <!-- Tutorial Header -->
         <div class="tutorial-header">
             <div class="azbn-container">
-                <h1 class="chapter-title">Chapter 4: K-means Clustering Algorithm</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <h1 class="chapter-title">Chapter 6: K-Means Optimization</h1>
+                <p class="chapter-subtitle">Master advanced optimization techniques, initialization methods, and algorithmic improvements for K-means clustering</p>
                 
-                <!-- Chapter Progress Bar (4/15) -->
+                <!-- Chapter Progress Bar (6/15) -->
                 <div class="chapter-progress">
-                    <div class="chapter-progress-fill" data-progress="26.67"></div>
+                    <div class="chapter-progress-fill" data-progress="40.00"></div>
                 </div>
                 
                 <!-- Chapter Navigation (All 15 chapters) -->
@@ -61,17 +61,19 @@
                 
                 <!-- Section Progress Bar -->
                 <div class="section-progress">
-                    <div class="section-progress-fill" data-progress="14.29"></div>
+                    <div class="section-progress-fill" data-progress="11.11"></div>
                 </div>
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
                     <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
+                    <button class="section-nav-btn" data-section="kmeans_plus">K-means++</button>
                     <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="acceleration">Acceleration Techniques</button>
+                    <button class="section-nav-btn" data-section="variants">Algorithmic Variants</button>
+                    <button class="section-nav-btn" data-section="parallel">Parallel & Distributed</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -83,20 +85,22 @@
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
+                        <li>Understand K-means optimization challenges and limitations</li>
+                        <li>Master various initialization methods and their impact</li>
+                        <li>Learn K-means++ algorithm and its theoretical guarantees</li>
                         <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Explore acceleration techniques for large-scale data</li>
+                        <li>Understand algorithmic variants and improvements</li>
+                        <li>Learn parallel and distributed K-means implementations</li>
+                        <li>Implement optimization techniques with interactive demos</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
+                <div class="tutorial-content">
                 <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>Optimizing K-Means: Beyond Basic Lloyd's Algorithm</h2>
                         
                         <p>While Lloyd's algorithm provides a solid foundation for K-means clustering, its practical success depends heavily on several optimization considerations. The choice of initial centroids, convergence criteria, and algorithmic variants can dramatically affect both the quality of results and computational efficiency.</p>
@@ -145,7 +149,7 @@
                         <div class="image-container">
                             <img src="{{ url_for('static', filename='images/tutorials/clustering/chapter6/initialization_impact.png') }}" alt="Initialization Impact on K-Means" class="tutorial-image">
                             <p class="image-caption">2x3 grid showing different initializations and their convergence curves</p>
-                        </div>
+                    </div>
 
                         <div class="model-box">
                             <h4>Theoretical Impact of Initialization</h4>
@@ -171,14 +175,14 @@
                                 <li><strong>Number of clusters k:</strong> Higher k makes good initialization less likely</li>
                                 <li><strong>Data dimensionality:</strong> Higher dimensions reduce probability of good initialization</li>
                             </ul>
-                        </div>
-
+                                </div>
+                                
                         <h3>Optimization Landscape Overview</h3>
                         <p>Understanding the K-means optimization landscape helps explain why different strategies are needed for different scenarios.</p>
-                    </div>
-
-                    <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
+                                </div>
+                                
+                    <!-- Initialization Methods Section -->
+                    <div id="initialization" class="content-section">
                         <h2>Initialization Methods: Setting the Stage for Success</h2>
                         
                         <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
@@ -280,8 +284,9 @@
                         </div>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
+
+                    <!-- K-means++ Section -->
+                    <div id="kmeans_plus" class="content-section">
                         <h2>K-means++: The Smart Initialization Revolution</h2>
                         
                         <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
@@ -317,9 +322,9 @@
         centroids.append(X[next_idx])
     
     <strong>return</strong> centroids
-                                </div>
                             </div>
-                            
+                        </div>
+
                             <h5>Key Insight:</h5>
                             <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
                             
@@ -388,65 +393,6 @@
                         </div>
                     </div>
 
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
-                        
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
-                            <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
-                            <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Convergence Analysis Section -->
                     <div id="convergence" class="content-section">
@@ -500,145 +446,405 @@
                         </div>
                     </div>
 
-                    <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
+                    <!-- Acceleration Techniques Section -->
+                    <div id="acceleration" class="content-section">
+                        <h2>Acceleration Techniques for Large-Scale Data</h2>
                         
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
+                        <p>Traditional K-means can be slow on large datasets. Various acceleration techniques have been developed to improve computational efficiency while maintaining clustering quality.</p>
+
+                        <h3>Triangle Inequality Acceleration</h3>
+                        <p>Exploits geometric properties to avoid unnecessary distance calculations.</p>
+
+                        <div class="algorithm-box">
+                            <h4>Triangle Inequality Optimization</h4>
+                            <ul>
+                                <li><strong>Distance bounds:</strong> Use triangle inequality to bound distances</li>
+                                <li><strong>Centroid tracking:</strong> Monitor centroid movement between iterations</li>
+                                <li><strong>Early termination:</strong> Skip calculations when bounds are sufficient</li>
+                                <li><strong>Geometric pruning:</strong> Eliminate impossible cluster assignments</li>
+                            </ul>
                         </div>
 
+                        <h3>Approximate Methods</h3>
+                        <p>Trade accuracy for speed in large-scale applications.</p>
+
+                        <div class="model-box">
+                            <h4>Approximation Strategies</h4>
+                            <ul>
+                                <li><strong>Sampling methods:</strong> Work with data subsets</li>
+                                <li><strong>Quantization:</strong> Reduce data precision</li>
+                                <li><strong>Hierarchical approaches:</strong> Multi-level clustering</li>
+                                <li><strong>Incremental updates:</strong> Process data in streams</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Acceleration Techniques Performance</h4>
+                            <p><strong>Image Description:</strong> Performance comparison chart showing execution time vs dataset size for different K-means acceleration techniques. The chart shows standard K-means (slowest), triangle inequality acceleration (moderate speedup), mini-batch K-means (good speedup), and approximate methods (fastest but with accuracy trade-offs).</p>
+                            <p><em>This demonstrates the speed-accuracy trade-offs in K-means acceleration</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Algorithmic Variants Section -->
+                    <div id="variants" class="content-section">
+                        <h2>Algorithmic Variants and Improvements</h2>
+                        
+                        <p>Beyond basic K-means, numerous algorithmic variants have been developed to address specific limitations and improve performance in various scenarios.</p>
+
+                        <h3>Mini-Batch K-means</h3>
+                        <p>Mini-batch K-means processes data in small batches, making it suitable for large datasets that don't fit in memory.</p>
+
+                        <div class="algorithm-box">
+                            <h4>Mini-Batch K-means Algorithm</h4>
+                            <ul>
+                                <li><strong>Memory efficient:</strong> Processes data in small batches</li>
+                                <li><strong>Faster convergence:</strong> Updates centroids more frequently</li>
+                                <li><strong>Approximate solution:</strong> Trade-off between speed and accuracy</li>
+                                <li><strong>Online learning:</strong> Can handle streaming data</li>
+                            </ul>
+                        </div>
+
+                        <h3>Fuzzy C-means</h3>
+                        <p>Fuzzy C-means allows data points to belong to multiple clusters with different membership degrees.</p>
+
+                        <div class="model-box">
+                            <h4>Fuzzy C-means Features</h4>
+                            <ul>
+                                <li><strong>Soft clustering:</strong> Points can belong to multiple clusters</li>
+                                <li><strong>Membership degrees:</strong> Probabilistic cluster assignments</li>
+                                <li><strong>Robust to outliers:</strong> Less sensitive to noise</li>
+                                <li><strong>Overlapping clusters:</strong> Handles ambiguous boundaries</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Algorithmic Variants Comparison</h4>
+                            <p><strong>Image Description:</strong> A comparison of different K-means variants showing their performance characteristics. Left panel: Standard K-means with hard cluster boundaries. Center panel: Mini-batch K-means showing faster convergence but slightly different final result. Right panel: Fuzzy C-means showing soft boundaries and membership degrees.</p>
+                            <p><em>This demonstrates the trade-offs between different algorithmic approaches</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Parallel & Distributed Section -->
+                    <div id="parallel" class="content-section">
+                        <h2>Parallel and Distributed K-means</h2>
+                        
+                        <p>For large-scale datasets, parallel and distributed implementations of K-means are essential for practical applications.</p>
+
+                        <h3>Parallelization Strategies</h3>
+                        <div class="explanation-box">
+                            <h4>Parallel K-means Approaches</h4>
+                            <ul>
+                                <li><strong>Data parallelism:</strong> Distribute data points across processors</li>
+                                <li><strong>Centroid parallelism:</strong> Parallel centroid updates</li>
+                                <li><strong>Assignment parallelism:</strong> Parallel point-to-cluster assignments</li>
+                                <li><strong>Hybrid approaches:</strong> Combine multiple parallelization strategies</li>
+                            </ul>
+                        </div>
+
+                        <h3>Distributed Computing</h3>
+                        <p>Distributed K-means implementations for cluster computing environments.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Implementation</th>
+                                        <th>Scalability</th>
+                                        <th>Fault Tolerance</th>
+                                        <th>Use Case</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>MapReduce K-means</strong></td>
+                                        <td>Very High</td>
+                                        <td>High</td>
+                                        <td>Batch processing</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Spark MLlib</strong></td>
+                                        <td>High</td>
+                                        <td>High</td>
+                                        <td>Interactive analytics</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>MPI K-means</strong></td>
+                                        <td>High</td>
+                                        <td>Medium</td>
+                                        <td>HPC clusters</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>GPU K-means</strong></td>
+                                        <td>Medium</td>
+                                        <td>Low</td>
+                                        <td>Single machine acceleration</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                    <!-- Interactive Demos Section -->
+                    <div id="interactive" class="content-section">
+                        <h2>Interactive K-Means Optimization Demos</h2>
+                        
+                        <p>Explore K-means optimization techniques through interactive demonstrations. Compare different initialization methods, acceleration techniques, and observe their impact on clustering performance.</p>
+
+                        <h3>Demo 1: Initialization Methods Comparison</h3>
                         <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
-                            
                             <div class="demo-controls">
                                 <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
+                                    <label for="init-dataset">Dataset:</label>
+                                    <select id="init-dataset">
+                                        <option value="blobs">Blob Clusters</option>
+                                        <option value="moons">Moon Shapes</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="random">Random Points</option>
+                                    </select>
                                 </div>
                                 
                                 <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
+                                    <label for="init-method">Initialization Method:</label>
+                                    <select id="init-method">
                                         <option value="random">Random</option>
                                         <option value="kmeans++">K-means++</option>
+                                        <option value="furthest">Furthest-First</option>
+                                        <option value="kmeans++_improved">K-means++ Improved</option>
                                     </select>
                                 </div>
                                 
                                 <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
-                                        <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
-                                    </select>
+                                    <label for="init-runs">Number of Runs:</label>
+                                    <input type="range" id="init-runs" min="1" max="10" value="5">
+                                    <span id="init-runs-display">5</span>
                                 </div>
                                 
-                                <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
+                                <button class="demo-button" onclick="generateInitDemo()">Compare Methods</button>
+                                <button class="demo-button" onclick="resetInitDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>Clustering Results</h4>
+                                    <svg id="init-plot" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Convergence Comparison</h4>
+                                    <svg id="init-convergence" width="400" height="300"></svg>
                                 </div>
                             </div>
                             
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
-                            </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
+                            <div class="demo-metrics">
                                 <div class="metrics-grid">
                                     <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
+                                        <div class="metric-label">Average WCSS</div>
+                                        <div class="metric-value" id="avg-wcss">-</div>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
+                                        <div class="metric-label">Convergence Iterations</div>
+                                        <div class="metric-value" id="convergence-iter">-</div>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
+                                        <div class="metric-label">Success Rate</div>
+                                        <div class="metric-value" id="success-rate">-</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <h3>Demo 2: Acceleration Techniques</h3>
+                        <div class="interactive-container">
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="accel-dataset-size">Dataset Size:</label>
+                                    <select id="accel-dataset-size">
+                                        <option value="small">Small (100 points)</option>
+                                        <option value="medium">Medium (1000 points)</option>
+                                        <option value="large">Large (5000 points)</option>
+                                        <option value="xlarge">Extra Large (10000 points)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="accel-method">Acceleration Method:</label>
+                                    <select id="accel-method">
+                                        <option value="standard">Standard K-means</option>
+                                        <option value="triangle">Triangle Inequality</option>
+                                        <option value="minibatch">Mini-batch</option>
+                                        <option value="approximate">Approximate</option>
+                                    </select>
+                                </div>
+                                
+                                <button class="demo-button" onclick="generateAccelDemo()">Run Benchmark</button>
+                                <button class="demo-button" onclick="resetAccelDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>Performance Results</h4>
+                                    <svg id="accel-performance" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Clustering Quality</h4>
+                                    <svg id="accel-quality" width="400" height="300"></svg>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-metrics">
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-label">Execution Time (ms)</div>
+                                        <div class="metric-value" id="exec-time">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Silhouette Score</div>
+                                        <div class="metric-value" id="silhouette-score">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Speedup Factor</div>
+                                        <div class="metric-value" id="speedup">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     </div>
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
+                        <h2>Quiz</h2>
+                        
+                        <p>Test your understanding of K-means optimization techniques with these comprehensive questions covering the key concepts discussed in this chapter.</p>
                         
                         <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
+                                <h3>Question 1: K-means++ Initialization</h3>
+                                <p>What is the main advantage of K-means++ initialization over random initialization?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span class="option-text">It guarantees global optimum</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span class="option-text">It provides better initialization leading to faster convergence and better local minima</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span class="option-text">It's computationally faster</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span class="option-text">It works better with non-spherical clusters</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 2: Convergence Analysis</h3>
+                                <p>What is the main reason K-means algorithm is guaranteed to converge?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span class="option-text">The objective function is convex</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span class="option-text">The objective function is monotonically decreasing and bounded below</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span class="option-text">The algorithm always finds the global optimum</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span class="option-text">The number of possible clusterings is finite</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
                                 </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 3: Triangle Inequality Acceleration</h3>
+                                <p>How does triangle inequality acceleration improve K-means performance?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="a">
+                                        <span class="option-text">By reducing the number of distance calculations needed</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="b">
+                                        <span class="option-text">By improving the quality of clustering results</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="c">
+                                        <span class="option-text">By reducing memory usage</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="d">
+                                        <span class="option-text">By making the algorithm deterministic</span>
+                                    </label>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
-                                </div>
+                                <h3>Question 4: Mini-batch K-means</h3>
+                                <p>What is the main trade-off in mini-batch K-means?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="a">
+                                        <span class="option-text">Speed vs memory usage</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="b">
+                                        <span class="option-text">Speed vs clustering accuracy</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="c">
+                                        <span class="option-text">Memory usage vs clustering accuracy</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="d">
+                                        <span class="option-text">Determinism vs randomness</span>
+                                    </label>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
+                                <h3>Question 5: Parallel K-means</h3>
+                                <p>Which parallelization strategy is most effective for K-means on large datasets?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="a">
+                                        <span class="option-text">Data parallelism - distributing data points across processors</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="b">
+                                        <span class="option-text">Centroid parallelism - parallel centroid updates</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="c">
+                                        <span class="option-text">Assignment parallelism - parallel point-to-cluster assignments</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="d">
+                                        <span class="option-text">Hybrid approaches combining multiple strategies</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
-                                </div>
+                            </div>
+
+                            <button class="demo-button" onclick="checkQuizAnswers()">Submit Answers</button>
+                            
+                            <div id="quiz-results" class="quiz-score-container" style="display: none;">
+                                <h3>Quiz Results</h3>
+                                <div id="quiz-score"></div>
+                                <div id="quiz-feedback"></div>
                             </div>
                         </div>
                     </div>
                 </main>
+                </div>
             </div>
         </section>
     </main>
@@ -650,8 +856,8 @@
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Initialization Methods</span>
                 <span>Next →</span>
             </button>
         </div>

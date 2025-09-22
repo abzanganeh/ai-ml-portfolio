@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter8.js') }}"></script>
 </head>
 <body>
     <header class="azbn-header">
@@ -33,7 +33,7 @@
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 8: Hierarchical Clustering Theory</h1>
-                <p class="chapter-subtitle">Master the most popular clustering algorithm from mathematical foundations to practical implementation</p>
+                <p class="chapter-subtitle">Master the mathematical foundations and theoretical principles of hierarchical clustering algorithms</p>
                 
                 <!-- Chapter Progress Bar (4/15) -->
                 <div class="chapter-progress">
@@ -66,12 +66,14 @@
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn" data-section="theory">Mathematical Theory</button>
+                    <button class="section-nav-btn" data-section="agglomerative">Agglomerative Methods</button>
+                    <button class="section-nav-btn" data-section="divisive">Divisive Methods</button>
+                    <button class="section-nav-btn" data-section="dendrograms">Dendrogram Analysis</button>
+                    <button class="section-nav-btn" data-section="complexity">Complexity Analysis</button>
+                    <button class="section-nav-btn" data-section="applications">Applications</button>
+                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
                     <button class="section-nav-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
@@ -83,20 +85,20 @@
                 <div class="learning-objectives-box">
                     <h2>Learning Objectives</h2>
                     <ul>
-                        <li>Understand the K-means algorithm step-by-step process</li>
-                        <li>Master the mathematical foundations and objective function</li>
-                        <li>Learn different initialization methods and their impact</li>
-                        <li>Analyze convergence properties and stopping criteria</li>
-                        <li>Implement K-means from scratch with interactive demos</li>
-                        <li>Compare different distance metrics in K-means clustering</li>
-                        <li>Evaluate clustering quality using various metrics</li>
+                        <li>Understand the mathematical foundations of hierarchical clustering</li>
+                        <li>Master agglomerative and divisive clustering algorithms</li>
+                        <li>Learn dendrogram construction and interpretation</li>
+                        <li>Analyze computational complexity of hierarchical methods</li>
+                        <li>Explore real-world applications and use cases</li>
+                        <li>Compare hierarchical clustering with other approaches</li>
+                        <li>Implement hierarchical clustering with interactive demos</li>
                     </ul>
                 </div>
 
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
-                    <!-- Algorithm Overview Section -->
-                    <div id="algorithm" class="content-section active">
+                    <!-- Introduction Section -->
+                    <div id="introduction" class="content-section active">
                         <h2>Hierarchical Clustering: Revealing Nested Structure in Data</h2>
                         
                         <p>Hierarchical clustering represents a fundamentally different approach to clustering compared to partitional methods like K-means. Instead of producing a single flat partitioning, hierarchical methods construct a tree-like hierarchy of clusters, revealing structure at multiple scales simultaneously. This approach is particularly valuable when the natural granularity of clustering is unknown or when understanding relationships between clusters is important.</p>
@@ -182,470 +184,1067 @@
                     </div>
 
                     <!-- Mathematical Foundation Section -->
-                    <div id="mathematics" class="content-section">
-                        <h2>Initialization Methods: Setting the Stage for Success</h2>
+                    <div id="theory" class="content-section">
+                        <h2>Mathematical Theory of Hierarchical Clustering</h2>
                         
-                        <p>The initialization phase of K-means clustering is critical for achieving high-quality results. Poor initialization can lead to suboptimal local minima, slow convergence, and inconsistent results across runs. This section explores various initialization strategies, from simple random selection to sophisticated heuristics.</p>
+                        <p>The theoretical foundations of hierarchical clustering rest on concepts from metric geometry, graph theory, and discrete optimization. Understanding these mathematical principles provides insight into when hierarchical methods work well and what properties we can expect from the resulting cluster hierarchies.</p>
 
-                        <h3>Random Initialization: The Baseline</h3>
-                        <p>The simplest approach randomly selects k data points as initial centroids, but this method has significant limitations.</p>
+                        <h3>Ultrametric Spaces and Hierarchical Consistency</h3>
+                        <p>The most important theoretical concept in hierarchical clustering is the relationship between ultrametric spaces and tree representations.</p>
 
-                        <div class="model-box">
-                            <h4>Random Initialization Algorithm</h4>
+                        <div class="theorem-box">
+                            <h4>Ultrametric Spaces</h4>
                             
-                            <div class="formula-box">
-                                <h5><strong>Basic Random Selection:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_init(X, k):
-    n, d = X.shape
-    indices = random_sample(n, k)  <span style="color: #1976d2;">// Sample k indices without replacement</span>
-    centroids = X[indices]          <span style="color: #1976d2;">// Select corresponding data points</span>
-    <strong>return</strong> centroids
-                                </div>
-                                
-                                <h5><strong>Random Uniform in Feature Space:</strong></h5>
-                                <div class="code-box">
-<strong>function</strong> random_uniform_init(X, k):
-    n, d = X.shape
-    min_vals = min(X, axis=0)       <span style="color: #1976d2;">// Feature-wise minimum</span>
-    max_vals = max(X, axis=0)       <span style="color: #1976d2;">// Feature-wise maximum</span>
-    centroids = uniform(min_vals, max_vals, size=(k, d))
-    <strong>return</strong> centroids
-                                </div>
+                            <h5>Definition:</h5>
+                            <div class="formula-display">
+                                <p>A metric space (X, d) is called ultrametric if for all x, y, z ∈ X:</p>
+                                <strong>d(x, z) ≤ max{d(x, y), d(y, z)}</strong>
+                                <p>This is stronger than the triangle inequality: d(x, z) ≤ d(x, y) + d(y, z)</p>
                             </div>
                             
-                            <h5>Advantages of Random Initialization:</h5>
+                            <h5>Properties of Ultrametric Spaces:</h5>
                             <ul>
-                                <li><strong>Simplicity:</strong> Easy to implement and understand</li>
-                                <li><strong>Speed:</strong> O(kd) time complexity</li>
-                                <li><strong>Unbiased:</strong> No assumptions about data structure</li>
-                                <li><strong>Baseline:</strong> Good reference for comparing other methods</li>
+                                <li><strong>Strong triangle inequality:</strong> Distances are more constrained</li>
+                                <li><strong>Isosceles triangles:</strong> Every triangle has two equal sides (the longer ones)</li>
+                                <li><strong>Nested ball property:</strong> Any two balls are either disjoint or one contains the other</li>
+                                <li><strong>Tree representation:</strong> Can be exactly represented as a tree with edge weights</li>
                             </ul>
                             
-                            <h5>Disadvantages:</h5>
+                            <h5>Fundamental Theorem:</h5>
+                            <div class="formula-display">
+                                <p><strong>Theorem (Ultrametric Tree Representation):</strong></p>
+                                <p>A finite metric space (X, d) is ultrametric if and only if it can be isometrically embedded in a weighted tree where distances between leaves equal tree path lengths.</p>
+                            </div>
+                        </div>
+
+                        <h3>Hierarchical Clustering Axioms</h3>
+                        <p>Kleinberg's famous impossibility theorem characterizes hierarchical clustering through three natural axioms.</p>
+
+                        <div class="proof-box">
+                            <h4>Kleinberg's Impossibility Theorem (2003)</h4>
+                            
+                            <h5>The Three Axioms:</h5>
+                            <div class="formula-display">
+                                <p><strong>A1. Scale Invariance:</strong> Multiplying all distances by a positive constant doesn't change the clustering.</p>
+                                <p><strong>A2. Richness:</strong> For any partition of the data, there exists a distance function that produces this partition.</p>
+                                <p><strong>A3. Consistency:</strong> If distances within clusters decrease or distances between clusters increase, the clustering shouldn't change.</p>
+                            </div>
+                            
+                            <h5>The Impossibility Result:</h5>
+                            <div class="formula-display">
+                                <p><strong>Theorem:</strong> No hierarchical clustering function can satisfy all three axioms simultaneously.</p>
+                                <p><strong>Implication:</strong> Any hierarchical clustering algorithm must violate at least one intuitively reasonable property.</p>
+                            </div>
+                            
+                            <h5>Practical Implications:</h5>
                             <ul>
-                                <li><strong>High variance:</strong> Results vary significantly across runs</li>
-                                <li><strong>Poor clustering:</strong> Often leads to suboptimal solutions</li>
-                                <li><strong>Slow convergence:</strong> May require many iterations</li>
-                                <li><strong>Empty clusters:</strong> Risk of centroids in sparse regions</li>
+                                <li><strong>No perfect algorithm:</strong> All methods have theoretical limitations</li>
+                                <li><strong>Trade-offs necessary:</strong> Must choose which axiom to violate</li>
+                                <li><strong>Context matters:</strong> Algorithm choice depends on application requirements</li>
                             </ul>
                         </div>
 
-                        <h3>Furthest-First Heuristic</h3>
-                        <p>This method iteratively selects centroids that are as far as possible from previously selected ones, promoting good coverage of the data space.</p>
+                        <h3>Linkage Criteria and Their Properties</h3>
+                        <p>Different linkage criteria define how to measure distance between clusters, leading to different theoretical properties.</p>
 
-                        <div class="model-box">
-                            <h4>Furthest-First Initialization</h4>
+                        <div class="linkage-box">
+                            <h4>Mathematical Formulation of Linkage Criteria</h4>
                             
-                            <div class="formula-box">
-                                <div class="code-box">
-<strong>function</strong> furthest_first_init(X, k):
-    n, d = X.shape
-    centroids = []
-    
-    <span style="color: #1976d2;">// Step 1: Choose first centroid randomly</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
-    
-    <span style="color: #1976d2;">// Step 2: Iteratively choose furthest points</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        max_distance = -1
-        furthest_idx = -1
-        
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            <span style="color: #1976d2;">// Find minimum distance to existing centroids</span>
-            min_dist = min([distance(X[j], c) <strong>for</strong> c <strong>in</strong> centroids])
-            
-            <strong>if</strong> min_dist > max_distance:
-                max_distance = min_dist
-                furthest_idx = j
-        
-        centroids.append(X[furthest_idx])
-    
-    <strong>return</strong> centroids
-                                </div>
+                            <h5>General Framework:</h5>
+                            <p>For clusters A and B, define inter-cluster distance as:</p>
+                            <div class="formula-display">
+                                <strong>D(A, B) = f({d(a, b) : a ∈ A, b ∈ B})</strong>
                             </div>
                             
-                            <h5>Advantages:</h5>
-                            <ul>
-                                <li><strong>Good coverage:</strong> Centroids spread across data space</li>
-                                <li><strong>Deterministic:</strong> Same result for same first choice</li>
-                                <li><strong>No empty clusters:</strong> Guarantees centroids on data points</li>
-                                <li><strong>Better than random:</strong> Generally produces better initializations</li>
-                            </ul>
-                            
-                            <h5>Disadvantages:</h5>
-                            <ul>
-                                <li><strong>Outlier sensitivity:</strong> May select extreme outliers</li>
-                                <li><strong>Computational cost:</strong> O(nk) time complexity</li>
-                                <li><strong>Still suboptimal:</strong> Not guaranteed to find good initializations</li>
-                                <li><strong>First choice matters:</strong> Quality depends on initial random selection</li>
-                            </ul>
+                            <h5>Specific Linkage Criteria:</h5>
+                            <div class="comparison-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Linkage</th>
+                                            <th>Formula</th>
+                                            <th>Properties</th>
+                                            <th>Cluster Shape Bias</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Single</strong></td>
+                                            <td>min{d(a,b) : a∈A, b∈B}</td>
+                                            <td>Chaining effect, connects via closest points</td>
+                                            <td>Elongated, irregular</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Complete</strong></td>
+                                            <td>max{d(a,b) : a∈A, b∈B}</td>
+                                            <td>Compact clusters, robust to outliers</td>
+                                            <td>Spherical, compact</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Average</strong></td>
+                                            <td>(1/|A||B|) Σ d(a,b)</td>
+                                            <td>Balanced approach, moderate chaining</td>
+                                            <td>Variable, balanced</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ward</strong></td>
+                                            <td>Minimize increase in WSS</td>
+                                            <td>Minimizes variance, equal-sized clusters</td>
+                                            <td>Spherical, equal-sized</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Mathematical Theory</h4>
+                            <p><strong>Image Description:</strong> A 2x2 grid illustrating hierarchical clustering theory. Top-left: Ultrametric space showing the strong triangle inequality with three points where the longest side equals one of the shorter sides. Top-right: Tree representation of the same ultrametric space with edge weights. Bottom-left: Kleinberg's impossibility theorem demonstration showing how the three axioms lead to contradiction. Bottom-right: Comparison of different linkage criteria showing how they produce different cluster shapes on the same data.</p>
+                            <p><em>This demonstrates the mathematical foundations that govern hierarchical clustering behavior</em></p>
                         </div>
                     </div>
 
-                    <!-- Initialization Methods Section -->
-                    <div id="initialization" class="content-section">
-                        <h2>K-means++: The Smart Initialization Revolution</h2>
+                    <!-- Agglomerative Methods Section -->
+                    <div id="agglomerative" class="content-section">
+                        <h2>Agglomerative Methods</h2>
                         
-                        <p>K-means++ represents a breakthrough in K-means initialization, providing both theoretical guarantees and practical improvements. Developed by Arthur and Vassilvitskii in 2007, this method uses probabilistic selection to choose initial centroids that are likely to be well-separated, leading to better clustering results.</p>
+                        <p>Agglomerative clustering, also known as bottom-up hierarchical clustering, starts with each data point as its own cluster and iteratively merges the most similar clusters until all points belong to a single cluster. This approach is the most commonly used hierarchical clustering method due to its conceptual simplicity and computational efficiency.</p>
 
-                        <h3>The K-means++ Algorithm</h3>
-                        <p>K-means++ carefully selects initial centroids using a probability distribution that favors points far from existing centroids.</p>
+                        <h3>Basic Agglomerative Algorithm</h3>
+                        <p>The fundamental agglomerative clustering algorithm follows a simple but powerful iterative process.</p>
 
-                        <div class="model-box">
-                            <h4>K-means++ Initialization Algorithm</h4>
+                        <div class="algorithm-box">
+                            <h4>Agglomerative Clustering Algorithm</h4>
                             
                             <div class="formula-box">
                                 <div class="code-box">
-<strong>function</strong> kmeans_plus_plus(X, k):
-    n, d = X.shape
-    centroids = []
+                                    <pre><code><strong>function</strong> agglomerative_clustering(X, linkage):
+    n = X.shape[0]
+    clusters = [{i} <strong>for</strong> i <strong>in</strong> range(n)]  <span class="comment">// Each point is its own cluster</span>
+    dendrogram = []
     
-    <span style="color: #1976d2;">// Step 1: Choose first centroid uniformly at random</span>
-    first_idx = random_choice(n)
-    centroids.append(X[first_idx])
+    <span class="comment">// Step 1: Compute initial distance matrix</span>
+    distance_matrix = compute_distances(X)
     
-    <span style="color: #1976d2;">// Step 2: Choose remaining k-1 centroids</span>
-    <strong>for</strong> i = 2 <strong>to</strong> k:
-        distances = []
+    <span class="comment">// Step 2: Iteratively merge closest clusters</span>
+    <strong>for</strong> step = 1 <strong>to</strong> n-1:
+        <span class="comment">// Find closest pair of clusters</span>
+        min_distance = infinity
+        merge_i, merge_j = -1, -1
         
-        <span style="color: #1976d2;">// Compute squared distance to nearest existing centroid</span>
-        <strong>for</strong> j = 1 <strong>to</strong> n:
-            min_dist_sq = min([||X[j] - c||² <strong>for</strong> c <strong>in</strong> centroids])
-            distances.append(min_dist_sq)
+        <strong>for</strong> i = 0 <strong>to</strong> len(clusters)-1:
+            <strong>for</strong> j = i+1 <strong>to</strong> len(clusters)-1:
+                dist = linkage_distance(clusters[i], clusters[j], distance_matrix, linkage)
+                <strong>if</strong> dist < min_distance:
+                    min_distance = dist
+                    merge_i, merge_j = i, j
         
-        <span style="color: #1976d2;">// Choose next centroid with probability proportional to squared distance</span>
-        probabilities = distances / sum(distances)
-        next_idx = weighted_random_choice(probabilities)
-        centroids.append(X[next_idx])
+        <span class="comment">// Merge clusters and record in dendrogram</span>
+        new_cluster = clusters[merge_i] ∪ clusters[merge_j]
+        dendrogram.append((merge_i, merge_j, min_distance))
+        
+        <span class="comment">// Update cluster list</span>
+        clusters.remove(clusters[merge_j])  <span class="comment">// Remove second cluster</span>
+        clusters[merge_i] = new_cluster      <span class="comment">// Update first cluster</span>
     
-    <strong>return</strong> centroids
+    <strong>return</strong> dendrogram</code></pre>
                                 </div>
                             </div>
                             
-                            <h5>Key Insight:</h5>
-                            <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
+                            <h5>Key Steps:</h5>
+                            <ul>
+                                <li><strong>Initialization:</strong> Each data point starts as its own cluster</li>
+                                <li><strong>Distance computation:</strong> Calculate pairwise distances between all points</li>
+                                <li><strong>Iterative merging:</strong> Find and merge the closest pair of clusters</li>
+                                <li><strong>Linkage criterion:</strong> Use specified method to measure cluster distances</li>
+                                <li><strong>Dendrogram construction:</strong> Record merge history with heights</li>
+                            </ul>
                             
-                            <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
-                                <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
-                                    <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
-                                </div>
-                                <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
+                            <h5>Time Complexity:</h5>
+                            <div class="formula-display">
+                                <p><strong>O(n³):</strong> For each of n-1 merges, examine O(n²) cluster pairs</p>
+                                <p>Can be optimized to O(n² log n) using efficient data structures</p>
                             </div>
                         </div>
 
-                        <h3>Theoretical Analysis</h3>
-                        <p>K-means++ comes with strong theoretical guarantees that explain its superior performance.</p>
+                        <h3>Linkage Criteria in Agglomerative Clustering</h3>
+                        <p>The choice of linkage criterion determines how distances between clusters are calculated, significantly affecting the resulting hierarchy.</p>
 
-                        <div class="model-box">
-                            <h4>K-means++ Approximation Guarantee</h4>
+                        <div class="explanation-box">
+                            <h4>Common Linkage Criteria</h4>
                             
-                            <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
-                                <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
-                                
-                                <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
-                                
-                                <p>Where OPT is the cost of the optimal k-means clustering.</p>
+                            <h5>Single Linkage (Minimum):</h5>
+                            <div class="formula-display">
+                                <strong>D(A,B) = min{d(a,b) : a ∈ A, b ∈ B}</strong>
+                                <p>Uses the minimum distance between any two points in different clusters.</p>
                             </div>
                             
-                            <h5>Proof Sketch:</h5>
-                            <ol>
-                                <li><strong>Potential function:</strong> Define Φ = Σᵢ D²(xᵢ) as sum of squared distances to nearest centroids</li>
-                                <li><strong>Expected reduction:</strong> Each K-means++ step reduces E[Φ] by a constant factor</li>
-                                <li><strong>Concentration:</strong> Use probability tail bounds to show consistent performance</li>
-                                <li><strong>Optimality bound:</strong> Relate final potential to optimal clustering cost</li>
-                            </ol>
+                            <h5>Complete Linkage (Maximum):</h5>
+                            <div class="formula-display">
+                                <strong>D(A,B) = max{d(a,b) : a ∈ A, b ∈ B}</strong>
+                                <p>Uses the maximum distance between any two points in different clusters.</p>
+                            </div>
                             
-                            <h5>Implications:</h5>
+                            <h5>Average Linkage (UPGMA):</h5>
+                            <div class="formula-display">
+                                <strong>D(A,B) = (1/|A||B|) Σ_{a∈A} Σ_{b∈B} d(a,b)</strong>
+                                <p>Uses the average distance between all pairs of points in different clusters.</p>
+                            </div>
+                            
+                            <h5>Ward's Linkage:</h5>
+                            <div class="formula-display">
+                                <strong>D(A,B) = (|A||B|)/(|A|+|B|) ||μ_A - μ_B||²</strong>
+                                <p>Minimizes the increase in within-cluster sum of squares.</p>
+                            </div>
+                        </div>
+
+                        <h3>Computational Optimizations</h3>
+                        <p>Several optimization techniques can significantly improve the efficiency of agglomerative clustering.</p>
+
+                        <div class="explanation-box">
+                            <h4>Efficiency Improvements</h4>
+                            
+                            <h5>Lance-Williams Formula:</h5>
+                            <p>For updating distances after merging clusters A and B into cluster C:</p>
+                            <div class="formula-display">
+                                <strong>D(C,D) = α_A·D(A,D) + α_B·D(B,D) + β·D(A,B) + γ·|D(A,D) - D(B,D)|</strong>
+                            </div>
+                            <p>Where α_A, α_B, β, γ are coefficients that depend on the linkage criterion.</p>
+                            
+                            <h5>Heap-based Implementation:</h5>
                             <ul>
-                                <li><strong>Logarithmic guarantee:</strong> Performance degrades slowly with k</li>
-                                <li><strong>Probabilistic bound:</strong> Guarantee holds in expectation</li>
-                                <li><strong>Initialization only:</strong> Bound applies to initialization, Lloyd's improves it</li>
-                                <li><strong>Practical relevance:</strong> Constant factors are reasonable in practice</li>
+                                <li><strong>Priority queue:</strong> Maintain closest cluster pairs in a heap</li>
+                                <li><strong>Lazy updates:</strong> Only update distances when necessary</li>
+                                <li><strong>Complexity reduction:</strong> O(n² log n) instead of O(n³)</li>
+                            </ul>
+                            
+                            <h5>Memory Optimization:</h5>
+                            <ul>
+                                <li><strong>Triangular storage:</strong> Store only upper triangle of distance matrix</li>
+                                <li><strong>Incremental computation:</strong> Compute distances on-demand</li>
+                                <li><strong>Chunked processing:</strong> Process large datasets in batches</li>
                             </ul>
                         </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Agglomerative Clustering Process</h4>
+                            <p><strong>Image Description:</strong> A step-by-step visualization of agglomerative clustering. Top row: Initial state with each point as its own cluster, then first merge of closest points. Middle row: Progressive merging showing how clusters grow and merge. Bottom row: Final dendrogram showing the complete hierarchy with merge heights, and a comparison of different linkage criteria on the same data showing how they produce different cluster structures.</p>
+                            <p><em>This demonstrates the bottom-up construction of hierarchical clusters</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Divisive Methods Section -->
+                    <div id="divisive" class="content-section">
+                        <h2>Divisive Methods</h2>
+                        
+                        <p>Divisive clustering, also known as top-down hierarchical clustering, takes the opposite approach to agglomerative methods. It starts with all data points in a single cluster and iteratively splits the most heterogeneous cluster until each point forms its own cluster. While less commonly used due to computational complexity, divisive methods can be more effective for certain types of data.</p>
+
+                        <h3>Basic Divisive Algorithm</h3>
+                        <p>The fundamental divisive clustering algorithm follows a top-down approach, starting with all points in one cluster.</p>
+
+                        <div class="algorithm-box">
+                            <h4>Divisive Clustering Algorithm</h4>
+                            
+                            <div class="formula-box">
+                                <div class="code-box">
+                                    <pre><code><strong>function</strong> divisive_clustering(X, split_criterion):
+    n = X.shape[0]
+    clusters = [set(range(n))]  <span class="comment">// All points in single cluster</span>
+    dendrogram = []
+    
+    <span class="comment">// Step 1: Iteratively split most heterogeneous cluster</span>
+    <strong>for</strong> step = 1 <strong>to</strong> n-1:
+        <span class="comment">// Find cluster with highest heterogeneity</span>
+        max_heterogeneity = -1
+        split_cluster_idx = -1
+        
+        <strong>for</strong> i = 0 <strong>to</strong> len(clusters)-1:
+            heterogeneity = compute_heterogeneity(clusters[i], X, split_criterion)
+            <strong>if</strong> heterogeneity > max_heterogeneity:
+                max_heterogeneity = heterogeneity
+                split_cluster_idx = i
+        
+        <span class="comment">// Split the most heterogeneous cluster</span>
+        cluster_to_split = clusters[split_cluster_idx]
+        left_cluster, right_cluster = split_cluster(cluster_to_split, X, split_criterion)
+        
+        <span class="comment">// Record split in dendrogram</span>
+        dendrogram.append((split_cluster_idx, left_cluster, right_cluster, max_heterogeneity))
+        
+        <span class="comment">// Update cluster list</span>
+        clusters.remove(cluster_to_split)
+        clusters.extend([left_cluster, right_cluster])
+    
+    <strong>return</strong> dendrogram</code></pre>
+                                </div>
+                            </div>
+                            
+                            <h5>Key Steps:</h5>
+                            <ul>
+                                <li><strong>Initialization:</strong> All points start in a single cluster</li>
+                                <li><strong>Heterogeneity calculation:</strong> Measure how spread out each cluster is</li>
+                                <li><strong>Cluster selection:</strong> Choose the most heterogeneous cluster to split</li>
+                                <li><strong>Optimal splitting:</strong> Find the best way to divide the selected cluster</li>
+                                <li><strong>Dendrogram construction:</strong> Record split history with heights</li>
+                            </ul>
+                        </div>
+
+                        <h3>Split Criteria and Methods</h3>
+                        <p>The choice of split criterion determines how clusters are divided, significantly affecting the resulting hierarchy.</p>
+
+                        <div class="explanation-box">
+                            <h4>Common Split Criteria</h4>
+                            
+                            <h5>Diameter-based Splitting:</h5>
+                            <div class="formula-display">
+                                <strong>Heterogeneity(C) = max{d(x,y) : x,y ∈ C}</strong>
+                                <p>Measures the maximum distance between any two points in the cluster.</p>
+                            </div>
+                            
+                            <h5>Radius-based Splitting:</h5>
+                            <div class="formula-display">
+                                <strong>Heterogeneity(C) = min_{c} max_{x∈C} d(x,c)</strong>
+                                <p>Measures the radius of the smallest ball containing all points in the cluster.</p>
+                            </div>
+                            
+                            <h5>Variance-based Splitting:</h5>
+                            <div class="formula-display">
+                                <strong>Heterogeneity(C) = Σ_{x∈C} ||x - μ_C||²</strong>
+                                <p>Measures the within-cluster sum of squares (WCSS).</p>
+                            </div>
+                            
+                            <h5>K-means Splitting:</h5>
+                            <div class="formula-display">
+                                <strong>Split using 2-means on cluster points</strong>
+                                <p>Uses K-means with k=2 to find optimal binary split.</p>
+                            </div>
+                        </div>
+
+                        <h3>Computational Challenges</h3>
+                        <p>Divisive methods face significant computational challenges that limit their practical applicability.</p>
+
+                        <div class="explanation-box">
+                            <h4>Complexity Issues</h4>
+                            
+                            <h5>Exponential Complexity:</h5>
+                            <ul>
+                                <li><strong>Optimal splitting:</strong> Finding optimal binary split is NP-hard</li>
+                                <li><strong>Exhaustive search:</strong> 2^n possible ways to split n points</li>
+                                <li><strong>Heuristic required:</strong> Must use approximation algorithms</li>
+                            </ul>
+                            
+                            <h5>Common Heuristics:</h5>
+                            <ul>
+                                <li><strong>K-means splitting:</strong> Use 2-means to find approximate optimal split</li>
+                                <li><strong>Principal component splitting:</strong> Split along first principal component</li>
+                                <li><strong>Furthest pair splitting:</strong> Use two most distant points as initial centroids</li>
+                                <li><strong>Random splitting:</strong> Randomly assign points to two subclusters</li>
+                            </ul>
+                            
+                            <h5>Time Complexity:</h5>
+                            <div class="formula-display">
+                                <p><strong>O(n²) to O(2^n):</strong> Depending on split method used</p>
+                                <p>K-means splitting: O(n²) per split, O(n³) total</p>
+                            </div>
+                        </div>
+
+                        <h3>Advantages and Disadvantages</h3>
+                        <p>Divisive methods have specific strengths and weaknesses compared to agglomerative approaches.</p>
+
+                        <div class="explanation-box">
+                            <h4>Advantages of Divisive Methods</h4>
+                            <ul>
+                                <li><strong>Global perspective:</strong> Considers entire dataset when making splits</li>
+                                <li><strong>Better for large clusters:</strong> Can identify major cluster boundaries early</li>
+                                <li><strong>Natural for some data:</strong> Works well when data has clear hierarchical structure</li>
+                                <li><strong>Interpretable splits:</strong> Each split can be understood in terms of data structure</li>
+                            </ul>
+                            
+                            <h4>Disadvantages of Divisive Methods</h4>
+                            <ul>
+                                <li><strong>Computational cost:</strong> Much more expensive than agglomerative methods</li>
+                                <li><strong>Heuristic dependence:</strong> Quality depends heavily on split method choice</li>
+                                <li><strong>Local optima:</strong> Early splits can lead to poor overall hierarchy</li>
+                                <li><strong>Limited scalability:</strong> Difficult to apply to large datasets</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Divisive Clustering Process</h4>
+                            <p><strong>Image Description:</strong> A step-by-step visualization of divisive clustering. Top row: Initial state with all points in one cluster, then first split showing how the most heterogeneous cluster is divided. Middle row: Progressive splitting showing how clusters are recursively divided. Bottom row: Final dendrogram showing the complete hierarchy with split heights, and a comparison with agglomerative clustering on the same data showing how the two approaches can produce different structures.</p>
+                            <p><em>This demonstrates the top-down construction of hierarchical clusters</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Dendrogram Analysis Section -->
+                    <div id="dendrograms" class="content-section">
+                        <h2>Dendrogram Analysis</h2>
+                        
+                        <p>Dendrograms are the primary visualization tool for hierarchical clustering results, providing a comprehensive view of the clustering hierarchy. Understanding how to read, interpret, and analyze dendrograms is crucial for extracting meaningful insights from hierarchical clustering.</p>
+
+                        <h3>Dendrogram Structure and Components</h3>
+                        <p>A dendrogram is a tree-like diagram that represents the hierarchical clustering process, showing how clusters are merged or split at different levels.</p>
+
+                        <div class="dendrogram-box">
+                            <h4>Key Components of a Dendrogram</h4>
+                            
+                            <h5>Leaves (Terminal Nodes):</h5>
+                            <ul>
+                                <li><strong>Individual data points:</strong> Each leaf represents one data point</li>
+                                <li><strong>Bottom level:</strong> Located at the bottom of the dendrogram</li>
+                                <li><strong>Height zero:</strong> All leaves are at height 0</li>
+                            </ul>
+                            
+                            <h5>Internal Nodes (Merge Points):</h5>
+                            <ul>
+                                <li><strong>Cluster merges:</strong> Represent the merging of two clusters</li>
+                                <li><strong>Merge height:</strong> Height indicates dissimilarity at which merge occurred</li>
+                                <li><strong>Binary structure:</strong> Each internal node has exactly two children</li>
+                            </ul>
+                            
+                            <h5>Root (Top Node):</h5>
+                            <ul>
+                                <li><strong>Single cluster:</strong> Represents the cluster containing all data points</li>
+                                <li><strong>Maximum height:</strong> Located at the highest point of the dendrogram</li>
+                                <li><strong>Complete hierarchy:</strong> Root contains the entire clustering hierarchy</li>
+                            </ul>
+                        </div>
+
+                        <h3>Reading and Interpreting Dendrograms</h3>
+                        <p>Proper interpretation of dendrograms requires understanding the relationship between height, distance, and cluster structure.</p>
+
+                        <div class="explanation-box">
+                            <h4>Height and Distance Interpretation</h4>
+                            
+                            <h5>Height Meaning:</h5>
+                            <ul>
+                                <li><strong>Merge height:</strong> Distance between clusters when they were merged</li>
+                                <li><strong>Cluster separation:</strong> Higher merges indicate more distinct clusters</li>
+                                <li><strong>Relative importance:</strong> Height differences show cluster quality</li>
+                            </ul>
+                            
+                            <h5>Cutting the Dendrogram:</h5>
+                            <ul>
+                                <li><strong>Horizontal cuts:</strong> Create flat clusterings at different levels</li>
+                                <li><strong>Number of clusters:</strong> Determined by number of branches intersected</li>
+                                <li><strong>Cluster membership:</strong> Points in same subtree belong to same cluster</li>
+                            </ul>
+                            
+                            <h5>Cluster Quality Assessment:</h5>
+                            <ul>
+                                <li><strong>Compact clusters:</strong> Low merge heights indicate tight clusters</li>
+                                <li><strong>Well-separated clusters:</strong> High merge heights indicate distinct clusters</li>
+                                <li><strong>Natural number of clusters:</strong> Look for large height jumps</li>
+                            </ul>
+                        </div>
+
+                        <h3>Dendrogram Cutting Strategies</h3>
+                        <p>Determining where to cut the dendrogram to obtain a final clustering is a critical decision in hierarchical clustering analysis.</p>
+
+                        <div class="explanation-box">
+                            <h4>Common Cutting Methods</h4>
+                            
+                            <h5>Fixed Number of Clusters:</h5>
+                            <ul>
+                                <li><strong>K-cluster cut:</strong> Cut to obtain exactly k clusters</li>
+                                <li><strong>Simple approach:</strong> Cut at height that produces k clusters</li>
+                                <li><strong>Limitation:</strong> May not respect natural cluster boundaries</li>
+                            </ul>
+                            
+                            <h5>Height-based Cutting:</h5>
+                            <ul>
+                                <li><strong>Fixed height:</strong> Cut at a specific dissimilarity threshold</li>
+                                <li><strong>Natural breaks:</strong> Look for large gaps in merge heights</li>
+                                <li><strong>Elbow method:</strong> Find point of maximum curvature in height profile</li>
+                            </ul>
+                            
+                            <h5>Statistical Methods:</h5>
+                            <ul>
+                                <li><strong>Gap statistic:</strong> Compare within-cluster dispersion to random data</li>
+                                <li><strong>Silhouette analysis:</strong> Maximize silhouette coefficient</li>
+                                <li><strong>Bootstrap validation:</strong> Assess stability across resamples</li>
+                            </ul>
+                        </div>
+
+                        <h3>Dendrogram Validation and Quality Assessment</h3>
+                        <p>Evaluating the quality and reliability of dendrograms is essential for making informed clustering decisions.</p>
+
+                        <div class="explanation-box">
+                            <h4>Validation Techniques</h4>
+                            
+                            <h5>Internal Validation:</h5>
+                            <ul>
+                                <li><strong>Cophenetic correlation:</strong> Measure how well dendrogram preserves original distances</li>
+                                <li><strong>Inconsistency coefficient:</strong> Identify potentially unreliable merges</li>
+                                <li><strong>Height analysis:</strong> Examine distribution of merge heights</li>
+                            </ul>
+                            
+                            <h5>External Validation:</h5>
+                            <ul>
+                                <li><strong>Known labels:</strong> Compare with ground truth if available</li>
+                                <li><strong>Expert knowledge:</strong> Validate against domain expertise</li>
+                                <li><strong>Cross-validation:</strong> Test stability on different data subsets</li>
+                            </ul>
+                            
+                            <h5>Robustness Assessment:</h5>
+                            <ul>
+                                <li><strong>Bootstrap resampling:</strong> Test stability under data perturbations</li>
+                                <li><strong>Noise sensitivity:</strong> Assess robustness to outliers</li>
+                                <li><strong>Parameter sensitivity:</strong> Test sensitivity to linkage choice</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Dendrogram Analysis</h4>
+                            <p><strong>Image Description:</strong> A comprehensive dendrogram analysis visualization. Top panel: Complete dendrogram with different cutting levels highlighted in different colors. Middle panel: Height profile showing merge heights and potential cutting points. Bottom panel: Comparison of different cutting strategies showing how they produce different clusterings, with quality metrics displayed for each approach.</p>
+                            <p><em>This demonstrates the comprehensive analysis of dendrogram structure and cutting strategies</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Complexity Analysis Section -->
+                    <div id="complexity" class="content-section">
+                        <h2>Complexity Analysis</h2>
+                        
+                        <p>Understanding the computational complexity of hierarchical clustering algorithms is crucial for assessing their scalability and practical applicability. The complexity varies significantly between different approaches and linkage criteria.</p>
+
+                        <h3>Time Complexity Analysis</h3>
+                        <p>The time complexity of hierarchical clustering depends on the specific algorithm and linkage criterion used.</p>
+
+                        <div class="explanation-box">
+                            <h4>Agglomerative Clustering Complexity</h4>
+                            
+                            <h5>Basic Algorithm:</h5>
+                            <ul>
+                                <li><strong>Distance matrix computation:</strong> O(n²) for n data points</li>
+                                <li><strong>Iterative merging:</strong> O(n³) for n-1 merge operations</li>
+                                <li><strong>Total complexity:</strong> O(n³) for most linkage criteria</li>
+                            </ul>
+                            
+                            <h5>Linkage-specific Complexity:</h5>
+                            <ul>
+                                <li><strong>Single linkage:</strong> O(n²) using MST algorithms</li>
+                                <li><strong>Complete linkage:</strong> O(n² log n) with efficient data structures</li>
+                                <li><strong>Average linkage:</strong> O(n² log n) with heap-based implementation</li>
+                                <li><strong>Ward's method:</strong> O(n² log n) with optimized updates</li>
+                            </ul>
+                            
+                            <h5>Optimization Techniques:</h5>
+                            <ul>
+                                <li><strong>Heap-based implementation:</strong> Reduces complexity to O(n² log n)</li>
+                                <li><strong>Lance-Williams formula:</strong> Enables efficient distance updates</li>
+                                <li><strong>Memory optimization:</strong> Reduces space complexity</li>
+                            </ul>
+                        </div>
+
+                        <h3>Space Complexity Analysis</h3>
+                        <p>Memory requirements are a significant limiting factor for hierarchical clustering on large datasets.</p>
+
+                        <div class="explanation-box">
+                            <h4>Memory Requirements</h4>
+                            
+                            <h5>Distance Matrix Storage:</h5>
+                            <ul>
+                                <li><strong>Full matrix:</strong> O(n²) space for n×n distance matrix</li>
+                                <li><strong>Triangular storage:</strong> O(n²/2) space for upper triangle only</li>
+                                <li><strong>Memory bottleneck:</strong> Limits dataset size to ~10,000 points</li>
+                            </ul>
+                            
+                            <h5>Optimization Strategies:</h5>
+                            <ul>
+                                <li><strong>Incremental computation:</strong> Compute distances on-demand</li>
+                                <li><strong>Chunked processing:</strong> Process data in batches</li>
+                                <li><strong>Approximate methods:</strong> Use sampling for large datasets</li>
+                                <li><strong>External memory:</strong> Store matrix on disk for very large datasets</li>
+                            </ul>
+                        </div>
+
+                        <h3>Scalability Challenges and Solutions</h3>
+                        <p>Hierarchical clustering faces significant scalability challenges that require specialized approaches for large datasets.</p>
+
+                        <div class="explanation-box">
+                            <h4>Scalability Issues</h4>
+                            
+                            <h5>Computational Bottlenecks:</h5>
+                            <ul>
+                                <li><strong>Quadratic growth:</strong> Time complexity grows quadratically with data size</li>
+                                <li><strong>Memory limitations:</strong> Distance matrix becomes prohibitively large</li>
+                                <li><strong>Cache efficiency:</strong> Poor memory access patterns for large matrices</li>
+                            </ul>
+                            
+                            <h5>Approximate Solutions:</h5>
+                            <ul>
+                                <li><strong>Sampling methods:</strong> Cluster a sample, assign remaining points</li>
+                                <li><strong>Incremental clustering:</strong> Build hierarchy incrementally</li>
+                                <li><strong>Parallel algorithms:</strong> Distribute computation across multiple cores</li>
+                                <li><strong>GPU acceleration:</strong> Use parallel processing for distance computations</li>
+                            </ul>
+                        </div>
+
+                        <h3>Comparison with Other Clustering Methods</h3>
+                        <p>Understanding how hierarchical clustering compares to other methods helps in algorithm selection.</p>
+
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Time Complexity</th>
+                                        <th>Space Complexity</th>
+                                        <th>Scalability</th>
+                                        <th>Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Hierarchical (Agglomerative)</strong></td>
+                                        <td>O(n² log n)</td>
+                                        <td>O(n²)</td>
+                                        <td>Poor (n < 10,000)</td>
+                                        <td>Complete hierarchy</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>K-means</strong></td>
+                                        <td>O(nkt)</td>
+                                        <td>O(n + k)</td>
+                                        <td>Good (n < 1,000,000)</td>
+                                        <td>Flat clustering</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>DBSCAN</strong></td>
+                                        <td>O(n log n)</td>
+                                        <td>O(n)</td>
+                                        <td>Excellent</td>
+                                        <td>Density-based clusters</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gaussian Mixture</strong></td>
+                                        <td>O(nkt)</td>
+                                        <td>O(n + k)</td>
+                                        <td>Good</td>
+                                        <td>Probabilistic clusters</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Complexity Analysis</h4>
+                            <p><strong>Image Description:</strong> A comprehensive complexity analysis visualization. Top panel: Time complexity comparison showing how different algorithms scale with dataset size. Middle panel: Memory usage comparison showing space requirements for different methods. Bottom panel: Scalability limits showing maximum dataset sizes for different approaches, with practical recommendations for algorithm selection.</p>
+                            <p><em>This demonstrates the computational trade-offs in hierarchical clustering</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Applications Section -->
+                    <div id="applications" class="content-section">
+                        <h2>Applications</h2>
+                        
+                        <p>Hierarchical clustering finds applications across diverse domains where understanding data relationships and hierarchical structures is crucial. Its ability to provide complete dendrograms makes it valuable for exploratory data analysis and domain-specific clustering tasks.</p>
+
+                        <h3>Biological and Medical Applications</h3>
+                        <p>Hierarchical clustering is extensively used in bioinformatics and medical research for analyzing genetic and protein data.</p>
+
+                        <div class="explanation-box">
+                            <h4>Gene Expression Analysis</h4>
+                            <p>Hierarchical clustering helps identify co-expressed genes and functional gene groups:</p>
+                            <ul>
+                                <li><strong>Microarray data analysis:</strong> Cluster genes with similar expression patterns</li>
+                                <li><strong>Disease classification:</strong> Identify disease subtypes based on gene expression</li>
+                                <li><strong>Drug discovery:</strong> Group compounds with similar mechanisms of action</li>
+                                <li><strong>Pathway analysis:</strong> Discover biological pathways and regulatory networks</li>
+                            </ul>
+                            
+                            <h4>Phylogenetic Analysis</h4>
+                            <p>Used to construct evolutionary trees and study species relationships:</p>
+                            <ul>
+                                <li><strong>Species classification:</strong> Build phylogenetic trees from genetic data</li>
+                                <li><strong>Evolutionary studies:</strong> Analyze evolutionary relationships and divergence</li>
+                                <li><strong>Conservation biology:</strong> Identify genetically distinct populations</li>
+                            </ul>
+                        </div>
+
+                        <h3>Social and Behavioral Sciences</h3>
+                        <p>Hierarchical clustering provides insights into social structures and behavioral patterns.</p>
+
+                        <div class="explanation-box">
+                            <h4>Market Segmentation</h4>
+                            <p>Businesses use hierarchical clustering to understand customer behavior:</p>
+                            <ul>
+                                <li><strong>Customer profiling:</strong> Group customers with similar purchasing patterns</li>
+                                <li><strong>Product positioning:</strong> Identify market segments for targeted marketing</li>
+                                <li><strong>Brand analysis:</strong> Understand brand perception and positioning</li>
+                            </ul>
+                            
+                            <h4>Social Network Analysis</h4>
+                            <p>Analyze social structures and community formation:</p>
+                            <ul>
+                                <li><strong>Community detection:</strong> Identify social groups and communities</li>
+                                <li><strong>Influence analysis:</strong> Study information flow and influence patterns</li>
+                                <li><strong>Behavioral clustering:</strong> Group users with similar online behavior</li>
+                            </ul>
+                        </div>
+
+                        <h3>Image and Document Analysis</h3>
+                        <p>Hierarchical clustering is valuable for organizing and analyzing large collections of images and documents.</p>
+
+                        <div class="explanation-box">
+                            <h4>Image Clustering</h4>
+                            <p>Organize and categorize image collections:</p>
+                            <ul>
+                                <li><strong>Content-based retrieval:</strong> Group similar images for search systems</li>
+                                <li><strong>Facial recognition:</strong> Cluster face images by identity</li>
+                                <li><strong>Medical imaging:</strong> Classify medical images by pathology</li>
+                                <li><strong>Satellite imagery:</strong> Analyze land use and environmental changes</li>
+                            </ul>
+                            
+                            <h4>Text Mining and NLP</h4>
+                            <p>Organize and analyze text documents:</p>
+                            <ul>
+                                <li><strong>Document clustering:</strong> Group similar documents for organization</li>
+                                <li><strong>Topic modeling:</strong> Discover topics in large text collections</li>
+                                <li><strong>Author identification:</strong> Group documents by writing style</li>
+                                <li><strong>Sentiment analysis:</strong> Cluster text by emotional content</li>
+                            </ul>
+                        </div>
+
+                        <h3>Geographic and Environmental Applications</h3>
+                        <p>Hierarchical clustering helps analyze spatial patterns and environmental data.</p>
+
+                        <div class="explanation-box">
+                            <h4>Spatial Analysis</h4>
+                            <p>Analyze geographic patterns and relationships:</p>
+                            <ul>
+                                <li><strong>Urban planning:</strong> Identify similar neighborhoods and districts</li>
+                                <li><strong>Epidemiology:</strong> Study disease spread patterns</li>
+                                <li><strong>Crime analysis:</strong> Identify crime hotspots and patterns</li>
+                                <li><strong>Transportation:</strong> Optimize routes and service areas</li>
+                            </ul>
+                            
+                            <h4>Environmental Monitoring</h4>
+                            <p>Analyze environmental data and patterns:</p>
+                            <ul>
+                                <li><strong>Climate analysis:</strong> Group regions with similar climate patterns</li>
+                                <li><strong>Ecosystem studies:</strong> Analyze species distribution and habitats</li>
+                                <li><strong>Pollution monitoring:</strong> Identify pollution sources and patterns</li>
+                            </ul>
+                        </div>
+
+                        <h3>Financial and Economic Applications</h3>
+                        <p>Hierarchical clustering provides insights into financial markets and economic patterns.</p>
+
+                        <div class="explanation-box">
+                            <h4>Portfolio Management</h4>
+                            <p>Analyze financial instruments and market behavior:</p>
+                            <ul>
+                                <li><strong>Asset clustering:</strong> Group similar financial instruments</li>
+                                <li><strong>Risk analysis:</strong> Identify correlated risk factors</li>
+                                <li><strong>Market segmentation:</strong> Understand market structure and dynamics</li>
+                            </ul>
+                            
+                            <h4>Economic Analysis</h4>
+                            <p>Study economic patterns and relationships:</p>
+                            <ul>
+                                <li><strong>Country clustering:</strong> Group countries by economic indicators</li>
+                                <li><strong>Industry analysis:</strong> Identify similar industries and sectors</li>
+                                <li><strong>Economic forecasting:</strong> Analyze economic cycles and trends</li>
+                            </ul>
+                        </div>
+
+                        <div class="visualization-placeholder">
+                            <h4>Visualization: Application Domains</h4>
+                            <p><strong>Image Description:</strong> A comprehensive overview of hierarchical clustering applications across different domains. The visualization shows six main application areas: Biological/Medical (gene expression, phylogenetics), Social/Behavioral (market segmentation, social networks), Image/Document (content retrieval, text mining), Geographic/Environmental (spatial analysis, climate), Financial/Economic (portfolio management, economic analysis), and Industrial/Manufacturing (quality control, process optimization). Each domain shows specific use cases with example datasets and clustering objectives.</p>
+                            <p><em>This demonstrates the versatility of hierarchical clustering across diverse fields</em></p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demos Section -->
+                    <div id="interactive" class="content-section">
+                        <h2>Interactive Demos</h2>
+                        
+                        <p>Explore hierarchical clustering through interactive demonstrations that allow you to experiment with different algorithms, parameters, and datasets. These demos provide hands-on experience with the concepts discussed in this chapter.</p>
+
+                        <h3>Demo 1: Linkage Criteria Comparison</h3>
+                        <p>Compare different linkage criteria on the same dataset to understand their behavior and characteristics.</p>
 
                         <div class="interactive-container">
-                            <h3>Initialization Comparison Demo</h3>
-                            <div class="demo-controls">
-                                <label for="init-method">Initialization Method:</label>
-                                <select id="init-method">
-                                    <option value="random">Random</option>
-                                    <option value="kmeans++">K-means++</option>
-                                </select>
-                                
-                                <label for="num-clusters-init">Number of Clusters:</label>
-                                <input type="range" id="num-clusters-init" min="2" max="6" value="3">
-                                <span id="clusters-init-display">3</span>
-                                
-                                <button onclick="runInitializationDemo()">Run Demo</button>
-                                <button onclick="resetInitializationDemo()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="initialization-canvas">
-                                <p>Click "Run Demo" to compare different initialization methods</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Optimization Process Section -->
-                    <div id="optimization" class="content-section">
-                        <h2>Optimization Process</h2>
-                        
-                        <div class="explanation-box">
-                            <p>The K-means optimization process involves iteratively improving the clustering by alternating between assignment and update steps. Understanding this process helps in implementing efficient algorithms and analyzing convergence behavior.</p>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Assignment Step</h3>
-                            <div class="formula-display">
-                                <h4>Point-to-Cluster Assignment</h4>
-                                <div class="formula">cᵢ = argminⱼ ||xᵢ - μⱼ||²</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>cᵢ is the cluster assignment for point xᵢ</li>
-                                    <li>μⱼ is the centroid of cluster j</li>
-                                    <li>argmin finds the cluster with minimum distance</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Update Step</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Recalculation</h4>
-                                <div class="formula">μⱼ = (1/|Sⱼ|) Σᵢ∈Sⱼ xᵢ</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>Sⱼ is the set of points assigned to cluster j</li>
-                                    <li>|Sⱼ| is the number of points in cluster j</li>
-                                    <li>μⱼ is the new centroid for cluster j</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Optimization Properties</h3>
-                            <ul>
-                                <li><strong>Coordinate Descent:</strong> Alternates between optimizing assignments and centroids</li>
-                                <li><strong>Monotonic Improvement:</strong> Objective function never increases</li>
-                                <li><strong>Finite Convergence:</strong> Guaranteed to converge in finite steps</li>
-                                <li><strong>Local Optima:</strong> May converge to local minimum</li>
-                            </ul>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>Step-by-Step Optimization Demo</h3>
-                            <div class="demo-controls">
-                                <button onclick="stepOptimization()">Next Step</button>
-                                <button onclick="runFullOptimization()">Run Full Algorithm</button>
-                                <button onclick="resetOptimization()">Reset</button>
-                            </div>
-                            
-                            <div class="metric-visualization" id="optimization-canvas">
-                                <p>Click "Next Step" to see the optimization process step by step</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Convergence Analysis Section -->
-                    <div id="convergence" class="content-section">
-                        <h2>Convergence Analysis</h2>
-                        
-                        <div class="explanation-box">
-                            <p>Understanding convergence properties is essential for implementing K-means correctly and determining appropriate stopping criteria. The algorithm's convergence behavior affects both computational efficiency and clustering quality.</p>
-                        </div>
-
-                        <div class="model-box">
-                            <h3>Convergence Criteria</h3>
-                            <ul>
-                                <li><strong>Centroid Movement:</strong> Stop when centroids move less than threshold</li>
-                                <li><strong>Assignment Stability:</strong> Stop when cluster assignments don't change</li>
-                                <li><strong>Objective Function:</strong> Stop when WCSS improvement is minimal</li>
-                                <li><strong>Maximum Iterations:</strong> Stop after fixed number of iterations</li>
-                            </ul>
-                        </div>
-
-                        <div class="formula-box">
-                            <h3>Convergence Conditions</h3>
-                            <div class="formula-display">
-                                <h4>Centroid Movement Threshold</h4>
-                                <div class="formula">maxᵢ ||μᵢ^(t+1) - μᵢ^(t)|| < ε</div>
-                                <p><strong>Where:</strong></p>
-                                <ul>
-                                    <li>μᵢ^(t) is centroid i at iteration t</li>
-                                    <li>ε is the convergence threshold (typically 1e-4)</li>
-                                    <li>maxᵢ finds the maximum movement across all centroids</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="explanation-box">
-                            <h3>Convergence Guarantees</h3>
-                            <p>K-means is guaranteed to converge because:</p>
-                            <ul>
-                                <li>The objective function is bounded below by zero</li>
-                                <li>Each iteration decreases or maintains the objective function</li>
-                                <li>There are only finitely many possible cluster assignments</li>
-                                <li>The algorithm cannot cycle due to strict improvement</li>
-                            </ul>
-                        </div>
-
-                        <div class="image-container">
-                            <h4>Visualization: Convergence Behavior</h4>
-                            <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
-                            </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
-                        </div>
-                    </div>
-
-                    <!-- Interactive Demo Section -->
-                    <div id="demo" class="content-section">
-                        <h2>Interactive K-means Demo</h2>
-                        
-                        <div class="explanation-box">
-                            <p>Experiment with the K-means algorithm using this interactive demo. Adjust parameters, try different initialization methods, and observe how they affect clustering results and convergence behavior.</p>
-                        </div>
-
-                        <div class="interactive-container">
-                            <h3>K-means Clustering Demo</h3>
-                            
                             <div class="demo-controls">
                                 <div class="control-group">
-                                    <label for="demo-clusters">Number of Clusters:</label>
-                                    <input type="range" id="demo-clusters" min="2" max="8" value="3">
-                                    <span id="demo-clusters-display">3</span>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-init">Initialization:</label>
-                                    <select id="demo-init">
-                                        <option value="random">Random</option>
-                                        <option value="kmeans++">K-means++</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="control-group">
-                                    <label for="demo-data">Data Type:</label>
-                                    <select id="demo-data">
-                                        <option value="blobs">Well-separated Blobs</option>
+                                    <label for="linkage-dataset">Dataset:</label>
+                                    <select id="linkage-dataset">
+                                        <option value="blobs">Blob Clusters</option>
+                                        <option value="moons">Moon Shapes</option>
+                                        <option value="circles">Concentric Circles</option>
                                         <option value="random">Random Points</option>
-                                        <option value="moons">Moon-shaped</option>
                                     </select>
                                 </div>
                                 
-                                <div class="control-buttons">
-                                    <button onclick="generateDemoData()">Generate Data</button>
-                                    <button onclick="runKmeansDemo()">Run K-means</button>
-                                    <button onclick="stepKmeansDemo()">Step-by-Step</button>
-                                    <button onclick="resetDemo()">Reset</button>
+                                <div class="control-group">
+                                    <label for="linkage-method">Linkage Method:</label>
+                                    <select id="linkage-method">
+                                        <option value="single">Single Linkage</option>
+                                        <option value="complete">Complete Linkage</option>
+                                        <option value="average">Average Linkage</option>
+                                        <option value="ward">Ward's Method</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="linkage-clusters">Number of Clusters:</label>
+                                    <input type="range" id="linkage-clusters" min="2" max="8" value="3">
+                                    <span id="linkage-clusters-display">3</span>
+                                </div>
+                                
+                                <button class="demo-button" onclick="generateLinkageDemo()">Generate Clustering</button>
+                                <button class="demo-button" onclick="resetLinkageDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>Data Points and Clusters</h4>
+                                    <svg id="linkage-plot" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Dendrogram</h4>
+                                    <svg id="linkage-dendrogram" width="400" height="300"></svg>
                                 </div>
                             </div>
                             
-                            <div class="demo-status" id="demo-status">
-                                <p>Click "Generate Data" to start the demo</p>
-                            </div>
-                            
-                            <div class="metric-visualization" id="kmeans-demo-canvas">
-                                <p>Interactive K-means clustering visualization will appear here</p>
-                            </div>
-                            
-                            <div class="demo-metrics" id="demo-metrics" style="display: none;">
-                                <h4>Clustering Metrics</h4>
+                            <div class="demo-metrics">
                                 <div class="metrics-grid">
                                     <div class="metric-item">
-                                        <span class="metric-label">WCSS:</span>
-                                        <span class="metric-value" id="wcss-value">-</span>
+                                        <div class="metric-label">Silhouette Score</div>
+                                        <div class="metric-value" id="linkage-silhouette">-</div>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-label">Silhouette:</span>
-                                        <span class="metric-value" id="silhouette-value">-</span>
+                                        <div class="metric-label">Calinski-Harabasz Index</div>
+                                        <div class="metric-value" id="linkage-calinski">-</div>
                                     </div>
                                     <div class="metric-item">
-                                        <span class="metric-label">Iterations:</span>
-                                        <span class="metric-value" id="iterations-value">-</span>
+                                        <div class="metric-label">Davies-Bouldin Index</div>
+                                        <div class="metric-value" id="linkage-davies">-</div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <h3>Demo 2: Dendrogram Analysis</h3>
+                        <p>Explore dendrogram construction and cutting strategies to understand hierarchical clustering results.</p>
+
+                        <div class="interactive-container">
+                            <div class="demo-controls">
+                                <div class="control-group">
+                                    <label for="dendro-dataset">Dataset:</label>
+                                    <select id="dendro-dataset">
+                                        <option value="blobs">Blob Clusters</option>
+                                        <option value="moons">Moon Shapes</option>
+                                        <option value="circles">Concentric Circles</option>
+                                        <option value="random">Random Points</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="dendro-method">Linkage Method:</label>
+                                    <select id="dendro-method">
+                                        <option value="single">Single Linkage</option>
+                                        <option value="complete">Complete Linkage</option>
+                                        <option value="average">Average Linkage</option>
+                                        <option value="ward">Ward's Method</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="dendro-cut">Cutting Strategy:</label>
+                                    <select id="dendro-cut">
+                                        <option value="height">Height-based</option>
+                                        <option value="clusters">Number of Clusters</option>
+                                        <option value="inconsistency">Inconsistency</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="control-group">
+                                    <label for="dendro-threshold">Cutting Threshold:</label>
+                                    <input type="range" id="dendro-threshold" min="0" max="100" value="50">
+                                    <span id="dendro-threshold-display">50</span>
+                                </div>
+                                
+                                <button class="demo-button" onclick="generateDendrogramDemo()">Generate Dendrogram</button>
+                                <button class="demo-button" onclick="resetDendrogramDemo()">Reset</button>
+                            </div>
+                            
+                            <div class="visualization-container">
+                                <div class="visualization-panel">
+                                    <h4>Dendrogram with Cut Line</h4>
+                                    <svg id="dendro-plot" width="400" height="300"></svg>
+                                </div>
+                                <div class="visualization-panel">
+                                    <h4>Resulting Clusters</h4>
+                                    <svg id="dendro-clusters" width="400" height="300"></svg>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-metrics">
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <div class="metric-label">Number of Clusters</div>
+                                        <div class="metric-value" id="dendro-num-clusters">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Cut Height</div>
+                                        <div class="metric-value" id="dendro-cut-height">-</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-label">Inconsistency Score</div>
+                                        <div class="metric-value" id="dendro-inconsistency">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>Demo Instructions</h4>
+                            <ul>
+                                <li><strong>Linkage Criteria Comparison:</strong> Experiment with different linkage methods to see how they affect clustering results and dendrogram structure.</li>
+                                <li><strong>Dendrogram Analysis:</strong> Explore different cutting strategies and thresholds to understand how to extract meaningful clusters from hierarchical structures.</li>
+                                <li><strong>Parameter Effects:</strong> Observe how changing parameters affects the clustering quality metrics and visual results.</li>
+                                <li><strong>Dataset Comparison:</strong> Test different datasets to understand how hierarchical clustering performs on various data structures.</li>
+                            </ul>
                         </div>
                     </div>
 
                     <!-- Quiz Section -->
                     <div id="quiz" class="content-section">
-                        <h2>Chapter 4 Quiz</h2>
+                        <h2>Quiz</h2>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
-                                <h4>Question 1: What is the primary objective function minimized by K-means?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Between-cluster sum of squares</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Within-cluster sum of squares (WCSS)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Silhouette coefficient</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Calinski-Harabasz index</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means minimizes the within-cluster sum of squares (WCSS), which measures the total squared distance of all points from their cluster centroids.</p>
-                                </div>
-                            </div>
-                        </div>
+                        <p>Test your understanding of hierarchical clustering theory with these comprehensive questions covering the key concepts discussed in this chapter.</p>
 
                         <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 2: How are centroids updated in each K-means iteration?</h4>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>As the arithmetic mean of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the median of all points in the cluster</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As the point closest to the cluster center</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>As a weighted average based on point distances</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Centroids are updated as the arithmetic mean of all points assigned to that cluster, which minimizes the WCSS for that cluster.</p>
+                                <h3>Question 1: Agglomerative Clustering</h3>
+                                <p>What is the main characteristic of agglomerative hierarchical clustering?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span class="option-text">It starts with all points in separate clusters and merges them iteratively</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span class="option-text">It starts with one cluster and splits it iteratively</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span class="option-text">It uses a fixed number of clusters from the beginning</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span class="option-text">It only works with categorical data</span>
+                                    </label>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="enhanced-quiz-container">
                             <div class="enhanced-quiz-question">
-                                <h4>Question 3: What is the main advantage of K-means++ initialization over random initialization?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It's faster to compute</p>
+                                <h3>Question 2: Linkage Criteria</h3>
+                                <p>Which linkage criterion is most sensitive to outliers?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span class="option-text">Single linkage</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span class="option-text">Complete linkage</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span class="option-text">Average linkage</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span class="option-text">Ward's method</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It guarantees global optimum</p>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 3: Time Complexity</h3>
+                                <p>What is the time complexity of standard agglomerative hierarchical clustering?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="a">
+                                        <span class="option-text">O(n log n)</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="b">
+                                        <span class="option-text">O(n²)</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="c">
+                                        <span class="option-text">O(n² log n)</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q3" value="d">
+                                        <span class="option-text">O(n³)</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>It provides better initialization leading to faster convergence</p>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 4: Dendrogram Properties</h3>
+                                <p>What property makes dendrograms useful for understanding cluster relationships?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="a">
+                                        <span class="option-text">They show the complete hierarchy of cluster merges</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="b">
+                                        <span class="option-text">They only show the final clustering result</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="c">
+                                        <span class="option-text">They work only with binary data</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q4" value="d">
+                                        <span class="option-text">They require pre-specified number of clusters</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>It works better with non-spherical clusters</p>
+                            </div>
+
+                            <div class="enhanced-quiz-question">
+                                <h3>Question 5: Ward's Method</h3>
+                                <p>What does Ward's method minimize when merging clusters?</p>
+                                <div class="enhanced-quiz-options">
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="a">
+                                        <span class="option-text">The maximum distance between cluster points</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="b">
+                                        <span class="option-text">The increase in within-cluster sum of squares</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="c">
+                                        <span class="option-text">The average distance between clusters</span>
+                                    </label>
+                                    <label class="enhanced-quiz-option">
+                                        <input type="radio" name="q5" value="d">
+                                        <span class="option-text">The minimum distance between cluster centroids</span>
+                                    </label>
                                 </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> K-means++ initialization probabilistically selects initial centroids that are well-separated, leading to better starting points and faster convergence to good local minima.</p>
-                                </div>
+                            </div>
+
+                            <button class="demo-button" onclick="checkQuizAnswers()">Submit Answers</button>
+                            
+                            <div id="quiz-results" class="quiz-score-container" style="display: none;">
+                                <h3>Quiz Results</h3>
+                                <div id="quiz-score"></div>
+                                <div id="quiz-feedback"></div>
                             </div>
                         </div>
                     </div>
-                </main>
-            </div>
-        </section>
-    </main>
+                </div>
+            </main>
+        </div>
+    </div>
 
     <!-- Sub-section Navigation Footer -->
     <div class="sub-section-nav-footer">
@@ -654,8 +1253,8 @@
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
-                <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Mathematical Theory</span>
                 <span>Next →</span>
             </button>
         </div>
@@ -664,7 +1263,9 @@
     <!-- Chapter Navigation Footer -->
     <div class="navigation-buttons">
         <a href="/tutorials/clustering/chapter7" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 7: Optimal K Selection</a>
-        <a href="/tutorials/clustering/chapter9" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 9: DBSCAN Clustering →</a>
+        <a href="/tutorials/clustering/chapter9" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 9: Linkage Criteria Methods →</a>
     </div>
+
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter8.js') }}"></script>
 </body>
 </html>
