@@ -69,6 +69,41 @@ function initializeDendrogramDemo() {
     setTimeout(() => {
         generateDendrogramDemo();
     }, 100);
+    
+    // Initialize linkage demo controls
+    initializeLinkageDemo();
+}
+
+// Initialize linkage demo
+function initializeLinkageDemo() {
+    // Add event listeners for linkage demo controls
+    const clustersSlider = document.getElementById('linkage-clusters');
+    const clustersDisplay = document.getElementById('linkage-clusters-display');
+    
+    if (clustersSlider && clustersDisplay) {
+        clustersSlider.addEventListener('input', function() {
+            clustersDisplay.textContent = this.value;
+            // Regenerate clustering when clusters change
+            generateLinkageDemo();
+        });
+    }
+    
+    // Add event listeners for other controls
+    const datasetSelect = document.getElementById('linkage-dataset');
+    const methodSelect = document.getElementById('linkage-method');
+    
+    if (datasetSelect) {
+        datasetSelect.addEventListener('change', generateLinkageDemo);
+    }
+    
+    if (methodSelect) {
+        methodSelect.addEventListener('change', generateLinkageDemo);
+    }
+    
+    // Generate initial linkage demo
+    setTimeout(() => {
+        generateLinkageDemo();
+    }, 150);
 }
 
 // Generate hierarchical clustering visualization
@@ -706,34 +741,115 @@ function drawDendrogramSimple(svgId, dendrogram) {
     
     svg.innerHTML = '';
     
+    const width = 400;
+    const height = 300;
+    const margin = { top: 40, right: 20, bottom: 60, left: 60 };
+    
     // Add title
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    title.setAttribute('x', 200);
-    title.setAttribute('y', 30);
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 20);
     title.setAttribute('text-anchor', 'middle');
     title.setAttribute('fill', '#2c3e50');
     title.setAttribute('font-size', '14');
+    title.setAttribute('font-weight', 'bold');
     title.textContent = 'Dendrogram Structure';
     svg.appendChild(title);
     
-    // Simplified dendrogram visualization
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', 50);
-    rect.setAttribute('y', 50);
-    rect.setAttribute('width', 300);
-    rect.setAttribute('height', 200);
-    rect.setAttribute('fill', 'none');
-    rect.setAttribute('stroke', '#bdc3c7');
-    rect.setAttribute('stroke-width', 2);
-    svg.appendChild(rect);
+    // Generate a simple dendrogram structure
+    const numLeaves = 6;
+    const leafPositions = [];
+    const leafSpacing = (width - margin.left - margin.right) / (numLeaves - 1);
     
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', 200);
-    text.setAttribute('y', 160);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('fill', '#7f8c8d');
-    text.textContent = 'Dendrogram visualization';
-    svg.appendChild(text);
+    // Position leaves
+    for (let i = 0; i < numLeaves; i++) {
+        leafPositions.push(margin.left + i * leafSpacing);
+    }
+    
+    // Draw dendrogram branches
+    const maxHeight = height - margin.top - margin.bottom;
+    const branchHeight = maxHeight * 0.8;
+    
+    // Draw vertical lines for leaves
+    leafPositions.forEach((x, i) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', height - margin.bottom);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', height - margin.bottom - 20);
+        line.setAttribute('stroke', '#3498db');
+        line.setAttribute('stroke-width', '2');
+        svg.appendChild(line);
+        
+        // Add leaf labels
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x);
+        label.setAttribute('y', height - margin.bottom + 15);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('fill', '#2c3e50');
+        label.setAttribute('font-size', '10');
+        label.textContent = `${i + 1}`;
+        svg.appendChild(label);
+    });
+    
+    // Draw hierarchical branches (simplified)
+    const mergeLevels = [
+        { level: 1, pairs: [[0, 1], [2, 3], [4, 5]] },
+        { level: 2, pairs: [[0, 2], [4]] },
+        { level: 3, pairs: [[0, 4]] }
+    ];
+    
+    mergeLevels.forEach(({ level, pairs }) => {
+        const y = height - margin.bottom - 20 - (level * branchHeight / 3);
+        
+        pairs.forEach((pair) => {
+            if (pair.length === 2) {
+                const [left, right] = pair;
+                const leftX = leafPositions[left];
+                const rightX = leafPositions[right];
+                
+                // Horizontal line
+                const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hLine.setAttribute('x1', leftX);
+                hLine.setAttribute('y1', y);
+                hLine.setAttribute('x2', rightX);
+                hLine.setAttribute('y2', y);
+                hLine.setAttribute('stroke', '#3498db');
+                hLine.setAttribute('stroke-width', '2');
+                svg.appendChild(hLine);
+                
+                // Vertical lines
+                const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                vLine1.setAttribute('x1', leftX);
+                vLine1.setAttribute('y1', height - margin.bottom - 20);
+                vLine1.setAttribute('x2', leftX);
+                vLine1.setAttribute('y2', y);
+                vLine1.setAttribute('stroke', '#3498db');
+                vLine1.setAttribute('stroke-width', '2');
+                svg.appendChild(vLine1);
+                
+                const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                vLine2.setAttribute('x1', rightX);
+                vLine2.setAttribute('y1', height - margin.bottom - 20);
+                vLine2.setAttribute('x2', rightX);
+                vLine2.setAttribute('y2', y);
+                vLine2.setAttribute('stroke', '#3498db');
+                vLine2.setAttribute('stroke-width', '2');
+                svg.appendChild(vLine2);
+            }
+        });
+    });
+    
+    // Add height axis label
+    const heightLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    heightLabel.setAttribute('x', 15);
+    heightLabel.setAttribute('y', height / 2);
+    heightLabel.setAttribute('text-anchor', 'middle');
+    heightLabel.setAttribute('fill', '#7f8c8d');
+    heightLabel.setAttribute('font-size', '12');
+    heightLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
+    heightLabel.textContent = 'Height';
+    svg.appendChild(heightLabel);
 }
 
 function drawDendrogramWithCut(svgId, dendrogram, cutHeight) {
