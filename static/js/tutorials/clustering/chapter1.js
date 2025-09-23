@@ -183,10 +183,23 @@ function euclideanDistance(p1, p2) {
 
 function calculateWCSS() {
     let wcss = 0;
+    
+    if (!currentData || !Array.isArray(currentData)) {
+        console.error('Invalid currentData:', currentData);
+        return 0;
+    }
+    
+    if (!currentCentroids || !Array.isArray(currentCentroids)) {
+        console.error('Invalid currentCentroids:', currentCentroids);
+        return 0;
+    }
+    
     currentData.forEach(point => {
-        if (point.cluster >= 0 && point.cluster < currentCentroids.length) {
+        if (point && point.cluster >= 0 && point.cluster < currentCentroids.length) {
             const centroid = currentCentroids[point.cluster];
-            wcss += Math.pow(euclideanDistance(point, centroid), 2);
+            if (centroid) {
+                wcss += Math.pow(euclideanDistance(point, centroid), 2);
+            }
         }
     });
     return wcss;
@@ -344,7 +357,7 @@ function createDistanceVisualization(title, data, distanceType) {
     metricsDiv.style.cssText = 'margin-top: 1rem; font-size: 0.9rem;';
     
     const silhouette = calculateSilhouetteScore(data, clusters, distanceType);
-    const wcss = calculateWCSS(data, clusters, distanceType);
+    const wcss = calculateWCSSForComparison(data, clusters, distanceType);
     
     metricsDiv.innerHTML = `
         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -538,11 +551,16 @@ function calculateSilhouetteScore(data, clusters, distanceType) {
     return validPoints > 0 ? totalScore / validPoints : 0;
 }
 
-function calculateWCSS(data, clusters, distanceType) {
+function calculateWCSSForComparison(data, clusters, distanceType) {
     let totalWCSS = 0;
     
+    if (!clusters || !Array.isArray(clusters)) {
+        console.error('Invalid clusters data:', clusters);
+        return 0;
+    }
+    
     clusters.forEach(cluster => {
-        if (cluster.length > 0) {
+        if (cluster && cluster.length > 0) {
             const centroid = [
                 cluster.reduce((sum, p) => sum + p[0], 0) / cluster.length,
                 cluster.reduce((sum, p) => sum + p[1], 0) / cluster.length
