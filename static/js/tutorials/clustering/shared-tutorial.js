@@ -60,7 +60,7 @@ function initializeSectionNavigation() {
     initializeSubSectionNavigation();
 }
 
-function showSection(sectionName, clickedElement) {
+function showSection(sectionName, clickedElement, isSubSectionNavigation = false) {
     console.log('Showing section:', sectionName);
     
     // Hide all content sections
@@ -95,11 +95,17 @@ function showSection(sectionName, clickedElement) {
     // Update sub-section navigation
     updateSubSectionNavigation();
     
-    // Scroll to top of the page for better user experience
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
+    // Scroll behavior based on navigation type
+    if (isSubSectionNavigation) {
+        // For sub-section navigation, scroll to content start (after Learning Objectives)
+        scrollToContentStart();
+    } else {
+        // For regular section navigation, scroll to top
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
 }
 
 function updateSectionProgress(sectionName) {
@@ -147,7 +153,31 @@ function navigateSubSection(direction) {
     if (newIndex >= 0 && newIndex < sections.length) {
         const newSectionName = sections[newIndex];
         const newButton = document.querySelector(`[data-section="${newSectionName}"]`);
-        showSection(newSectionName, newButton);
+        showSection(newSectionName, newButton, true); // Pass true for isSubSectionNavigation
+    }
+}
+
+function scrollToContentStart() {
+    // Find the Learning Objectives section and scroll to just after it
+    const learningObjectives = document.querySelector('.learning-objectives-box');
+    if (learningObjectives) {
+        const rect = learningObjectives.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetPosition = scrollTop + rect.bottom + 20; // 20px margin after Learning Objectives
+        
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
+    } else {
+        // Fallback: scroll to the first content section
+        const firstContentSection = document.querySelector('.content-section');
+        if (firstContentSection) {
+            firstContentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     }
 }
 
@@ -718,6 +748,7 @@ window.navigateSubSection = navigateSubSection;
 window.updateSectionProgress = updateSectionProgress;
 window.updateSubSectionNavigation = updateSubSectionNavigation;
 window.scrollToTop = scrollToTop;
+window.scrollToContentStart = scrollToContentStart;
 window.initializeCentroids = initializeCentroids;
 window.updateCentroids = updateCentroids;
 window.hasConverged = hasConverged;
