@@ -507,6 +507,22 @@ function drawClusteringVisualization(svg, data, clusters, distanceType) {
     });
 }
 
+function createClustersFromAssignments(data, assignments, numClusters) {
+    const clusters = [];
+    for (let i = 0; i < numClusters; i++) {
+        clusters[i] = [];
+    }
+    
+    data.forEach((point, index) => {
+        const clusterIndex = assignments[index];
+        if (clusterIndex >= 0 && clusterIndex < numClusters) {
+            clusters[clusterIndex].push(point);
+        }
+    });
+    
+    return clusters;
+}
+
 function calculateSilhouetteScore(data, clusters, distanceType) {
     // Simplified silhouette score calculation
     let totalScore = 0;
@@ -519,7 +535,13 @@ function calculateSilhouetteScore(data, clusters, distanceType) {
         
         // Find current cluster
         for (let i = 0; i < clusters.length; i++) {
-            if (clusters[i].some(p => p[0] === point[0] && p[1] === point[1])) {
+            if (clusters[i].some(p => {
+                const px = p.x !== undefined ? p.x : p[0];
+                const py = p.y !== undefined ? p.y : p[1];
+                const pointX = point.x !== undefined ? point.x : point[0];
+                const pointY = point.y !== undefined ? point.y : point[1];
+                return px === pointX && py === pointY;
+            })) {
                 currentCluster = i;
                 break;
             }
@@ -531,7 +553,12 @@ function calculateSilhouetteScore(data, clusters, distanceType) {
         let intraSum = 0;
         let intraCount = 0;
         clusters[currentCluster].forEach(otherPoint => {
-            if (otherPoint[0] !== point[0] || otherPoint[1] !== point[1]) {
+            const otherX = otherPoint.x !== undefined ? otherPoint.x : otherPoint[0];
+            const otherY = otherPoint.y !== undefined ? otherPoint.y : otherPoint[1];
+            const pointX = point.x !== undefined ? point.x : point[0];
+            const pointY = point.y !== undefined ? point.y : point[1];
+            
+            if (otherX !== pointX || otherY !== pointY) {
                 intraSum += calculateDistance(point, otherPoint, distanceType);
                 intraCount++;
             }
@@ -596,24 +623,27 @@ function showDistanceComparisonMetrics(data) {
     
     if (euclideanChecked) {
         const result = performClustering(data, 3, 'euclidean');
+        const clusters = createClustersFromAssignments(data, result.assignments, 3);
         metrics.euclidean = {
-            silhouette: calculateSilhouetteScore(data, result.assignments),
+            silhouette: calculateSilhouetteScore(data, clusters, 'euclidean'),
             wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'euclidean')
         };
     }
     
     if (manhattanChecked) {
         const result = performClustering(data, 3, 'manhattan');
+        const clusters = createClustersFromAssignments(data, result.assignments, 3);
         metrics.manhattan = {
-            silhouette: calculateSilhouetteScore(data, result.assignments),
+            silhouette: calculateSilhouetteScore(data, clusters, 'manhattan'),
             wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'manhattan')
         };
     }
     
     if (cosineChecked) {
         const result = performClustering(data, 3, 'cosine');
+        const clusters = createClustersFromAssignments(data, result.assignments, 3);
         metrics.cosine = {
-            silhouette: calculateSilhouetteScore(data, result.assignments),
+            silhouette: calculateSilhouetteScore(data, clusters, 'cosine'),
             wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'cosine')
         };
     }
