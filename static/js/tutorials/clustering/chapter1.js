@@ -90,6 +90,12 @@ function runKmeans() {
             } else {
                 isRunning = false;
                 updateStatus();
+                
+                // Automatically show metrics after convergence
+                setTimeout(() => {
+                    runDistanceMetricsAnalysis();
+                    runEvaluationMetricsAnalysis();
+                }, 100);
             }
         }
     };
@@ -112,12 +118,12 @@ function stepKmeans() {
     updateStatus();
     drawVisualization();
     
-    // If converged and in step-by-step mode, show the "Run Analysis" button
-    if (converged && isStepByStepMode) {
-        const analyzeBtn = document.getElementById('analyze-btn');
-        if (analyzeBtn) {
-            analyzeBtn.style.display = 'inline-block';
-        }
+    // If converged, automatically show metrics
+    if (converged) {
+        setTimeout(() => {
+            runDistanceMetricsAnalysis();
+            runEvaluationMetricsAnalysis();
+        }, 100);
     }
 }
 
@@ -693,83 +699,6 @@ function demonstrateMetrics() {
 
 // Global variable to store the current dataset for consistent analysis
 let currentAnalysisData = null;
-let isStepByStepMode = false;
-
-function runCompleteAnalysis() {
-    // Set mode to complete analysis
-    isStepByStepMode = false;
-    
-    // Generate new data
-    generateData();
-    
-    // Run K-means to convergence
-    runKmeans();
-    
-    // After K-means converges, run the other analyses automatically
-    setTimeout(() => {
-        runDistanceMetricsAnalysis();
-        runEvaluationMetricsAnalysis();
-    }, 100); // Small delay to ensure K-means has finished
-}
-
-function runStepByStepAnalysis() {
-    // Set mode to step-by-step
-    isStepByStepMode = true;
-    
-    // Generate new data if none exists
-    if (!currentData || currentData.length === 0) {
-        generateData();
-    }
-    
-    // Hide the "Run Analysis" button initially
-    const analyzeBtn = document.getElementById('analyze-btn');
-    if (analyzeBtn) {
-        analyzeBtn.style.display = 'none';
-    }
-    
-    // Don't run to convergence automatically - let user step through
-    // The step-by-step button will be available for manual stepping
-}
-
-function runAnalysisAfterStepping() {
-    // Run the distance metrics and evaluation metrics after user has stepped through
-    if (currentData && currentData.length > 0 && currentCentroids && currentCentroids.length > 0) {
-        runDistanceMetricsAnalysis();
-        runEvaluationMetricsAnalysis();
-    }
-}
-
-function resetAnalysis() {
-    // Reset K-means demo
-    resetKmeans();
-    
-    // Clear distance metrics results
-    const distanceComparison = document.getElementById('distance-comparison');
-    if (distanceComparison) {
-        distanceComparison.innerHTML = '';
-    }
-    
-    const distanceMetricsDisplay = document.getElementById('distance-metrics-display');
-    if (distanceMetricsDisplay) {
-        distanceMetricsDisplay.style.display = 'none';
-    }
-    
-    // Clear evaluation metrics results
-    const metricsDisplay = document.getElementById('metrics-display');
-    if (metricsDisplay) {
-        metricsDisplay.style.display = 'none';
-    }
-    
-    // Hide the "Run Analysis" button
-    const analyzeBtn = document.getElementById('analyze-btn');
-    if (analyzeBtn) {
-        analyzeBtn.style.display = 'none';
-    }
-    
-    // Reset current data and mode
-    currentAnalysisData = null;
-    isStepByStepMode = false;
-}
 
 function runDistanceMetricsAnalysis() {
     if (!currentData || currentData.length === 0) {
@@ -798,7 +727,3 @@ window.stepKmeans = stepKmeans;
 window.resetKmeans = resetKmeans;
 window.compareDistances = compareDistances;
 window.demonstrateMetrics = demonstrateMetrics;
-window.runCompleteAnalysis = runCompleteAnalysis;
-window.runStepByStepAnalysis = runStepByStepAnalysis;
-window.runAnalysisAfterStepping = runAnalysisAfterStepping;
-window.resetAnalysis = resetAnalysis;
