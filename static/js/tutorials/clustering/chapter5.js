@@ -114,10 +114,12 @@ function assignPoints() {
         let closestCentroid = 0;
         
         kmeansCentroids.forEach((centroid, index) => {
-            const dist = Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2);
-            if (dist < minDist) {
-                minDist = dist;
-                closestCentroid = index;
+            if (centroid && !isNaN(centroid.x) && !isNaN(centroid.y) && !isNaN(point.x) && !isNaN(point.y)) {
+                const dist = Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2);
+                if (!isNaN(dist) && dist < minDist) {
+                    minDist = dist;
+                    closestCentroid = index;
+                }
             }
         });
         
@@ -135,7 +137,12 @@ function updateCentroids() {
         if (clusterPoints.length > 0) {
             const avgX = clusterPoints.reduce((sum, point) => sum + point.x, 0) / clusterPoints.length;
             const avgY = clusterPoints.reduce((sum, point) => sum + point.y, 0) / clusterPoints.length;
-            newCentroids.push({x: avgX, y: avgY});
+            // Validate that averages are not NaN
+            if (!isNaN(avgX) && !isNaN(avgY)) {
+                newCentroids.push({x: avgX, y: avgY});
+            } else {
+                newCentroids.push({...kmeansCentroids[i]});
+            }
         } else {
             newCentroids.push({...kmeansCentroids[i]});
         }
@@ -148,9 +155,11 @@ function calculateWCSS() {
     let wcss = 0;
     kmeansData.forEach((point, index) => {
         const centroid = kmeansCentroids[kmeansAssignments[index]];
-        wcss += (point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2;
+        if (centroid && !isNaN(centroid.x) && !isNaN(centroid.y) && !isNaN(point.x) && !isNaN(point.y)) {
+            wcss += (point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2;
+        }
     });
-    return wcss;
+    return isNaN(wcss) ? 0 : wcss;
 }
 
 function stepKmeansDemo() {
@@ -286,7 +295,9 @@ function drawConvergencePlot() {
     const height = 200;
     const margin = 40;
     
-    const wcssValues = kmeansHistory.map(h => h.wcss);
+    const wcssValues = kmeansHistory.map(h => h.wcss).filter(wcss => !isNaN(wcss) && isFinite(wcss));
+    if (wcssValues.length === 0) return; // No valid WCSS values
+    
     const maxWCSS = Math.max(...wcssValues);
     const minWCSS = Math.min(...wcssValues);
     const range = maxWCSS - minWCSS;
@@ -336,8 +347,8 @@ function drawConvergencePlot() {
     
     // Draw points
     kmeansHistory.forEach((point, index) => {
-        const x = margin + (index / (kmeansHistory.length - 1)) * (width - 2 * margin);
-        const y = height - margin - ((point.wcss - minWCSS) / range) * (height - 2 * margin);
+        const x = margin + (kmeansHistory.length === 1 ? 0 : (index / (kmeansHistory.length - 1))) * (width - 2 * margin);
+        const y = height - margin - ((point.wcss - minWCSS) / effectiveRange) * (height - 2 * margin);
         
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', x);
