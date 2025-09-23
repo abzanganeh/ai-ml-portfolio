@@ -494,8 +494,8 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     
     svg.innerHTML = '';
     
-    const width = 800;
-    const height = 600;
+    const width = 700;
+    const height = 500;
     const margin = { top: 60, right: 40, bottom: 100, left: 120 };
     
     // Add title
@@ -537,7 +537,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     // Draw cut line if specified
     if (cutHeight !== null && cutHeight > 0) {
         const maxHeight = Math.max(...getChapter10AllHeights(dendrogram));
-        const cutY = height - margin.bottom - (cutHeight / 100) * maxHeight;
+        const cutY = height - margin.bottom - (cutHeight / 100) * (maxHeight / 2) * 50;
         
         const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         cutLine.setAttribute('x1', margin.left);
@@ -726,7 +726,7 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
     const rightPos = drawChapter10DendrogramNode(node.right, svg, leafPositions, maxHeight, depth + 1);
     
     const x = (leftPos.x + rightPos.x) / 2;
-    const y = maxHeight - node.height * 3; // Scale height for visualization (increased multiplier)
+    const y = maxHeight - (node.height / 2) * 50; // Scale height for visualization with proper scaling
     
     // Draw horizontal line
     const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
