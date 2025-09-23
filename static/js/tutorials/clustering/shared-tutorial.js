@@ -494,9 +494,9 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     
     svg.innerHTML = '';
     
-    const width = 500;
-    const height = 400;
-    const margin = { top: 50, right: 30, bottom: 80, left: 80 };
+    const width = 800;
+    const height = 600;
+    const margin = { top: 60, right: 40, bottom: 100, left: 120 };
     
     // Add title
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -504,7 +504,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     title.setAttribute('y', 25);
     title.setAttribute('text-anchor', 'middle');
     title.setAttribute('fill', '#2c3e50');
-    title.setAttribute('font-size', '16');
+    title.setAttribute('font-size', '20');
     title.setAttribute('font-weight', 'bold');
     title.textContent = 'Dendrogram';
     svg.appendChild(title);
@@ -554,7 +554,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
         cutLabel.setAttribute('x', width - margin.right + 15);
         cutLabel.setAttribute('y', cutY + 5);
         cutLabel.setAttribute('fill', '#e74c3c');
-        cutLabel.setAttribute('font-size', '14');
+        cutLabel.setAttribute('font-size', '16');
         cutLabel.setAttribute('font-weight', 'bold');
         cutLabel.textContent = `Cut: ${cutHeight.toFixed(1)}`;
         svg.appendChild(cutLabel);
@@ -569,7 +569,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     heightLabel.setAttribute('y', height / 2);
     heightLabel.setAttribute('text-anchor', 'middle');
     heightLabel.setAttribute('fill', '#7f8c8d');
-    heightLabel.setAttribute('font-size', '12');
+    heightLabel.setAttribute('font-size', '14');
     heightLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
     heightLabel.textContent = 'Height';
     svg.appendChild(heightLabel);
@@ -704,17 +704,17 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', x);
         circle.setAttribute('cy', y);
-        circle.setAttribute('r', 3);
+        circle.setAttribute('r', 5);
         circle.setAttribute('fill', '#4f46e5');
         svg.appendChild(circle);
         
         // Draw leaf label
         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         label.setAttribute('x', x);
-        label.setAttribute('y', y + 15);
+        label.setAttribute('y', y + 20);
         label.setAttribute('text-anchor', 'middle');
         label.setAttribute('fill', '#2c3e50');
-        label.setAttribute('font-size', '12');
+        label.setAttribute('font-size', '14');
         label.textContent = `P${node.points[0] + 1}`;
         svg.appendChild(label);
         
@@ -726,7 +726,7 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
     const rightPos = drawChapter10DendrogramNode(node.right, svg, leafPositions, maxHeight, depth + 1);
     
     const x = (leftPos.x + rightPos.x) / 2;
-    const y = maxHeight - node.height * 2; // Scale height for visualization
+    const y = maxHeight - node.height * 3; // Scale height for visualization (increased multiplier)
     
     // Draw horizontal line
     const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -735,7 +735,7 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
     hLine.setAttribute('x2', rightPos.x);
     hLine.setAttribute('y2', y);
     hLine.setAttribute('stroke', '#666');
-    hLine.setAttribute('stroke-width', 2);
+    hLine.setAttribute('stroke-width', 3);
     svg.appendChild(hLine);
     
     // Draw vertical lines
@@ -745,7 +745,7 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
     vLine1.setAttribute('x2', leftPos.x);
     vLine1.setAttribute('y2', y);
     vLine1.setAttribute('stroke', '#666');
-    vLine1.setAttribute('stroke-width', 2);
+    vLine1.setAttribute('stroke-width', 3);
     svg.appendChild(vLine1);
     
     const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -754,7 +754,7 @@ function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth)
     vLine2.setAttribute('x2', rightPos.x);
     vLine2.setAttribute('y2', y);
     vLine2.setAttribute('stroke', '#666');
-    vLine2.setAttribute('stroke-width', 2);
+    vLine2.setAttribute('stroke-width', 3);
     svg.appendChild(vLine2);
     
     return { x, y };
