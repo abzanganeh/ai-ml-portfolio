@@ -22,9 +22,34 @@ function resetInitializationDemo() {
 
 function generateInitDemo() {
     const canvas = document.getElementById('init-plot');
-    if (canvas) {
-        canvas.innerHTML = '<text x="200" y="150" text-anchor="middle">Initialization methods comparison</text>';
-    }
+    const convergenceCanvas = document.getElementById('init-convergence');
+    
+    if (!canvas || !convergenceCanvas) return;
+    
+    // Clear previous content
+    canvas.innerHTML = '';
+    convergenceCanvas.innerHTML = '';
+    
+    // Get demo parameters
+    const dataset = document.getElementById('init-dataset')?.value || 'blobs';
+    const method = document.getElementById('init-method')?.value || 'random';
+    const runs = parseInt(document.getElementById('init-runs')?.value || '5');
+    
+    // Generate sample data
+    const data = generateSampleData(dataset);
+    const numClusters = 3;
+    
+    // Run initialization comparison
+    const results = compareInitializationMethods(data, numClusters, runs);
+    
+    // Draw clustering results
+    drawInitClusteringResults(canvas, data, results, method);
+    
+    // Draw convergence comparison
+    drawInitConvergenceComparison(convergenceCanvas, results);
+    
+    // Update metrics display
+    updateInitMetrics(results, method);
 }
 
 function resetInitDemo() {
@@ -748,5 +773,486 @@ function updateAccelMetrics(performanceData, qualityData) {
         const element = document.getElementById(id);
         if (element) element.textContent = value;
     });
+}
+
+// Helper functions for initialization demo
+function generateSampleData(type) {
+    const data = [];
+    const numPoints = 100;
+    
+    switch (type) {
+        case 'blobs':
+            // Generate blob clusters
+            for (let i = 0; i < 3; i++) {
+                const centerX = 100 + i * 150;
+                const centerY = 150 + (i % 2) * 100;
+                for (let j = 0; j < numPoints / 3; j++) {
+                    data.push({
+                        x: centerX + (Math.random() - 0.5) * 60,
+                        y: centerY + (Math.random() - 0.5) * 60
+                    });
+                }
+            }
+            break;
+        case 'moons':
+            // Generate moon shapes
+            for (let i = 0; i < numPoints / 2; i++) {
+                const angle = Math.PI * i / (numPoints / 2);
+                data.push({
+                    x: 100 + Math.cos(angle) * 50,
+                    y: 150 + Math.sin(angle) * 30
+                });
+                data.push({
+                    x: 200 + Math.cos(angle) * 50,
+                    y: 200 + Math.sin(angle) * 30
+                });
+            }
+            break;
+        case 'circles':
+            // Generate concentric circles
+            for (let i = 0; i < numPoints / 2; i++) {
+                const angle = Math.PI * 2 * i / (numPoints / 2);
+                data.push({
+                    x: 150 + Math.cos(angle) * 40,
+                    y: 150 + Math.sin(angle) * 40
+                });
+                data.push({
+                    x: 150 + Math.cos(angle) * 80,
+                    y: 150 + Math.sin(angle) * 80
+                });
+            }
+            break;
+        default: // random
+            for (let i = 0; i < numPoints; i++) {
+                data.push({
+                    x: Math.random() * 300,
+                    y: Math.random() * 300
+                });
+            }
+    }
+    
+    return data;
+}
+
+function compareInitializationMethods(data, numClusters, runs) {
+    const methods = ['random', 'kmeans++', 'furthest', 'kmeans++_improved'];
+    const results = {};
+    
+    methods.forEach(method => {
+        results[method] = {
+            convergence: [],
+            finalWCSS: 0,
+            iterations: 0,
+            stability: 0,
+            centroids: []
+        };
+        
+        const wcssValues = [];
+        let bestResult = null;
+        
+        for (let run = 0; run < runs; run++) {
+            const result = runKMeansWithMethod(data, numClusters, method);
+            wcssValues.push(result.finalWCSS);
+            results[method].convergence.push(result.convergence);
+            
+            // Keep the best result for visualization
+            if (!bestResult || result.finalWCSS < bestResult.finalWCSS) {
+                bestResult = result;
+            }
+        }
+        
+        // Calculate average metrics
+        results[method].finalWCSS = wcssValues.reduce((a, b) => a + b, 0) / runs;
+        results[method].iterations = results[method].convergence[0].length;
+        results[method].stability = calculateStability(wcssValues);
+        results[method].centroids = bestResult.centroids;
+    });
+    
+    return results;
+}
+
+function runKMeansWithMethod(data, numClusters, method) {
+    // Initialize centroids based on method
+    const centroids = initializeCentroids(data, numClusters, method);
+    const convergence = [];
+    
+    let currentCentroids = [...centroids];
+    let prevWCSS = Infinity;
+    let iterations = 0;
+    const maxIterations = 50;
+    
+    while (iterations < maxIterations) {
+        // Assign points to clusters
+        const assignments = assignPointsToClusters(data, currentCentroids);
+        
+        // Calculate WCSS
+        const wcss = calculateWCSS(data, assignments, currentCentroids);
+        convergence.push(wcss);
+        
+        // Check convergence
+        if (Math.abs(prevWCSS - wcss) < 0.01) break;
+        prevWCSS = wcss;
+        
+        // Update centroids
+        currentCentroids = updateCentroids(data, assignments, numClusters);
+        iterations++;
+    }
+    
+    return {
+        centroids: currentCentroids,
+        finalWCSS: convergence[convergence.length - 1],
+        convergence: convergence
+    };
+}
+
+function initializeCentroids(data, numClusters, method) {
+    const centroids = [];
+    
+    switch (method) {
+        case 'random':
+            // Random initialization
+            for (let i = 0; i < numClusters; i++) {
+                const randomIndex = Math.floor(Math.random() * data.length);
+                centroids.push({ ...data[randomIndex] });
+            }
+            break;
+            
+        case 'kmeans++':
+            // K-means++ initialization
+            const firstIndex = Math.floor(Math.random() * data.length);
+            centroids.push({ ...data[firstIndex] });
+            
+            for (let i = 1; i < numClusters; i++) {
+                const distances = data.map(point => {
+                    const minDist = Math.min(...centroids.map(c => 
+                        Math.sqrt((point.x - c.x) ** 2 + (point.y - c.y) ** 2)
+                    ));
+                    return minDist ** 2;
+                });
+                
+                const sumDistances = distances.reduce((a, b) => a + b, 0);
+                const probabilities = distances.map(d => d / sumDistances);
+                
+                let cumulative = 0;
+                const random = Math.random();
+                for (let j = 0; j < data.length; j++) {
+                    cumulative += probabilities[j];
+                    if (random <= cumulative) {
+                        centroids.push({ ...data[j] });
+                        break;
+                    }
+                }
+            }
+            break;
+            
+        case 'furthest':
+            // Furthest-first initialization
+            const firstIndex2 = Math.floor(Math.random() * data.length);
+            centroids.push({ ...data[firstIndex2] });
+            
+            for (let i = 1; i < numClusters; i++) {
+                let maxDist = 0;
+                let furthestPoint = null;
+                
+                data.forEach(point => {
+                    const minDist = Math.min(...centroids.map(c => 
+                        Math.sqrt((point.x - c.x) ** 2 + (point.y - c.y) ** 2)
+                    ));
+                    if (minDist > maxDist) {
+                        maxDist = minDist;
+                        furthestPoint = point;
+                    }
+                });
+                
+                if (furthestPoint) {
+                    centroids.push({ ...furthestPoint });
+                }
+            }
+            break;
+            
+        case 'kmeans++_improved':
+            // Improved K-means++ with multiple attempts
+            let bestCentroids = null;
+            let bestScore = Infinity;
+            
+            for (let attempt = 0; attempt < 5; attempt++) {
+                const attemptCentroids = initializeCentroids(data, numClusters, 'kmeans++');
+                const score = calculateInitializationScore(data, attemptCentroids);
+                
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestCentroids = attemptCentroids;
+                }
+            }
+            
+            centroids.push(...bestCentroids);
+            break;
+    }
+    
+    return centroids;
+}
+
+function calculateInitializationScore(data, centroids) {
+    return data.reduce((sum, point) => {
+        const minDist = Math.min(...centroids.map(c => 
+            Math.sqrt((point.x - c.x) ** 2 + (point.y - c.y) ** 2)
+        ));
+        return sum + minDist ** 2;
+    }, 0);
+}
+
+function assignPointsToClusters(data, centroids) {
+    return data.map(point => {
+        let minDist = Infinity;
+        let closestCluster = 0;
+        
+        centroids.forEach((centroid, index) => {
+            const dist = Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2);
+            if (dist < minDist) {
+                minDist = dist;
+                closestCluster = index;
+            }
+        });
+        
+        return closestCluster;
+    });
+}
+
+function updateCentroids(data, assignments, numClusters) {
+    const newCentroids = [];
+    
+    for (let i = 0; i < numClusters; i++) {
+        const clusterPoints = data.filter((_, index) => assignments[index] === i);
+        
+        if (clusterPoints.length > 0) {
+            const avgX = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+            const avgY = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+            newCentroids.push({ x: avgX, y: avgY });
+        } else {
+            // Keep existing centroid if no points assigned
+            newCentroids.push({ x: 0, y: 0 });
+        }
+    }
+    
+    return newCentroids;
+}
+
+function calculateWCSS(data, assignments, centroids) {
+    return data.reduce((sum, point, index) => {
+        const clusterIndex = assignments[index];
+        const centroid = centroids[clusterIndex];
+        const dist = Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2);
+        return sum + dist ** 2;
+    }, 0);
+}
+
+function calculateStability(wcssValues) {
+    if (wcssValues.length <= 1) return 0;
+    
+    const mean = wcssValues.reduce((a, b) => a + b, 0) / wcssValues.length;
+    const variance = wcssValues.reduce((sum, val) => sum + (val - mean) ** 2, 0) / wcssValues.length;
+    const stdDev = Math.sqrt(variance);
+    
+    return mean > 0 ? (1 - stdDev / mean) : 0; // Higher is more stable
+}
+
+function drawInitClusteringResults(canvas, data, results, selectedMethod) {
+    const width = 400;
+    const height = 300;
+    const margin = 40;
+    
+    // Clear canvas
+    canvas.innerHTML = '';
+    
+    // Create SVG
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    
+    // Draw data points
+    data.forEach(point => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', point.x);
+        circle.setAttribute('cy', point.y);
+        circle.setAttribute('r', 3);
+        circle.setAttribute('fill', '#666');
+        circle.setAttribute('opacity', 0.6);
+        svg.appendChild(circle);
+    });
+    
+    // Draw centroids for selected method
+    const methodResult = results[selectedMethod];
+    if (methodResult && methodResult.centroids) {
+        methodResult.centroids.forEach((centroid, index) => {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', centroid.x);
+            circle.setAttribute('cy', centroid.y);
+            circle.setAttribute('r', 8);
+            circle.setAttribute('fill', `hsl(${index * 120}, 70%, 50%)`);
+            circle.setAttribute('stroke', '#000');
+            circle.setAttribute('stroke-width', 2);
+            svg.appendChild(circle);
+            
+            // Add centroid label
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', centroid.x);
+            text.setAttribute('y', centroid.y - 15);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('font-size', '12');
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = `C${index + 1}`;
+            svg.appendChild(text);
+        });
+    }
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 20);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('font-size', '14');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = `${selectedMethod.charAt(0).toUpperCase() + selectedMethod.slice(1)} Initialization`;
+    svg.appendChild(title);
+    
+    canvas.appendChild(svg);
+}
+
+function drawInitConvergenceComparison(canvas, results) {
+    const width = 400;
+    const height = 300;
+    const margin = 40;
+    
+    // Clear canvas
+    canvas.innerHTML = '';
+    
+    // Create SVG
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', width);
+    svg.setAttribute('height', height);
+    
+    // Get all convergence data
+    const methods = Object.keys(results);
+    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'];
+    
+    // Find global max/min for scaling
+    let maxIterations = 0;
+    let maxWCSS = 0;
+    let minWCSS = Infinity;
+    
+    methods.forEach(method => {
+        const convergence = results[method].convergence[0];
+        if (convergence && convergence.length > 0) {
+            maxIterations = Math.max(maxIterations, convergence.length);
+            maxWCSS = Math.max(maxWCSS, ...convergence);
+            minWCSS = Math.min(minWCSS, ...convergence);
+        }
+    });
+    
+    // Draw convergence lines
+    methods.forEach((method, methodIndex) => {
+        const convergence = results[method].convergence[0];
+        if (!convergence || convergence.length === 0) return;
+        
+        // Draw convergence line
+        let pathData = '';
+        convergence.forEach((wcss, iteration) => {
+            const x = margin + (iteration / Math.max(convergence.length - 1, 1)) * (width - 2 * margin);
+            const y = height - margin - ((wcss - minWCSS) / (maxWCSS - minWCSS)) * (height - 2 * margin);
+            
+            if (iteration === 0) {
+                pathData += `M ${x} ${y}`;
+            } else {
+                pathData += ` L ${x} ${y}`;
+            }
+        });
+        
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        path.setAttribute('stroke', colors[methodIndex % colors.length]);
+        path.setAttribute('stroke-width', 2);
+        path.setAttribute('fill', 'none');
+        svg.appendChild(path);
+        
+        // Add legend
+        const legendText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        legendText.setAttribute('x', width - 100);
+        legendText.setAttribute('y', 40 + methodIndex * 20);
+        legendText.setAttribute('font-size', '12');
+        legendText.setAttribute('fill', colors[methodIndex % colors.length]);
+        legendText.textContent = method;
+        svg.appendChild(legendText);
+    });
+    
+    // Add axes
+    const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    xAxis.setAttribute('x1', margin);
+    xAxis.setAttribute('y1', height - margin);
+    xAxis.setAttribute('x2', width - margin);
+    xAxis.setAttribute('y2', height - margin);
+    xAxis.setAttribute('stroke', '#000');
+    xAxis.setAttribute('stroke-width', 1);
+    svg.appendChild(xAxis);
+    
+    const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    yAxis.setAttribute('x1', margin);
+    yAxis.setAttribute('y1', margin);
+    yAxis.setAttribute('x2', margin);
+    yAxis.setAttribute('y2', height - margin);
+    yAxis.setAttribute('stroke', '#000');
+    yAxis.setAttribute('stroke-width', 1);
+    svg.appendChild(yAxis);
+    
+    // Add labels
+    const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    xLabel.setAttribute('x', width / 2);
+    xLabel.setAttribute('y', height - 10);
+    xLabel.setAttribute('text-anchor', 'middle');
+    xLabel.setAttribute('font-size', '12');
+    xLabel.textContent = 'Iterations';
+    svg.appendChild(xLabel);
+    
+    const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    yLabel.setAttribute('x', 15);
+    yLabel.setAttribute('y', height / 2);
+    yLabel.setAttribute('text-anchor', 'middle');
+    yLabel.setAttribute('font-size', '12');
+    yLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
+    yLabel.textContent = 'WCSS';
+    svg.appendChild(yLabel);
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 20);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('font-size', '14');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = 'Convergence Comparison';
+    svg.appendChild(title);
+    
+    canvas.appendChild(svg);
+}
+
+function updateInitMetrics(results, selectedMethod) {
+    const methodResult = results[selectedMethod];
+    if (!methodResult) return;
+    
+    // Update metric displays if they exist
+    const wcssElement = document.getElementById('init-wcss');
+    const iterationsElement = document.getElementById('init-iterations');
+    const stabilityElement = document.getElementById('init-stability');
+    
+    if (wcssElement) {
+        wcssElement.textContent = methodResult.finalWCSS.toFixed(2);
+    }
+    
+    if (iterationsElement) {
+        iterationsElement.textContent = methodResult.iterations;
+    }
+    
+    if (stabilityElement) {
+        stabilityElement.textContent = (methodResult.stability * 100).toFixed(1) + '%';
+    }
 }
 

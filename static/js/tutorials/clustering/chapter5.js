@@ -291,6 +291,9 @@ function drawConvergencePlot() {
     const minWCSS = Math.min(...wcssValues);
     const range = maxWCSS - minWCSS;
     
+    // Handle edge case where all WCSS values are the same
+    const effectiveRange = range === 0 ? 1 : range;
+    
     // Draw axes
     const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     xAxis.setAttribute('x1', margin);
@@ -315,8 +318,8 @@ function drawConvergencePlot() {
     let pathData = '';
     
     kmeansHistory.forEach((point, index) => {
-        const x = margin + (index / (kmeansHistory.length - 1)) * (width - 2 * margin);
-        const y = height - margin - ((point.wcss - minWCSS) / range) * (height - 2 * margin);
+        const x = margin + (kmeansHistory.length === 1 ? 0 : (index / (kmeansHistory.length - 1))) * (width - 2 * margin);
+        const y = height - margin - ((point.wcss - minWCSS) / effectiveRange) * (height - 2 * margin);
         
         if (index === 0) {
             pathData += `M ${x} ${y}`;
@@ -346,24 +349,38 @@ function drawConvergencePlot() {
 }
 
 function updateMetrics() {
-    document.getElementById('currentIteration').textContent = currentIteration;
-    
-    if (kmeansHistory.length > 0) {
-        const currentWCSS = kmeansHistory[kmeansHistory.length - 1].wcss;
-        document.getElementById('wcss').textContent = currentWCSS.toFixed(2);
-    } else {
-        document.getElementById('wcss').textContent = '-';
+    const iterationElement = document.getElementById('iterations-value');
+    if (iterationElement) {
+        iterationElement.textContent = currentIteration;
     }
     
-    const converged = document.getElementById('converged').textContent === 'Yes';
-    if (!converged && kmeansHistory.length > 1) {
-        const prevWCSS = kmeansHistory[kmeansHistory.length - 2].wcss;
-        const currentWCSS = kmeansHistory[kmeansHistory.length - 1].wcss;
-        const improvement = Math.abs(prevWCSS - currentWCSS) / prevWCSS;
-        
-        if (improvement < 0.001) {
-            document.getElementById('converged').textContent = 'Yes';
+    const wcssElement = document.getElementById('wcss-value');
+    if (wcssElement) {
+        if (kmeansHistory.length > 0) {
+            const currentWCSS = kmeansHistory[kmeansHistory.length - 1].wcss;
+            wcssElement.textContent = currentWCSS.toFixed(2);
+        } else {
+            wcssElement.textContent = '-';
         }
+    }
+    
+    // Update silhouette (simplified calculation)
+    const silhouetteElement = document.getElementById('silhouette-value');
+    if (silhouetteElement) {
+        if (kmeansHistory.length > 0) {
+            // Simple silhouette approximation based on WCSS
+            const currentWCSS = kmeansHistory[kmeansHistory.length - 1].wcss;
+            const silhouette = Math.max(0, Math.min(1, (1000 - currentWCSS) / 1000));
+            silhouetteElement.textContent = silhouette.toFixed(3);
+        } else {
+            silhouetteElement.textContent = '-';
+        }
+    }
+    
+    // Show metrics container
+    const metricsContainer = document.getElementById('demo-metrics');
+    if (metricsContainer) {
+        metricsContainer.style.display = 'block';
     }
 }
 

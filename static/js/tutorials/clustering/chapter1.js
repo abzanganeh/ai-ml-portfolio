@@ -319,7 +319,7 @@ function generateComparisonData() {
             y = 60 + (Math.random() - 0.5) * 15;
         }
         
-        data.push([x, y]);
+        data.push({x, y});
     }
     
     return data;
@@ -327,7 +327,12 @@ function generateComparisonData() {
 
 function createDistanceVisualization(title, data, distanceType) {
     const comparisonContainer = document.getElementById('distance-comparison');
-    if (!comparisonContainer) return;
+    if (!comparisonContainer) {
+        console.error('distance-comparison container not found');
+        return;
+    }
+    
+    console.log('Creating visualization for:', title, 'with', data.length, 'data points');
     
     // Create visualization panel
     const panel = document.createElement('div');
@@ -348,6 +353,7 @@ function createDistanceVisualization(title, data, distanceType) {
     
     // Perform clustering with the specified distance metric
     const clusters = performClustering(data, distanceType);
+    console.log('Clustering result:', clusters);
     
     // Draw the visualization
     drawClusteringVisualization(svg, data, clusters, distanceType);
@@ -389,7 +395,7 @@ function performClustering(data, distanceType) {
     let centroids = [];
     for (let i = 0; i < k; i++) {
         const randomIndex = Math.floor(Math.random() * data.length);
-        centroids.push([...data[randomIndex]]);
+        centroids.push({x: data[randomIndex].x, y: data[randomIndex].y});
     }
     
     let assignments = new Array(data.length);
@@ -420,8 +426,8 @@ function performClustering(data, distanceType) {
         for (let j = 0; j < centroids.length; j++) {
             const clusterPoints = data.filter((_, i) => assignments[i] === j);
             if (clusterPoints.length > 0) {
-                centroids[j][0] = clusterPoints.reduce((sum, p) => sum + p[0], 0) / clusterPoints.length;
-                centroids[j][1] = clusterPoints.reduce((sum, p) => sum + p[1], 0) / clusterPoints.length;
+                centroids[j].x = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                centroids[j].y = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
             }
         }
         
@@ -577,7 +583,68 @@ function calculateWCSSForComparison(data, clusters, distanceType) {
 }
 
 function showDistanceComparisonMetrics(data) {
-    // This could be expanded to show more detailed comparison metrics
+    // Calculate metrics for each distance type
+    const metrics = {};
+    
+    // Get selected distance metrics
+    const euclideanChecked = document.getElementById('euclidean')?.checked || false;
+    const manhattanChecked = document.getElementById('manhattan')?.checked || false;
+    const cosineChecked = document.getElementById('cosine')?.checked || false;
+    
+    if (euclideanChecked) {
+        const result = performClustering(data, 3, 'euclidean');
+        metrics.euclidean = {
+            silhouette: calculateSilhouetteScore(data, result.assignments),
+            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'euclidean')
+        };
+    }
+    
+    if (manhattanChecked) {
+        const result = performClustering(data, 3, 'manhattan');
+        metrics.manhattan = {
+            silhouette: calculateSilhouetteScore(data, result.assignments),
+            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'manhattan')
+        };
+    }
+    
+    if (cosineChecked) {
+        const result = performClustering(data, 3, 'cosine');
+        metrics.cosine = {
+            silhouette: calculateSilhouetteScore(data, result.assignments),
+            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'cosine')
+        };
+    }
+    
+    // Update the metrics display
+    const metricsDisplay = document.getElementById('distance-metrics-display');
+    if (metricsDisplay) {
+        metricsDisplay.style.display = 'block';
+        
+        // Update Euclidean metrics
+        if (metrics.euclidean) {
+            const silhouetteEl = document.getElementById('euclidean-silhouette');
+            const wcssEl = document.getElementById('euclidean-wcss');
+            if (silhouetteEl) silhouetteEl.textContent = `Silhouette: ${metrics.euclidean.silhouette.toFixed(3)}`;
+            if (wcssEl) wcssEl.textContent = `WCSS: ${metrics.euclidean.wcss.toFixed(1)}`;
+        }
+        
+        // Update Manhattan metrics
+        if (metrics.manhattan) {
+            const silhouetteEl = document.getElementById('manhattan-silhouette');
+            const wcssEl = document.getElementById('manhattan-wcss');
+            if (silhouetteEl) silhouetteEl.textContent = `Silhouette: ${metrics.manhattan.silhouette.toFixed(3)}`;
+            if (wcssEl) wcssEl.textContent = `WCSS: ${metrics.manhattan.wcss.toFixed(1)}`;
+        }
+        
+        // Update Cosine metrics
+        if (metrics.cosine) {
+            const silhouetteEl = document.getElementById('cosine-silhouette');
+            const wcssEl = document.getElementById('cosine-wcss');
+            if (silhouetteEl) silhouetteEl.textContent = `Silhouette: ${metrics.cosine.silhouette.toFixed(3)}`;
+            if (wcssEl) wcssEl.textContent = `WCSS: ${metrics.cosine.wcss.toFixed(1)}`;
+        }
+    }
+    
     console.log('Distance comparison completed for', data.length, 'data points');
 }
 
