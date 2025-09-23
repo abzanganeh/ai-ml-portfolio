@@ -454,23 +454,23 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     
     svg.innerHTML = '';
     
-    const width = 350;
-    const height = 250;
-    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+    const width = 400;
+    const height = 300;
+    const margin = { top: 40, right: 20, bottom: 60, left: 60 };
     
     // Add title
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     title.setAttribute('x', width / 2);
-    title.setAttribute('y', 15);
+    title.setAttribute('y', 20);
     title.setAttribute('text-anchor', 'middle');
     title.setAttribute('fill', '#2c3e50');
-    title.setAttribute('font-size', '12');
+    title.setAttribute('font-size', '14');
     title.setAttribute('font-weight', 'bold');
     title.textContent = 'Dendrogram';
     svg.appendChild(title);
     
-    // Generate dendrogram with leaves matching the number of clusters
-    const numLeaves = Math.max(4, parseInt(numClusters) * 2);
+    // Generate a simple dendrogram structure
+    const numLeaves = 8;
     const leafPositions = [];
     const leafSpacing = (width - margin.left - margin.right) / (numLeaves - 1);
     
@@ -488,105 +488,37 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', x);
         line.setAttribute('y1', height - margin.bottom);
-        line.setAttribute('y2', height - margin.bottom - 15);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', height - margin.bottom - 20);
         line.setAttribute('stroke', '#3498db');
         line.setAttribute('stroke-width', '2');
         svg.appendChild(line);
+        
+        // Add leaf labels
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x);
+        label.setAttribute('y', height - margin.bottom + 15);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('fill', '#2c3e50');
+        label.setAttribute('font-size', '10');
+        label.textContent = `P${i + 1}`;
+        svg.appendChild(label);
     });
     
-    // Draw hierarchical branches with proper structure
+    // Draw hierarchical branches (simplified)
     const mergeLevels = [
         { level: 1, pairs: [[0, 1], [2, 3], [4, 5], [6, 7]] },
-        { level: 2, pairs: [[1, 3], [5, 7]] },
-        { level: 3, pairs: [[3, 7]] }
+        { level: 2, pairs: [[0, 2], [4, 6]] },
+        { level: 3, pairs: [[0, 4]] }
     ];
     
-    // Only show merge levels up to the selected number of clusters
-    const maxLevel = Math.min(mergeLevels.length, Math.max(1, 4 - parseInt(numClusters) + 1));
-    
-    for (let level = 1; level <= maxLevel; level++) {
-        const y = height - margin.bottom - 15 - (level * branchHeight / 3);
+    mergeLevels.forEach(({ level, pairs }) => {
+        const y = height - margin.bottom - 20 - (level * branchHeight / 3);
         
-        if (level === 1) {
-            // First level merges
-            const pairs = [[0, 1], [2, 3], [4, 5], [6, 7]];
-            pairs.forEach(([left, right]) => {
-                if (left < numLeaves && right < numLeaves) {
-                    const leftX = leafPositions[left];
-                    const rightX = leafPositions[right];
-                    
-                    // Horizontal line
-                    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    hLine.setAttribute('x1', leftX);
-                    hLine.setAttribute('y1', y);
-                    hLine.setAttribute('x2', rightX);
-                    hLine.setAttribute('y2', y);
-                    hLine.setAttribute('stroke', '#3498db');
-                    hLine.setAttribute('stroke-width', '2');
-                    svg.appendChild(hLine);
-                    
-                    // Vertical lines
-                    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine1.setAttribute('x1', leftX);
-                    vLine1.setAttribute('y1', height - margin.bottom - 15);
-                    vLine1.setAttribute('x2', leftX);
-                    vLine1.setAttribute('y2', y);
-                    vLine1.setAttribute('stroke', '#3498db');
-                    vLine1.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine1);
-                    
-                    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine2.setAttribute('x1', rightX);
-                    vLine2.setAttribute('y1', height - margin.bottom - 15);
-                    vLine2.setAttribute('x2', rightX);
-                    vLine2.setAttribute('y2', y);
-                    vLine2.setAttribute('stroke', '#3498db');
-                    vLine2.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine2);
-                }
-            });
-        } else if (level === 2) {
-            // Second level merges
-            const pairs = [[1, 3], [5, 7]];
-            pairs.forEach(([left, right]) => {
-                if (left < numLeaves && right < numLeaves) {
-                    const leftX = leafPositions[left];
-                    const rightX = leafPositions[right];
-                    
-                    // Horizontal line
-                    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    hLine.setAttribute('x1', leftX);
-                    hLine.setAttribute('y1', y);
-                    hLine.setAttribute('x2', rightX);
-                    hLine.setAttribute('y2', y);
-                    hLine.setAttribute('stroke', '#3498db');
-                    hLine.setAttribute('stroke-width', '2');
-                    svg.appendChild(hLine);
-                    
-                    // Vertical lines
-                    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine1.setAttribute('x1', leftX);
-                    vLine1.setAttribute('y1', height - margin.bottom - 15 - (branchHeight / 3));
-                    vLine1.setAttribute('x2', leftX);
-                    vLine1.setAttribute('y2', y);
-                    vLine1.setAttribute('stroke', '#3498db');
-                    vLine1.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine1);
-                    
-                    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    vLine2.setAttribute('x1', rightX);
-                    vLine2.setAttribute('y1', height - margin.bottom - 15 - (branchHeight / 3));
-                    vLine2.setAttribute('x2', rightX);
-                    vLine2.setAttribute('y2', y);
-                    vLine2.setAttribute('stroke', '#3498db');
-                    vLine2.setAttribute('stroke-width', '2');
-                    svg.appendChild(vLine2);
-                }
-            });
-        } else if (level === 3) {
-            // Final merge
-            const leftX = leafPositions[3];
-            const rightX = leafPositions[7];
+        pairs.forEach(([left, right]) => {
+            const leftX = leafPositions[left];
+            const rightX = leafPositions[right];
+            const centerX = (leftX + rightX) / 2;
             
             // Horizontal line
             const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -601,7 +533,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
             // Vertical lines
             const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             vLine1.setAttribute('x1', leftX);
-            vLine1.setAttribute('y1', height - margin.bottom - 15 - (2 * branchHeight / 3));
+            vLine1.setAttribute('y1', height - margin.bottom - 20);
             vLine1.setAttribute('x2', leftX);
             vLine1.setAttribute('y2', y);
             vLine1.setAttribute('stroke', '#3498db');
@@ -610,18 +542,28 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
             
             const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             vLine2.setAttribute('x1', rightX);
-            vLine2.setAttribute('y1', height - margin.bottom - 15 - (2 * branchHeight / 3));
+            vLine2.setAttribute('y1', height - margin.bottom - 20);
             vLine2.setAttribute('x2', rightX);
             vLine2.setAttribute('y2', y);
             vLine2.setAttribute('stroke', '#3498db');
             vLine2.setAttribute('stroke-width', '2');
             svg.appendChild(vLine2);
-        }
-    }
+            
+            // Center vertical line
+            const centerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            centerLine.setAttribute('x1', centerX);
+            centerLine.setAttribute('y1', y);
+            centerLine.setAttribute('x2', centerX);
+            centerLine.setAttribute('y2', y - 20);
+            centerLine.setAttribute('stroke', '#3498db');
+            centerLine.setAttribute('stroke-width', '2');
+            svg.appendChild(centerLine);
+        });
+    });
     
-    // Add cut line if specified
+    // Draw cut line if specified
     if (cutHeight !== null) {
-        const cutY = height - margin.bottom - 15 - (cutHeight / 100) * branchHeight;
+        const cutY = height - margin.bottom - 20 - (cutHeight / 100) * branchHeight;
         const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         cutLine.setAttribute('x1', margin.left);
         cutLine.setAttribute('y1', cutY);
@@ -642,6 +584,17 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
         cutLabel.textContent = `Cut: ${cutHeight.toFixed(1)}`;
         svg.appendChild(cutLabel);
     }
+    
+    // Add height axis label
+    const heightLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    heightLabel.setAttribute('x', 15);
+    heightLabel.setAttribute('y', height / 2);
+    heightLabel.setAttribute('text-anchor', 'middle');
+    heightLabel.setAttribute('fill', '#7f8c8d');
+    heightLabel.setAttribute('font-size', '12');
+    heightLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
+    heightLabel.textContent = 'Height';
+    svg.appendChild(heightLabel);
 }
 
 // Export functions for potential use in other files
