@@ -683,6 +683,68 @@ function demonstrateMetrics() {
     if (metricsDisplay) metricsDisplay.style.display = 'block';
 }
 
+// Global variable to store the current dataset for consistent analysis
+let currentAnalysisData = null;
+
+function runCompleteAnalysis() {
+    // Generate new data
+    generateData();
+    
+    // Run K-means to convergence
+    runKmeans();
+    
+    // After K-means converges, run the other analyses
+    setTimeout(() => {
+        runDistanceMetricsAnalysis();
+        runEvaluationMetricsAnalysis();
+    }, 100); // Small delay to ensure K-means has finished
+}
+
+function resetAnalysis() {
+    // Reset K-means demo
+    resetKmeans();
+    
+    // Clear distance metrics results
+    const distanceComparison = document.getElementById('distance-comparison');
+    if (distanceComparison) {
+        distanceComparison.innerHTML = '';
+    }
+    
+    const distanceMetricsDisplay = document.getElementById('distance-metrics-display');
+    if (distanceMetricsDisplay) {
+        distanceMetricsDisplay.style.display = 'none';
+    }
+    
+    // Clear evaluation metrics results
+    const metricsDisplay = document.getElementById('metrics-display');
+    if (metricsDisplay) {
+        metricsDisplay.style.display = 'none';
+    }
+    
+    // Reset current data
+    currentAnalysisData = null;
+}
+
+function runDistanceMetricsAnalysis() {
+    if (!currentData || currentData.length === 0) {
+        console.error('No data available for distance metrics analysis');
+        return;
+    }
+    
+    // Use the same data that was used for K-means
+    currentAnalysisData = currentData;
+    compareDistances();
+}
+
+function runEvaluationMetricsAnalysis() {
+    if (!currentData || currentData.length === 0 || !currentCentroids || currentCentroids.length === 0) {
+        console.error('No clustering results available for evaluation metrics');
+        return;
+    }
+    
+    demonstrateMetrics();
+}
+
 // Make functions globally available
 window.generateData = generateData;
 window.runKmeans = runKmeans;
@@ -690,3 +752,5 @@ window.stepKmeans = stepKmeans;
 window.resetKmeans = resetKmeans;
 window.compareDistances = compareDistances;
 window.demonstrateMetrics = demonstrateMetrics;
+window.runCompleteAnalysis = runCompleteAnalysis;
+window.resetAnalysis = resetAnalysis;
