@@ -254,7 +254,313 @@ function drawVisualization() {
 }
 
 function compareDistances() {
-    alert('Distance comparison feature - implementation would show different clustering results using various distance metrics');
+    // Get selected distance metrics
+    const euclideanChecked = document.getElementById('euclidean-distance')?.checked || false;
+    const manhattanChecked = document.getElementById('manhattan-distance')?.checked || false;
+    const cosineChecked = document.getElementById('cosine-distance')?.checked || false;
+    
+    // Generate sample data for comparison
+    const sampleData = generateComparisonData();
+    
+    // Clear previous results
+    const comparisonContainer = document.getElementById('distance-comparison');
+    if (comparisonContainer) {
+        comparisonContainer.innerHTML = '';
+    }
+    
+    // Create visualizations for each selected metric
+    if (euclideanChecked) {
+        createDistanceVisualization('Euclidean Distance', sampleData, 'euclidean');
+    }
+    if (manhattanChecked) {
+        createDistanceVisualization('Manhattan Distance', sampleData, 'manhattan');
+    }
+    if (cosineChecked) {
+        createDistanceVisualization('Cosine Distance', sampleData, 'cosine');
+    }
+    
+    // Show comparison metrics
+    showDistanceComparisonMetrics(sampleData);
+}
+
+function generateComparisonData() {
+    // Generate 2D data points for visualization
+    const data = [];
+    const numPoints = 80;
+    
+    // Create 3 clusters with slight overlap
+    for (let i = 0; i < numPoints; i++) {
+        let x, y;
+        
+        if (i < numPoints / 3) {
+            // Cluster 1: centered around (20, 20)
+            x = 20 + (Math.random() - 0.5) * 15;
+            y = 20 + (Math.random() - 0.5) * 15;
+        } else if (i < (2 * numPoints) / 3) {
+            // Cluster 2: centered around (60, 20)
+            x = 60 + (Math.random() - 0.5) * 15;
+            y = 20 + (Math.random() - 0.5) * 15;
+        } else {
+            // Cluster 3: centered around (40, 60)
+            x = 40 + (Math.random() - 0.5) * 15;
+            y = 60 + (Math.random() - 0.5) * 15;
+        }
+        
+        data.push([x, y]);
+    }
+    
+    return data;
+}
+
+function createDistanceVisualization(title, data, distanceType) {
+    const comparisonContainer = document.getElementById('distance-comparison');
+    if (!comparisonContainer) return;
+    
+    // Create visualization panel
+    const panel = document.createElement('div');
+    panel.className = 'visualization-panel';
+    panel.style.cssText = 'background: white; border-radius: 8px; padding: 1rem; border: 1px solid rgba(75, 63, 114, 0.1); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);';
+    
+    // Create title
+    const titleElement = document.createElement('h4');
+    titleElement.textContent = title;
+    titleElement.style.cssText = 'margin: 0 0 1rem 0; color: var(--aura-indigo); font-size: 1.1rem; font-weight: 600; text-align: center; border-bottom: 2px solid var(--alpine-oat); padding-bottom: 0.5rem;';
+    
+    // Create SVG
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '300');
+    svg.setAttribute('height', '250');
+    svg.setAttribute('viewBox', '0 0 80 80');
+    svg.style.cssText = 'border: 1px solid #ddd; border-radius: 4px;';
+    
+    // Perform clustering with the specified distance metric
+    const clusters = performClustering(data, distanceType);
+    
+    // Draw the visualization
+    drawClusteringVisualization(svg, data, clusters, distanceType);
+    
+    // Create metrics display
+    const metricsDiv = document.createElement('div');
+    metricsDiv.style.cssText = 'margin-top: 1rem; font-size: 0.9rem;';
+    
+    const silhouette = calculateSilhouetteScore(data, clusters, distanceType);
+    const wcss = calculateWCSS(data, clusters, distanceType);
+    
+    metricsDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span><strong>Silhouette:</strong></span>
+            <span>${silhouette.toFixed(3)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span><strong>WCSS:</strong></span>
+            <span>${wcss.toFixed(1)}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span><strong>Clusters:</strong></span>
+            <span>${clusters.length}</span>
+        </div>
+    `;
+    
+    panel.appendChild(titleElement);
+    panel.appendChild(svg);
+    panel.appendChild(metricsDiv);
+    comparisonContainer.appendChild(panel);
+}
+
+function performClustering(data, distanceType) {
+    // Simple k-means clustering with specified distance metric
+    const k = 3;
+    const maxIterations = 10;
+    
+    // Initialize centroids randomly
+    let centroids = [];
+    for (let i = 0; i < k; i++) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        centroids.push([...data[randomIndex]]);
+    }
+    
+    let assignments = new Array(data.length);
+    let prevAssignments = new Array(data.length).fill(-1);
+    
+    for (let iter = 0; iter < maxIterations; iter++) {
+        // Assign points to closest centroid
+        for (let i = 0; i < data.length; i++) {
+            let minDist = Infinity;
+            let closestCentroid = 0;
+            
+            for (let j = 0; j < centroids.length; j++) {
+                const dist = calculateDistance(data[i], centroids[j], distanceType);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestCentroid = j;
+                }
+            }
+            assignments[i] = closestCentroid;
+        }
+        
+        // Check for convergence
+        if (JSON.stringify(assignments) === JSON.stringify(prevAssignments)) {
+            break;
+        }
+        
+        // Update centroids
+        for (let j = 0; j < centroids.length; j++) {
+            const clusterPoints = data.filter((_, i) => assignments[i] === j);
+            if (clusterPoints.length > 0) {
+                centroids[j][0] = clusterPoints.reduce((sum, p) => sum + p[0], 0) / clusterPoints.length;
+                centroids[j][1] = clusterPoints.reduce((sum, p) => sum + p[1], 0) / clusterPoints.length;
+            }
+        }
+        
+        prevAssignments = [...assignments];
+    }
+    
+    // Group points by cluster
+    const clusters = [];
+    for (let j = 0; j < k; j++) {
+        clusters[j] = data.filter((_, i) => assignments[i] === j);
+    }
+    
+    return clusters;
+}
+
+function calculateDistance(point1, point2, distanceType) {
+    const [x1, y1] = point1;
+    const [x2, y2] = point2;
+    
+    switch (distanceType) {
+        case 'manhattan':
+            return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+        case 'cosine':
+            const dot = x1 * x2 + y1 * y2;
+            const mag1 = Math.sqrt(x1 * x1 + y1 * y1);
+            const mag2 = Math.sqrt(x2 * x2 + y2 * y2);
+            return 1 - (dot / (mag1 * mag2));
+        case 'euclidean':
+        default:
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    }
+}
+
+function drawClusteringVisualization(svg, data, clusters, distanceType) {
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+    
+    // Draw data points
+    data.forEach((point, index) => {
+        // Find which cluster this point belongs to
+        let clusterIndex = -1;
+        for (let i = 0; i < clusters.length; i++) {
+            if (clusters[i].some(p => p[0] === point[0] && p[1] === point[1])) {
+                clusterIndex = i;
+                break;
+            }
+        }
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', point[0]);
+        circle.setAttribute('cy', point[1]);
+        circle.setAttribute('r', '0.8');
+        circle.setAttribute('fill', clusterIndex >= 0 ? colors[clusterIndex % colors.length] : '#999');
+        circle.setAttribute('opacity', '0.7');
+        svg.appendChild(circle);
+    });
+    
+    // Draw centroids
+    clusters.forEach((cluster, index) => {
+        if (cluster.length > 0) {
+            const centroid = [
+                cluster.reduce((sum, p) => sum + p[0], 0) / cluster.length,
+                cluster.reduce((sum, p) => sum + p[1], 0) / cluster.length
+            ];
+            
+            const centroidCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            centroidCircle.setAttribute('cx', centroid[0]);
+            centroidCircle.setAttribute('cy', centroid[1]);
+            centroidCircle.setAttribute('r', '2');
+            centroidCircle.setAttribute('fill', colors[index % colors.length]);
+            centroidCircle.setAttribute('stroke', '#333');
+            centroidCircle.setAttribute('stroke-width', '0.5');
+            svg.appendChild(centroidCircle);
+        }
+    });
+}
+
+function calculateSilhouetteScore(data, clusters, distanceType) {
+    // Simplified silhouette score calculation
+    let totalScore = 0;
+    let validPoints = 0;
+    
+    data.forEach(point => {
+        let minIntraDist = Infinity;
+        let minInterDist = Infinity;
+        let currentCluster = -1;
+        
+        // Find current cluster
+        for (let i = 0; i < clusters.length; i++) {
+            if (clusters[i].some(p => p[0] === point[0] && p[1] === point[1])) {
+                currentCluster = i;
+                break;
+            }
+        }
+        
+        if (currentCluster === -1) return;
+        
+        // Calculate intra-cluster distance (average distance to points in same cluster)
+        let intraSum = 0;
+        let intraCount = 0;
+        clusters[currentCluster].forEach(otherPoint => {
+            if (otherPoint[0] !== point[0] || otherPoint[1] !== point[1]) {
+                intraSum += calculateDistance(point, otherPoint, distanceType);
+                intraCount++;
+            }
+        });
+        minIntraDist = intraCount > 0 ? intraSum / intraCount : 0;
+        
+        // Calculate inter-cluster distance (minimum average distance to other clusters)
+        for (let i = 0; i < clusters.length; i++) {
+            if (i !== currentCluster) {
+                let interSum = 0;
+                clusters[i].forEach(otherPoint => {
+                    interSum += calculateDistance(point, otherPoint, distanceType);
+                });
+                const avgInterDist = clusters[i].length > 0 ? interSum / clusters[i].length : 0;
+                minInterDist = Math.min(minInterDist, avgInterDist);
+            }
+        }
+        
+        if (minInterDist > 0) {
+            const silhouette = (minInterDist - minIntraDist) / Math.max(minIntraDist, minInterDist);
+            totalScore += silhouette;
+            validPoints++;
+        }
+    });
+    
+    return validPoints > 0 ? totalScore / validPoints : 0;
+}
+
+function calculateWCSS(data, clusters, distanceType) {
+    let totalWCSS = 0;
+    
+    clusters.forEach(cluster => {
+        if (cluster.length > 0) {
+            const centroid = [
+                cluster.reduce((sum, p) => sum + p[0], 0) / cluster.length,
+                cluster.reduce((sum, p) => sum + p[1], 0) / cluster.length
+            ];
+            
+            cluster.forEach(point => {
+                const dist = calculateDistance(point, centroid, distanceType);
+                totalWCSS += dist * dist;
+            });
+        }
+    });
+    
+    return totalWCSS;
+}
+
+function showDistanceComparisonMetrics(data) {
+    // This could be expanded to show more detailed comparison metrics
+    console.log('Distance comparison completed for', data.length, 'data points');
 }
 
 function demonstrateMetrics() {
