@@ -517,8 +517,21 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     // Perform hierarchical clustering to get proper dendrogram structure
     const dendrogram = performHierarchicalClustering(dataPoints);
     
+    // Check if dendrogram was created successfully
+    if (!dendrogram) {
+        console.error('Failed to create dendrogram structure');
+        return;
+    }
+    
     // Calculate leaf positions
     const leaves = getDendrogramLeaves(dendrogram);
+    
+    // Check if leaves were extracted successfully
+    if (!leaves || !Array.isArray(leaves) || leaves.length === 0) {
+        console.error('Failed to extract leaves from dendrogram:', dendrogram);
+        return;
+    }
+    
     const leafPositions = {};
     const leafPositionsArray = []; // For compatibility with highlightClustersAtCut
     leaves.forEach((leaf, index) => {
@@ -607,6 +620,11 @@ function generateSampleDataForDendrogram(numPoints, numClusters) {
 
 // Perform hierarchical clustering
 function performHierarchicalClustering(points) {
+    if (!points || !Array.isArray(points) || points.length === 0) {
+        console.error('Invalid points array:', points);
+        return null;
+    }
+    
     const n = points.length;
     const distances = [];
     
@@ -661,6 +679,11 @@ function performHierarchicalClustering(points) {
         clusters.splice(Math.max(minI, minJ), 1);
         clusters.splice(Math.min(minI, minJ), 1);
         clusters.push(newCluster);
+    }
+    
+    if (clusters.length !== 1) {
+        console.error('Hierarchical clustering failed - expected 1 final cluster, got:', clusters.length);
+        return null;
     }
     
     return clusters[0];
