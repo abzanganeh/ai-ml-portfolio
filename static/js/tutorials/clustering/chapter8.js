@@ -735,6 +735,8 @@ document.addEventListener('DOMContentLoaded', function() {
         dendroThresholdSlider.addEventListener('input', function() {
             const display = document.getElementById('dendro-threshold-display');
             if (display) display.textContent = this.value;
+            // Regenerate dendrogram with new threshold
+            generateDendrogramDemo();
         });
     }
 });

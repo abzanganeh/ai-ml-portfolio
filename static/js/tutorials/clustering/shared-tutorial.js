@@ -562,8 +562,13 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     });
     
     // Draw cut line if specified
-    if (cutHeight !== null) {
-        const cutY = height - margin.bottom - 20 - (cutHeight / 100) * branchHeight;
+    if (cutHeight !== null && cutHeight > 0) {
+        // Convert cutHeight (0-100) to actual dendrogram height position
+        // Higher cutHeight values should cut higher up the dendrogram
+        const maxCutY = height - margin.bottom - 20 - branchHeight;
+        const minCutY = height - margin.bottom - 20;
+        const cutY = minCutY - (cutHeight / 100) * branchHeight;
+        
         const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         cutLine.setAttribute('x1', margin.left);
         cutLine.setAttribute('y1', cutY);
@@ -583,6 +588,9 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
         cutLabel.setAttribute('font-weight', 'bold');
         cutLabel.textContent = `Cut: ${cutHeight.toFixed(1)}`;
         svg.appendChild(cutLabel);
+        
+        // Highlight clusters that would be cut at this height
+        highlightClustersAtCut(svg, leafPositions, cutY, numClusters, margin, height);
     }
     
     // Add height axis label
@@ -595,6 +603,44 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     heightLabel.setAttribute('transform', `rotate(-90, 15, ${height / 2})`);
     heightLabel.textContent = 'Height';
     svg.appendChild(heightLabel);
+}
+
+// Helper function to highlight clusters at cut height
+function highlightClustersAtCut(svg, leafPositions, cutY, numClusters, margin, height) {
+    // Determine which clusters would be formed at this cut height
+    const clusterGroups = [];
+    
+    // Simple logic: group leaves based on cut height
+    if (cutY > height - margin.bottom - 20 - 30) {
+        // High cut - many clusters
+        clusterGroups = [[0], [1], [2], [3], [4], [5], [6], [7]];
+    } else if (cutY > height - margin.bottom - 20 - 60) {
+        // Medium cut - some clusters
+        clusterGroups = [[0, 1], [2, 3], [4, 5], [6, 7]];
+    } else {
+        // Low cut - few clusters
+        clusterGroups = [[0, 1, 2, 3], [4, 5, 6, 7]];
+    }
+    
+    // Highlight cluster groups with colored backgrounds
+    clusterGroups.forEach((group, groupIndex) => {
+        if (group.length > 1) {
+            const leftX = leafPositions[group[0]];
+            const rightX = leafPositions[group[group.length - 1]];
+            const clusterWidth = rightX - leftX;
+            
+            // Add subtle background highlight
+            const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            highlight.setAttribute('x', leftX - 5);
+            highlight.setAttribute('y', height - margin.bottom - 25);
+            highlight.setAttribute('width', clusterWidth + 10);
+            highlight.setAttribute('height', 15);
+            highlight.setAttribute('fill', `rgba(52, 152, 219, 0.1)`);
+            highlight.setAttribute('stroke', `rgba(52, 152, 219, 0.3)`);
+            highlight.setAttribute('stroke-width', '1');
+            svg.appendChild(highlight);
+        }
+    });
 }
 
 // Export functions for potential use in other files
