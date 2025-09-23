@@ -271,6 +271,13 @@ function drawKMeansVisualization() {
 
 function drawConvergencePlot() {
     const svg = document.getElementById('convergencePlot');
+    if (!svg) {
+        console.error('Element convergencePlot not found');
+        return;
+    }
+    
+    // Show the convergence plot container
+    svg.style.display = 'block';
     svg.innerHTML = '';
     
     if (kmeansHistory.length === 0) return;
