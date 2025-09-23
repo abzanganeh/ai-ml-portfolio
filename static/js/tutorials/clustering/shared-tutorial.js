@@ -158,17 +158,27 @@ function navigateSubSection(direction) {
 }
 
 function scrollToContentStart() {
-    // Find the Learning Objectives section and scroll to just after it
-    const learningObjectives = document.querySelector('.learning-objectives-box');
-    if (learningObjectives) {
-        const rect = learningObjectives.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const targetPosition = scrollTop + rect.bottom + 20; // 20px margin after Learning Objectives
-        
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-        });
+    // Find the currently active content section and scroll to its title
+    const activeSection = document.querySelector('.content-section.active');
+    if (activeSection) {
+        // Find the h2 title within the active section
+        const sectionTitle = activeSection.querySelector('h2');
+        if (sectionTitle) {
+            const rect = sectionTitle.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const targetPosition = scrollTop + rect.top - 80; // 80px margin above the title
+            
+            window.scrollTo({
+                top: Math.max(0, targetPosition), // Ensure we don't scroll above the page
+                behavior: 'smooth'
+            });
+        } else {
+            // Fallback: scroll to the section itself
+            activeSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
     } else {
         // Fallback: scroll to the first content section
         const firstContentSection = document.querySelector('.content-section');
