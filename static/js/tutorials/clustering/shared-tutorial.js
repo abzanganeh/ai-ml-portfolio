@@ -509,27 +509,34 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     title.textContent = 'Dendrogram';
     svg.appendChild(title);
     
-    // Generate simple dendrogram structure
-    const clusterCount = parseInt(numClusters) || 3;
-    const numLeaves = Math.max(clusterCount * 2, 6); // Simple number of leaves
+    // Generate data points for dendrogram
+    const dataPoints = generateChapter10Dataset();
     
-    // Create leaf positions
-    const leafPositions = {};
-    const leafPositionsArray = [];
-    const leafSpacing = (width - margin.left - margin.right) / (numLeaves - 1);
+    // Generate proper dendrogram structure using Chapter 10's algorithm
+    const dendrogram = generateChapter10Dendrogram(dataPoints);
     
-    for (let i = 0; i < numLeaves; i++) {
-        const x = margin.left + i * leafSpacing;
-        leafPositions[`P${i + 1}`] = x;
-        leafPositionsArray[i] = x;
+    if (!dendrogram) {
+        console.error('Failed to generate dendrogram');
+        return;
     }
     
-    // Draw simple hierarchical dendrogram structure
-    drawSimpleDendrogram(svg, leafPositions, leafPositionsArray, numLeaves, clusterCount, margin, height);
+    // Calculate leaf positions
+    const leaves = getChapter10Leaves(dendrogram);
+    const leafPositions = {};
+    const leafPositionsArray = [];
+    
+    leaves.forEach((leaf, index) => {
+        const x = margin.left + (index * (width - margin.left - margin.right)) / (leaves.length - 1);
+        leafPositions[leaf] = x;
+        leafPositionsArray[index] = x;
+    });
+    
+    // Draw the proper dendrogram using Chapter 10's drawing function
+    drawChapter10DendrogramNode(dendrogram, svg, leafPositions, height - margin.bottom, 0);
     
     // Draw cut line if specified
     if (cutHeight !== null && cutHeight > 0) {
-        const maxHeight = 200; // Fixed max height for simple dendrogram
+        const maxHeight = Math.max(...getChapter10AllHeights(dendrogram));
         const cutY = height - margin.bottom - (cutHeight / 100) * maxHeight;
         
         const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -569,6 +576,189 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
 }
 
 // Helper functions for proper hierarchical dendrogram
+
+// Chapter 10 dendrogram functions (working implementation)
+function generateChapter10Dataset() {
+    const points = [];
+    const numPoints = 15;
+    const numClusters = 3;
+    const pointsPerCluster = Math.floor(numPoints / numClusters);
+    
+    const centers = [
+        { x: 2, y: 2 },
+        { x: 6, y: 3 },
+        { x: 4, y: 6 }
+    ];
+    
+    for (let i = 0; i < numClusters; i++) {
+        for (let j = 0; j < pointsPerCluster; j++) {
+            const x = centers[i].x + (Math.random() - 0.5) * 2;
+            const y = centers[i].y + (Math.random() - 0.5) * 2;
+            points.push({ x, y, cluster: i });
+        }
+    }
+    
+    return points;
+}
+
+function generateChapter10Dendrogram(points) {
+    const n = points.length;
+    const distances = [];
+    
+    // Calculate distance matrix
+    for (let i = 0; i < n; i++) {
+        distances[i] = [];
+        for (let j = 0; j < n; j++) {
+            if (i === j) {
+                distances[i][j] = 0;
+            } else {
+                distances[i][j] = calculateChapter10Distance(points[i], points[j]);
+            }
+        }
+    }
+    
+    // Simple hierarchical clustering
+    const clusters = points.map((point, index) => ({ points: [index], height: 0 }));
+    
+    while (clusters.length > 1) {
+        let minDist = Infinity;
+        let mergeI = 0, mergeJ = 1;
+        
+        // Find closest clusters
+        for (let i = 0; i < clusters.length; i++) {
+            for (let j = i + 1; j < clusters.length; j++) {
+                const dist = calculateChapter10ClusterDistance(clusters[i], clusters[j], distances);
+                if (dist < minDist) {
+                    minDist = dist;
+                    mergeI = i;
+                    mergeJ = j;
+                }
+            }
+        }
+        
+        // Merge clusters
+        const newCluster = {
+            points: [...clusters[mergeI].points, ...clusters[mergeJ].points],
+            height: minDist,
+            left: clusters[mergeI],
+            right: clusters[mergeJ]
+        };
+        
+        // Remove merged clusters and add new one
+        clusters.splice(Math.max(mergeI, mergeJ), 1);
+        clusters.splice(Math.min(mergeI, mergeJ), 1);
+        clusters.push(newCluster);
+    }
+    
+    return clusters[0];
+}
+
+function calculateChapter10Distance(point1, point2) {
+    const dx = point1.x - point2.x;
+    const dy = point1.y - point2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function calculateChapter10ClusterDistance(cluster1, cluster2, distances) {
+    let totalDist = 0;
+    let count = 0;
+    
+    for (const point1 of cluster1.points) {
+        for (const point2 of cluster2.points) {
+            totalDist += distances[point1][point2];
+            count++;
+        }
+    }
+    
+    return count > 0 ? totalDist / count : 0;
+}
+
+function getChapter10Leaves(node) {
+    if (!node.left && !node.right) {
+        return node.points;
+    }
+    
+    const leftLeaves = node.left ? getChapter10Leaves(node.left) : [];
+    const rightLeaves = node.right ? getChapter10Leaves(node.right) : [];
+    return [...leftLeaves, ...rightLeaves];
+}
+
+function getChapter10AllHeights(node) {
+    if (!node.left && !node.right) {
+        return [0];
+    }
+    
+    const heights = [node.height];
+    if (node.left) heights.push(...getChapter10AllHeights(node.left));
+    if (node.right) heights.push(...getChapter10AllHeights(node.right));
+    return heights;
+}
+
+function drawChapter10DendrogramNode(node, svg, leafPositions, maxHeight, depth) {
+    if (!node.left && !node.right) {
+        // Leaf node
+        const x = leafPositions[node.points[0]];
+        const y = maxHeight;
+        
+        // Draw leaf
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 3);
+        circle.setAttribute('fill', '#4f46e5');
+        svg.appendChild(circle);
+        
+        // Draw leaf label
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', x);
+        label.setAttribute('y', y + 15);
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('fill', '#2c3e50');
+        label.setAttribute('font-size', '12');
+        label.textContent = `P${node.points[0] + 1}`;
+        svg.appendChild(label);
+        
+        return { x, y };
+    }
+    
+    // Internal node
+    const leftPos = drawChapter10DendrogramNode(node.left, svg, leafPositions, maxHeight, depth + 1);
+    const rightPos = drawChapter10DendrogramNode(node.right, svg, leafPositions, maxHeight, depth + 1);
+    
+    const x = (leftPos.x + rightPos.x) / 2;
+    const y = maxHeight - node.height * 2; // Scale height for visualization
+    
+    // Draw horizontal line
+    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    hLine.setAttribute('x1', leftPos.x);
+    hLine.setAttribute('y1', y);
+    hLine.setAttribute('x2', rightPos.x);
+    hLine.setAttribute('y2', y);
+    hLine.setAttribute('stroke', '#666');
+    hLine.setAttribute('stroke-width', 2);
+    svg.appendChild(hLine);
+    
+    // Draw vertical lines
+    const vLine1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine1.setAttribute('x1', leftPos.x);
+    vLine1.setAttribute('y1', leftPos.y);
+    vLine1.setAttribute('x2', leftPos.x);
+    vLine1.setAttribute('y2', y);
+    vLine1.setAttribute('stroke', '#666');
+    vLine1.setAttribute('stroke-width', 2);
+    svg.appendChild(vLine1);
+    
+    const vLine2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    vLine2.setAttribute('x1', rightPos.x);
+    vLine2.setAttribute('y1', rightPos.y);
+    vLine2.setAttribute('x2', rightPos.x);
+    vLine2.setAttribute('y2', y);
+    vLine2.setAttribute('stroke', '#666');
+    vLine2.setAttribute('stroke-width', 2);
+    svg.appendChild(vLine2);
+    
+    return { x, y };
+}
 
 // Draw simple hierarchical dendrogram structure
 function drawSimpleDendrogram(svg, leafPositions, leafPositionsArray, numLeaves, clusterCount, margin, height) {
@@ -937,8 +1127,11 @@ window.generateSampleData = generateSampleData;
 window.assignPointsToClusters = assignPointsToClusters;
 window.drawSharedDendrogram = drawSharedDendrogram;
 window.highlightClustersAtCut = highlightClustersAtCut;
-window.drawSimpleDendrogram = drawSimpleDendrogram;
-window.createMergeLevels = createMergeLevels;
+window.generateChapter10Dataset = generateChapter10Dataset;
+window.generateChapter10Dendrogram = generateChapter10Dendrogram;
+window.drawChapter10DendrogramNode = drawChapter10DendrogramNode;
+window.getChapter10Leaves = getChapter10Leaves;
+window.getChapter10AllHeights = getChapter10AllHeights;
 
 // Export common utility functions
 window.initializeRangeSlider = initializeRangeSlider;
