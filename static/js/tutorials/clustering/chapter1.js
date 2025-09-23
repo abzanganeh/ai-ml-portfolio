@@ -507,22 +507,6 @@ function drawClusteringVisualization(svg, data, clusters, distanceType) {
     });
 }
 
-function createClustersFromAssignments(data, assignments, numClusters) {
-    const clusters = [];
-    for (let i = 0; i < numClusters; i++) {
-        clusters[i] = [];
-    }
-    
-    data.forEach((point, index) => {
-        const clusterIndex = assignments[index];
-        if (clusterIndex >= 0 && clusterIndex < numClusters) {
-            clusters[clusterIndex].push(point);
-        }
-    });
-    
-    return clusters;
-}
-
 function calculateSilhouetteScore(data, clusters, distanceType) {
     // Simplified silhouette score calculation
     let totalScore = 0;
@@ -597,10 +581,10 @@ function calculateWCSSForComparison(data, clusters, distanceType) {
     
     clusters.forEach(cluster => {
         if (cluster && cluster.length > 0) {
-            const centroid = [
-                cluster.reduce((sum, p) => sum + p[0], 0) / cluster.length,
-                cluster.reduce((sum, p) => sum + p[1], 0) / cluster.length
-            ];
+            const centroid = {
+                x: cluster.reduce((sum, p) => sum + (p.x !== undefined ? p.x : p[0]), 0) / cluster.length,
+                y: cluster.reduce((sum, p) => sum + (p.y !== undefined ? p.y : p[1]), 0) / cluster.length
+            };
             
             cluster.forEach(point => {
                 const dist = calculateDistance(point, centroid, distanceType);
@@ -622,29 +606,26 @@ function showDistanceComparisonMetrics(data) {
     const cosineChecked = document.getElementById('cosine')?.checked || false;
     
     if (euclideanChecked) {
-        const result = performClustering(data, 3, 'euclidean');
-        const clusters = createClustersFromAssignments(data, result.assignments, 3);
+        const clusters = performClustering(data, 'euclidean');
         metrics.euclidean = {
             silhouette: calculateSilhouetteScore(data, clusters, 'euclidean'),
-            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'euclidean')
+            wcss: calculateWCSSForComparison(data, clusters, 'euclidean')
         };
     }
     
     if (manhattanChecked) {
-        const result = performClustering(data, 3, 'manhattan');
-        const clusters = createClustersFromAssignments(data, result.assignments, 3);
+        const clusters = performClustering(data, 'manhattan');
         metrics.manhattan = {
             silhouette: calculateSilhouetteScore(data, clusters, 'manhattan'),
-            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'manhattan')
+            wcss: calculateWCSSForComparison(data, clusters, 'manhattan')
         };
     }
     
     if (cosineChecked) {
-        const result = performClustering(data, 3, 'cosine');
-        const clusters = createClustersFromAssignments(data, result.assignments, 3);
+        const clusters = performClustering(data, 'cosine');
         metrics.cosine = {
             silhouette: calculateSilhouetteScore(data, clusters, 'cosine'),
-            wcss: calculateWCSSForComparison(data, result.assignments, result.centroids, 'cosine')
+            wcss: calculateWCSSForComparison(data, clusters, 'cosine')
         };
     }
     
