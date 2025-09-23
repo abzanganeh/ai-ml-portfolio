@@ -8,40 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize all Chapter 7 demos
 function initializeChapter7Demos() {
     // Initialize range sliders
-    initializeRangeSliders();
+    initializeChapter7Sliders();
     
     // Initialize demo controls
     initializeDemoControls();
 }
 
-// Initialize range sliders with display updates
-function initializeRangeSliders() {
-    // Elbow demo slider
-    const elbowMaxK = document.getElementById('elbow-max-k');
-    const elbowMaxKDisplay = document.getElementById('elbow-max-k-display');
-    if (elbowMaxK && elbowMaxKDisplay) {
-        elbowMaxK.addEventListener('input', function() {
-            elbowMaxKDisplay.textContent = this.value;
-        });
-    }
-    
-    // Silhouette demo slider
-    const silhouetteK = document.getElementById('silhouette-k');
-    const silhouetteKDisplay = document.getElementById('silhouette-k-display');
-    if (silhouetteK && silhouetteKDisplay) {
-        silhouetteK.addEventListener('input', function() {
-            silhouetteKDisplay.textContent = this.value;
-        });
-    }
-    
-    // K-means demo slider
-    const demoClusters = document.getElementById('demo-clusters');
-    const demoClustersDisplay = document.getElementById('demo-clusters-display');
-    if (demoClusters && demoClustersDisplay) {
-        demoClusters.addEventListener('input', function() {
-            demoClustersDisplay.textContent = this.value;
-        });
-    }
+// Initialize range sliders using shared function
+function initializeChapter7Sliders() {
+    initializeRangeSliders([
+        { sliderId: 'elbow-max-k', displayId: 'elbow-max-k-display' },
+        { sliderId: 'silhouette-k', displayId: 'silhouette-k-display' },
+        { sliderId: 'demo-clusters', displayId: 'demo-clusters-display' }
+    ]);
 }
 
 // Initialize demo controls
@@ -71,6 +50,9 @@ function generateElbowDemo() {
 }
 
 function resetElbowDemo() {
+    resetDemo(['elbow-plot', 'elbow-clusters']);
+    
+    // Add custom placeholder text
     const elbowPlot = document.getElementById('elbow-plot');
     const elbowClusters = document.getElementById('elbow-clusters');
     
@@ -292,6 +274,9 @@ function generateSilhouetteDemo() {
 }
 
 function resetSilhouetteDemo() {
+    resetDemo(['silhouette-plot', 'silhouette-clusters'], ['avg-silhouette', 'best-cluster', 'worst-cluster']);
+    
+    // Add custom placeholder text
     const silhouettePlot = document.getElementById('silhouette-plot');
     const silhouetteClusters = document.getElementById('silhouette-clusters');
     
@@ -302,11 +287,6 @@ function resetSilhouetteDemo() {
     if (silhouetteClusters) {
         silhouetteClusters.innerHTML = '<text x="200" y="150" text-anchor="middle" fill="#666">Clustering visualization will appear here</text>';
     }
-    
-    // Reset metrics
-    document.getElementById('avg-silhouette').textContent = '-';
-    document.getElementById('best-cluster').textContent = '-';
-    document.getElementById('worst-cluster').textContent = '-';
 }
 
 function generateSilhouetteData(datasetType, k) {
