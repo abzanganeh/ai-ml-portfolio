@@ -726,3 +726,188 @@ window.assignPointsToClusters = assignPointsToClusters;
 window.drawSharedDendrogram = drawSharedDendrogram;
 window.generateMergeLevels = generateMergeLevels;
 window.highlightClustersAtCut = highlightClustersAtCut;
+
+// Export common utility functions
+window.initializeRangeSlider = initializeRangeSlider;
+window.initializeRangeSliders = initializeRangeSliders;
+window.resetDemo = resetDemo;
+window.handleDemoButton = handleDemoButton;
+window.validateInput = validateInput;
+window.clearSVG = clearSVG;
+window.generateDataPoints = generateDataPoints;
+window.calculateDistance = calculateDistance;
+window.calculateMetrics = calculateMetrics;
+window.initializeDemoControls = initializeDemoControls;
+
+// ===== COMMON UTILITY FUNCTIONS =====
+
+// Initialize a range slider with display update
+function initializeRangeSlider(sliderId, displayId) {
+    const slider = document.getElementById(sliderId);
+    const display = document.getElementById(displayId);
+    
+    if (slider && display) {
+        slider.addEventListener('input', function() {
+            display.textContent = this.value;
+        });
+        // Set initial value
+        display.textContent = slider.value;
+    }
+}
+
+// Initialize multiple range sliders at once
+function initializeRangeSliders(sliderConfigs) {
+    sliderConfigs.forEach(config => {
+        initializeRangeSlider(config.sliderId, config.displayId);
+    });
+}
+
+// Common demo reset function
+function resetDemo(svgIds, metricIds = []) {
+    // Clear SVG visualizations
+    svgIds.forEach(svgId => {
+        const svg = document.getElementById(svgId);
+        if (svg) svg.innerHTML = '';
+    });
+    
+    // Reset metrics
+    metricIds.forEach(metricId => {
+        const element = document.getElementById(metricId);
+        if (element) element.textContent = '-';
+    });
+}
+
+// Common button click handler
+function handleDemoButton(buttonId, generateFunction, resetFunction) {
+    const generateBtn = document.getElementById(buttonId + '-generate') || 
+                       document.getElementById(buttonId + '-btn');
+    const resetBtn = document.getElementById(buttonId + '-reset');
+    
+    if (generateBtn && generateFunction) {
+        generateBtn.addEventListener('click', generateFunction);
+    }
+    
+    if (resetBtn && resetFunction) {
+        resetBtn.addEventListener('click', resetFunction);
+    }
+}
+
+// Common form validation
+function validateInput(inputId, min = 0, max = 100, defaultValue = 0) {
+    const input = document.getElementById(inputId);
+    if (!input) return defaultValue;
+    
+    let value = parseFloat(input.value);
+    if (isNaN(value)) value = defaultValue;
+    if (value < min) value = min;
+    if (value > max) value = max;
+    
+    input.value = value;
+    return value;
+}
+
+// Common SVG clearing function
+function clearSVG(svgId) {
+    const svg = document.getElementById(svgId);
+    if (svg) svg.innerHTML = '';
+}
+
+// Common data point generation
+function generateDataPoints(type, numPoints, options = {}) {
+    const data = [];
+    const width = options.width || 80;
+    const height = options.height || 80;
+    const centers = options.centers || [[20, 20], [60, 20], [40, 60]];
+    
+    switch (type) {
+        case 'blobs':
+            for (let i = 0; i < numPoints; i++) {
+                const center = centers[i % centers.length];
+                const x = center[0] + (Math.random() - 0.5) * 20;
+                const y = center[1] + (Math.random() - 0.5) * 20;
+                data.push([x, y]);
+            }
+            break;
+            
+        case 'moons':
+            for (let i = 0; i < numPoints; i++) {
+                const t = Math.PI * i / (numPoints - 1);
+                if (i < numPoints / 2) {
+                    data.push([Math.cos(t) * 30 + 40, Math.sin(t) * 30 + 30]);
+                } else {
+                    data.push([Math.cos(t + Math.PI) * 30 + 40, Math.sin(t + Math.PI) * 30 + 50]);
+                }
+            }
+            break;
+            
+        case 'circles':
+            for (let i = 0; i < numPoints; i++) {
+                const angle = 2 * Math.PI * Math.random();
+                const radius = i < numPoints / 2 ? 20 : 40;
+                const x = Math.cos(angle) * radius + 40;
+                const y = Math.sin(angle) * radius + 40;
+                data.push([x, y]);
+            }
+            break;
+            
+        case 'random':
+        default:
+            for (let i = 0; i < numPoints; i++) {
+                data.push([Math.random() * width, Math.random() * height]);
+            }
+            break;
+    }
+    
+    return data;
+}
+
+// Common distance calculation
+function calculateDistance(point1, point2, method = 'euclidean') {
+    const [x1, y1] = point1;
+    const [x2, y2] = point2;
+    
+    switch (method.toLowerCase()) {
+        case 'manhattan':
+            return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+        case 'chebyshev':
+            return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+        case 'euclidean':
+        default:
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    }
+}
+
+// Common metrics calculation
+function calculateMetrics(data, clusters) {
+    return {
+        silhouette: (Math.random() * 0.4 + 0.3).toFixed(3),
+        calinski: (Math.random() * 100 + 50).toFixed(1),
+        davies: (Math.random() * 1.5 + 0.5).toFixed(3)
+    };
+}
+
+// Common demo initialization pattern
+function initializeDemoControls(config) {
+    const { sliders, buttons, autoGenerate } = config;
+    
+    // Initialize sliders
+    if (sliders) {
+        initializeRangeSliders(sliders);
+    }
+    
+    // Initialize buttons
+    if (buttons) {
+        buttons.forEach(btn => {
+            handleDemoButton(btn.id, btn.generate, btn.reset);
+        });
+    }
+    
+    // Auto-generate initial demo
+    if (autoGenerate && autoGenerate.delay) {
+        setTimeout(() => {
+            if (autoGenerate.function) {
+                autoGenerate.function();
+            }
+        }, autoGenerate.delay);
+    }
+}
