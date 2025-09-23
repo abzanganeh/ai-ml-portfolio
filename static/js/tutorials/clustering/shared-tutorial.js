@@ -495,8 +495,8 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
     svg.innerHTML = '';
     
     const width = 700;
-    const height = 500;
-    const margin = { top: 60, right: 40, bottom: 100, left: 120 };
+    const height = 600;
+    const margin = { top: 50, right: 20, bottom: 80, left: 60 };
     
     // Add title
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
