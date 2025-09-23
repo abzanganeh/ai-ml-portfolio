@@ -204,7 +204,7 @@ function runKmeansDemo() {
     
     const runStep = () => {
         if (currentIteration < maxIter && isRunning) {
-            stepKMeansDemo();
+            stepKmeansDemo();
             setTimeout(runStep, 500);
         } else {
             isRunning = false;
@@ -226,7 +226,11 @@ function resetKMeansDemo() {
 }
 
 function drawKMeansVisualization() {
-    const svg = document.getElementById('kmeansVisualization');
+    const svg = document.getElementById('kmeans-demo-canvas');
+    if (!svg) {
+        console.error('Element kmeans-demo-canvas not found');
+        return;
+    }
     svg.innerHTML = '';
     
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
