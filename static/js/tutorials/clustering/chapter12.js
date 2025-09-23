@@ -366,6 +366,9 @@ function generateGMMData(dataset, components) {
     return { points: points, gaussians: gaussians };
 }
 
+// Global variable to store fixed data points for EM demo
+let emDemoData = null;
+
 // Create EM Algorithm Visualization
 function createEMVisualization(iteration, loglikelihood) {
     const container = document.getElementById('em-demo-canvas');
@@ -385,27 +388,30 @@ function createEMVisualization(iteration, loglikelihood) {
     svg.style.background = '#f9f9f9';
     svg.style.borderRadius = '8px';
     
-    // Generate sample data points for EM visualization
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'];
-    const numPoints = 60;
+    // Generate fixed data points only once (on first call or reset)
+    if (!emDemoData) {
+        emDemoData = generateFixedEMData();
+    }
     
-    // Create data points with evolving cluster assignments
-    for (let i = 0; i < numPoints; i++) {
-        const x = 50 + Math.random() * 300;
-        const y = 50 + Math.random() * 200;
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4'];
+    
+    // Draw the same data points with evolving cluster assignments
+    emDemoData.forEach((point, i) => {
+        // Simulate EM convergence - cluster assignments become clearer over iterations
+        const clusterId = point.trueCluster;
         
-        // Simulate EM convergence - points become more clearly assigned over iterations
-        const clusterId = Math.floor(Math.random() * 3);
+        // Simulate uncertainty reduction as EM converges
+        const uncertainty = Math.max(0.1, 0.8 - (iteration * 0.05));
         const opacity = Math.min(0.3 + (iteration * 0.05), 0.9);
         
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', x);
-        circle.setAttribute('cy', y);
+        circle.setAttribute('cx', point.x);
+        circle.setAttribute('cy', point.y);
         circle.setAttribute('r', '4');
         circle.setAttribute('fill', colors[clusterId]);
         circle.setAttribute('opacity', opacity);
         svg.appendChild(circle);
-    }
+    });
     
     // Draw cluster centers that move during EM iterations
     const centerPositions = [
