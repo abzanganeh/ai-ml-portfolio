@@ -206,17 +206,46 @@ function drawMinkowskiVisualization(x1, y1, x2, y2, p, minkowski) {
 
 // ===== MINKOWSKI CLUSTERING DEMO FUNCTIONS =====
 
+function generateMinkowskiSampleData(numClusters) {
+    const data = [];
+    const pointsPerCluster = 20;
+    
+    // Define cluster centers
+    const centers = [
+        { x: 80, y: 80 },
+        { x: 200, y: 100 },
+        { x: 320, y: 200 },
+        { x: 150, y: 250 },
+        { x: 280, y: 150 },
+        { x: 100, y: 200 }
+    ];
+    
+    for (let clusterId = 0; clusterId < numClusters; clusterId++) {
+        const center = centers[clusterId];
+        
+        for (let i = 0; i < pointsPerCluster; i++) {
+            // Add some randomness around the center
+            const x = center.x + (Math.random() - 0.5) * 60;
+            const y = center.y + (Math.random() - 0.5) * 60;
+            
+            data.push({ x, y, cluster: clusterId });
+        }
+    }
+    
+    return data;
+}
+
 function runMinkowskiClustering() {
     console.log('Running Minkowski clustering demo...');
     const pSelect = document.getElementById('clustering-p');
     const pValue = pSelect.value === 'infinity' ? Infinity : parseFloat(pSelect.value);
-    const clusters = parseInt(document.getElementById('cluster-count').value);
+    const numClusters = parseInt(document.getElementById('cluster-count').value);
     
-    // Generate sample data
-    const data = generateSampleData(clusters);
+    // Generate sample data with proper structure
+    const data = generateMinkowskiSampleData(numClusters);
     
     // Run clustering with selected p-value
-    const results = performMinkowskiClustering(data, clusters, pValue);
+    const results = performMinkowskiClustering(data, numClusters, pValue);
     
     // Visualize results
     visualizeMinkowskiClustering(results, pValue);
@@ -224,49 +253,69 @@ function runMinkowskiClustering() {
 
 
 function performMinkowskiClustering(data, k, p) {
-    // Simple K-means implementation with Minkowski distance
-    const centroids = initializeCentroids(data, k);
-    let clusters = assignPointsToClustersMinkowski(data, centroids, p);
+    // Initialize centroids randomly from data points
+    const centroids = [];
+    for (let i = 0; i < k; i++) {
+        const randomIndex = Math.floor(Math.random() * data.length);
+        centroids.push({ x: data[randomIndex].x, y: data[randomIndex].y });
+    }
+    
+    let assignments = new Array(data.length).fill(-1);
+    let prevAssignments = new Array(data.length).fill(-1);
     
     // Iterate until convergence
     for (let iter = 0; iter < 15; iter++) {
-        const newCentroids = updateCentroids(clusters);
-        const newClusters = assignPointsToClustersMinkowski(data, newCentroids, p);
+        // Assign points to closest centroid
+        for (let i = 0; i < data.length; i++) {
+            let minDistance = Infinity;
+            let closestCentroid = 0;
+            
+            for (let j = 0; j < centroids.length; j++) {
+                const distance = calculateMinkowskiDistanceBetweenPoints(data[i], centroids[j], p);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestCentroid = j;
+                }
+            }
+            assignments[i] = closestCentroid;
+        }
         
-        if (hasConverged(clusters, newClusters)) {
+        // Check for convergence
+        if (JSON.stringify(assignments) === JSON.stringify(prevAssignments)) {
             break;
         }
-        clusters = newClusters;
+        
+        // Update centroids
+        for (let j = 0; j < centroids.length; j++) {
+            const clusterPoints = data.filter((_, i) => assignments[i] === j);
+            if (clusterPoints.length > 0) {
+                centroids[j].x = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+                centroids[j].y = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+            }
+        }
+        
+        prevAssignments = [...assignments];
     }
     
-    return { data, clusters, centroids };
+    // Group points by cluster
+    const clusters = [];
+    for (let j = 0; j < k; j++) {
+        clusters[j] = data.filter((_, i) => assignments[i] === j);
+    }
+    
+    return { data, clusters, centroids, assignments };
 }
 
 
-function assignPointsToClustersMinkowski(data, centroids, p) {
-    return data.map(point => {
-        let minDistance = Infinity;
-        let assignedCluster = 0;
-        
-        centroids.forEach((centroid, index) => {
-            let distance;
-            if (p === Infinity) {
-                // Chebyshev distance
-                distance = Math.max(Math.abs(point.x - centroid.x), Math.abs(point.y - centroid.y));
-            } else {
-                // Minkowski distance
-                const sum = Math.pow(Math.abs(point.x - centroid.x), p) + Math.pow(Math.abs(point.y - centroid.y), p);
-                distance = Math.pow(sum, 1/p);
-            }
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                assignedCluster = index;
-            }
-        });
-        
-        return { ...point, cluster: assignedCluster };
-    });
+function calculateMinkowskiDistanceBetweenPoints(point1, point2, p) {
+    if (p === Infinity) {
+        // Chebyshev distance
+        return Math.max(Math.abs(point1.x - point2.x), Math.abs(point1.y - point2.y));
+    } else {
+        // Minkowski distance
+        const sum = Math.pow(Math.abs(point1.x - point2.x), p) + Math.pow(Math.abs(point1.y - point2.y), p);
+        return Math.pow(sum, 1/p);
+    }
 }
 
 
@@ -286,13 +335,13 @@ function visualizeMinkowskiClustering(results, p) {
     
     const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
     
-    // Draw data points
-    results.data.forEach(point => {
+    // Draw data points with correct cluster assignments
+    results.data.forEach((point, index) => {
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', point.x);
         circle.setAttribute('cy', point.y);
         circle.setAttribute('r', '4');
-        circle.setAttribute('fill', colors[point.cluster % colors.length]);
+        circle.setAttribute('fill', colors[results.assignments[index] % colors.length]);
         circle.setAttribute('opacity', '0.7');
         svg.appendChild(circle);
     });
@@ -307,6 +356,16 @@ function visualizeMinkowskiClustering(results, p) {
         centroidCircle.setAttribute('stroke', '#333');
         centroidCircle.setAttribute('stroke-width', '2');
         svg.appendChild(centroidCircle);
+        
+        // Add centroid label
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', centroid.x + 12);
+        label.setAttribute('y', centroid.y - 12);
+        label.setAttribute('font-size', '12');
+        label.setAttribute('font-weight', 'bold');
+        label.setAttribute('fill', '#333');
+        label.textContent = `C${index + 1}`;
+        svg.appendChild(label);
     });
     
     // Add title
