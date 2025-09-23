@@ -40,11 +40,13 @@ function initializeQuiz() {
 
 // Initialize demo controls
 function initializeDemoControls() {
+    // Initialize clusters slider with auto-generation
+    initializeRangeSlider('demo-clusters', 'demo-clusters-display');
+    
+    // Add auto-generation on slider change
     const clustersSlider = document.getElementById('demo-clusters');
     if (clustersSlider) {
         clustersSlider.addEventListener('input', function() {
-            const display = document.getElementById('demo-clusters-display');
-            if (display) display.textContent = this.value;
             // Auto-generate dendrogram when slider changes
             generateDendrogramDemo();
         });
@@ -634,11 +636,7 @@ function drawClusteringVisualization(svgId, datasetType, linkageMethod) {
 }
 
 function resetLinkageDemo() {
-    const datasetSvg = document.getElementById('linkage-dataset-plot');
-    const clusteringSvg = document.getElementById('linkage-clustering-plot');
-    
-    if (datasetSvg) datasetSvg.innerHTML = '';
-    if (clusteringSvg) clusteringSvg.innerHTML = '';
+    resetDemo(['linkage-dataset-plot', 'linkage-clustering-plot']);
 }
 
 function generateDendrogramDemo() {
@@ -698,11 +696,7 @@ function drawDendrogramDataVisualization(svgId, numClusters) {
 
 
 function resetDendrogramDemo() {
-    const dataSvg = document.getElementById('dendrogram-data-plot');
-    const treeSvg = document.getElementById('dendrogram-tree-plot');
-    
-    if (dataSvg) dataSvg.innerHTML = '';
-    if (treeSvg) treeSvg.innerHTML = '';
+    resetDemo(['dendrogram-data-plot', 'dendrogram-tree-plot']);
 }
 
 // Helper functions for data generation
