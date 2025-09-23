@@ -549,3 +549,204 @@ function checkQuizAnswers() {
     document.getElementById('quiz-results').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ===== ACCELERATION TECHNIQUES DEMO FUNCTIONS =====
+
+function generateAccelDemo() {
+    const datasetSize = document.getElementById('accel-dataset-size')?.value || 'medium';
+    const method = document.getElementById('accel-method')?.value || 'standard';
+    
+    // Generate performance data based on method and dataset size
+    const performanceData = generateAccelPerformanceData(datasetSize, method);
+    const qualityData = generateAccelQualityData(datasetSize, method);
+    
+    // Draw performance visualization
+    drawAccelPerformanceChart(performanceData);
+    
+    // Draw quality visualization
+    drawAccelQualityChart(qualityData);
+    
+    // Update metrics
+    updateAccelMetrics(performanceData, qualityData);
+}
+
+function resetAccelDemo() {
+    // Clear visualizations
+    const performanceSvg = document.getElementById('accel-performance');
+    const qualitySvg = document.getElementById('accel-quality');
+    
+    if (performanceSvg) performanceSvg.innerHTML = '';
+    if (qualitySvg) qualitySvg.innerHTML = '';
+    
+    // Reset metrics
+    const metrics = ['exec-time', 'memory-usage', 'iterations', 'silhouette-score', 'inertia'];
+    metrics.forEach(metricId => {
+        const element = document.getElementById(metricId);
+        if (element) element.textContent = '-';
+    });
+}
+
+function generateAccelPerformanceData(datasetSize, method) {
+    const sizeMultipliers = {
+        'small': 1,
+        'medium': 10,
+        'large': 50,
+        'xlarge': 100
+    };
+    
+    const baseTime = {
+        'standard': 100,
+        'triangle': 60,
+        'minibatch': 40,
+        'approximate': 20
+    };
+    
+    const multiplier = sizeMultipliers[datasetSize] || 10;
+    const methodTime = baseTime[method] || 100;
+    
+    return {
+        executionTime: methodTime * multiplier,
+        memoryUsage: Math.round(50 * multiplier / 10),
+        iterations: Math.round(15 - (method === 'approximate' ? 5 : 0)),
+        datasetSize: datasetSize
+    };
+}
+
+function generateAccelQualityData(datasetSize, method) {
+    const qualityScores = {
+        'standard': 0.85,
+        'triangle': 0.84,
+        'minibatch': 0.80,
+        'approximate': 0.75
+    };
+    
+    return {
+        silhouetteScore: qualityScores[method] || 0.85,
+        inertia: Math.round(1000 * (1.2 - (qualityScores[method] || 0.85))),
+        method: method
+    };
+}
+
+function drawAccelPerformanceChart(data) {
+    const svg = document.getElementById('accel-performance');
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    // Create a simple bar chart
+    const width = 400;
+    const height = 300;
+    const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+    
+    const methods = ['Standard', 'Triangle', 'Mini-batch', 'Approximate'];
+    const times = [100, 60, 40, 20].map(t => t * (data.datasetSize === 'small' ? 1 : data.datasetSize === 'medium' ? 10 : data.datasetSize === 'large' ? 50 : 100));
+    
+    const xScale = (width - margin.left - margin.right) / methods.length;
+    const yScale = (height - margin.top - margin.bottom) / Math.max(...times);
+    
+    methods.forEach((method, i) => {
+        const barHeight = times[i] * yScale;
+        const x = margin.left + i * xScale + xScale * 0.1;
+        const y = height - margin.bottom - barHeight;
+        
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', xScale * 0.8);
+        rect.setAttribute('height', barHeight);
+        rect.setAttribute('fill', i === 0 ? '#4ECDC4' : '#FF6B6B');
+        rect.setAttribute('opacity', '0.7');
+        svg.appendChild(rect);
+        
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x + xScale * 0.4);
+        text.setAttribute('y', height - margin.bottom + 15);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-size', '10px');
+        text.textContent = method;
+        svg.appendChild(text);
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 15);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('font-size', '14px');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = 'Execution Time Comparison';
+    svg.appendChild(title);
+}
+
+function drawAccelQualityChart(data) {
+    const svg = document.getElementById('accel-quality');
+    if (!svg) return;
+    
+    svg.innerHTML = '';
+    
+    const width = 400;
+    const height = 300;
+    
+    // Create a simple quality indicator
+    const score = data.silhouetteScore;
+    const radius = 80;
+    const cx = width / 2;
+    const cy = height / 2;
+    
+    // Background circle
+    const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    bgCircle.setAttribute('cx', cx);
+    bgCircle.setAttribute('cy', cy);
+    bgCircle.setAttribute('r', radius);
+    bgCircle.setAttribute('fill', 'none');
+    bgCircle.setAttribute('stroke', '#ddd');
+    bgCircle.setAttribute('stroke-width', '10');
+    svg.appendChild(bgCircle);
+    
+    // Score circle
+    const scoreCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    scoreCircle.setAttribute('cx', cx);
+    scoreCircle.setAttribute('cy', cy);
+    scoreCircle.setAttribute('r', radius);
+    scoreCircle.setAttribute('fill', 'none');
+    scoreCircle.setAttribute('stroke', score > 0.8 ? '#4ECDC4' : score > 0.7 ? '#FFEAA7' : '#FF6B6B');
+    scoreCircle.setAttribute('stroke-width', '10');
+    scoreCircle.setAttribute('stroke-dasharray', `${2 * Math.PI * radius * score} ${2 * Math.PI * radius * (1 - score)}`);
+    scoreCircle.setAttribute('stroke-dashoffset', `${2 * Math.PI * radius * 0.25}`);
+    svg.appendChild(scoreCircle);
+    
+    // Score text
+    const scoreText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    scoreText.setAttribute('x', cx);
+    scoreText.setAttribute('y', cy + 5);
+    scoreText.setAttribute('text-anchor', 'middle');
+    scoreText.setAttribute('font-size', '24px');
+    scoreText.setAttribute('font-weight', 'bold');
+    scoreText.textContent = score.toFixed(2);
+    svg.appendChild(scoreText);
+    
+    // Title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', cx);
+    title.setAttribute('y', cy + 50);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('font-size', '14px');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = 'Silhouette Score';
+    svg.appendChild(title);
+}
+
+function updateAccelMetrics(performanceData, qualityData) {
+    const metrics = {
+        'exec-time': `${performanceData.executionTime} ms`,
+        'memory-usage': `${performanceData.memoryUsage} MB`,
+        'iterations': performanceData.iterations,
+        'silhouette-score': qualityData.silhouetteScore.toFixed(3),
+        'inertia': qualityData.inertia
+    };
+    
+    Object.entries(metrics).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    });
+}
+
