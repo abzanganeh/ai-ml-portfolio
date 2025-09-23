@@ -444,8 +444,11 @@ function performClustering(data, distanceType) {
 }
 
 function calculateDistance(point1, point2, distanceType) {
-    const [x1, y1] = point1;
-    const [x2, y2] = point2;
+    // Handle both object {x, y} and array [x, y] formats
+    const x1 = point1.x !== undefined ? point1.x : point1[0];
+    const y1 = point1.y !== undefined ? point1.y : point1[1];
+    const x2 = point2.x !== undefined ? point2.x : point2[0];
+    const y2 = point2.y !== undefined ? point2.y : point2[1];
     
     switch (distanceType) {
         case 'manhattan':

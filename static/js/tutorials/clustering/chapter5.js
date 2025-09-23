@@ -235,12 +235,19 @@ function resetKMeansDemo() {
 }
 
 function drawKMeansVisualization() {
-    const svg = document.getElementById('kmeans-demo-canvas');
-    if (!svg) {
+    const container = document.getElementById('kmeans-demo-canvas');
+    if (!container) {
         console.error('Element kmeans-demo-canvas not found');
         return;
     }
-    svg.innerHTML = '';
+    container.innerHTML = '';
+    
+    // Create SVG element
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '400');
+    svg.setAttribute('height', '300');
+    svg.setAttribute('style', 'border: 1px solid #ccc; background: white;');
+    container.appendChild(svg);
     
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
     
@@ -279,15 +286,22 @@ function drawKMeansVisualization() {
 }
 
 function drawConvergencePlot() {
-    const svg = document.getElementById('convergencePlot');
-    if (!svg) {
+    const container = document.getElementById('convergencePlot');
+    if (!container) {
         console.error('Element convergencePlot not found');
         return;
     }
     
     // Show the convergence plot container
-    svg.style.display = 'block';
-    svg.innerHTML = '';
+    container.style.display = 'block';
+    container.innerHTML = '';
+    
+    // Create SVG element
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '400');
+    svg.setAttribute('height', '200');
+    svg.setAttribute('style', 'border: 1px solid #ccc; background: white;');
+    container.appendChild(svg);
     
     if (kmeansHistory.length === 0) return;
     
@@ -375,13 +389,11 @@ function updateMetrics() {
         }
     }
     
-    // Update silhouette (simplified calculation)
+    // Update silhouette (proper calculation)
     const silhouetteElement = document.getElementById('silhouette-value');
     if (silhouetteElement) {
-        if (kmeansHistory.length > 0) {
-            // Simple silhouette approximation based on WCSS
-            const currentWCSS = kmeansHistory[kmeansHistory.length - 1].wcss;
-            const silhouette = Math.max(0, Math.min(1, (1000 - currentWCSS) / 1000));
+        if (kmeansData.length > 0 && kmeansAssignments.length > 0) {
+            const silhouette = calculateSilhouetteScore();
             silhouetteElement.textContent = silhouette.toFixed(3);
         } else {
             silhouetteElement.textContent = '-';
@@ -446,6 +458,71 @@ function checkQuizAnswers() {
     document.getElementById('quizScore').innerHTML = scoreDisplay;
     document.getElementById('quizExplanations').innerHTML = results;
     document.getElementById('quizResults').style.display = 'block';
+}
+
+function calculateSilhouetteScore() {
+    if (kmeansData.length === 0 || kmeansAssignments.length === 0) {
+        return 0;
+    }
+    
+    const numClusters = kmeansCentroids.length;
+    if (numClusters <= 1) return 0;
+    
+    let totalSilhouette = 0;
+    let validPoints = 0;
+    
+    for (let i = 0; i < kmeansData.length; i++) {
+        const point = kmeansData[i];
+        const clusterIndex = kmeansAssignments[i];
+        
+        // Calculate average distance to points in same cluster (a_i)
+        let sameClusterDist = 0;
+        let sameClusterCount = 0;
+        
+        for (let j = 0; j < kmeansData.length; j++) {
+            if (i !== j && kmeansAssignments[j] === clusterIndex) {
+                const dist = Math.sqrt((point.x - kmeansData[j].x) ** 2 + (point.y - kmeansData[j].y) ** 2);
+                sameClusterDist += dist;
+                sameClusterCount++;
+            }
+        }
+        
+        const a_i = sameClusterCount > 0 ? sameClusterDist / sameClusterCount : 0;
+        
+        // Calculate minimum average distance to points in other clusters (b_i)
+        let minOtherClusterDist = Infinity;
+        
+        for (let k = 0; k < numClusters; k++) {
+            if (k !== clusterIndex) {
+                let otherClusterDist = 0;
+                let otherClusterCount = 0;
+                
+                for (let j = 0; j < kmeansData.length; j++) {
+                    if (kmeansAssignments[j] === k) {
+                        const dist = Math.sqrt((point.x - kmeansData[j].x) ** 2 + (point.y - kmeansData[j].y) ** 2);
+                        otherClusterDist += dist;
+                        otherClusterCount++;
+                    }
+                }
+                
+                if (otherClusterCount > 0) {
+                    const avgDist = otherClusterDist / otherClusterCount;
+                    minOtherClusterDist = Math.min(minOtherClusterDist, avgDist);
+                }
+            }
+        }
+        
+        const b_i = minOtherClusterDist === Infinity ? 0 : minOtherClusterDist;
+        
+        // Calculate silhouette score for this point
+        if (Math.max(a_i, b_i) > 0) {
+            const s_i = (b_i - a_i) / Math.max(a_i, b_i);
+            totalSilhouette += s_i;
+            validPoints++;
+        }
+    }
+    
+    return validPoints > 0 ? totalSilhouette / validPoints : 0;
 }
 
 // Initialize demo when page loads
