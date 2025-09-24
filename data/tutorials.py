@@ -58,49 +58,18 @@ TUTORIALS_DATA = [
     'tags': 'ensemble-methods, random-forest, xgboost, gradient-boosting, bagging, regularization, model-selection'
     },
     {
-        'title': 'Decision Tree Regression',
-        'slug': 'decision-tree-regression',
-        'description': 'Learn how decision trees work for regression problems with practical examples.',
+        'title': 'Decision Trees Tutorial',
+        'slug': 'decision-trees',
+        'description': 'Master decision tree algorithms from basics to advanced techniques. 5 comprehensive chapters covering introduction, mathematics, Python implementation, overfitting prevention, and ensemble methods.',
         'category': 'Machine Learning',
         'difficulty': 'intermediate',
-        'duration': '30 min',
+        'duration': '95 min',
         'author': 'Alireza Barzin Zanganeh',
-        'has_dedicated_template': False,
-        'template_path': None,
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/decision_trees/index.html',
         'published': True,
-        'excerpt': 'Understand decision tree algorithms for regression with step-by-step examples.',
-        'content': '''
-        <h2>Introduction to Decision Tree Regression</h2>
-        <p>Decision trees are powerful algorithms that can be used for both classification and regression tasks...</p>
-        
-        <h3>How Decision Trees Work</h3>
-        <p>Decision trees make predictions by splitting the data based on feature values:</p>
-        <ol>
-            <li>Choose the best feature to split on</li>
-            <li>Create branches for different values</li>
-            <li>Repeat until stopping criteria are met</li>
-        </ol>
-        
-        <h3>Advantages and Disadvantages</h3>
-        <div class="pros-cons">
-            <div class="pros">
-                <h4>Pros</h4>
-                <ul>
-                    <li>Easy to understand and interpret</li>
-                    <li>Requires little data preparation</li>
-                    <li>Handles both numerical and categorical data</li>
-                </ul>
-            </div>
-            <div class="cons">
-                <h4>Cons</h4>
-                <ul>
-                    <li>Can overfit to training data</li>
-                    <li>Unstable - small changes can result in different trees</li>
-                    <li>Biased toward features with more levels</li>
-                </ul>
-            </div>
-        </div>
-        '''
+        'excerpt': 'Interactive decision tree tutorial with Python demos, mathematical foundations, and practical applications across 5 focused chapters.',
+        'tags': 'decision-trees,classification,regression,entropy,gini-impurity,pruning,ensemble-methods,python'
     },
     {
         'title': 'Feature Engineering Essentials',
