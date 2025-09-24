@@ -443,15 +443,15 @@ function generateDemoData() {
     const dataType = document.getElementById('demo-data')?.value || 'blobs';
     const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
     
-    // Generate data
-    kmeansData = generateClusterData(dataType, k);
+    // Generate raw data points (not pre-clustered)
+    kmeansData = generateRawDataPoints(dataType, k);
     kmeansCentroids = [];
     kmeansAssignments = [];
     kmeansIteration = 0;
     kmeansIsRunning = false;
     
-    // Display initial state
-    drawKMeansDemo(kmeansData, [], [], false);
+    // Display initial state (just raw points, no clusters)
+    drawRawDataPoints(kmeansData);
     
     // Update status
     updateKMeansStatus();
@@ -689,7 +689,7 @@ function resetDemo() {
     }
 }
 
-function drawKMeansDemo(clusters, showCentroids) {
+function drawKMeansDemo(data, centroids, assignments, showCentroids) {
     const canvas = document.getElementById('kmeans-demo-canvas');
     if (!canvas) return;
     
@@ -711,33 +711,42 @@ function drawKMeansDemo(clusters, showCentroids) {
     
     const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
     
-    clusters.forEach((cluster, clusterIndex) => {
-        cluster.points.forEach(point => {
-            const x = margin + (point.x / 8) * (width - 2 * margin);
-            const y = margin + (point.y / 8) * (height - 2 * margin);
-            
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('cx', x);
-            circle.setAttribute('cy', y);
-            circle.setAttribute('r', '3');
-            circle.setAttribute('fill', colors[clusterIndex % colors.length]);
-            svg.appendChild(circle);
-        });
+    // Draw data points with cluster colors
+    data.forEach((point, i) => {
+        const x = margin + (point.x / 8) * (width - 2 * margin);
+        const y = margin + (point.y / 8) * (height - 2 * margin);
         
-        if (showCentroids) {
-            const centroidX = margin + (cluster.centroid.x / 8) * (width - 2 * margin);
-            const centroidY = margin + (cluster.centroid.y / 8) * (height - 2 * margin);
-            
-            const centroid = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            centroid.setAttribute('cx', centroidX);
-            centroid.setAttribute('cy', centroidY);
-            centroid.setAttribute('r', '6');
-            centroid.setAttribute('fill', colors[clusterIndex % colors.length]);
-            centroid.setAttribute('stroke', '#fff');
-            centroid.setAttribute('stroke-width', '2');
-            svg.appendChild(centroid);
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', '3');
+        
+        // Color based on assignment if available, otherwise gray
+        if (assignments && assignments[i] !== undefined) {
+            circle.setAttribute('fill', colors[assignments[i] % colors.length]);
+        } else {
+            circle.setAttribute('fill', '#999');
         }
+        
+        svg.appendChild(circle);
     });
+    
+    // Draw centroids if available
+    if (showCentroids && centroids && centroids.length > 0) {
+        centroids.forEach((centroid, i) => {
+            const centroidX = margin + (centroid.x / 8) * (width - 2 * margin);
+            const centroidY = margin + (centroid.y / 8) * (height - 2 * margin);
+            
+            const centroidCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            centroidCircle.setAttribute('cx', centroidX);
+            centroidCircle.setAttribute('cy', centroidY);
+            centroidCircle.setAttribute('r', '6');
+            centroidCircle.setAttribute('fill', colors[i % colors.length]);
+            centroidCircle.setAttribute('stroke', '#fff');
+            centroidCircle.setAttribute('stroke-width', '2');
+            svg.appendChild(centroidCircle);
+        });
+    }
 }
 
 function runKMeansAlgorithm(initialClusters, k, initMethod) {
@@ -775,6 +784,93 @@ function runKMeansAlgorithm(initialClusters, k, initMethod) {
 
 
 // ===== UTILITY FUNCTIONS =====
+
+function generateRawDataPoints(datasetType, k) {
+    const points = [];
+    
+    switch (datasetType) {
+        case 'blobs':
+            // Generate well-separated blob clusters
+            for (let i = 0; i < k; i++) {
+                const centerX = 1 + (i % 3) * 3;
+                const centerY = 1 + Math.floor(i / 3) * 3;
+                
+                for (let j = 0; j < 15; j++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const radius = Math.random() * 1.5;
+                    points.push({
+                        x: centerX + radius * Math.cos(angle),
+                        y: centerY + radius * Math.sin(angle)
+                    });
+                }
+            }
+            break;
+            
+        case 'random':
+            // Generate random points
+            for (let i = 0; i < 45; i++) {
+                points.push({
+                    x: Math.random() * 8,
+                    y: Math.random() * 8
+                });
+            }
+            break;
+            
+        case 'moons':
+            // Generate moon-shaped clusters
+            for (let i = 0; i < 2; i++) {
+                const centerX = 2 + i * 4;
+                const centerY = 4;
+                const radius = 1.5;
+                
+                for (let j = 0; j < 22; j++) {
+                    const angle = Math.random() * Math.PI;
+                    const r = radius + (Math.random() - 0.5) * 0.8;
+                    points.push({
+                        x: centerX + r * Math.cos(angle),
+                        y: centerY + r * Math.sin(angle) * (i === 0 ? -1 : 1)
+                    });
+                }
+            }
+            break;
+    }
+    
+    return points;
+}
+
+function drawRawDataPoints(points) {
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    if (!canvas) return;
+    
+    const width = 400;
+    const height = 300;
+    const margin = 20;
+    
+    // Create SVG if it doesn't exist
+    let svg = canvas.querySelector('svg');
+    if (!svg) {
+        svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', width);
+        svg.setAttribute('height', height);
+        canvas.innerHTML = '';
+        canvas.appendChild(svg);
+    } else {
+        svg.innerHTML = '';
+    }
+    
+    // Draw all points in gray (unassigned)
+    points.forEach(point => {
+        const x = margin + (point.x / 8) * (width - 2 * margin);
+        const y = margin + (point.y / 8) * (height - 2 * margin);
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', '3');
+        circle.setAttribute('fill', '#999');
+        svg.appendChild(circle);
+    });
+}
 
 function generateClusterData(datasetType, k) {
     const clusters = [];
