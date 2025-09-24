@@ -481,20 +481,19 @@ function updateMetrics(cutHeight, minClusterSize, maxClusters, cuttingMethod) {
 
 function drawCuttingVisualization(cutHeight) {
     const svg = document.getElementById('cutting-dendrogram-svg');
-    const canvas = document.getElementById('clustered-canvas');
+    const clustersSvg = document.getElementById('cutting-clusters');
     
     if (svg) {
         // Use shared dendrogram function with cut line
         drawSharedDendrogram('cutting-dendrogram-svg', 3, cutHeight);
     }
     
-    if (canvas) {
-        // Draw clustered data points
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
+    if (clustersSvg) {
+        // Draw clustered data points on SVG
+        clustersSvg.innerHTML = '';
         
-        ctx.clearRect(0, 0, width, height);
+        const width = parseInt(clustersSvg.getAttribute('width')) || 700;
+        const height = parseInt(clustersSvg.getAttribute('height')) || 300;
         
         // Generate clustered points based on cut height
         const numClusters = Math.min(Math.floor(cutHeight * 2), 8);
@@ -509,10 +508,16 @@ function drawCuttingVisualization(cutHeight) {
                 const x = centerX + (Math.random() - 0.5) * 30;
                 const y = centerY + (Math.random() - 0.5) * 30;
                 
-                ctx.fillStyle = colors[cluster % colors.length];
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                ctx.fill();
+                // Create SVG circle element
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', 4);
+                circle.setAttribute('fill', colors[cluster % colors.length]);
+                circle.setAttribute('stroke', '#2c3e50');
+                circle.setAttribute('stroke-width', 1);
+                
+                clustersSvg.appendChild(circle);
             }
         }
     }
