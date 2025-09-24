@@ -560,7 +560,7 @@ function drawSharedDendrogram(svgId, numClusters, cutHeight = null) {
         svg.appendChild(cutLabel);
         
         // Highlight clusters that would be cut at this height
-        highlightClustersAtCut(svg, leafPositionsArray, cutY, clusterCount, margin, height);
+        highlightClustersAtCut(svg, leafPositionsArray, cutY, numClusters, margin, height);
     }
     
     // Add height axis label

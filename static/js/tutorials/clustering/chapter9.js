@@ -395,7 +395,7 @@ function drawDendrogramNode(node, svg, leafPositions, maxHeight, depth) {
     const rightPos = drawDendrogramNode(node.right, svg, leafPositions, maxHeight, depth + 1);
     
     const x = (leftPos.x + rightPos.x) / 2;
-    const y = maxHeight - (node.height * 20); // Scale height
+    const y = maxHeight - (node.height * 90); // Scale height
     
     // Draw horizontal line
     const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
