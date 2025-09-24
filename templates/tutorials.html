@@ -48,14 +48,16 @@
             <div class="tutorial-card">
                 <div class="tutorial-header">
                     <div class="tutorial-meta">
-                        <span class="tutorial-category">{{ tutorial.category }}</span>
-                        <span class="tutorial-difficulty {{ tutorial.difficulty_class }}">
-                            {{ tutorial.difficulty.title() }}
-                        </span>
-                    </div>
-                    <div class="tutorial-time">
-                        <i class="fas fa-clock"></i>
-                        {{ tutorial.duration }}
+                        <div class="tutorial-badges">
+                            <span class="tutorial-category">{{ tutorial.category }}</span>
+                            <span class="tutorial-difficulty {{ tutorial.difficulty_class }}">
+                                {{ tutorial.difficulty.title() }}
+                            </span>
+                        </div>
+                        <div class="tutorial-time">
+                            <i class="fas fa-clock"></i>
+                            {{ tutorial.duration }}
+                        </div>
                     </div>
                 </div>
 
@@ -95,7 +97,7 @@
             <div class="cta-card" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 3rem; border-radius: 1rem; text-align: center;">
                 <h3>Stay Updated</h3>
                 <p>Get notified when new tutorials are published</p>
-                <a href="{{ url_for('contact') }}" class="btn btn-outline" style="color: burg; border-color: white;">
+                <a href="{{ url_for('contact') }}" class="btn btn-outline" style="color: burgundy; border-color: white;">
                     Get Notifications
                 </a>
             </div>
@@ -138,14 +140,16 @@
 }
 
 .tutorial-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 1rem;
-    min-height: 2rem;
 }
 
 .tutorial-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tutorial-badges {
     display: flex;
     gap: 0.5rem;
 }
@@ -196,7 +200,6 @@
     color: var(--text-secondary);
     font-size: 0.8rem;
     white-space: nowrap;
-    min-height: 1.5rem;
 }
 
 .tutorial-content {
@@ -276,12 +279,7 @@
         align-items: center;
     }
     
-    .tutorial-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .tutorial-meta {
+    .tutorial-badges {
         flex-wrap: wrap;
     }
 }
