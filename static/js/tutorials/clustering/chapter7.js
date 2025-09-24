@@ -476,8 +476,9 @@ function runKmeansDemo() {
     
     // Initialize centroids
     kmeansCentroids = initializeKMeansCentroids(kmeansData, k, initMethod);
-    kmeansAssignments = new Array(kmeansData.length).fill(0);
-    kmeansIteration = 0;
+    // Initialize assignments by assigning points to closest centroids
+    kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+    kmeansIteration = 1; // Start at iteration 1 since we've done initial assignment
     
     // Run K-means to convergence
     kmeansIsRunning = true;
@@ -506,17 +507,24 @@ function stepKmeansDemo() {
         return;
     }
     
-    if (kmeansIteration === 0) {
-        // First step - assign points to centroids
+    if (kmeansCentroids.length === 0) {
+        // Initialize centroids if not done yet
+        const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
+        const initMethod = document.getElementById('demo-init')?.value || 'random';
+        kmeansCentroids = initializeKMeansCentroids(kmeansData, k, initMethod);
         kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+        kmeansIteration = 1;
     } else {
-        // Update centroids
-        kmeansCentroids = updateCentroids(kmeansData, kmeansAssignments, kmeansCentroids.length);
-        // Assign points again
-        kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+        // Perform one K-means step
+        const converged = kmeansStep();
+        if (converged) {
+            const status = document.getElementById('demo-status');
+            if (status) {
+                status.innerHTML += `<p><strong>✅ K-means converged!</strong></p>`;
+            }
+        }
     }
     
-    kmeansIteration++;
     updateKMeansStatus();
     drawKMeansDemo(kmeansData, kmeansCentroids, kmeansAssignments, true);
     updateKMeansMetrics();
@@ -765,18 +773,6 @@ function runKMeansAlgorithm(initialClusters, k, initMethod) {
     return { clusters, iterations, wcss };
 }
 
-function updateKMeansMetrics(result) {
-    const metrics = document.getElementById('demo-metrics');
-    if (metrics) {
-        metrics.style.display = 'block';
-        document.getElementById('wcss-value').textContent = result.wcss.toFixed(2);
-        document.getElementById('iterations-value').textContent = result.iterations;
-        
-        // Calculate silhouette score (simplified)
-        const silhouetteScore = 0.5 + Math.random() * 0.3; // Placeholder
-        document.getElementById('silhouette-value').textContent = silhouetteScore.toFixed(3);
-    }
-}
 
 // ===== UTILITY FUNCTIONS =====
 
