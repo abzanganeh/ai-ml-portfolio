@@ -3,16 +3,19 @@
 ## 🚨 CRITICAL RULES FOR LLM
 
 ### 1. **TEMPLATE COPYING PROTOCOL** ⚠️ MOST CRITICAL
-- **Rule**: When creating new chapters, ALWAYS copy the exact structure from Chapter 1
+- **Rule**: When creating new tutorials (clustering, decision trees, etc.), ALWAYS use the clustering tutorial as the master template
 - **Process**: 
-  1. Copy Chapter 1 HTML structure EXACTLY
+  1. Copy Chapter 1 clustering HTML structure EXACTLY
   2. Replace ONLY the content sections (title, subtitle, content)
-  3. Update chapter numbers and links
+  3. Update tutorial type (clustering → decision-trees), chapter numbers and links
   4. Keep ALL CSS/JS loading order identical
   5. Keep ALL navigation structure identical
+  6. Update CSS paths: clustering.css → decision-tree.css (create new CSS file)
+  7. Update JS paths: clustering/ → decision-trees/ (create new JS files)
 - **NEVER**: Create new structure from scratch - this causes multiple issues
-- **CRITICAL**: CSS loading order must be: main.css → clustering.css
+- **CRITICAL**: CSS loading order must be: main.css → [tutorial-type].css
 - **CRITICAL**: JavaScript must be loaded in <head> for Chapter 1, <body> end for others
+- **MASTER TEMPLATE**: Use clustering tutorial Chapter 1 as the gold standard structure
 
 ### 2. **NO EMOJIS EVER**
 - **Rule**: Never add emojis to any content, headings, buttons, or text
@@ -331,6 +334,166 @@ The sub-chapter navigation follows this pattern:
 - ✅ Professional, academic tone
 - ✅ Responsive design working
 
+## 🌳 Decision Tree Regression Tutorial Creation Guide
+
+### Complete Tutorial Structure (100 Chapters)
+**Based on clustering tutorial structure, create comprehensive decision tree regression tutorial:**
+
+#### **Phase 1: Fundamentals (Chapters 1-20)**
+- **Chapter 1**: Introduction to Decision Trees & Regression
+- **Chapter 2**: Decision Tree Structure & Terminology
+- **Chapter 3**: Regression vs Classification Trees
+- **Chapter 4**: Splitting Criteria - Mean Squared Error
+- **Chapter 5**: Splitting Criteria - Variance Reduction
+- **Chapter 6**: Splitting Criteria - Friedman's Impurity
+- **Chapter 7**: Tree Construction Algorithm
+- **Chapter 8**: Stopping Criteria & Pruning
+- **Chapter 9**: Overfitting in Regression Trees
+- **Chapter 10**: Tree Visualization & Interpretation
+- **Chapter 11**: Feature Importance Calculation
+- **Chapter 12**: Handling Continuous Features
+- **Chapter 13**: Handling Categorical Features
+- **Chapter 14**: Missing Value Handling
+- **Chapter 15**: Outlier Impact on Trees
+- **Chapter 16**: Tree Depth vs Performance
+- **Chapter 17**: Leaf Size Optimization
+- **Chapter 18**: Cost Complexity Pruning
+- **Chapter 19**: Cross-Validation for Trees
+- **Chapter 20**: Model Evaluation Metrics
+
+#### **Phase 2: Advanced Concepts (Chapters 21-40)**
+- **Chapter 21**: Ensemble Methods Introduction
+- **Chapter 22**: Random Forest Regression
+- **Chapter 23**: Gradient Boosting Trees
+- **Chapter 24**: XGBoost for Regression
+- **Chapter 25**: LightGBM Implementation
+- **Chapter 26**: CatBoost Features
+- **Chapter 27**: Stacking Ensemble Methods
+- **Chapter 28**: Bagging vs Boosting
+- **Chapter 29**: Feature Selection in Trees
+- **Chapter 30**: Hyperparameter Tuning
+- **Chapter 31**: Grid Search Optimization
+- **Chapter 32**: Random Search Strategy
+- **Chapter 33**: Bayesian Optimization
+- **Chapter 34**: Early Stopping Techniques
+- **Chapter 35**: Learning Rate Scheduling
+- **Chapter 36**: Regularization Methods
+- **Chapter 37**: Dropout in Tree Ensembles
+- **Chapter 38**: Tree Diversity Measures
+- **Chapter 39**: Bias-Variance Tradeoff
+- **Chapter 40**: Model Interpretability
+
+#### **Phase 3: Real-World Applications (Chapters 41-60)**
+- **Chapter 41**: Housing Price Prediction
+- **Chapter 42**: Stock Price Forecasting
+- **Chapter 43**: Sales Revenue Prediction
+- **Chapter 44**: Energy Consumption Modeling
+- **Chapter 45**: Medical Diagnosis Support
+- **Chapter 46**: Weather Prediction Systems
+- **Chapter 47**: Customer Lifetime Value
+- **Chapter 48**: Risk Assessment Models
+- **Chapter 49**: Quality Control Systems
+- **Chapter 50**: Supply Chain Optimization
+- **Chapter 51**: Financial Risk Modeling
+- **Chapter 52**: Marketing Campaign ROI
+- **Chapter 53**: Resource Allocation
+- **Chapter 54**: Performance Benchmarking
+- **Chapter 55**: A/B Testing Analysis
+- **Chapter 56**: Time Series Forecasting
+- **Chapter 57**: Multi-output Regression
+- **Chapter 58**: Censored Data Handling
+- **Chapter 59**: Imbalanced Dataset Treatment
+- **Chapter 60**: Transfer Learning Applications
+
+#### **Phase 4: Advanced Techniques (Chapters 61-80)**
+- **Chapter 61**: Deep Learning Integration
+- **Chapter 62**: Neural Network Trees
+- **Chapter 63**: Attention Mechanisms
+- **Chapter 64**: Transformer-based Trees
+- **Chapter 65**: Graph Neural Networks
+- **Chapter 66**: Multi-task Learning
+- **Chapter 67**: Meta-Learning Approaches
+- **Chapter 68**: Few-shot Learning
+- **Chapter 69**: Adversarial Training
+- **Chapter 70**: Robust Optimization
+- **Chapter 71**: Uncertainty Quantification
+- **Chapter 72**: Confidence Intervals
+- **Chapter 73**: Prediction Intervals
+- **Chapter 74**: Bayesian Trees
+- **Chapter 75**: Probabilistic Programming
+- **Chapter 76**: Causal Inference
+- **Chapter 77**: Treatment Effect Estimation
+- **Chapter 78**: Instrumental Variables
+- **Chapter 79**: Counterfactual Analysis
+- **Chapter 80**: Fairness in ML
+
+#### **Phase 5: Production & Deployment (Chapters 81-100)**
+- **Chapter 81**: Model Serialization
+- **Chapter 82**: API Development
+- **Chapter 83**: Web Application Integration
+- **Chapter 84**: Database Integration
+- **Chapter 85**: Real-time Prediction
+- **Chapter 86**: Batch Processing
+- **Chapter 87**: Model Monitoring
+- **Chapter 88**: Drift Detection
+- **Chapter 89**: Performance Tracking
+- **Chapter 90**: A/B Testing Framework
+- **Chapter 91**: Model Versioning
+- **Chapter 92**: CI/CD Pipeline
+- **Chapter 93**: Docker Containerization
+- **Chapter 94**: Cloud Deployment
+- **Chapter 95**: Scaling Strategies
+- **Chapter 96**: Load Balancing
+- **Chapter 97**: Security Considerations
+- **Chapter 98**: Privacy Protection
+- **Chapter 99**: Compliance & Ethics
+- **Chapter 100**: Future Directions
+
+### File Structure for Decision Tree Tutorial:
+```
+templates/tutorials/decision-trees/
+├── index.html (tutorial overview)
+├── chapter1.html
+├── chapter2.html
+├── ...
+└── chapter100.html
+
+static/css/tutorials/decision-trees/
+├── decision-tree.css (copy from clustering.css)
+└── shared-tutorial.css
+
+static/js/tutorials/decision-trees/
+├── shared-tutorial.js (copy from clustering/)
+├── chapter1.js
+├── chapter2.js
+├── ...
+└── chapter100.js
+
+static/images/tutorials/decision-trees/
+├── chapter1/
+├── chapter2/
+├── ...
+└── chapter100/
+```
+
+### Interactive Demo Requirements for Each Chapter:
+1. **Data Generation**: Create sample datasets relevant to chapter topic
+2. **Visualization**: SVG-based plots showing decision tree structure
+3. **Parameter Controls**: Sliders/inputs for tree parameters
+4. **Real-time Updates**: Visualizations update as parameters change
+5. **Metrics Display**: Show relevant performance metrics
+6. **Reset Functionality**: Ability to reset to default state
+
+### Content Requirements per Chapter:
+1. **Learning Objectives**: 3-5 clear objectives
+2. **Mathematical Foundation**: Complete formulas with explanations
+3. **Algorithm Explanation**: Step-by-step process description
+4. **Interactive Demo**: Working visualization with controls
+5. **Real-world Example**: Practical application case study
+6. **Code Implementation**: Python code examples
+7. **Quiz Section**: 5 questions testing understanding
+8. **Key Takeaways**: Summary of important concepts
+
 ## 🔄 Update Process for Existing Tutorials
 
 ### When Updating Existing Content:
@@ -346,5 +509,7 @@ The sub-chapter navigation follows this pattern:
 2. **Use clustering tutorial as template** - It has the most complete structure
 3. **Maintain consistency** - Follow the same patterns and styling
 4. **Test thoroughly** - Ensure all functionality works before completion
+5. **Create comprehensive content** - 100 chapters with full interactivity
+6. **Include all phases** - Fundamentals → Advanced → Applications → Production
 
 This document serves as the definitive guide for all LLM interactions with the tutorial system. Follow these guidelines strictly to maintain quality and consistency.

@@ -443,43 +443,227 @@ function generateDemoData() {
     const dataType = document.getElementById('demo-data')?.value || 'blobs';
     const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
     
-    // Generate and display data
-    const clusters = generateClusterData(dataType, k);
-    drawKMeansDemo(clusters, false);
+    // Generate data
+    kmeansData = generateClusterData(dataType, k);
+    kmeansCentroids = [];
+    kmeansAssignments = [];
+    kmeansIteration = 0;
+    kmeansIsRunning = false;
+    
+    // Display initial state
+    drawKMeansDemo(kmeansData, [], [], false);
     
     // Update status
-    const status = document.getElementById('demo-status');
-    if (status) {
-        status.innerHTML = `<p>Data generated with ${k} clusters. Click "Run K-means" to start clustering.</p>`;
-    }
+    updateKMeansStatus();
 }
+
+// Global variables for K-means demo
+let kmeansData = [];
+let kmeansCentroids = [];
+let kmeansAssignments = [];
+let kmeansIteration = 0;
+let kmeansIsRunning = false;
 
 function runKmeansDemo() {
     const dataType = document.getElementById('demo-data')?.value || 'blobs';
     const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
     const initMethod = document.getElementById('demo-init')?.value || 'random';
     
-    // Generate data and run K-means
-    const clusters = generateClusterData(dataType, k);
-    const result = runKMeansAlgorithm(clusters, k, initMethod);
-    
-    // Display result
-    drawKMeansDemo(result.clusters, true);
-    updateKMeansMetrics(result);
-    
-    // Update status
-    const status = document.getElementById('demo-status');
-    if (status) {
-        status.innerHTML = `<p>K-means completed in ${result.iterations} iterations. WCSS: ${result.wcss.toFixed(2)}</p>`;
+    // Generate data if not already generated
+    if (kmeansData.length === 0) {
+        kmeansData = generateClusterData(dataType, k);
     }
+    
+    // Initialize centroids
+    kmeansCentroids = initializeKMeansCentroids(kmeansData, k, initMethod);
+    kmeansAssignments = new Array(kmeansData.length).fill(0);
+    kmeansIteration = 0;
+    
+    // Run K-means to convergence
+    kmeansIsRunning = true;
+    const runStep = () => {
+        if (kmeansIsRunning) {
+            const converged = kmeansStep();
+            updateKMeansStatus();
+            drawKMeansDemo(kmeansData, kmeansCentroids, kmeansAssignments, true);
+            
+            if (!converged && kmeansIteration < 100) {
+                setTimeout(runStep, 500);
+            } else {
+                kmeansIsRunning = false;
+                updateKMeansStatus();
+                updateKMeansMetrics();
+            }
+        }
+    };
+    
+    runStep();
 }
 
 function stepKmeansDemo() {
-    // For now, just run the full algorithm
-    runKmeansDemo();
+    if (kmeansData.length === 0) {
+        alert('Please generate data first!');
+        return;
+    }
+    
+    if (kmeansIteration === 0) {
+        // First step - assign points to centroids
+        kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+    } else {
+        // Update centroids
+        kmeansCentroids = updateCentroids(kmeansData, kmeansAssignments, kmeansCentroids.length);
+        // Assign points again
+        kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+    }
+    
+    kmeansIteration++;
+    updateKMeansStatus();
+    drawKMeansDemo(kmeansData, kmeansCentroids, kmeansAssignments, true);
+    updateKMeansMetrics();
+}
+
+function kmeansStep() {
+    const oldAssignments = [...kmeansAssignments];
+    
+    // Assign points to centroids
+    kmeansAssignments = assignPointsToCentroids(kmeansData, kmeansCentroids);
+    
+    // Update centroids
+    kmeansCentroids = updateCentroids(kmeansData, kmeansAssignments, kmeansCentroids.length);
+    
+    kmeansIteration++;
+    
+    // Check convergence
+    return checkKMeansConvergence(oldAssignments, kmeansAssignments, kmeansCentroids);
+}
+
+function initializeKMeansCentroids(data, k, method) {
+    const centroids = [];
+    
+    if (method === 'random') {
+        // Random initialization
+        for (let i = 0; i < k; i++) {
+            const randomIndex = Math.floor(Math.random() * data.length);
+            centroids.push({...data[randomIndex]});
+        }
+    } else {
+        // K-means++ initialization
+        // First centroid: random
+        const firstIndex = Math.floor(Math.random() * data.length);
+        centroids.push({...data[firstIndex]});
+        
+        // Remaining centroids: weighted by distance
+        for (let i = 1; i < k; i++) {
+            const distances = data.map(point => {
+                const minDist = Math.min(...centroids.map(centroid => 
+                    Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2)
+                ));
+                return minDist ** 2;
+            });
+            
+            const totalDistance = distances.reduce((sum, dist) => sum + dist, 0);
+            let random = Math.random() * totalDistance;
+            
+            for (let j = 0; j < data.length; j++) {
+                random -= distances[j];
+                if (random <= 0) {
+                    centroids.push({...data[j]});
+                    break;
+                }
+            }
+        }
+    }
+    
+    return centroids;
+}
+
+function assignPointsToCentroids(data, centroids) {
+    return data.map(point => {
+        let minDist = Infinity;
+        let bestCluster = 0;
+        
+        centroids.forEach((centroid, i) => {
+            const dist = Math.sqrt((point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2);
+            if (dist < minDist) {
+                minDist = dist;
+                bestCluster = i;
+            }
+        });
+        
+        return bestCluster;
+    });
+}
+
+function updateCentroids(data, assignments, k) {
+    const newCentroids = [];
+    
+    for (let i = 0; i < k; i++) {
+        const clusterPoints = data.filter((_, idx) => assignments[idx] === i);
+        
+        if (clusterPoints.length > 0) {
+            const avgX = clusterPoints.reduce((sum, point) => sum + point.x, 0) / clusterPoints.length;
+            const avgY = clusterPoints.reduce((sum, point) => sum + point.y, 0) / clusterPoints.length;
+            newCentroids.push({ x: avgX, y: avgY });
+        } else {
+            // Keep old centroid if no points assigned
+            newCentroids.push({ x: 0, y: 0 });
+        }
+    }
+    
+    return newCentroids;
+}
+
+function checkKMeansConvergence(oldAssignments, newAssignments, centroids) {
+    // Check if assignments changed
+    for (let i = 0; i < oldAssignments.length; i++) {
+        if (oldAssignments[i] !== newAssignments[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function updateKMeansStatus() {
+    const status = document.getElementById('demo-status');
+    if (status) {
+        if (kmeansIteration === 0) {
+            status.innerHTML = '<p>Ready to start K-means. Click "Run K-means" to begin.</p>';
+        } else {
+            status.innerHTML = `<p>Iteration ${kmeansIteration}: ${kmeansIsRunning ? 'Running...' : 'Converged!'}</p>`;
+        }
+    }
+}
+
+function updateKMeansMetrics() {
+    if (kmeansData.length === 0) return;
+    
+    // Calculate WCSS
+    let wcss = 0;
+    kmeansData.forEach((point, i) => {
+        const centroid = kmeansCentroids[kmeansAssignments[i]];
+        wcss += (point.x - centroid.x) ** 2 + (point.y - centroid.y) ** 2;
+    });
+    
+    const metrics = document.getElementById('demo-metrics');
+    if (metrics) {
+        metrics.innerHTML = `
+            <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 6px; margin: 1rem 0;">
+                <h4>Clustering Metrics:</h4>
+                <p><strong>Iterations:</strong> ${kmeansIteration}</p>
+                <p><strong>WCSS:</strong> ${wcss.toFixed(2)}</p>
+                <p><strong>Status:</strong> ${kmeansIsRunning ? 'Running' : 'Converged'}</p>
+            </div>
+        `;
+    }
 }
 
 function resetDemo() {
+    kmeansData = [];
+    kmeansCentroids = [];
+    kmeansAssignments = [];
+    kmeansIteration = 0;
+    kmeansIsRunning = false;
+    
     const canvas = document.getElementById('kmeans-demo-canvas');
     const metrics = document.getElementById('demo-metrics');
     const status = document.getElementById('demo-status');
