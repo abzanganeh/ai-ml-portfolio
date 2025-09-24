@@ -10,16 +10,194 @@ let currentIteration = 0;
 let isRunning = false;
 
 // Demo Functions
-function updateKMeansDemo() {
+function generateDemoData() {
+    updateKMeansDemo();
+}
+
+function runKmeansDemo() {
+    if (kmeansData.length === 0) {
+        generateDemoData();
+    }
+    
+    // Run K-means to convergence
+    let converged = false;
+    let iterations = 0;
+    const maxIterations = 50;
+    
+    while (!converged && iterations < maxIterations) {
+        const newAssignments = assignPoints(kmeansData, kmeansCentroids);
+        const newCentroids = updateCentroids(kmeansData, newAssignments, kmeansCentroids.length);
+        
+        // Check convergence
+        converged = checkConvergence(kmeansCentroids, newCentroids, newAssignments, kmeansAssignments);
+        
+        kmeansAssignments = newAssignments;
+        kmeansCentroids = newCentroids;
+        kmeansHistory.push({
+            iteration: iterations,
+            wcss: calculateWCSS(kmeansData, kmeansCentroids, kmeansAssignments),
+            centroids: kmeansCentroids.map(c => ({...c}))
+        });
+        
+        iterations++;
+    }
+    
+    currentIteration = iterations;
+    drawKMeansVisualization();
+    drawConvergencePlot();
+    updateMetrics();
+}
+
+function stepKmeansDemo() {
+    if (kmeansData.length === 0) {
+        generateDemoData();
+        return;
+    }
+    
+    if (currentIteration === 0) {
+        // First step - assign points
+        kmeansAssignments = assignPoints(kmeansData, kmeansCentroids);
+    } else {
+        // Update centroids
+        kmeansCentroids = updateCentroids(kmeansData, kmeansAssignments, kmeansCentroids.length);
+        // Assign points again
+        kmeansAssignments = assignPoints(kmeansData, kmeansCentroids);
+    }
+    
+    // Store history
+    kmeansHistory.push({
+        iteration: currentIteration,
+        wcss: calculateWCSS(kmeansData, kmeansCentroids, kmeansAssignments),
+        centroids: kmeansCentroids.map(c => ({...c}))
+    });
+    
+    currentIteration++;
+    drawKMeansVisualization();
+    drawConvergencePlot();
+    updateMetrics();
+}
+
+function resetDemo() {
+    kmeansData = [];
+    kmeansCentroids = [];
+    kmeansAssignments = [];
+    kmeansHistory = [];
+    currentIteration = 0;
+    
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    const plot = document.getElementById('convergencePlot');
+    const status = document.getElementById('demo-status');
+    
+    if (canvas) canvas.innerHTML = '<p>Interactive K-means clustering visualization will appear here</p>';
+    if (plot) plot.innerHTML = '';
+    if (status) status.innerHTML = '<p>Click "Generate Data" to start the demo</p>';
+}
+
+function runInitializationDemo() {
+    const method = document.getElementById('init-method')?.value || 'random';
     const k = parseInt(document.getElementById('num-clusters-init')?.value || 3);
-    const initMethod = document.getElementById('init-method')?.value || 'random';
-    const maxIter = 10; // Default value since maxIterations element doesn't exist
-    const dataset = 'blobs'; // Default value since dataset element doesn't exist
+    
+    // Generate sample data
+    const data = generateKMeansDataset('blobs');
+    
+    // Run initialization comparison
+    const randomCentroids = initializeCentroids(data, k, 'random');
+    const kmeansPlusCentroids = initializeCentroids(data, k, 'kmeans++');
+    
+    // Draw comparison
+    drawInitializationComparison(data, randomCentroids, kmeansPlusCentroids, method);
+}
+
+function resetInitializationDemo() {
+    const canvas = document.getElementById('initialization-canvas');
+    if (canvas) canvas.innerHTML = '<p>Click "Run Demo" to compare different initialization methods</p>';
+}
+
+function drawInitializationComparison(data, randomCentroids, kmeansPlusCentroids, method) {
+    const canvas = document.getElementById('initialization-canvas');
+    if (!canvas) return;
+    
+    const width = 400;
+    const height = 300;
+    
+    // Clear canvas
+    canvas.innerHTML = `
+        <svg width="${width}" height="${height}" style="border: 1px solid #ccc; background: white;">
+            <g id="init-plot"></g>
+        </svg>
+    `;
+    
+    const svg = canvas.querySelector('svg');
+    const g = svg.querySelector('#init-plot');
+    
+    // Scale data to fit canvas
+    const margin = 40;
+    const plotWidth = width - 2 * margin;
+    const plotHeight = height - 2 * margin;
+    
+    // Find data bounds
+    const xValues = data.map(d => d.x);
+    const yValues = data.map(d => d.y);
+    const xMin = Math.min(...xValues);
+    const xMax = Math.max(...xValues);
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+    
+    const xScale = plotWidth / (xMax - xMin);
+    const yScale = plotHeight / (yMax - yMin);
+    
+    // Draw data points
+    data.forEach(point => {
+        const x = margin + (point.x - xMin) * xScale;
+        const y = margin + (yMax - point.y) * yScale;
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 3);
+        circle.setAttribute('fill', '#666');
+        circle.setAttribute('opacity', '0.6');
+        g.appendChild(circle);
+    });
+    
+    // Draw centroids based on selected method
+    const centroids = method === 'random' ? randomCentroids : kmeansPlusCentroids;
+    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+    
+    centroids.forEach((centroid, i) => {
+        const x = margin + (centroid.x - xMin) * xScale;
+        const y = margin + (yMax - centroid.y) * yScale;
+        
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 8);
+        circle.setAttribute('fill', colors[i % colors.length]);
+        circle.setAttribute('stroke', '#fff');
+        circle.setAttribute('stroke-width', '2');
+        g.appendChild(circle);
+    });
+    
+    // Add title
+    const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title.setAttribute('x', width / 2);
+    title.setAttribute('y', 20);
+    title.setAttribute('text-anchor', 'middle');
+    title.setAttribute('font-size', '14');
+    title.setAttribute('font-weight', 'bold');
+    title.textContent = `${method.charAt(0).toUpperCase() + method.slice(1)} Initialization (k=${k})`;
+    g.appendChild(title);
+}
+
+function updateKMeansDemo() {
+    const k = parseInt(document.getElementById('demo-clusters')?.value || 3);
+    const initMethod = document.getElementById('demo-init')?.value || 'random';
+    const dataset = document.getElementById('demo-data')?.value || 'blobs';
+    const maxIter = 10;
     
     // Update displays
-    const kDisplay = document.getElementById('clusters-init-display');
+    const kDisplay = document.getElementById('demo-clusters-display');
     if (kDisplay) kDisplay.textContent = k;
-    // maxIterationsDisplay doesn't exist, skip
     
     // Generate new data
     kmeansData = generateKMeansDataset(dataset);
