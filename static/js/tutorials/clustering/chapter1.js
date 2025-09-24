@@ -212,7 +212,7 @@ function calculateWCSS() {
         if (point && point.cluster >= 0 && point.cluster < currentCentroids.length) {
             const centroid = currentCentroids[point.cluster];
             if (centroid) {
-                wcss += Math.pow(euclideanDistance(point, centroid), 2);
+            wcss += Math.pow(euclideanDistance(point, centroid), 2);
             }
         }
     });
