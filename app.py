@@ -348,16 +348,7 @@ def clustering_chapter(chapter_num):
     except:
         abort(404)
 
-# Decision Trees tutorial routes
-@app.route('/tutorials/decision-trees/')
-@app.route('/tutorials/decision-trees')
-def decision_trees_index():
-    """Decision Trees tutorial index page"""
-    try:
-        return render_template('tutorials/decision_trees/index.html')
-    except:
-        abort(404)
-
+# Decision Trees tutorial chapter routes
 @app.route('/tutorials/decision-trees/chapter<int:chapter_num>')
 def decision_trees_chapter(chapter_num):
     """Decision Trees tutorial chapters"""
@@ -371,6 +362,7 @@ def decision_trees_chapter(chapter_num):
         return render_template(template_path)
     except:
         abort(404)
+
 
 @app.route('/blog')
 def blog():
