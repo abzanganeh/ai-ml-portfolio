@@ -623,11 +623,9 @@ function drawDataPointsOnSVG(svgId, data, clusters = null) {
     
     svg.innerHTML = '';
     
-    const width = 400;
-    const height = 300;
-    
-    // Set SVG viewBox
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    // Get actual SVG dimensions from HTML attributes
+    const width = parseInt(svg.getAttribute('width')) || 700;
+    const height = parseInt(svg.getAttribute('height')) || 300;
     
     // Draw points
     data.forEach((point, i) => {

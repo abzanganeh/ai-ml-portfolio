@@ -98,8 +98,8 @@ function generateDendrogramVisualization() {
     // Generate dendrogram
     const dendrogram = generateDendrogram(dataPoints, linkageMethod, distanceMetric);
     
-    // Draw dendrogram
-    drawDendrogram(dendrogram);
+    // Draw dendrogram using shared function
+    drawSharedDendrogram('dendrogram-svg', 3);
 }
 
 // Generate different types of datasets
@@ -484,34 +484,8 @@ function drawCuttingVisualization(cutHeight) {
     const canvas = document.getElementById('clustered-canvas');
     
     if (svg) {
-        // Clear and redraw dendrogram with cut line
-        svg.innerHTML = '';
-        
-        const width = svg.getAttribute('width');
-        const height = svg.getAttribute('height');
-        const margin = 20;
-        
-        // Draw simplified dendrogram
-        const dendrogramLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        dendrogramLine.setAttribute('x1', margin);
-        dendrogramLine.setAttribute('y1', height - margin);
-        dendrogramLine.setAttribute('x2', width - margin);
-        dendrogramLine.setAttribute('y2', margin);
-        dendrogramLine.setAttribute('stroke', '#666');
-        dendrogramLine.setAttribute('stroke-width', 3);
-        svg.appendChild(dendrogramLine);
-        
-        // Draw cut line
-        const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        const cutY = height - margin - (cutHeight * 20);
-        cutLine.setAttribute('x1', margin);
-        cutLine.setAttribute('y1', cutY);
-        cutLine.setAttribute('x2', width - margin);
-        cutLine.setAttribute('y2', cutY);
-        cutLine.setAttribute('stroke', '#ff6b6b');
-        cutLine.setAttribute('stroke-width', 2);
-        cutLine.setAttribute('stroke-dasharray', '5,5');
-        svg.appendChild(cutLine);
+        // Use shared dendrogram function with cut line
+        drawSharedDendrogram('cutting-dendrogram-svg', 3, cutHeight);
     }
     
     if (canvas) {
