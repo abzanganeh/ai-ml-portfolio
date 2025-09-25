@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/projects.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/churn-risk-intelligence.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container project-detail churn-project">
+    <!-- Project Header -->
+    <div class="project-header">
+        <div class="project-header-content">
+            <div class="project-info">
+                <h1 class="project-title">{{ project.title }}</h1>
+                <p class="project-description">{{ project.description }}</p>
+                
+                <div class="project-meta">
+                    <span class="project-category">{{ project.category }}</span>
+                    <span class="project-status">Completed</span>
+                    <span class="project-duration">2 months</span>
+                </div>
+                
+                <div class="project-links">
+                    <a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">
+                        <i class="fas fa-code"></i> View Code
+                    </a>
+                    <a href="{{ project.github_url }}/blob/main/README.md" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-book"></i> Documentation
+                    </a>
+                </div>
+            </div>
+            
+            <div class="project-image">
+                <img src="{{ project.default_image_url }}" alt="{{ project.title }}" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Impact Section -->
+    <div class="business-impact">
+        <h2><i class="fas fa-chart-line"></i> Business Impact</h2>
+        <div class="impact-grid">
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-bullseye"></i></div>
+                <h3>Problem Solved</h3>
+                <p>Customer acquisition costs are 5-25x higher than retention costs. This solution identifies at-risk customers with 82% accuracy.</p>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-dollar-sign"></i></div>
+                <h3>Value Delivered</h3>
+                <p>Enables proactive retention campaigns, reduces revenue loss, and optimizes marketing budget allocation.</p>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>Key Results</h3>
+                <p>82.19% accuracy with Logistic Regression, identifying high-risk customers for targeted retention strategies.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance -->
+    <div class="model-performance">
+        <h2><i class="fas fa-brain"></i> Model Performance</h2>
+        <div class="performance-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision (Churn)</th>
+                        <th>Recall (Churn)</th>
+                        <th>Business Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="best-model">
+                        <td><strong>Logistic Regression</strong></td>
+                        <td><strong>82.19%</strong></td>
+                        <td><strong>69%</strong></td>
+                        <td><strong>60%</strong></td>
+                        <td><strong>Balanced Performance</strong></td>
+                    </tr>
+                    <tr>
+                        <td>KNN (k=15)</td>
+                        <td>77.93%</td>
+                        <td>60%</td>
+                        <td>51%</td>
+                        <td>Standard Classification</td>
+                    </tr>
+                    <tr>
+                        <td>Logistic + SMOTE</td>
+                        <td>76.86%</td>
+                        <td>55%</td>
+                        <td>72%</td>
+                        <td>Higher Recall Priority</td>
+                    </tr>
+                    <tr>
+                        <td>KNN + SMOTE</td>
+                        <td>72.89%</td>
+                        <td>49%</td>
+                        <td><strong>81%</strong></td>
+                        <td><strong>Maximum Churn Detection</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Technical Architecture -->
+    <div class="technical-architecture">
+        <h2><i class="fas fa-cogs"></i> Technical Architecture</h2>
+        <div class="architecture-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Data Preprocessing</h3>
+                <p>Missing value imputation, categorical encoding, feature scaling, and data leakage detection.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Feature Engineering</h3>
+                <p>One-hot encoding, data leakage detection, and train-test splitting with stratification.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Model Development</h3>
+                <p>Logistic Regression and K-Nearest Neighbors with hyperparameter optimization using GridSearchCV.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Class Imbalance Handling</h3>
+                <p>SMOTE (Synthetic Minority Oversampling Technique) for balanced model training.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <h3>Evaluation & Insights</h3>
+                <p>Comprehensive metrics analysis with business-focused interpretation and actionable recommendations.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Integration -->
+    <div class="code-integration">
+        <h2><i class="fas fa-code"></i> Key Code Components</h2>
+        
+        <div class="code-section">
+            <h3>Main Pipeline Orchestrator</h3>
+            <div class="code-embed">
+                <script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fabzanganeh%2Fchurn_risk_intelligence%2Fblob%2Fmain%2Fsrc%2Fmain.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <h3>Model Training Pipeline</h3>
+            <div class="code-embed">
+                <script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fabzanganeh%2Fchurn_risk_intelligence%2Fblob%2Fmain%2Fsrc%2Fmodel_training.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Information -->
+    <div class="dataset-info">
+        <h2><i class="fas fa-database"></i> Dataset Information</h2>
+        <div class="dataset-details">
+            <div class="dataset-stat">
+                <h3>Source</h3>
+                <p>Telco Customer Churn Dataset</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Size</h3>
+                <p>7,043 customers × 21 features</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Target</h3>
+                <p>Customer churn (Yes/No)</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Class Distribution</h3>
+                <p>26.5% churn rate (imbalanced dataset)</p>
+            </div>
+        </div>
+        
+        <div class="feature-categories">
+            <h3>Feature Categories</h3>
+            <div class="feature-grid">
+                <div class="feature-category">
+                    <h4>Demographics</h4>
+                    <p>Gender, age range, partner/dependent status</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Account Information</h4>
+                    <p>Contract type, payment method, tenure, billing preferences</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Services</h4>
+                    <p>Phone, internet, security, backup, streaming services</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Financial</h4>
+                    <p>Monthly charges, total charges</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Recommendations -->
+    <div class="business-recommendations">
+        <h2><i class="fas fa-lightbulb"></i> Business Recommendations</h2>
+        
+        <div class="recommendation-section">
+            <h3>For High-Value Customer Businesses</h3>
+            <ul>
+                <li><strong>Use KNN + SMOTE model</strong> for maximum churn detection (81% recall)</li>
+                <li>Implement comprehensive retention campaigns for all flagged customers</li>
+                <li>Focus on customers with fiber optic internet and month-to-month contracts</li>
+            </ul>
+        </div>
+
+        <div class="recommendation-section">
+            <h3>For Cost-Conscious Operations</h3>
+            <ul>
+                <li><strong>Use Logistic Regression model</strong> for efficient targeting (69% precision)</li>
+                <li>Prioritize customers with electronic check payments and high monthly charges</li>
+                <li>Develop automated retention workflows for scalability</li>
+            </ul>
+        </div>
+
+        <div class="risk-factors">
+            <h3>Key Risk Factors to Monitor</h3>
+            <div class="risk-grid">
+                <div class="risk-item">
+                    <h4>Contract Type</h4>
+                    <p>Month-to-month contracts show highest churn rates</p>
+                </div>
+                <div class="risk-item">
+                    <h4>Internet Service</h4>
+                    <p>Fiber optic users demonstrate elevated churn risk</p>
+                </div>
+                <div class="risk-item">
+                    <h4>Payment Method</h4>
+                    <p>Electronic check payments correlate with increased churn</p>
+                </div>
+                <div class="risk-item">
+                    <h4>Tenure</h4>
+                    <p>New customers (&lt; 6 months) require attention</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="technology-stack">
+        <h2><i class="fas fa-tools"></i> Technology Stack</h2>
+        <div class="tech-grid">
+            {% for tech in project.technology_list %}
+            <span class="tech-badge">{{ tech }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="back-navigation">
+        <a href="{{ url_for('projects') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add any project-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize any interactive elements
+    console.log('Churn Risk Intelligence project page loaded');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/projects.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/projects/bank-term-deposit-prediction.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container project-detail bank-project">
+    <!-- Project Header -->
+    <div class="project-header">
+        <div class="project-header-content">
+            <div class="project-info">
+                <h1 class="project-title">{{ project.title }}</h1>
+                <p class="project-description">{{ project.description }}</p>
+                
+                <div class="project-meta">
+                    <span class="project-category">{{ project.category }}</span>
+                    <span class="project-status">Completed</span>
+                    <span class="project-duration">2 months</span>
+                </div>
+                
+                <div class="project-links">
+                    <a href="{{ project.github_url }}" class="btn btn-outline" target="_blank">
+                        <i class="fas fa-code"></i> View Code
+                    </a>
+                    <a href="{{ project.github_url }}/blob/main/README.md" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-book"></i> Documentation
+                    </a>
+                </div>
+            </div>
+            
+            <div class="project-image">
+                <img src="{{ project.default_image_url }}" alt="{{ project.title }}" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Impact Section -->
+    <div class="business-impact">
+        <h2><i class="fas fa-chart-line"></i> Business Impact</h2>
+        <div class="impact-grid">
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-bullseye"></i></div>
+                <h3>Problem Solved</h3>
+                <p>Banks invest significant resources in marketing campaigns. This solution optimizes marketing spend by targeting high-probability prospects.</p>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-dollar-sign"></i></div>
+                <h3>Value Delivered</h3>
+                <p>Increases campaign conversion rates, improves customer experience, and maximizes return on investment for marketing activities.</p>
+            </div>
+            <div class="impact-item">
+                <div class="impact-icon"><i class="fas fa-chart-bar"></i></div>
+                <h3>Key Results</h3>
+                <p>Comprehensive binary classification pipeline analyzing ~41,000 customers with multiple ML algorithms for actionable insights.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Information -->
+    <div class="dataset-info">
+        <h2><i class="fas fa-database"></i> Dataset Information</h2>
+        <div class="dataset-details">
+            <div class="dataset-stat">
+                <h3>Source</h3>
+                <p>Bank Marketing Campaign Data</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Size</h3>
+                <p>~41,000 customers × 20+ features</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Target</h3>
+                <p>Term deposit subscription (yes/no)</p>
+            </div>
+            <div class="dataset-stat">
+                <h3>Class Distribution</h3>
+                <p>88% no subscription, 12% subscription</p>
+            </div>
+        </div>
+        
+        <div class="feature-categories">
+            <h3>Feature Categories</h3>
+            <div class="feature-grid">
+                <div class="feature-category">
+                    <h4>Demographic</h4>
+                    <p>Age, job, marital status, education, default status</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Financial</h4>
+                    <p>Housing loan, personal loan status</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Campaign</h4>
+                    <p>Contact method, month, day, duration, contacts</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Economic</h4>
+                    <p>Employment rate, CPI, confidence index</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Comparison -->
+    <div class="model-comparison">
+        <h2><i class="fas fa-brain"></i> Model Comparison</h2>
+        <div class="models-grid">
+            <div class="model-card">
+                <div class="model-header">
+                    <h3>Naive Bayes</h3>
+                    <span class="model-type">Probabilistic</span>
+                </div>
+                <div class="model-features">
+                    <ul>
+                        <li>Fast training and prediction</li>
+                        <li>Good baseline performance</li>
+                        <li>Handles categorical features well</li>
+                        <li>Probabilistic outputs</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="model-card">
+                <div class="model-header">
+                    <h3>Decision Tree (Gini)</h3>
+                    <span class="model-type">Tree-based</span>
+                </div>
+                <div class="model-features">
+                    <ul>
+                        <li>Interpretable decision rules</li>
+                        <li>Handles mixed data types</li>
+                        <li>Provides feature importance</li>
+                        <li>No feature scaling required</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="model-card">
+                <div class="model-header">
+                    <h3>Decision Tree (Entropy)</h3>
+                    <span class="model-type">Tree-based</span>
+                </div>
+                <div class="model-features">
+                    <ul>
+                        <li>Alternative splitting criterion</li>
+                        <li>Comparable performance to Gini</li>
+                        <li>Different decision boundaries</li>
+                        <li>Information theory approach</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Insights -->
+    <div class="key-insights">
+        <h2><i class="fas fa-lightbulb"></i> Key Insights & Findings</h2>
+        
+        <div class="insights-grid">
+            <div class="insight-section">
+                <h3>Data Insights</h3>
+                <div class="insight-list">
+                    <div class="insight-item">
+                        <h4>Class Imbalance</h4>
+                        <p>~88% customers do not subscribe to term deposits</p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>High Correlation</h4>
+                        <p>Strong correlation between economic indicators</p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>Seasonal Patterns</h4>
+                        <p>March and December show higher subscription rates</p>
+                    </div>
+                    <div class="insight-item">
+                        <h4>Contact Method</h4>
+                        <p>Cellular contact generally outperforms telephone</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-section">
+                <h3>Business Recommendations</h3>
+                <div class="recommendation-list">
+                    <div class="recommendation-item">
+                        <h4>Target Segments</h4>
+                        <p>Focus campaigns on students and retired individuals</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Timing</h4>
+                        <p>Schedule major campaigns in March and December</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Contact Method</h4>
+                        <p>Prioritize cellular over telephone contact</p>
+                    </div>
+                    <div class="recommendation-item">
+                        <h4>Previous Success</h4>
+                        <p>Heavily weight previous campaign success in targeting</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Architecture -->
+    <div class="technical-architecture">
+        <h2><i class="fas fa-cogs"></i> Technical Architecture</h2>
+        <div class="architecture-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Data Processing</h3>
+                <p>Data loading, cleaning, comprehensive EDA with visualizations and data quality validation.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Feature Engineering</h3>
+                <p>Creates meaningful features, handles multicollinearity, and implements categorical encoding.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Model Training</h3>
+                <p>Implements and compares Naive Bayes and Decision Tree models with comprehensive evaluation.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Model Evaluation</h3>
+                <p>Complete assessment with metrics, visualizations, confusion matrices, and ROC curves.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <h3>Model Persistence</h3>
+                <p>Automated saving of trained models with timestamps and comprehensive reporting.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Integration -->
+    <div class="code-integration">
+        <h2><i class="fas fa-code"></i> Key Code Components</h2>
+        
+        <div class="code-section">
+            <h3>Main Pipeline Orchestrator</h3>
+            <div class="code-embed">
+                <script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fabzanganeh%2Fbank-term-deposit-prediction%2Fblob%2Fmain%2Fsrc%2Fmain.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <h3>Data Processing Module</h3>
+            <div class="code-embed">
+                <script src="https://emgithub.com/embed-v2.js?target=https%3A%2F%2Fgithub.com%2Fabzanganeh%2Fbank-term-deposit-prediction%2Fblob%2Fmain%2Fsrc%2Fdata_processing.py&style=default&type=code&showBorder=on&showLineNumbers=on&showFileMeta=on&showCopy=on"></script>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Structure -->
+    <div class="project-structure">
+        <h2><i class="fas fa-folder-tree"></i> Project Structure</h2>
+        <div class="structure-tree">
+            <div class="structure-item">
+                <div class="structure-folder">
+                    <i class="fas fa-folder"></i> src/
+                </div>
+                <div class="structure-files">
+                    <div class="structure-file"><i class="fas fa-file-code"></i> config.py</div>
+                    <div class="structure-file"><i class="fas fa-file-code"></i> data_processing.py</div>
+                    <div class="structure-file"><i class="fas fa-file-code"></i> feature_engineering.py</div>
+                    <div class="structure-file"><i class="fas fa-file-code"></i> model_training.py</div>
+                    <div class="structure-file"><i class="fas fa-file-code"></i> evaluation.py</div>
+                    <div class="structure-file"><i class="fas fa-file-code"></i> main.py</div>
+                </div>
+            </div>
+            
+            <div class="structure-item">
+                <div class="structure-folder">
+                    <i class="fas fa-folder"></i> data/
+                </div>
+                <div class="structure-files">
+                    <div class="structure-file"><i class="fas fa-file-csv"></i> bank_data.csv</div>
+                </div>
+            </div>
+            
+            <div class="structure-item">
+                <div class="structure-folder">
+                    <i class="fas fa-folder"></i> models/
+                </div>
+                <div class="structure-files">
+                    <div class="structure-file"><i class="fas fa-file-archive"></i> saved models (.pkl)</div>
+                </div>
+            </div>
+            
+            <div class="structure-item">
+                <div class="structure-folder">
+                    <i class="fas fa-folder"></i> results/
+                </div>
+                <div class="structure-files">
+                    <div class="structure-file"><i class="fas fa-chart-bar"></i> plots and reports</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="technology-stack">
+        <h2><i class="fas fa-tools"></i> Technology Stack</h2>
+        <div class="tech-grid">
+            {% for tech in project.technology_list %}
+            <span class="tech-badge">{{ tech }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="back-navigation">
+        <a href="{{ url_for('projects') }}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Projects
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Bank Term Deposit Prediction project page loaded');
+});
+</script>
+{% endblock %}
