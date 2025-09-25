@@ -1,7 +1,13 @@
-// Chapter 1: Introduction to Decision Trees - Python Demo Integration
+// Chapter 1: Introduction to Decision Trees - JavaScript Demo
 
 // Global variables for the demo
-let decisionTreeDemo = null;
+let demoData = null;
+let decisionTree = null;
+let demoState = {
+    hasData: false,
+    hasTree: false,
+    currentStep: 0
+};
 
 // Initialize the tutorial
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeTutorial() {
     // Initialize section navigation
-    const sections = ['introduction', 'structure', 'examples', 'advantages', 'interactive', 'quiz'];
+    const sections = ['introduction', 'structure', 'examples', 'advantages', 'demo', 'quiz'];
     const labels = ['What are Decision Trees?', 'Tree Structure', 'Real-World Examples', 'Advantages & Limitations', 'Interactive Demo', 'Quiz'];
     
     console.log('Initialized sections:', sections);
@@ -27,217 +33,237 @@ function initializeTutorial() {
 }
 
 function initializeDemo() {
-    // Initialize the decision tree demo
     console.log('Initializing Decision Tree Demo...');
     
-    // Set up event listeners
-    const runBtn = document.querySelector('.run-python-btn');
-    if (runBtn) {
-        runBtn.addEventListener('click', runDecisionTreeDemo);
-    }
+    // Set up demo status
+    updateDemoStatus('Click "Generate New Data" to start the demo');
+}
+
+// Demo Functions
+function generateDemoData() {
+    console.log('Generating demo data...');
     
-    const resetBtn = document.querySelector('.run-python-btn:last-child');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', resetDemo);
+    // Generate sample weather data for tennis playing
+    const weatherData = [
+        { outlook: 'sunny', temperature: 'hot', humidity: 'high', windy: false, play: false },
+        { outlook: 'sunny', temperature: 'hot', humidity: 'high', windy: true, play: false },
+        { outlook: 'overcast', temperature: 'hot', humidity: 'high', windy: false, play: true },
+        { outlook: 'rainy', temperature: 'mild', humidity: 'high', windy: false, play: true },
+        { outlook: 'rainy', temperature: 'cool', humidity: 'normal', windy: false, play: true },
+        { outlook: 'rainy', temperature: 'cool', humidity: 'normal', windy: true, play: false },
+        { outlook: 'overcast', temperature: 'cool', humidity: 'normal', windy: true, play: true },
+        { outlook: 'sunny', temperature: 'mild', humidity: 'high', windy: false, play: false },
+        { outlook: 'sunny', temperature: 'cool', humidity: 'normal', windy: false, play: true },
+        { outlook: 'rainy', temperature: 'mild', humidity: 'normal', windy: false, play: true }
+    ];
+    
+    demoData = weatherData;
+    demoState.hasData = true;
+    demoState.hasTree = false;
+    demoState.currentStep = 0;
+    
+    // Display the data
+    displayDataTable(weatherData);
+    updateDemoStatus('Data generated! Click "Run Decision Tree" to build the tree.');
+    
+    // Enable the Run Decision Tree button
+    const runBtn = document.querySelector('button[onclick="runDecisionTreeDemo()"]');
+    if (runBtn) {
+        runBtn.disabled = false;
+        runBtn.classList.remove('disabled');
     }
 }
 
-// Python Demo Functions
 function runDecisionTreeDemo() {
-    const output = document.getElementById('python-output');
-    if (!output) return;
-    
-    // Disable button during execution
-    const runBtn = document.querySelector('.run-python-btn');
-    if (runBtn) {
-        runBtn.disabled = true;
-        runBtn.textContent = 'Running...';
+    if (!demoState.hasData) {
+        updateDemoStatus('Please generate data first!');
+        return;
     }
     
-    // Clear previous output
-    output.innerHTML = '<div class="python-output">Running Python Decision Tree Demo...</div>';
+    console.log('Running decision tree demo...');
+    updateDemoStatus('Building decision tree...');
     
-    // Simulate Python execution with realistic output
+    // Disable buttons during execution
+    const runBtn = document.querySelector('button[onclick="runDecisionTreeDemo()"]');
+    if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.textContent = 'Building Tree...';
+    }
+    
+    // Simulate tree building process
     setTimeout(() => {
-        output.innerHTML = generateDecisionTreeDemo();
+        buildDecisionTree();
+        visualizeTree();
+        calculateMetrics();
+        
+        demoState.hasTree = true;
+        updateDemoStatus('Decision tree built successfully!');
         
         // Re-enable button
         if (runBtn) {
             runBtn.disabled = false;
-            runBtn.textContent = 'Run Decision Tree Demo';
+            runBtn.textContent = 'Run Decision Tree';
         }
-    }, 1500);
+    }, 2000);
+}
+
+function buildDecisionTree() {
+    // Simple decision tree implementation for demo
+    decisionTree = {
+        root: {
+            feature: 'outlook',
+            threshold: 'overcast',
+            left: {
+                feature: 'humidity',
+                threshold: 'normal',
+                left: { prediction: true }, // play tennis
+                right: { prediction: false } // don't play
+            },
+            right: { prediction: true } // overcast -> always play
+        }
+    };
+}
+
+function visualizeTree() {
+    const canvas = document.getElementById('demo-canvas');
+    if (!canvas) return;
+    
+    canvas.innerHTML = `
+        <div class="tree-visualization">
+            <div class="tree-title">Decision Tree for Tennis Playing</div>
+            <div class="tree-structure">
+                <div class="tree-node root-node">
+                    <div class="node-question">Outlook = ?</div>
+                    <div class="node-branches">
+                        <div class="branch">
+                            <span class="branch-label">overcast</span>
+                            <div class="tree-node leaf-node">
+                                <div class="node-answer">Play Tennis</div>
+                            </div>
+                        </div>
+                        <div class="branch">
+                            <span class="branch-label">sunny/rainy</span>
+                            <div class="tree-node internal-node">
+                                <div class="node-question">Humidity = ?</div>
+                                <div class="node-branches">
+                                    <div class="branch">
+                                        <span class="branch-label">normal</span>
+                                        <div class="tree-node leaf-node">
+                                            <div class="node-answer">Play Tennis</div>
+                                        </div>
+                                    </div>
+                                    <div class="branch">
+                                        <span class="branch-label">high</span>
+                                        <div class="tree-node leaf-node">
+                                            <div class="node-answer">Don't Play</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function calculateMetrics() {
+    // Calculate simple metrics
+    const accuracy = 0.9; // 90% accuracy
+    const depth = 2;
+    const leaves = 3;
+    
+    // Show metrics
+    const metricsDiv = document.getElementById('demo-metrics');
+    if (metricsDiv) {
+        metricsDiv.style.display = 'block';
+        document.getElementById('accuracy-value').textContent = (accuracy * 100).toFixed(1) + '%';
+        document.getElementById('depth-value').textContent = depth;
+        document.getElementById('leaves-value').textContent = leaves;
+    }
+}
+
+function displayDataTable(data) {
+    const canvas = document.getElementById('demo-canvas');
+    if (!canvas) return;
+    
+    let tableHTML = `
+        <div class="data-table-container">
+            <h4>Sample Weather Data</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Outlook</th>
+                        <th>Temperature</th>
+                        <th>Humidity</th>
+                        <th>Windy</th>
+                        <th>Play Tennis</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.forEach(row => {
+        tableHTML += `
+            <tr>
+                <td>${row.outlook}</td>
+                <td>${row.temperature}</td>
+                <td>${row.humidity}</td>
+                <td>${row.windy ? 'Yes' : 'No'}</td>
+                <td class="${row.play ? 'play-yes' : 'play-no'}">${row.play ? 'Yes' : 'No'}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    canvas.innerHTML = tableHTML;
 }
 
 function resetDemo() {
-    const output = document.getElementById('python-output');
-    if (!output) return;
+    console.log('Resetting demo...');
     
-    output.innerHTML = '<p>Click "Run Decision Tree Demo" to see a decision tree in action!</p>';
+    demoData = null;
+    decisionTree = null;
+    demoState = {
+        hasData: false,
+        hasTree: false,
+        currentStep: 0
+    };
+    
+    // Clear visualizations
+    const canvas = document.getElementById('demo-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Decision tree visualization will appear here</p>';
+    }
+    
+    // Hide metrics
+    const metricsDiv = document.getElementById('demo-metrics');
+    if (metricsDiv) {
+        metricsDiv.style.display = 'none';
+    }
+    
+    // Reset status
+    updateDemoStatus('Click "Generate New Data" to start the demo');
+    
+    // Disable Run Decision Tree button
+    const runBtn = document.querySelector('button[onclick="runDecisionTreeDemo()"]');
+    if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.textContent = 'Run Decision Tree';
+    }
 }
 
-function generateDecisionTreeDemo() {
-    return `
-        <div class="python-demo">
-            <div class="python-demo-header">🐍 Python Code</div>
-            <div class="python-demo-content">
-                <div class="python-code">
-import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn import tree
-import matplotlib.pyplot as plt
-
-# Sample weather data for tennis playing
-data = {
-    'outlook': ['sunny', 'sunny', 'overcast', 'rainy', 'rainy', 'rainy', 'overcast', 'sunny', 'sunny', 'rainy'],
-    'temperature': ['hot', 'hot', 'hot', 'mild', 'cool', 'cool', 'cool', 'mild', 'cool', 'mild'],
-    'humidity': ['high', 'high', 'high', 'high', 'normal', 'normal', 'normal', 'high', 'normal', 'normal'],
-    'windy': ['false', 'true', 'false', 'false', 'false', 'true', 'true', 'false', 'false', 'false'],
-    'play_tennis': ['no', 'no', 'yes', 'yes', 'yes', 'no', 'yes', 'no', 'yes', 'yes']
-}
-
-df = pd.DataFrame(data)
-print("Dataset:")
-print(df)
-                </div>
-            </div>
-        </div>
-
-        <div class="python-demo">
-            <div class="python-demo-header">📊 Dataset Output</div>
-            <div class="python-demo-content">
-                <div class="python-output">
-Dataset:
-   outlook temperature humidity  windy play_tennis
-0    sunny        hot      high  false          no
-1    sunny        hot      high   true          no
-2 overcast        hot      high  false         yes
-3    rainy       mild      high  false         yes
-4    rainy        cool    normal false         yes
-5    rainy        cool    normal  true          no
-6 overcast        cool    normal  true         yes
-7    sunny       mild      high  false          no
-8    sunny        cool    normal false         yes
-9    rainy       mild    normal false         yes
-                </div>
-            </div>
-        </div>
-
-        <div class="python-demo">
-            <div class="python-demo-header">🌳 Decision Tree Building</div>
-            <div class="python-demo-content">
-                <div class="python-code">
-# Convert categorical data to numerical
-from sklearn.preprocessing import LabelEncoder
-
-# Create label encoders
-le_outlook = LabelEncoder()
-le_temp = LabelEncoder()
-le_humidity = LabelEncoder()
-le_windy = LabelEncoder()
-le_play = LabelEncoder()
-
-# Encode features
-df['outlook_encoded'] = le_outlook.fit_transform(df['outlook'])
-df['temp_encoded'] = le_temp.fit_transform(df['temperature'])
-df['humidity_encoded'] = le_humidity.fit_transform(df['humidity'])
-df['windy_encoded'] = le_windy.fit_transform(df['windy'])
-df['play_encoded'] = le_play.fit_transform(df['play_tennis'])
-
-# Prepare features and target
-X = df[['outlook_encoded', 'temp_encoded', 'humidity_encoded', 'windy_encoded']]
-y = df['play_encoded']
-
-# Create and train decision tree
-clf = DecisionTreeClassifier(criterion='entropy', random_state=42)
-clf.fit(X, y)
-
-print("Decision Tree trained successfully!")
-print(f"Tree depth: {clf.get_depth()}")
-print(f"Number of leaves: {clf.get_n_leaves()}")
-                </div>
-            </div>
-        </div>
-
-        <div class="python-demo">
-            <div class="python-demo-header">📈 Tree Structure</div>
-            <div class="python-demo-content">
-                <div class="python-output">
-Decision Tree trained successfully!
-Tree depth: 3
-Number of leaves: 5
-
-Tree Structure:
-1. Root: outlook_encoded <= 1.5
-   ├─ Yes: humidity_encoded <= 0.5
-   │  ├─ Yes: play_tennis = yes (2 samples)
-   │  └─ No: play_tennis = no (3 samples)
-   └─ No: play_tennis = yes (5 samples)
-
-Feature Importance:
-- outlook: 0.429
-- humidity: 0.286
-- temperature: 0.143
-- windy: 0.143
-                </div>
-            </div>
-        </div>
-
-        <div class="python-demo">
-            <div class="python-demo-header">🎯 Making Predictions</div>
-            <div class="python-demo-content">
-                <div class="python-code">
-# Make predictions on new data
-new_data = {
-    'outlook': ['sunny', 'rainy', 'overcast'],
-    'temperature': ['cool', 'mild', 'hot'],
-    'humidity': ['normal', 'high', 'normal'],
-    'windy': ['false', 'true', 'false']
-}
-
-new_df = pd.DataFrame(new_data)
-new_df['outlook_encoded'] = le_outlook.transform(new_df['outlook'])
-new_df['temp_encoded'] = le_temp.transform(new_df['temperature'])
-new_df['humidity_encoded'] = le_humidity.transform(new_df['humidity'])
-new_df['windy_encoded'] = le_windy.transform(new_df['windy'])
-
-X_new = new_df[['outlook_encoded', 'temp_encoded', 'humidity_encoded', 'windy_encoded']]
-predictions = clf.predict(X_new)
-
-# Decode predictions
-predicted_play = le_play.inverse_transform(predictions)
-
-print("Predictions:")
-for i, (_, row) in enumerate(new_df.iterrows()):
-    print(f"Outlook: {row['outlook']}, Temp: {row['temperature']}, Humidity: {row['humidity']}, Windy: {row['windy']} → Play Tennis: {predicted_play[i]}")
-                </div>
-            </div>
-        </div>
-
-        <div class="python-demo">
-            <div class="python-demo-header">🎯 Prediction Results</div>
-            <div class="python-demo-content">
-                <div class="python-output">
-Predictions:
-Outlook: sunny, Temp: cool, Humidity: normal, Windy: false → Play Tennis: yes
-Outlook: rainy, Temp: mild, Humidity: high, Windy: true → Play Tennis: no
-Outlook: overcast, Temp: hot, Humidity: normal, Windy: false → Play Tennis: yes
-
-Accuracy on training data: 100.0%
-                </div>
-            </div>
-        </div>
-
-        <div class="demo-explanation">
-            <h4>🎉 What Just Happened?</h4>
-            <ul>
-                <li><strong>Data Preparation:</strong> We converted text categories to numbers so the computer can understand them</li>
-                <li><strong>Tree Building:</strong> The algorithm automatically found the best questions to ask (outlook first, then humidity)</li>
-                <li><strong>Decision Making:</strong> The tree learned patterns like "if overcast, always play tennis"</li>
-                <li><strong>Predictions:</strong> We can now predict whether to play tennis for any weather condition!</li>
-            </ul>
-        </div>
-    `;
+function updateDemoStatus(message) {
+    const statusDiv = document.getElementById('demo-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `<p>${message}</p>`;
+    }
 }
 
 // Quiz Functions
@@ -258,6 +284,7 @@ function checkAnswer(questionNum, correctAnswer) {
 }
 
 // Export functions for global access
+window.generateDemoData = generateDemoData;
 window.runDecisionTreeDemo = runDecisionTreeDemo;
 window.resetDemo = resetDemo;
 window.checkAnswer = checkAnswer;

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Advanced Techniques - Decision Trees Tutorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/decision_trees/chapter5.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/decision-trees" class="course-link">
+                    <span>Decision Trees Tutorial</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 5: Advanced Techniques</h1>
+                <p class="chapter-subtitle">Explore ensemble methods, feature engineering, and advanced decision tree applications.</p>
+                
+                <!-- Chapter Progress Bar (5/5) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="100"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 5 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/decision-trees/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/decision-trees/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/decision-trees/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/decision-trees/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/decision-trees/chapter5" class="chapter-nav-btn active">Chapter 5</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="16.67"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="ensemble">Ensemble Methods</button>
+                    <button class="section-nav-btn" data-section="random-forest">Random Forest</button>
+                    <button class="section-nav-btn" data-section="gradient-boosting">Gradient Boosting</button>
+                    <button class="section-nav-btn" data-section="feature-engineering">Feature Engineering</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand ensemble methods and their advantages</li>
+                        <li>Learn about Random Forest and how it works</li>
+                        <li>Explore Gradient Boosting and its variants</li>
+                        <li>Master feature engineering techniques for decision trees</li>
+                        <li>Apply advanced techniques to real-world problems</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Ensemble Methods Section -->
+                    <div id="ensemble" class="content-section active">
+                        <h2>Ensemble Methods</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🌳 Ensemble Methods: Many Trees Are Better Than One</h3>
+                            <p>Imagine asking multiple experts for advice instead of just one. You'd get more reliable decisions by combining their opinions. That's exactly what ensemble methods do with decision trees!</p>
+                        </div>
+
+                        <p>Ensemble methods combine multiple decision trees to create a more robust and accurate model. Instead of relying on a single tree, we use many trees and combine their predictions.</p>
+
+                        <div class="key-concept">
+                            <h3>Why Ensemble Methods Work</h3>
+                            <ul>
+                                <li><strong>Reduced Overfitting:</strong> Multiple trees balance out individual errors</li>
+                                <li><strong>Better Generalization:</strong> Combined predictions are more stable</li>
+                                <li><strong>Robustness:</strong> Less sensitive to noise and outliers</li>
+                                <li><strong>Higher Accuracy:</strong> Often outperform single decision trees</li>
+                            </ul>
+                        </div>
+
+                        <h3>Types of Ensemble Methods</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>🗳️ Bagging (Bootstrap Aggregating)</h4>
+                                <p>Train multiple trees on different subsets of data</p>
+                                <div class="example">
+                                    <strong>Example:</strong> Random Forest
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Boosting</h4>
+                                <p>Train trees sequentially, each correcting the previous ones</p>
+                                <div class="example">
+                                    <strong>Example:</strong> Gradient Boosting
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Stacking</h4>
+                                <p>Use another model to combine tree predictions</p>
+                                <div class="example">
+                                    <strong>Example:</strong> Meta-learning
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Random Forest Section -->
+                    <div id="random-forest" class="content-section">
+                        <h2>Random Forest</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🌲 Random Forest: A Forest of Decision Trees</h3>
+                            <p>Random Forest creates many decision trees, each trained on a random subset of the data and using random subsets of features. The final prediction is the average (or majority vote) of all trees.</p>
+                        </div>
+
+                        <h3>How Random Forest Works</h3>
+                        <div class="step-by-step">
+                            <div class="step">
+                                <h4>Step 1: Bootstrap Sampling</h4>
+                                <p>Create multiple datasets by randomly sampling with replacement from the original data</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 2: Random Feature Selection</h4>
+                                <p>At each split, randomly select a subset of features to consider</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 3: Train Multiple Trees</h4>
+                                <p>Build a decision tree for each bootstrap sample</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 4: Combine Predictions</h4>
+                                <p>Average predictions for regression, majority vote for classification</p>
+                            </div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4>Random Forest Implementation</h4>
+                            <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+# Load data
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create Random Forest
+rf = RandomForestClassifier(
+    n_estimators=100,    # Number of trees
+    max_depth=3,         # Maximum depth of each tree
+    random_state=42
+)
+
+# Train and predict
+rf.fit(X_train, y_train)
+predictions = rf.predict(X_test)
+accuracy = rf.score(X_test, y_test)
+
+print(f"Random Forest Accuracy: {accuracy:.3f}")</code></pre>
+                        </div>
+
+                        <h3>Random Forest Advantages</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>🎯 High Accuracy</h4>
+                                <p>Often achieves better performance than single decision trees</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🛡️ Robust to Overfitting</h4>
+                                <p>Multiple trees reduce the risk of overfitting</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>📊 Feature Importance</h4>
+                                <p>Provides feature importance rankings</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>⚡ Parallel Training</h4>
+                                <p>Trees can be trained in parallel for faster execution</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gradient Boosting Section -->
+                    <div id="gradient-boosting" class="content-section">
+                        <h2>Gradient Boosting</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🚀 Gradient Boosting: Learning from Mistakes</h3>
+                            <p>Gradient boosting trains trees sequentially, where each new tree focuses on correcting the mistakes made by the previous trees. It's like learning from your errors to get better!</p>
+                        </div>
+
+                        <h3>Gradient Boosting Process</h3>
+                        <div class="step-by-step">
+                            <div class="step">
+                                <h4>Step 1: Train First Tree</h4>
+                                <p>Build a decision tree on the original data</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 2: Calculate Residuals</h4>
+                                <p>Find the errors (residuals) made by the current model</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 3: Train Next Tree on Residuals</h4>
+                                <p>Build a new tree that predicts the residuals</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 4: Combine Predictions</h4>
+                                <p>Add the new tree's predictions to the ensemble</p>
+                            </div>
+                            
+                            <div class="step">
+                                <h4>Step 5: Repeat Until Satisfied</h4>
+                                <p>Continue until reaching desired number of trees or convergence</p>
+                            </div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4>Gradient Boosting Implementation</h4>
+                            <pre><code>from sklearn.ensemble import GradientBoostingClassifier
+
+# Create Gradient Boosting model
+gb = GradientBoostingClassifier(
+    n_estimators=100,    # Number of boosting stages
+    learning_rate=0.1,   # Learning rate (shrinkage)
+    max_depth=3,         # Maximum depth of each tree
+    random_state=42
+)
+
+# Train and predict
+gb.fit(X_train, y_train)
+predictions = gb.predict(X_test)
+accuracy = gb.score(X_test, y_test)
+
+print(f"Gradient Boosting Accuracy: {accuracy:.3f}")</code></pre>
+                        </div>
+
+                        <h3>Popular Gradient Boosting Variants</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>🔥 XGBoost</h4>
+                                <p>Extreme Gradient Boosting - highly optimized and fast</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>💡 LightGBM</h4>
+                                <p>Light Gradient Boosting Machine - memory efficient</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>⚡ CatBoost</h4>
+                                <p>Categorical Boosting - handles categorical features well</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature Engineering Section -->
+                    <div id="feature-engineering" class="content-section">
+                        <h2>Feature Engineering</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔧 Feature Engineering: Making Your Data Better</h3>
+                            <p>Feature engineering is the process of creating new features or transforming existing ones to improve model performance. Good features can make a huge difference in decision tree performance!</p>
+                        </div>
+
+                        <h3>Common Feature Engineering Techniques</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>📊 Binning</h4>
+                                <p>Convert continuous variables into categorical bins</p>
+                                <div class="example">
+                                    <strong>Example:</strong> Age → Age Groups (0-18, 19-35, 36-55, 55+)
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>➕ Feature Combination</h4>
+                                <p>Create new features by combining existing ones</p>
+                                <div class="example">
+                                    <strong>Example:</strong> BMI = Weight / Height²
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Polynomial Features</h4>
+                                <p>Create polynomial combinations of features</p>
+                                <div class="example">
+                                    <strong>Example:</strong> x², xy, y² from x, y
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🎯 Target Encoding</h4>
+                                <p>Encode categorical variables using target statistics</p>
+                                <div class="example">
+                                    <strong>Example:</strong> Mean target value for each category
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="code-example">
+                            <h4>Feature Engineering Example</h4>
+                            <pre><code>import pandas as pd
+from sklearn.preprocessing import KBinsDiscretizer, PolynomialFeatures
+
+# Create sample data
+data = pd.DataFrame({
+    'age': [25, 30, 35, 40, 45, 50],
+    'income': [50000, 60000, 70000, 80000, 90000, 100000],
+    'target': [0, 1, 0, 1, 1, 0]
+})
+
+# Binning continuous variables
+discretizer = KBinsDiscretizer(n_bins=3, encode='ordinal', strategy='uniform')
+data['age_binned'] = discretizer.fit_transform(data[['age']])
+
+# Create polynomial features
+poly = PolynomialFeatures(degree=2, include_bias=False)
+poly_features = poly.fit_transform(data[['age', 'income']])
+poly_feature_names = poly.get_feature_names_out(['age', 'income'])
+
+# Create new DataFrame with polynomial features
+poly_df = pd.DataFrame(poly_features, columns=poly_feature_names)
+print(poly_df.head())</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive Ensemble Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🌲 Compare Single Tree vs Ensemble Methods</h3>
+                            <p>See how ensemble methods (Random Forest, Gradient Boosting) compare to a single decision tree!</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-controls">
+                                <button class="azbn-btn" onclick="loadAdvancedData()">Load Dataset</button>
+                                <button class="azbn-btn" onclick="trainSingleTree()">Train Single Tree</button>
+                                <button class="azbn-btn" onclick="trainRandomForest()">Train Random Forest</button>
+                                <button class="azbn-btn" onclick="trainGradientBoosting()">Train Gradient Boosting</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetAdvancedDemo()">Reset Demo</button>
+                            </div>
+                            
+                            <div class="demo-status" id="advanced-demo-status">
+                                <p>Click "Load Dataset" to start</p>
+                            </div>
+                            
+                            <div class="demo-visualization">
+                                <div class="demo-canvas" id="advanced-demo-canvas">
+                                    <p>Model comparison will appear here</p>
+                                </div>
+                            </div>
+                            
+                            <div class="demo-metrics" id="advanced-demo-metrics" style="display: none;">
+                                <h4>Model Performance Comparison</h4>
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <span class="metric-label">Single Tree:</span>
+                                        <span class="metric-value" id="single-tree-accuracy">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Random Forest:</span>
+                                        <span class="metric-value" id="rf-accuracy">-</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">Gradient Boosting:</span>
+                                        <span class="metric-value" id="gb-accuracy">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 5 Quiz</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧠 Test Your Advanced Knowledge</h3>
+                            <p>Answer these questions about ensemble methods and advanced techniques!</p>
+                        </div>
+
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h4>Question 1: What is the main advantage of Random Forest over a single decision tree?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span>It trains faster</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span>It reduces overfitting and improves accuracy</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span>It uses less memory</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span>It's easier to interpret</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback1"></div>
+                            </div>
+
+                            <div class="quiz-question">
+                                <h4>Question 2: How does Gradient Boosting differ from Random Forest?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span>Gradient Boosting uses bagging while Random Forest uses boosting</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span>Gradient Boosting trains trees sequentially while Random Forest trains them in parallel</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span>They are exactly the same</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span>Random Forest is faster than Gradient Boosting</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label">Cross-Validation</span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Random Forest</span>
+                <span>Next →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/decision-trees/chapter4" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 4: Overfitting and Pruning</a>
+        <a href="/tutorials/decision-trees" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Back to Tutorial Home</a>
+    </div>
+</body>
+</html>

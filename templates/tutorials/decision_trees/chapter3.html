@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Python Implementation - Decision Trees Tutorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/decision_trees/chapter3.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/decision-trees" class="course-link">
+                    <span>Decision Trees Tutorial</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 3: Python Implementation</h1>
+                <p class="chapter-subtitle">Learn how to implement decision trees in Python using scikit-learn and build your own from scratch.</p>
+                
+                <!-- Chapter Progress Bar (3/5) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="60"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 5 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/decision-trees/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/decision-trees/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/decision-trees/chapter3" class="chapter-nav-btn active">Chapter 3</a>
+                    <a href="/tutorials/decision-trees/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/decision-trees/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="16.67"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="sklearn">Using scikit-learn</button>
+                    <button class="section-nav-btn" data-section="custom">Custom Implementation</button>
+                    <button class="section-nav-btn" data-section="visualization">Tree Visualization</button>
+                    <button class="section-nav-btn" data-section="parameters">Parameters & Tuning</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Learn to use scikit-learn's DecisionTreeClassifier</li>
+                        <li>Understand key parameters and how to tune them</li>
+                        <li>Build a custom decision tree from scratch</li>
+                        <li>Visualize decision trees effectively</li>
+                        <li>Handle real-world datasets with decision trees</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- scikit-learn Section -->
+                    <div id="sklearn" class="content-section active">
+                        <h2>Using scikit-learn</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🐍 scikit-learn: Your Decision Tree Toolkit</h3>
+                            <p>scikit-learn provides powerful, optimized implementations of decision trees that handle all the complex math for you. You just need to understand how to use them effectively!</p>
+                        </div>
+
+                        <h3>Basic Implementation</h3>
+                        <div class="code-example">
+                            <h4>Simple Decision Tree Example</h4>
+                            <pre><code>from sklearn.tree import DecisionTreeClassifier
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+# Load sample data
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create and train decision tree
+clf = DecisionTreeClassifier(random_state=42)
+clf.fit(X_train, y_train)
+
+# Make predictions
+predictions = clf.predict(X_test)
+accuracy = clf.score(X_test, y_test)
+
+print(f"Accuracy: {accuracy:.2f}")</code></pre>
+                        </div>
+
+                        <h3>Key Parameters</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>🎯 criterion</h4>
+                                <p>How to measure split quality</p>
+                                <div class="example">
+                                    <strong>Options:</strong> 'gini', 'entropy', 'log_loss'
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>📏 max_depth</h4>
+                                <p>Maximum depth of the tree</p>
+                                <div class="example">
+                                    <strong>Default:</strong> None (unlimited)
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🍃 min_samples_split</h4>
+                                <p>Minimum samples needed to split</p>
+                                <div class="example">
+                                    <strong>Default:</strong> 2
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🍂 min_samples_leaf</h4>
+                                <p>Minimum samples in leaf nodes</p>
+                                <div class="example">
+                                    <strong>Default:</strong> 1
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Custom Implementation Section -->
+                    <div id="custom" class="content-section">
+                        <h2>Custom Implementation</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔨 Building Your Own Decision Tree</h3>
+                            <p>While scikit-learn is powerful, understanding how to build a decision tree from scratch helps you truly understand the algorithm and customize it for specific needs.</p>
+                        </div>
+
+                        <h3>Core Components</h3>
+                        <div class="code-example">
+                            <h4>Node Class</h4>
+                            <pre><code>class TreeNode:
+    def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):
+        self.feature = feature      # Feature to split on
+        self.threshold = threshold  # Threshold value
+        self.left = left           # Left child
+        self.right = right         # Right child
+        self.value = value         # Prediction (for leaf nodes)
+        
+    def is_leaf(self):
+        return self.value is not None</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Visualization Section -->
+                    <div id="visualization" class="content-section">
+                        <h2>Tree Visualization</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>👁️ Seeing Your Decision Tree</h3>
+                            <p>Visualizing decision trees helps you understand how they make decisions and debug any issues. There are several ways to visualize trees in Python.</p>
+                        </div>
+
+                        <h3>Text Visualization</h3>
+                        <div class="code-example">
+                            <h4>Using sklearn.tree.export_text</h4>
+                            <pre><code>from sklearn.tree import export_text
+
+# Export tree as text
+tree_rules = export_text(clf, feature_names=iris.feature_names)
+print(tree_rules)</code></pre>
+                        </div>
+
+                        <h3>Graph Visualization</h3>
+                        <div class="code-example">
+                            <h4>Using sklearn.tree.plot_tree</h4>
+                            <pre><code>import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+
+# Plot the decision tree
+plt.figure(figsize=(12, 8))
+plot_tree(clf, feature_names=iris.feature_names, 
+          class_names=iris.target_names, filled=True)
+plt.title("Decision Tree Visualization")
+plt.show()</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Parameters Section -->
+                    <div id="parameters" class="content-section">
+                        <h2>Parameters & Tuning</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚙️ Tuning Your Decision Tree</h3>
+                            <p>Decision trees have several parameters that control their behavior. Understanding these parameters is crucial for building effective models.</p>
+                        </div>
+
+                        <h3>Preventing Overfitting</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>📏 Maximum Depth</h4>
+                                <p>Limit how deep the tree can grow</p>
+                                <div class="example">
+                                    <strong>Tip:</strong> Start with 3-5, increase if underfitting
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Minimum Samples Split</h4>
+                                <p>Require minimum samples to create a split</p>
+                                <div class="example">
+                                    <strong>Tip:</strong> Use 10-20 for small datasets
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Minimum Samples Leaf</h4>
+                                <p>Require minimum samples in leaf nodes</p>
+                                <div class="example">
+                                    <strong>Tip:</strong> Use 5-10 to prevent tiny leaves
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🔍 Maximum Features</h4>
+                                <p>Maximum features to consider at each split</p>
+                                <div class="example">
+                                    <strong>Tip:</strong> Use 'sqrt' or 'log2' for high-dimensional data
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive Python Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>�� Try Python Implementation</h3>
+                            <p>Experiment with different parameters and see how they affect the decision tree performance and structure!</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-controls">
+                                <button class="azbn-btn" onclick="loadDataset()">Load Dataset</button>
+                                <button class="azbn-btn" onclick="trainTree()">Train Tree</button>
+                                <button class="azbn-btn" onclick="visualizeTree()">Visualize Tree</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetPythonDemo()">Reset Demo</button>
+                            </div>
+                            
+                            <div class="demo-status" id="python-demo-status">
+                                <p>Click "Load Dataset" to start</p>
+                            </div>
+                            
+                            <div class="demo-visualization">
+                                <div class="demo-canvas" id="python-demo-canvas">
+                                    <p>Python code and results will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 3 Quiz</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧠 Test Your Python Knowledge</h3>
+                            <p>Answer these questions about Python implementation!</p>
+                        </div>
+
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h4>Question 1: Which parameter controls the maximum depth of a decision tree?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span>min_depth</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span>max_depth</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span>depth_limit</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span>tree_depth</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback1"></div>
+                            </div>
+
+                            <div class="quiz-question">
+                                <h4>Question 2: What is the default criterion for DecisionTreeClassifier?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span>entropy</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span>gini</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span>information_gain</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span>variance</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label">Splitting Criteria</span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Custom Implementation</span>
+                <span>Next →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/decision-trees/chapter2" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 2: Decision Tree Mathematics</a>
+        <a href="/tutorials/decision-trees/chapter4" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 4: Overfitting and Pruning →</a>
+    </div>
+</body>
+</html>

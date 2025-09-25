@@ -4,415 +4,286 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chapter 2: Decision Tree Mathematics - Decision Trees Tutorial</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/chapter1.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/decision_trees/decision_trees.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/decision_trees/chapter2.js') }}"></script>
 </head>
 <body>
-    <div class="tutorial-header">
-        <div class="tutorial-nav">
-            <a href="{{ url_for('decision_trees_chapter', chapter=1) }}" class="back-link">← Previous Chapter</a>
-            <div class="chapter-info">
-                <span class="chapter-number">Chapter 2</span>
-                <h1>Decision Tree Mathematics</h1>
-                <p class="chapter-subtitle">Understand entropy, information gain, and splitting criteria</p>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/decision-trees" class="course-link">
+                    <span>Decision Trees Tutorial</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
             </div>
-            <div class="chapter-nav">
-                <a href="{{ url_for('decision_trees_index') }}" class="nav-link">Tutorial Home</a>
-                <a href="{{ url_for('decision_trees_chapter', chapter=3) }}" class="nav-link">Next Chapter →</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 2: Decision Tree Mathematics</h1>
+                <p class="chapter-subtitle">Dive deep into the mathematical foundations of decision trees, including entropy, information gain, and splitting criteria.</p>
+                
+                <!-- Chapter Progress Bar (2/5) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="40"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 5 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/decision-trees/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/decision-trees/chapter2" class="chapter-nav-btn active">Chapter 2</a>
+                    <a href="/tutorials/decision-trees/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/decision-trees/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/decision-trees/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="16.67"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="entropy">Entropy & Information</button>
+                    <button class="section-nav-btn" data-section="information-gain">Information Gain</button>
+                    <button class="section-nav-btn" data-section="gini">Gini Impurity</button>
+                    <button class="section-nav-btn" data-section="splitting">Splitting Criteria</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="tutorial-content">
-        <div class="azbn-container">
-            <!-- Learning Objectives -->
-            <div class="learning-objectives-box">
-                <h2>Learning Objectives</h2>
-                <ul>
-                    <li>Understand entropy and its role in decision trees</li>
-                    <li>Learn how information gain helps choose the best splits</li>
-                    <li>Explore Gini impurity as an alternative splitting criterion</li>
-                    <li>Calculate splitting metrics with Python examples</li>
-                    <li>Compare different splitting criteria and their effects</li>
-                </ul>
-            </div>
-
-            <!-- Section Navigation -->
-            <div class="section-nav">
-                <button class="section-nav-btn active" data-section="entropy">Entropy</button>
-                <button class="section-nav-btn" data-section="information-gain">Information Gain</button>
-                <button class="section-nav-btn" data-section="gini">Gini Impurity</button>
-                <button class="section-nav-btn" data-section="comparison">Criteria Comparison</button>
-                <button class="section-nav-btn" data-section="interactive">Interactive Calculator</button>
-                <button class="section-nav-btn" data-section="quiz">Quiz</button>
-            </div>
-
-            <!-- Content Sections -->
-            <div class="content-sections">
-                <!-- Entropy Section -->
-                <div id="entropy" class="content-section active">
-                    <h2>Entropy: Measuring Uncertainty</h2>
-                    
-                    <div class="explanation-box">
-                        <h3>🎲 Think of Entropy Like a Coin Flip</h3>
-                        <p>Imagine you have a coin. If it's a fair coin (50% heads, 50% tails), you're very uncertain about what will happen next. But if it's a biased coin that always lands heads, you're certain about the outcome. Entropy measures this uncertainty!</p>
-                    </div>
-
-                    <p>Entropy is a measure of disorder or uncertainty in a dataset. In decision trees, we use entropy to determine how "mixed up" our data is. The higher the entropy, the more uncertain we are about the outcome.</p>
-
-                    <h3>The Entropy Formula</h3>
-                    <div class="formula-box">
-                        <h4>Entropy = -Σ(p × log₂(p))</h4>
-                        <p>Where p is the proportion of each class in the dataset</p>
-                    </div>
-
-                    <h3>Understanding Entropy Values</h3>
-                    <div class="concept-grid">
-                        <div class="concept-card">
-                            <h4>🎯 Entropy = 0</h4>
-                            <p>Perfect order! All samples belong to the same class. No uncertainty at all.</p>
-                            <div class="example">
-                                <strong>Example:</strong> All 10 people play tennis
-                            </div>
-                        </div>
-                        
-                        <div class="concept-card">
-                            <h4>🎲 Entropy = 1</h4>
-                            <p>Maximum disorder! Equal mix of classes. Complete uncertainty.</p>
-                            <div class="example">
-                                <strong>Example:</strong> 5 people play tennis, 5 don't
-                            </div>
-                        </div>
-                        
-                        <div class="concept-card">
-                            <h4>📊 Entropy = 0.5</h4>
-                            <p>Some order, some disorder. Moderate uncertainty.</p>
-                            <div class="example">
-                                <strong>Example:</strong> 8 people play tennis, 2 don't
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>Why Entropy Matters</h3>
-                    <p>Decision trees use entropy to find the best questions to ask. They want to reduce entropy at each step - this means making the data more "pure" and less uncertain.</p>
-                </div>
-
-                <!-- Information Gain Section -->
-                <div id="information-gain" class="content-section">
-                    <h2>Information Gain: Finding the Best Split</h2>
-                    
-                    <div class="explanation-box">
-                        <h3>🎯 Think of Information Gain Like a Detective</h3>
-                        <p>A detective asks questions to narrow down suspects. Each good question eliminates many possibilities and gets closer to the truth. Information gain measures how much a question helps us reduce uncertainty!</p>
-                    </div>
-
-                    <p>Information gain tells us how much a particular split reduces entropy. The higher the information gain, the better the split is at separating different classes.</p>
-
-                    <h3>The Information Gain Formula</h3>
-                    <div class="formula-box">
-                        <h4>Information Gain = Entropy(parent) - Weighted Average Entropy(children)</h4>
-                        <p>We subtract the weighted entropy of child nodes from the parent node's entropy</p>
-                    </div>
-
-                    <h3>Step-by-Step Example</h3>
-                    <div class="step-by-step">
-                        <div class="step">
-                            <h4>Step 1: Calculate Parent Entropy</h4>
-                            <p>Let's say we have 14 people: 9 play tennis, 5 don't.</p>
-                            <div class="calculation">
-                                <p>Entropy = -(9/14 × log₂(9/14) + 5/14 × log₂(5/14))</p>
-                                <p>Entropy = -(0.643 × (-0.637) + 0.357 × (-1.485))</p>
-                                <p>Entropy = 0.940</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step">
-                            <h4>Step 2: Try a Split</h4>
-                            <p>What if we split by "Outlook"?</p>
-                            <div class="calculation">
-                                <p>Sunny: 2 play, 3 don't → Entropy = 0.971</p>
-                                <p>Overcast: 4 play, 0 don't → Entropy = 0</p>
-                                <p>Rainy: 3 play, 2 don't → Entropy = 0.971</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step">
-                            <h4>Step 3: Calculate Weighted Average</h4>
-                            <div class="calculation">
-                                <p>Weighted Entropy = (5/14 × 0.971) + (4/14 × 0) + (5/14 × 0.971)</p>
-                                <p>Weighted Entropy = 0.693</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step">
-                            <h4>Step 4: Calculate Information Gain</h4>
-                            <div class="calculation">
-                                <p>Information Gain = 0.940 - 0.693 = 0.247</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gini Section -->
-                <div id="gini" class="content-section">
-                    <h2>Gini Impurity: An Alternative Measure</h2>
-                    
-                    <div class="explanation-box">
-                        <h3>🎯 Think of Gini Like a Lottery</h3>
-                        <p>Imagine you have a bag of colored balls. If all balls are the same color, you're certain what you'll pick. But if there are many different colors, you're uncertain. Gini impurity measures this uncertainty!</p>
-                    </div>
-
-                    <p>Gini impurity is another way to measure how "mixed up" our data is. It's often used as an alternative to entropy because it's faster to calculate and gives similar results.</p>
-
-                    <h3>The Gini Impurity Formula</h3>
-                    <div class="formula-box">
-                        <h4>Gini = 1 - Σ(p²)</h4>
-                        <p>Where p is the proportion of each class in the dataset</p>
-                    </div>
-
-                    <h3>Gini vs Entropy Comparison</h3>
-                    <div class="comparison-grid">
-                        <div class="comparison-card">
-                            <h4>📊 Gini Impurity</h4>
-                            <ul>
-                                <li><strong>Range:</strong> 0 to 0.5 (for binary classification)</li>
-                                <li><strong>Calculation:</strong> Faster (no logarithms)</li>
-                                <li><strong>Behavior:</strong> More sensitive to class probability changes</li>
-                                <li><strong>Use Case:</strong> Default in many libraries</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="comparison-card">
-                            <h4>📈 Entropy</h4>
-                            <ul>
-                                <li><strong>Range:</strong> 0 to 1 (for binary classification)</li>
-                                <li><strong>Calculation:</strong> Slower (requires logarithms)</li>
-                                <li><strong>Behavior:</strong> More balanced sensitivity</li>
-                                <li><strong>Use Case:</strong> Better for theoretical analysis</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <h3>When to Use Which?</h3>
-                    <div class="decision-guide">
-                        <h4>🎯 Choose Gini When:</h4>
-                        <ul>
-                            <li>Speed is important (large datasets)</li>
-                            <li>You want the default behavior</li>
-                            <li>Working with binary classification</li>
-                        </ul>
-                        
-                        <h4>📊 Choose Entropy When:</h4>
-                        <ul>
-                            <li>You need theoretical understanding</li>
-                            <li>Working with multi-class problems</li>
-                            <li>You want more balanced splits</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Comparison Section -->
-                <div id="comparison" class="content-section">
-                    <h2>Splitting Criteria Comparison</h2>
-                    
-                    <h3>Real-World Example: Credit Approval</h3>
-                    <p>Let's compare how different splitting criteria would handle a credit approval dataset:</p>
-
-                    <div class="example-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Income</th>
-                                    <th>Credit Score</th>
-                                    <th>Age</th>
-                                    <th>Approved</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>High</td><td>Good</td><td>Young</td><td>Yes</td></tr>
-                                <tr><td>High</td><td>Poor</td><td>Old</td><td>No</td></tr>
-                                <tr><td>Low</td><td>Good</td><td>Young</td><td>No</td></tr>
-                                <tr><td>High</td><td>Good</td><td>Old</td><td>Yes</td></tr>
-                                <tr><td>Low</td><td>Poor</td><td>Old</td><td>No</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="criteria-results">
-                        <div class="criteria-card">
-                            <h4>🎯 Entropy Results</h4>
-                            <div class="result-item">
-                                <strong>Best Split:</strong> Income (Gain: 0.171)
-                            </div>
-                            <div class="result-item">
-                                <strong>Second Best:</strong> Credit Score (Gain: 0.123)
-                            </div>
-                            <div class="result-item">
-                                <strong>Worst:</strong> Age (Gain: 0.048)
-                            </div>
-                        </div>
-                        
-                        <div class="criteria-card">
-                            <h4>📊 Gini Results</h4>
-                            <div class="result-item">
-                                <strong>Best Split:</strong> Income (Gain: 0.125)
-                            </div>
-                            <div class="result-item">
-                                <strong>Second Best:</strong> Credit Score (Gain: 0.089)
-                            </div>
-                            <div class="result-item">
-                                <strong>Worst:</strong> Age (Gain: 0.035)
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>Key Insights</h3>
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
                     <ul>
-                        <li><strong>Both criteria agree:</strong> Income is the most important feature</li>
-                        <li><strong>Entropy is more sensitive:</strong> Shows larger differences between features</li>
-                        <li><strong>Gini is more conservative:</strong> Smaller differences, but same ranking</li>
-                        <li><strong>Both ignore Age:</strong> Age doesn't help much in this example</li>
+                        <li>Understand entropy and its role in decision tree splitting</li>
+                        <li>Learn how to calculate information gain</li>
+                        <li>Master Gini impurity as an alternative splitting criterion</li>
+                        <li>Understand different splitting criteria and when to use them</li>
+                        <li>See mathematical concepts in action with interactive demos</li>
                     </ul>
                 </div>
 
-                <!-- Interactive Calculator Section -->
-                <div id="interactive" class="content-section">
-                    <h2>Interactive Splitting Calculator</h2>
-                    
-                    <div class="explanation-box">
-                        <h3>🧮 Try It Yourself!</h3>
-                        <p>Use this interactive calculator to see how different splitting criteria work with your own data. Modify the class distributions and see how entropy and Gini impurity change!</p>
-                    </div>
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Entropy Section -->
+                    <div id="entropy" class="content-section active">
+                        <h2>Entropy & Information Theory</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎲 Think of Entropy Like a Coin Flip</h3>
+                            <p>Imagine you have a bag of coins. If all coins are fair (50% heads, 50% tails), you're very uncertain about what you'll get - this is high entropy. If all coins are weighted to always land heads, you're certain about the outcome - this is low entropy.</p>
+                        </div>
 
-                    <div class="interactive-python">
-                        <div class="interactive-python-header">
-                            🐍 Python Splitting Calculator
-                        </div>
-                        <div class="interactive-python-controls">
-                            <div class="control-group">
-                                <label for="class1-count">Class 1 Count:</label>
-                                <input type="range" id="class1-count" min="0" max="20" value="10">
-                                <span id="class1-display">10</span>
+                        <p>Entropy measures the amount of uncertainty or randomness in a dataset. In decision trees, we use entropy to determine how "pure" or "impure" a group of data points is.</p>
+
+                        <div class="key-concept">
+                            <h3>Mathematical Definition</h3>
+                            <p>Entropy is calculated using the formula:</p>
+                            <div class="formula">
+                                <code>H(S) = -Σ p(x) × log₂(p(x))</code>
                             </div>
-                            <div class="control-group">
-                                <label for="class2-count">Class 2 Count:</label>
-                                <input type="range" id="class2-count" min="0" max="20" value="10">
-                                <span id="class2-display">10</span>
-                            </div>
-                            <button class="run-python-btn" onclick="calculateSplittingMetrics()">Calculate Metrics</button>
-                        </div>
-                        <div class="interactive-python-output" id="splitting-output">
-                            <p>Adjust the class counts and click "Calculate Metrics" to see entropy and Gini impurity!</p>
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>H(S)</strong> is the entropy of set S</li>
+                                <li><strong>p(x)</strong> is the proportion of class x in the set</li>
+                                <li><strong>log₂</strong> is the logarithm base 2</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="demo-explanation">
-                        <h4>What This Calculator Shows</h4>
-                        <ul>
-                            <li><strong>Entropy Calculation:</strong> See how uncertainty changes with class distribution</li>
-                            <li><strong>Gini Impurity:</strong> Compare Gini values with entropy</li>
-                            <li><strong>Visual Comparison:</strong> Understand the relationship between the two metrics</li>
-                            <li><strong>Real-time Updates:</strong> See immediate changes as you adjust the data</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Quiz Section -->
-                <div id="quiz" class="content-section">
-                    <h2>Chapter 2 Quiz</h2>
-                    
-                    <div class="explanation-box">
-                        <h3>🧠 Test Your Mathematical Understanding</h3>
-                        <p>Answer these questions to make sure you understand entropy, information gain, and Gini impurity!</p>
-                    </div>
-
-                    <div class="quiz-container">
-                        <div class="quiz-question">
-                            <h4>Question 1: What does entropy measure in decision trees?</h4>
-                            <div class="quiz-options">
-                                <label class="quiz-option">
-                                    <input type="radio" name="q1" value="a">
-                                    <span>The speed of the algorithm</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q1" value="b">
-                                    <span>The uncertainty or disorder in the data</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q1" value="c">
-                                    <span>The number of features</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q1" value="d">
-                                    <span>The depth of the tree</span>
-                                </label>
-                            </div>
-                            <button class="check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
-                            <div class="answer-feedback" id="feedback1"></div>
+                    <!-- Information Gain Section -->
+                    <div id="information-gain" class="content-section">
+                        <h2>Information Gain</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎁 Information Gain = How Much We Learn</h3>
+                            <p>Information gain measures how much we reduce uncertainty by splitting the data. If splitting gives us much more organized groups, we gain a lot of information!</p>
                         </div>
 
-                        <div class="quiz-question">
-                            <h4>Question 2: What is the maximum value of entropy for binary classification?</h4>
-                            <div class="quiz-options">
-                                <label class="quiz-option">
-                                    <input type="radio" name="q2" value="a">
-                                    <span>0.5</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q2" value="b">
-                                    <span>1.0</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q2" value="c">
-                                    <span>2.0</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q2" value="d">
-                                    <span>It depends on the data</span>
-                                </label>
+                        <div class="key-concept">
+                            <h3>Information Gain Formula</h3>
+                            <p>Information Gain is calculated as:</p>
+                            <div class="formula">
+                                <code>IG(S, A) = H(S) - Σ (|Sv|/|S|) × H(Sv)</code>
                             </div>
-                            <button class="check-answer-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
-                            <div class="answer-feedback" id="feedback2"></div>
-                        </div>
-
-                        <div class="quiz-question">
-                            <h4>Question 3: Which splitting criterion is generally faster to calculate?</h4>
-                            <div class="quiz-options">
-                                <label class="quiz-option">
-                                    <input type="radio" name="q3" value="a">
-                                    <span>Entropy</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q3" value="b">
-                                    <span>Gini Impurity</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q3" value="c">
-                                    <span>They are equally fast</span>
-                                </label>
-                                <label class="quiz-option">
-                                    <input type="radio" name="q3" value="d">
-                                    <span>It depends on the data size</span>
-                                </label>
-                            </div>
-                            <button class="check-answer-btn" onclick="checkAnswer(3, 'b')">Check Answer</button>
-                            <div class="answer-feedback" id="feedback3"></div>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Gini Impurity Section -->
+                    <div id="gini" class="content-section">
+                        <h2>Gini Impurity</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 Gini: A Simpler Alternative to Entropy</h3>
+                            <p>Gini impurity is another way to measure how "mixed" a dataset is. It's computationally faster than entropy and gives similar results in most cases.</p>
+                        </div>
+
+                        <div class="key-concept">
+                            <h3>Gini Impurity Formula</h3>
+                            <p>Gini impurity is calculated as:</p>
+                            <div class="formula">
+                                <code>Gini(S) = 1 - Σ p(x)²</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Splitting Criteria Section -->
+                    <div id="splitting" class="content-section">
+                        <h2>Splitting Criteria</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔍 How Decision Trees Choose the Best Split</h3>
+                            <p>Decision trees try every possible way to split the data and pick the one that gives the most "pure" groups. It's like trying different questions to see which one best separates the data.</p>
+                        </div>
+
+                        <h3>Common Splitting Criteria</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>�� Information Gain</h4>
+                                <p>Maximizes the reduction in entropy. Good for balanced datasets.</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>🎯 Gini Impurity</h4>
+                                <p>Minimizes the probability of misclassification. Faster computation.</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>📈 Information Gain Ratio</h4>
+                                <p>Information gain divided by split information. Reduces bias toward multi-valued attributes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive Mathematics Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧮 Calculate Entropy & Information Gain</h3>
+                            <p>Try different datasets and see how entropy and information gain change. This will help you understand the math behind decision tree splitting!</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-controls">
+                                <button class="azbn-btn" onclick="generateMathDemo()">Generate Sample Data</button>
+                                <button class="azbn-btn" onclick="calculateEntropy()">Calculate Entropy</button>
+                                <button class="azbn-btn" onclick="calculateInformationGain()">Calculate Information Gain</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetMathDemo()">Reset Demo</button>
+                            </div>
+                            
+                            <div class="demo-status" id="math-demo-status">
+                                <p>Click "Generate Sample Data" to start</p>
+                            </div>
+                            
+                            <div class="demo-visualization">
+                                <div class="demo-canvas" id="math-demo-canvas">
+                                    <p>Mathematical calculations will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 2 Quiz</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧠 Test Your Mathematical Understanding</h3>
+                            <p>Answer these questions to make sure you understand the math behind decision trees!</p>
+                        </div>
+
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h4>Question 1: What is the entropy of a perfectly pure dataset?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span>1.0</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span>0.0</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span>0.5</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span>Depends on the data</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback1"></div>
+                            </div>
+
+                            <div class="quiz-question">
+                                <h4>Question 2: Which splitting criterion is computationally fastest?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span>Information Gain</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span>Gini Impurity</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span>Information Gain Ratio</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span>All are equally fast</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
+        </section>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label">What are Decision Trees?</span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Information Gain</span>
+                <span>Next →</span>
+            </button>
         </div>
     </div>
 
-    <!-- Navigation Footer -->
-    <div class="chapter-navigation">
-        <div class="azbn-container">
-            <a href="{{ url_for('decision_trees_chapter', chapter=1) }}" class="nav-btn prev">← Previous Chapter</a>
-            <a href="{{ url_for('decision_trees_chapter', chapter=3) }}" class="nav-btn next">Next Chapter →</a>
-        </div>
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/decision-trees/chapter1" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 1: Introduction to Decision Trees</a>
+        <a href="/tutorials/decision-trees/chapter3" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 3: Python Implementation →</a>
     </div>
-
-    <script src="{{ url_for('static', filename='js/tutorials/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/decision_trees/chapter2.js') }}"></script>
 </body>
 </html>

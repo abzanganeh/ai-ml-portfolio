@@ -72,40 +72,6 @@ TUTORIALS_DATA = [
         'tags': 'decision-trees,classification,regression,entropy,gini-impurity,pruning,ensemble-methods,python'
     },
     {
-        'title': 'Feature Engineering Essentials',
-        'slug': 'feature-engineering',
-        'description': 'Master the art of feature engineering to improve your machine learning models.',
-        'category': 'Data Science',
-        'difficulty': 'intermediate',
-        'duration': '40 min',
-        'author': 'Alireza Barzin Zanganeh',
-        'has_dedicated_template': False,
-        'template_path': None,
-        'published': True,
-        'excerpt': 'Learn essential feature engineering techniques to boost model performance.',
-        'content': '''
-        <h2>What is Feature Engineering?</h2>
-        <p>Feature engineering is the process of creating, transforming, and selecting features to improve machine learning model performance...</p>
-        
-        <h3>Common Techniques</h3>
-        <ul>
-            <li><strong>Scaling:</strong> Normalize features to similar ranges</li>
-            <li><strong>Encoding:</strong> Convert categorical variables to numerical</li>
-            <li><strong>Creation:</strong> Generate new features from existing ones</li>
-            <li><strong>Selection:</strong> Choose the most relevant features</li>
-        </ul>
-        
-        <h3>Best Practices</h3>
-        <ol>
-            <li>Understand your data thoroughly</li>
-            <li>Handle missing values appropriately</li>
-            <li>Consider domain knowledge</li>
-            <li>Avoid data leakage</li>
-            <li>Test feature importance</li>
-        </ol>
-        '''
-    },
-    {
         'title': 'Complete Exploratory Data Analysis: LeetCode Dataset',
         'slug': 'complete-eda-leetcode',
         'description': 'Master the complete EDA workflow from data loading to insights, using a real LeetCode dataset with 1825 coding problems.',

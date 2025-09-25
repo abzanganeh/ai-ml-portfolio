@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Overfitting and Pruning - Decision Trees Tutorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/decision_trees/chapter4.js') }}"></script>
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/decision-trees" class="course-link">
+                    <span>Decision Trees Tutorial</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 4: Overfitting and Pruning</h1>
+                <p class="chapter-subtitle">Learn how to prevent overfitting and improve generalization using various pruning techniques.</p>
+                
+                <!-- Chapter Progress Bar (4/5) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="80"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 5 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/decision-trees/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/decision-trees/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/decision-trees/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/decision-trees/chapter4" class="chapter-nav-btn active">Chapter 4</a>
+                    <a href="/tutorials/decision-trees/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="16.67"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn active" data-section="overfitting">Understanding Overfitting</button>
+                    <button class="section-nav-btn" data-section="pre-pruning">Pre-pruning</button>
+                    <button class="section-nav-btn" data-section="post-pruning">Post-pruning</button>
+                    <button class="section-nav-btn" data-section="validation">Cross-Validation</button>
+                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand what overfitting is and why it happens</li>
+                        <li>Learn pre-pruning techniques to prevent overfitting</li>
+                        <li>Master post-pruning methods for better generalization</li>
+                        <li>Use cross-validation to evaluate model performance</li>
+                        <li>Apply pruning techniques in practice</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Overfitting Section -->
+                    <div id="overfitting" class="content-section active">
+                        <h2>Understanding Overfitting</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 Overfitting: When Trees Get Too Smart</h3>
+                            <p>Imagine memorizing answers for a test instead of understanding the concepts. You might ace that specific test, but fail on new questions. That's exactly what overfitting is in machine learning!</p>
+                        </div>
+
+                        <p>Overfitting occurs when a decision tree becomes too complex and memorizes the training data instead of learning general patterns. This leads to poor performance on new, unseen data.</p>
+
+                        <div class="key-concept">
+                            <h3>Signs of Overfitting</h3>
+                            <ul>
+                                <li><strong>High Training Accuracy, Low Test Accuracy:</strong> The model performs well on training data but poorly on new data</li>
+                                <li><strong>Very Deep Trees:</strong> Trees with many levels that capture noise</li>
+                                <li><strong>Many Small Leaves:</strong> Each leaf contains very few samples</li>
+                                <li><strong>Perfect Training Performance:</strong> 100% accuracy on training data is often suspicious</li>
+                            </ul>
+                        </div>
+
+                        <h3>Why Overfitting Happens</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>📊 Small Dataset</h4>
+                                <p>Limited data makes it hard to learn general patterns</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� High Dimensionality</h4>
+                                <p>Many features relative to samples</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� No Stopping Criteria</h4>
+                                <p>Tree grows until perfect training fit</p>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>📈 Noise in Data</h4>
+                                <p>Tree learns from random errors</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pre-pruning Section -->
+                    <div id="pre-pruning" class="content-section">
+                        <h2>Pre-pruning</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>✂️ Pre-pruning: Stopping Growth Early</h3>
+                            <p>Pre-pruning prevents overfitting by stopping the tree from growing too complex in the first place. It's like setting rules before you start building.</p>
+                        </div>
+
+                        <h3>Pre-pruning Techniques</h3>
+                        <div class="concept-grid">
+                            <div class="concept-card">
+                                <h4>📏 Maximum Depth</h4>
+                                <p>Limit how deep the tree can grow</p>
+                                <div class="code-example">
+                                    <code>DecisionTreeClassifier(max_depth=3)</code>
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Minimum Samples Split</h4>
+                                <p>Require minimum samples to create a split</p>
+                                <div class="code-example">
+                                    <code>DecisionTreeClassifier(min_samples_split=10)</code>
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>�� Minimum Samples Leaf</h4>
+                                <p>Require minimum samples in leaf nodes</p>
+                                <div class="code-example">
+                                    <code>DecisionTreeClassifier(min_samples_leaf=5)</code>
+                                </div>
+                            </div>
+                            
+                            <div class="concept-card">
+                                <h4>📈 Minimum Impurity Decrease</h4>
+                                <p>Only split if it improves purity significantly</p>
+                                <div class="code-example">
+                                    <code>DecisionTreeClassifier(min_impurity_decrease=0.01)</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post-pruning Section -->
+                    <div id="post-pruning" class="content-section">
+                        <h2>Post-pruning</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🌳 Post-pruning: Trim After Growing</h3>
+                            <p>Post-pruning grows the full tree first, then removes branches that don't improve generalization. It's like trimming a bush after it's grown.</p>
+                        </div>
+
+                        <h3>Cost Complexity Pruning</h3>
+                        <p>Cost complexity pruning (also called weakest link pruning) removes branches that provide the least improvement in generalization.</p>
+
+                        <div class="key-concept">
+                            <h3>Cost Complexity Formula</h3>
+                            <div class="formula">
+                                <code>Cost = Error + α × Complexity</code>
+                            </div>
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>Error:</strong> Misclassification rate</li>
+                                <li><strong>α:</strong> Complexity parameter (controls pruning)</li>
+                                <li><strong>Complexity:</strong> Number of leaves in the tree</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Validation Section -->
+                    <div id="validation" class="content-section">
+                        <h2>Cross-Validation</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>✅ Cross-Validation: Testing Without Cheating</h3>
+                            <p>Cross-validation helps you evaluate your model's performance without using the test set during training. It's like taking multiple practice tests to see how well you really understand the material.</p>
+                        </div>
+
+                        <h3>K-Fold Cross-Validation</h3>
+                        <div class="visual-example">
+                            <h4>5-Fold Cross-Validation Process</h4>
+                            <div class="cv-visualization">
+                                <div class="cv-fold">Fold 1: Train on 80%, Test on 20%</div>
+                                <div class="cv-fold">Fold 2: Train on 80%, Test on 20%</div>
+                                <div class="cv-fold">Fold 3: Train on 80%, Test on 20%</div>
+                                <div class="cv-fold">Fold 4: Train on 80%, Test on 20%</div>
+                                <div class="cv-fold">Fold 5: Train on 80%, Test on 20%</div>
+                                <div class="cv-result">Average Score</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Demo Section -->
+                    <div id="demo" class="content-section">
+                        <h2>Interactive Pruning Demo</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>�� Experiment with Pruning</h3>
+                            <p>Try different pruning techniques and see how they affect the tree structure and performance!</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <div class="demo-controls">
+                                <button class="azbn-btn" onclick="generateOverfittingData()">Generate Data</button>
+                                <button class="azbn-btn" onclick="trainOverfittedTree()">Train Overfitted Tree</button>
+                                <button class="azbn-btn" onclick="applyPruning()">Apply Pruning</button>
+                                <button class="azbn-btn azbn-secondary" onclick="resetPruningDemo()">Reset Demo</button>
+                            </div>
+                            
+                            <div class="demo-status" id="pruning-demo-status">
+                                <p>Click "Generate Data" to start</p>
+                            </div>
+                            
+                            <div class="demo-visualization">
+                                <div class="demo-canvas" id="pruning-demo-canvas">
+                                    <p>Tree visualization will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Chapter 4 Quiz</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>�� Test Your Pruning Knowledge</h3>
+                            <p>Answer these questions about overfitting and pruning!</p>
+                        </div>
+
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h4>Question 1: What is the main sign of overfitting?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="a">
+                                        <span>High training accuracy and high test accuracy</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="b">
+                                        <span>High training accuracy and low test accuracy</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="c">
+                                        <span>Low training accuracy and high test accuracy</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q1" value="d">
+                                        <span>Low training accuracy and low test accuracy</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback1"></div>
+                            </div>
+
+                            <div class="quiz-question">
+                                <h4>Question 2: Which technique prevents overfitting by stopping tree growth early?</h4>
+                                <div class="quiz-options">
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="a">
+                                        <span>Post-pruning</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="b">
+                                        <span>Pre-pruning</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="c">
+                                        <span>Cost complexity pruning</span>
+                                    </label>
+                                    <label class="quiz-option">
+                                        <input type="radio" name="q2" value="d">
+                                        <span>Weakest link pruning</span>
+                                    </label>
+                                </div>
+                                <button class="check-answer-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
+                                <div class="answer-feedback" id="feedback2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <!-- Sub-section Navigation Footer -->
+    <div class="sub-section-nav-footer">
+        <div class="sub-nav-buttons">
+            <button id="prev-subsection" class="sub-nav-btn prev-btn">
+                <span>← Previous</span>
+                <span class="sub-nav-label" id="prev-label">Parameters & Tuning</span>
+            </button>
+            <button id="next-subsection" class="sub-nav-btn next-btn">
+                <span class="sub-nav-label" id="next-label">Pre-pruning</span>
+                <span>Next →</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chapter Navigation Footer -->
+    <div class="navigation-buttons">
+        <a href="/tutorials/decision-trees/chapter3" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 3: Python Implementation</a>
+        <a href="/tutorials/decision-trees/chapter5" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 5: Advanced Techniques →</a>
+    </div>
+</body>
+</html>

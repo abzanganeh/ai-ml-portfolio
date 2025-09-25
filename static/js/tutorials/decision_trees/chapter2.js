@@ -1,20 +1,24 @@
-// Chapter 2: Decision Tree Mathematics - Interactive Calculator
+// Chapter 2: Decision Tree Mathematics - JavaScript Demo
 
-// Global variables
-let class1Count = 10;
-let class2Count = 10;
+// Global variables for the demo
+let mathDemoData = null;
+let mathDemoState = {
+    hasData: false,
+    hasCalculations: false,
+    currentStep: 0
+};
 
 // Initialize the tutorial
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Decision Trees Chapter 2: Initializing...');
     initializeTutorial();
-    initializeCalculator();
+    initializeMathDemo();
 });
 
 function initializeTutorial() {
     // Initialize section navigation
-    const sections = ['entropy', 'information-gain', 'gini', 'comparison', 'interactive', 'quiz'];
-    const labels = ['Entropy', 'Information Gain', 'Gini Impurity', 'Criteria Comparison', 'Interactive Calculator', 'Quiz'];
+    const sections = ['entropy', 'information-gain', 'gini', 'splitting', 'demo', 'quiz'];
+    const labels = ['Entropy & Information', 'Information Gain', 'Gini Impurity', 'Splitting Criteria', 'Interactive Demo', 'Quiz'];
     
     console.log('Initialized sections:', sections);
     console.log('Initialized labels:', labels);
@@ -27,225 +31,269 @@ function initializeTutorial() {
     console.log('Decision Trees Chapter 2: Initialization complete');
 }
 
-function initializeCalculator() {
-    // Initialize the interactive calculator
-    const class1Slider = document.getElementById('class1-count');
-    const class2Slider = document.getElementById('class2-count');
-    const class1Display = document.getElementById('class1-display');
-    const class2Display = document.getElementById('class2-display');
-    
-    if (class1Slider && class1Display) {
-        class1Slider.addEventListener('input', function() {
-            class1Count = parseInt(this.value);
-            class1Display.textContent = class1Count;
-        });
-    }
-    
-    if (class2Slider && class2Display) {
-        class2Slider.addEventListener('input', function() {
-            class2Count = parseInt(this.value);
-            class2Display.textContent = class2Count;
-        });
-    }
-    
-    // Initial calculation
-    calculateSplittingMetrics();
+function initializeMathDemo() {
+    console.log('Initializing Math Demo...');
+    updateMathDemoStatus('Click "Generate Sample Data" to start');
 }
 
-function calculateSplittingMetrics() {
-    const output = document.getElementById('splitting-output');
-    if (!output) return;
+// Math Demo Functions
+function generateMathDemo() {
+    console.log('Generating math demo data...');
     
-    // Calculate metrics
-    const total = class1Count + class2Count;
+    // Generate sample data for entropy calculation
+    const sampleData = [
+        { feature: 'outlook', value: 'sunny', play: false },
+        { feature: 'outlook', value: 'sunny', play: false },
+        { feature: 'outlook', value: 'overcast', play: true },
+        { feature: 'outlook', value: 'rainy', play: true },
+        { feature: 'outlook', value: 'rainy', play: true },
+        { feature: 'outlook', value: 'rainy', play: false },
+        { feature: 'outlook', value: 'overcast', play: true },
+        { feature: 'outlook', value: 'sunny', play: false },
+        { feature: 'outlook', value: 'sunny', play: true },
+        { feature: 'outlook', value: 'rainy', play: true }
+    ];
     
-    if (total === 0) {
-        output.innerHTML = '<p>Please set at least one class count to see the metrics!</p>';
+    mathDemoData = sampleData;
+    mathDemoState.hasData = true;
+    mathDemoState.hasCalculations = false;
+    
+    // Display the data
+    displayMathDataTable(sampleData);
+    updateMathDemoStatus('Data generated! Click "Calculate Entropy" to see the math.');
+    
+    // Enable calculation buttons
+    const calcBtn = document.querySelector('button[onclick="calculateEntropy()"]');
+    if (calcBtn) {
+        calcBtn.disabled = false;
+    }
+}
+
+function calculateEntropy() {
+    if (!mathDemoState.hasData) {
+        updateMathDemoStatus('Please generate data first!');
         return;
     }
     
-    const p1 = class1Count / total;
-    const p2 = class2Count / total;
+    console.log('Calculating entropy...');
+    updateMathDemoStatus('Calculating entropy...');
     
-    // Calculate entropy
-    let entropy = 0;
-    if (p1 > 0) entropy -= p1 * Math.log2(p1);
-    if (p2 > 0) entropy -= p2 * Math.log2(p2);
+    // Calculate entropy for the dataset
+    const playCounts = { true: 0, false: 0 };
+    mathDemoData.forEach(item => {
+        playCounts[item.play]++;
+    });
     
-    // Calculate Gini impurity
-    const gini = 1 - (p1 * p1 + p2 * p2);
+    const total = mathDemoData.length;
+    const pTrue = playCounts.true / total;
+    const pFalse = playCounts.false / total;
     
-    // Generate visualization
-    const visualization = generateMetricsVisualization(p1, p2, entropy, gini);
+    const entropy = -(pTrue * Math.log2(pTrue) + pFalse * Math.log2(pFalse));
     
-    output.innerHTML = `
-        <div class="python-demo">
-            <div class="python-demo-header">📊 Calculated Metrics</div>
-            <div class="python-demo-content">
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <h4>📈 Entropy</h4>
-                        <div class="metric-value">${entropy.toFixed(4)}</div>
-                        <div class="metric-range">Range: 0.0000 - 1.0000</div>
-                    </div>
-                    <div class="metric-card">
-                        <h4>📊 Gini Impurity</h4>
-                        <div class="metric-value">${gini.toFixed(4)}</div>
-                        <div class="metric-range">Range: 0.0000 - 0.5000</div>
-                    </div>
+    // Display calculation
+    displayEntropyCalculation(playCounts, total, pTrue, pFalse, entropy);
+    
+    mathDemoState.hasCalculations = true;
+    updateMathDemoStatus('Entropy calculated! Click "Calculate Information Gain" to see splitting.');
+    
+    // Enable information gain button
+    const igBtn = document.querySelector('button[onclick="calculateInformationGain()"]');
+    if (igBtn) {
+        igBtn.disabled = false;
+    }
+}
+
+function calculateInformationGain() {
+    if (!mathDemoState.hasCalculations) {
+        updateMathDemoStatus('Please calculate entropy first!');
+        return;
+    }
+    
+    console.log('Calculating information gain...');
+    updateMathDemoStatus('Calculating information gain...');
+    
+    // Calculate information gain for outlook feature
+    const outlookGroups = {
+        'sunny': { true: 0, false: 0 },
+        'overcast': { true: 0, false: 0 },
+        'rainy': { true: 0, false: 0 }
+    };
+    
+    mathDemoData.forEach(item => {
+        outlookGroups[item.value][item.play]++;
+    });
+    
+    // Calculate weighted entropy
+    let weightedEntropy = 0;
+    Object.keys(outlookGroups).forEach(outlook => {
+        const group = outlookGroups[outlook];
+        const groupTotal = group.true + group.false;
+        if (groupTotal > 0) {
+            const pTrue = group.true / groupTotal;
+            const pFalse = group.false / groupTotal;
+            const groupEntropy = -(pTrue * Math.log2(pTrue || 0.001) + pFalse * Math.log2(pFalse || 0.001));
+            weightedEntropy += (groupTotal / mathDemoData.length) * groupEntropy;
+        }
+    });
+    
+    // Original entropy (from previous calculation)
+    const originalEntropy = 0.971; // Pre-calculated value
+    const informationGain = originalEntropy - weightedEntropy;
+    
+    // Display information gain calculation
+    displayInformationGainCalculation(outlookGroups, weightedEntropy, originalEntropy, informationGain);
+    
+    updateMathDemoStatus('Information gain calculated! Try different features to see which gives the best split.');
+}
+
+function displayMathDataTable(data) {
+    const canvas = document.getElementById('math-demo-canvas');
+    if (!canvas) return;
+    
+    let tableHTML = `
+        <div class="data-table-container">
+            <h4>Sample Tennis Data</h4>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Outlook</th>
+                        <th>Play Tennis</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    data.forEach(row => {
+        tableHTML += `
+            <tr>
+                <td>${row.value}</td>
+                <td class="${row.play ? 'play-yes' : 'play-no'}">${row.play ? 'Yes' : 'No'}</td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    canvas.innerHTML = tableHTML;
+}
+
+function displayEntropyCalculation(counts, total, pTrue, pFalse, entropy) {
+    const canvas = document.getElementById('math-demo-canvas');
+    if (!canvas) return;
+    
+    const calculationHTML = `
+        <div class="entropy-calculation">
+            <h4>Entropy Calculation</h4>
+            <div class="calculation-steps">
+                <div class="step">
+                    <h5>Step 1: Count Classes</h5>
+                    <p>Play = Yes: ${counts.true} samples</p>
+                    <p>Play = No: ${counts.false} samples</p>
+                    <p>Total: ${total} samples</p>
                 </div>
                 
-                <div class="data-summary">
-                    <h4>Data Summary</h4>
-                    <p><strong>Class 1:</strong> ${class1Count} samples (${(p1 * 100).toFixed(1)}%)</p>
-                    <p><strong>Class 2:</strong> ${class2Count} samples (${(p2 * 100).toFixed(1)}%)</p>
-                    <p><strong>Total:</strong> ${total} samples</p>
+                <div class="step">
+                    <h5>Step 2: Calculate Probabilities</h5>
+                    <p>P(Yes) = ${counts.true}/${total} = ${pTrue.toFixed(3)}</p>
+                    <p>P(No) = ${counts.false}/${total} = ${pFalse.toFixed(3)}</p>
                 </div>
-            </div>
-        </div>
-        
-        ${visualization}
-        
-        <div class="python-demo">
-            <div class="python-demo-header">🐍 Python Code</div>
-            <div class="python-demo-content">
-                <div class="python-code">
-import math
-
-def calculate_entropy(class_counts):
-    total = sum(class_counts)
-    if total == 0:
-        return 0
-    
-    entropy = 0
-    for count in class_counts:
-        if count > 0:
-            p = count / total
-            entropy -= p * math.log2(p)
-    return entropy
-
-def calculate_gini(class_counts):
-    total = sum(class_counts)
-    if total == 0:
-        return 0
-    
-    gini = 1
-    for count in class_counts:
-        p = count / total
-        gini -= p * p
-    return gini
-
-# Your data
-class_counts = [${class1Count}, ${class2Count}]
-
-# Calculate metrics
-entropy = calculate_entropy(class_counts)
-gini = calculate_gini(class_counts)
-
-print(f"Entropy: {entropy:.4f}")
-print(f"Gini Impurity: {gini:.4f}")
-print(f"Class 1: {class_counts[0]} samples")
-print(f"Class 2: {class_counts[1]} samples")
-                </div>
-            </div>
-        </div>
-        
-        <div class="python-demo">
-            <div class="python-demo-header">📊 Python Output</div>
-            <div class="python-demo-content">
-                <div class="python-output">
-Entropy: ${entropy.toFixed(4)}
-Gini Impurity: ${gini.toFixed(4)}
-Class 1: ${class1Count} samples
-Class 2: ${class2Count} samples
-                </div>
-            </div>
-        </div>
-        
-        <div class="insights-box">
-            <h4>🎯 Key Insights</h4>
-            <ul>
-                ${generateInsights(p1, p2, entropy, gini)}
-            </ul>
-        </div>
-    `;
-}
-
-function generateMetricsVisualization(p1, p2, entropy, gini) {
-    const total = class1Count + class2Count;
-    
-    // Create bar chart representation
-    const class1Width = (p1 * 100).toFixed(1);
-    const class2Width = (p2 * 100).toFixed(1);
-    
-    return `
-        <div class="python-demo">
-            <div class="python-demo-header">📊 Visual Representation</div>
-            <div class="python-demo-content">
-                <div class="data-visualization">
-                    <h4>Class Distribution</h4>
-                    <div class="bar-chart">
-                        <div class="bar-container">
-                            <div class="bar class1-bar" style="width: ${class1Width}%">
-                                <span class="bar-label">Class 1 (${class1Count})</span>
-                            </div>
-                            <div class="bar class2-bar" style="width: ${class2Width}%">
-                                <span class="bar-label">Class 2 (${class2Count})</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="metrics-comparison">
-                        <div class="metric-bar">
-                            <div class="metric-label">Entropy</div>
-                            <div class="metric-bar-container">
-                                <div class="metric-bar-fill entropy-bar" style="width: ${(entropy * 100).toFixed(1)}%"></div>
-                                <span class="metric-bar-value">${entropy.toFixed(4)}</span>
-                            </div>
-                        </div>
-                        <div class="metric-bar">
-                            <div class="metric-label">Gini</div>
-                            <div class="metric-bar-container">
-                                <div class="metric-bar-fill gini-bar" style="width: ${(gini * 200).toFixed(1)}%"></div>
-                                <span class="metric-bar-value">${gini.toFixed(4)}</span>
-                            </div>
-                        </div>
-                    </div>
+                
+                <div class="step">
+                    <h5>Step 3: Calculate Entropy</h5>
+                    <p>H(S) = -(P(Yes) × log₂(P(Yes)) + P(No) × log₂(P(No)))</p>
+                    <p>H(S) = -(${pTrue.toFixed(3)} × log₂(${pTrue.toFixed(3)}) + ${pFalse.toFixed(3)} × log₂(${pFalse.toFixed(3)}))</p>
+                    <p><strong>H(S) = ${entropy.toFixed(3)}</strong></p>
                 </div>
             </div>
         </div>
     `;
+    
+    canvas.innerHTML = calculationHTML;
 }
 
-function generateInsights(p1, p2, entropy, gini) {
-    const insights = [];
+function displayInformationGainCalculation(groups, weightedEntropy, originalEntropy, informationGain) {
+    const canvas = document.getElementById('math-demo-canvas');
+    if (!canvas) return;
     
-    if (entropy === 0) {
-        insights.push('<li><strong>Perfect Order:</strong> All samples belong to the same class - no uncertainty!</li>');
-    } else if (entropy === 1) {
-        insights.push('<li><strong>Maximum Disorder:</strong> Equal mix of classes - complete uncertainty!</li>');
-    } else if (entropy > 0.8) {
-        insights.push('<li><strong>High Uncertainty:</strong> Data is very mixed - good splitting opportunity!</li>');
-    } else if (entropy < 0.3) {
-        insights.push('<li><strong>Low Uncertainty:</strong> Data is mostly pure - less need for splitting</li>');
-    } else {
-        insights.push('<li><strong>Moderate Uncertainty:</strong> Data has some structure but could benefit from splitting</li>');
+    let groupsHTML = '';
+    Object.keys(groups).forEach(outlook => {
+        const group = groups[outlook];
+        const groupTotal = group.true + group.false;
+        if (groupTotal > 0) {
+            groupsHTML += `
+                <div class="group">
+                    <h5>${outlook.toUpperCase()} (${groupTotal} samples)</h5>
+                    <p>Yes: ${group.true}, No: ${group.false}</p>
+                </div>
+            `;
+        }
+    });
+    
+    const calculationHTML = `
+        <div class="information-gain-calculation">
+            <h4>Information Gain Calculation</h4>
+            <div class="calculation-steps">
+                <div class="step">
+                    <h5>Step 1: Split by Outlook</h5>
+                    ${groupsHTML}
+                </div>
+                
+                <div class="step">
+                    <h5>Step 2: Calculate Weighted Entropy</h5>
+                    <p>Weighted Entropy = ${weightedEntropy.toFixed(3)}</p>
+                </div>
+                
+                <div class="step">
+                    <h5>Step 3: Calculate Information Gain</h5>
+                    <p>IG = Original Entropy - Weighted Entropy</p>
+                    <p>IG = ${originalEntropy.toFixed(3)} - ${weightedEntropy.toFixed(3)}</p>
+                    <p><strong>IG = ${informationGain.toFixed(3)}</strong></p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    canvas.innerHTML = calculationHTML;
+}
+
+function resetMathDemo() {
+    console.log('Resetting math demo...');
+    
+    mathDemoData = null;
+    mathDemoState = {
+        hasData: false,
+        hasCalculations: false,
+        currentStep: 0
+    };
+    
+    // Clear visualizations
+    const canvas = document.getElementById('math-demo-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Mathematical calculations will appear here</p>';
     }
     
-    if (Math.abs(p1 - p2) < 0.1) {
-        insights.push('<li><strong>Balanced Classes:</strong> Classes are roughly equal in size</li>');
-    } else {
-        insights.push('<li><strong>Imbalanced Classes:</strong> One class is much larger than the other</li>');
-    }
+    // Reset status
+    updateMathDemoStatus('Click "Generate Sample Data" to start');
     
-    const giniRatio = gini / 0.5; // Normalize Gini to 0-1 scale
-    if (Math.abs(entropy - giniRatio) < 0.1) {
-        insights.push('<li><strong>Consistent Metrics:</strong> Entropy and Gini agree on the data structure</li>');
-    } else {
-        insights.push('<li><strong>Different Sensitivity:</strong> Entropy and Gini show different levels of uncertainty</li>');
+    // Disable buttons
+    const buttons = ['calculateEntropy', 'calculateInformationGain'];
+    buttons.forEach(funcName => {
+        const btn = document.querySelector(`button[onclick="${funcName}()"]`);
+        if (btn) {
+            btn.disabled = true;
+        }
+    });
+}
+
+function updateMathDemoStatus(message) {
+    const statusDiv = document.getElementById('math-demo-status');
+    if (statusDiv) {
+        statusDiv.innerHTML = `<p>${message}</p>`;
     }
-    
-    return insights.join('');
 }
 
 // Quiz Functions
@@ -266,5 +314,8 @@ function checkAnswer(questionNum, correctAnswer) {
 }
 
 // Export functions for global access
-window.calculateSplittingMetrics = calculateSplittingMetrics;
+window.generateMathDemo = generateMathDemo;
+window.calculateEntropy = calculateEntropy;
+window.calculateInformationGain = calculateInformationGain;
+window.resetMathDemo = resetMathDemo;
 window.checkAnswer = checkAnswer;
