@@ -131,8 +131,28 @@ class TestAPIEndpoints:
         upper_results = upper_response.json()
         mixed_results = mixed_response.json()
         
+        # Compare only the structure and content, not timestamps or dynamic fields
+        def normalize_results(results):
+            """Normalize results by removing dynamic fields"""
+            normalized = {}
+            for key, items in results.items():
+                normalized[key] = []
+                for item in items:
+                    # Create a copy without dynamic fields
+                    normalized_item = {}
+                    for field, value in item.items():
+                        # Skip timestamp fields that might vary
+                        if field not in ['created_at', 'updated_at', 'date']:
+                            normalized_item[field] = value
+                    normalized[key].append(normalized_item)
+            return normalized
+        
+        lower_norm = normalize_results(lower_results)
+        upper_norm = normalize_results(upper_results)
+        mixed_norm = normalize_results(mixed_results)
+        
         # Results should be the same regardless of case
-        assert lower_results == upper_results == mixed_results
+        assert lower_norm == upper_norm == mixed_norm
     
     def test_api_projects_published_only(self, page: Page, base_url: str):
         """Test projects API only returns published projects"""

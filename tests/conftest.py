@@ -2,38 +2,18 @@ import pytest
 import os
 from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
 
-def pytest_addoption(parser):
-    """Add custom command line options"""
-    parser.addoption(
-        "--browser", 
-        action="store", 
-        default="chromium",
-        help="Browser to run tests on: chromium, firefox, webkit"
-    )
-    parser.addoption(
-        "--headed", 
-        action="store", 
-        default="false",
-        help="Run tests in headed mode: true, false"
-    )
-    parser.addoption(
-        "--base-url", 
-        action="store", 
-        default="https://www.zanganehai.com",
-        help="Base URL for testing"
-    )
-
+# Use environment variables instead of command line options to avoid conflicts
 @pytest.fixture(scope="session")
-def browser_name(request):
-    return request.config.getoption("--browser")
+def browser_name():
+    return os.getenv("BROWSER", "chromium")
 
 @pytest.fixture(scope="session") 
-def headed_mode(request):
-    return request.config.getoption("--headed").lower() == "true"
+def headed_mode():
+    return os.getenv("HEADED", "false").lower() == "true"
 
 @pytest.fixture(scope="session")
-def base_url(request):
-    return request.config.getoption("--base-url")
+def base_url():
+    return os.getenv("BASE_URL", "https://www.zanganehai.com")
 
 @pytest.fixture(scope="session")
 def browser():

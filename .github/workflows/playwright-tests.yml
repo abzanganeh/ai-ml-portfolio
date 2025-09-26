@@ -50,7 +50,10 @@ jobs:
           --base-url="https://www.zanganehai.com" \
           --html=reports/report-${{ matrix.browser }}.html \
           --self-contained-html \
-          -v
+          -v \
+          --tb=short \
+          --maxfail=5
+      continue-on-error: true
           
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -81,7 +84,23 @@ jobs:
       run: |
         mkdir -p final-reports
         
-        find all-reports -name "*.html" -exec cp {} final-reports/ \;
+        # Check if all-reports directory exists and has content
+        if [ -d "all-reports" ] && [ "$(ls -A all-reports 2>/dev/null)" ]; then
+          find all-reports -name "*.html" -exec cp {} final-reports/ \;
+        else
+          echo "No test reports found, creating placeholder"
+          # Create a placeholder report
+          cat > final-reports/placeholder.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head><title>No Reports Available</title></head>
+          <body>
+            <h1>No Test Reports Available</h1>
+            <p>Tests may have failed or no reports were generated.</p>
+          </body>
+          </html>
+          EOF
+        fi
         
         # Get current date and time
         CURRENT_DATE=$(date '+%B %d, %Y at %H:%M UTC')

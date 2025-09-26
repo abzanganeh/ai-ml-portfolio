@@ -428,7 +428,7 @@ def contact():
 # API Routes
 @app.route('/search')
 def search():
-    """Search page for tutorials, projects, and blog posts"""
+    """Search page for tutorials, projects, and blog posts with enhanced tag-based search"""
     query = request.args.get('q', '').strip()
     results = {'tutorials': [], 'projects': [], 'blog_posts': []}
     
@@ -436,24 +436,52 @@ def search():
         query_lower = query.lower()
         blog_posts = load_blog_data()
         
-        # Search tutorials from database
+        # Enhanced search function
+        def search_in_content(text, query):
+            """Check if query matches in text content"""
+            if not text:
+                return False
+            return query in text.lower()
+        
+        def search_in_tags(tags, query):
+            """Check if query matches any tag"""
+            if not tags:
+                return False
+            if isinstance(tags, str):
+                tags = [tag.strip() for tag in tags.split(',')]
+            return any(query in tag.lower() for tag in tags)
+        
+        # Search tutorials from database with enhanced matching
         tutorials_list = Tutorial.query.filter_by(published=True).all()
-        matching_tutorials = [
-            t for t in tutorials_list 
-            if query_lower in t.title.lower() or query_lower in t.description.lower()
-        ]
+        matching_tutorials = []
+        for t in tutorials_list:
+            # Check title, description, and tags
+            if (search_in_content(t.title, query_lower) or 
+                search_in_content(t.description, query_lower) or
+                search_in_tags(t.tags, query_lower)):
+                matching_tutorials.append(t)
         
-        # Search projects from database
+        # Search projects from database with enhanced matching
         projects_list = Project.query.filter_by(published=True).all()
-        matching_projects = [
-            p for p in projects_list 
-            if query_lower in p.title.lower() or query_lower in p.description.lower()
-        ]
+        matching_projects = []
+        for p in projects_list:
+            # Check title, description, and technology stack
+            tech_stack_text = ', '.join(p.technology_list) if p.technology_list else ''
+            if (search_in_content(p.title, query_lower) or 
+                search_in_content(p.description, query_lower) or
+                search_in_content(tech_stack_text, query_lower)):
+                matching_projects.append(p)
         
-        matching_posts = [
-            p for p in blog_posts 
-            if p.published and (query_lower in p.title.lower() or query_lower in p.excerpt.lower())
-        ]
+        # Search blog posts with enhanced matching
+        matching_posts = []
+        for p in blog_posts:
+            if p.published:
+                # Check title, excerpt, content, and tags
+                if (search_in_content(p.title, query_lower) or 
+                    search_in_content(p.excerpt, query_lower) or
+                    search_in_content(p.content, query_lower) or
+                    search_in_tags(p.tags, query_lower)):
+                    matching_posts.append(p)
         
         results = {
             'tutorials': matching_tutorials,
@@ -468,28 +496,63 @@ def search():
 
 @app.route('/api/search')
 def search_api():
-    """Search API for tutorials, projects, and blog posts"""
-    query = request.args.get('q', '').lower()
+    """Search API for tutorials, projects, and blog posts with enhanced tag-based search"""
+    query = request.args.get('q', '').lower().strip()
     blog_posts = load_blog_data()
     
-    # Search tutorials from database
+    if not query:
+        return jsonify({
+            'tutorials': [],
+            'projects': [],
+            'blog_posts': []
+        })
+    
+    # Enhanced search function
+    def search_in_content(text, query):
+        """Check if query matches in text content"""
+        if not text:
+            return False
+        return query in text.lower()
+    
+    def search_in_tags(tags, query):
+        """Check if query matches any tag"""
+        if not tags:
+            return False
+        if isinstance(tags, str):
+            tags = [tag.strip() for tag in tags.split(',')]
+        return any(query in tag.lower() for tag in tags)
+    
+    # Search tutorials from database with enhanced matching
     tutorials_list = Tutorial.query.filter_by(published=True).all()
-    matching_tutorials = [
-        t for t in tutorials_list 
-        if query in t.title.lower() or query in t.description.lower()
-    ]
+    matching_tutorials = []
+    for t in tutorials_list:
+        # Check title, description, and tags
+        if (search_in_content(t.title, query) or 
+            search_in_content(t.description, query) or
+            search_in_tags(t.tags, query)):
+            matching_tutorials.append(t)
     
-    # Search projects from database
+    # Search projects from database with enhanced matching
     projects_list = Project.query.filter_by(published=True).all()
-    matching_projects = [
-        p for p in projects_list 
-        if query in p.title.lower() or query in p.description.lower()
-    ]
+    matching_projects = []
+    for p in projects_list:
+        # Check title, description, and technology stack
+        tech_stack_text = ', '.join(p.technology_list) if p.technology_list else ''
+        if (search_in_content(p.title, query) or 
+            search_in_content(p.description, query) or
+            search_in_content(tech_stack_text, query)):
+            matching_projects.append(p)
     
-    matching_posts = [
-        p for p in blog_posts 
-        if p.published and (query in p.title.lower() or query in p.excerpt.lower())
-    ]
+    # Search blog posts with enhanced matching
+    matching_posts = []
+    for p in blog_posts:
+        if p.published:
+            # Check title, excerpt, content, and tags
+            if (search_in_content(p.title, query) or 
+                search_in_content(p.excerpt, query) or
+                search_in_content(p.content, query) or
+                search_in_tags(p.tags, query)):
+                matching_posts.append(p)
     
     results = {
         'tutorials': [t.to_dict() for t in matching_tutorials],

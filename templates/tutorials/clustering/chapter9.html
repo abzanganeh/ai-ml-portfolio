@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
     <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter9.js') }}"></script>
 </head>
 <body>
@@ -1238,114 +1239,80 @@
                             <p><strong>Don't worry if you don't get everything right the first time - that's normal! The goal is to learn.</strong></p>
                         </div>
                         
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
+                        <div class="quiz-section">
+                            <div class="quiz-question">
                                 <h4>Question 1: Which linkage method is most prone to chaining?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Complete linkage</p>
+                                <div class="quiz-options">
+                                    <label><input type="radio" name="q1" value="a"> Complete linkage</label><br/>
+                                    <label><input type="radio" name="q1" value="b"> Single linkage</label><br/>
+                                    <label><input type="radio" name="q1" value="c"> Average linkage</label><br/>
+                                    <label><input type="radio" name="q1" value="d"> Ward's method</label><br/>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Single linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Average linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Ward's method</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Single linkage is most prone to chaining because it only considers the minimum distance between clusters, which can lead to elongated cluster formations.</p>
-                                </div>
+                                <button class="azbn-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+                                <div class="margin-top" id="q1-result"></div>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
+                        <div class="quiz-section">
+                            <div class="quiz-question">
                                 <h4>Question 2: What does Ward's method minimize?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Maximum distance between clusters</p>
+                                <div class="quiz-options">
+                                    <label><input type="radio" name="q2" value="a"> Maximum distance between clusters</label><br/>
+                                    <label><input type="radio" name="q2" value="b"> Average distance between clusters</label><br/>
+                                    <label><input type="radio" name="q2" value="c"> Increase in within-cluster variance</label><br/>
+                                    <label><input type="radio" name="q2" value="d"> Total number of clusters</label><br/>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Average distance between clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Increase in within-cluster variance</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Total number of clusters</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Ward's method minimizes the increase in within-cluster sum of squares (WSS) when merging clusters, leading to compact, spherical clusters.</p>
-                                </div>
+                                <button class="azbn-btn" onclick="checkAnswer(2, 'c')">Check Answer</button>
+                                <div class="margin-top" id="q2-result"></div>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
+                        <div class="quiz-section">
+                            <div class="quiz-question">
                                 <h4>Question 3: Which linkage method is most robust to outliers?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Single linkage</p>
+                                <div class="quiz-options">
+                                    <label><input type="radio" name="q3" value="a"> Single linkage</label><br/>
+                                    <label><input type="radio" name="q3" value="b"> Complete linkage</label><br/>
+                                    <label><input type="radio" name="q3" value="c"> Average linkage</label><br/>
+                                    <label><input type="radio" name="q3" value="d"> Centroid linkage</label><br/>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Complete linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Average linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Centroid linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Complete linkage is most robust to outliers because it considers the maximum distance between clusters, making it less sensitive to individual outlier points.</p>
-                                </div>
+                                <button class="azbn-btn" onclick="checkAnswer(3, 'b')">Check Answer</button>
+                                <div class="margin-top" id="q3-result"></div>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
+                        <div class="quiz-section">
+                            <div class="quiz-question">
                                 <h4>Question 4: What is the time complexity of most linkage methods?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>O(n log n)</p>
+                                <div class="quiz-options">
+                                    <label><input type="radio" name="q4" value="a"> O(n log n)</label><br/>
+                                    <label><input type="radio" name="q4" value="b"> O(n²)</label><br/>
+                                    <label><input type="radio" name="q4" value="c"> O(n² log n)</label><br/>
+                                    <label><input type="radio" name="q4" value="d"> O(n³)</label><br/>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>O(n²)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>O(n² log n)</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>O(n³)</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Most linkage methods have O(n² log n) time complexity due to the need to compute and update the full distance matrix for n-1 merge operations.</p>
-                                </div>
+                                <button class="azbn-btn" onclick="checkAnswer(4, 'c')">Check Answer</button>
+                                <div class="margin-top" id="q4-result"></div>
                             </div>
                         </div>
 
-                        <div class="enhanced-quiz-container">
-                            <div class="enhanced-quiz-question">
+                        <div class="quiz-section">
+                            <div class="quiz-question">
                                 <h4>Question 5: Which linkage method is also known as UPGMA?</h4>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Single linkage</p>
+                                <div class="quiz-options">
+                                    <label><input type="radio" name="q5" value="a"> Single linkage</label><br/>
+                                    <label><input type="radio" name="q5" value="b"> Complete linkage</label><br/>
+                                    <label><input type="radio" name="q5" value="c"> Average linkage</label><br/>
+                                    <label><input type="radio" name="q5" value="d"> Ward's method</label><br/>
                                 </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Complete linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="correct">
-                                    <p>Average linkage</p>
-                                </div>
-                                <div class="enhanced-quiz-option" data-answer="incorrect">
-                                    <p>Ward's method</p>
-                                </div>
-                                <div class="enhanced-quiz-explanation">
-                                    <p><strong>Correct!</strong> Average linkage is also known as UPGMA (Unweighted Pair Group Method with Arithmetic Mean) and has its origins in phylogenetic analysis.</p>
-                                </div>
+                                <button class="azbn-btn" onclick="checkAnswer(5, 'c')">Check Answer</button>
+                                <div class="margin-top" id="q5-result"></div>
                             </div>
                         </div>
 
-                        <div class="quiz-score-container">
-                            <button onclick="checkQuizAnswers()" class="demo-button">Submit Answers</button>
-                            <div id="quiz-results" class="quiz-results"></div>
+                        <div class="quiz-section">
+                            <h4>Quiz Score</h4>
+                            <p>Correct answers: <span id="quiz-score">0</span> / 5</p>
+                            <button class="azbn-btn azbn-secondary" onclick="resetQuiz()">Reset Quiz</button>
                         </div>
                     </div>
                 </main>

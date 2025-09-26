@@ -196,21 +196,23 @@ function initSearchFunctionality() {
     }
     
     function displaySearchResults(data) {
-        const { tutorials, projects } = data;
+        const { tutorials, projects, blog_posts } = data;
         let html = '';
         
-        if (tutorials.length === 0 && projects.length === 0) {
+        if (tutorials.length === 0 && projects.length === 0 && blog_posts.length === 0) {
             html = '<p class="no-results">No results found</p>';
         } else {
             if (tutorials.length > 0) {
                 html += '<div class="search-section"><h4>Tutorials</h4>';
                 tutorials.forEach(tutorial => {
+                    const tags = tutorial.tags ? tutorial.tags.join(', ') : '';
                     html += `
                         <div class="search-item">
                             <a href="/tutorial/${tutorial.id}">
                                 <h5>${tutorial.title}</h5>
                                 <p>${tutorial.description}</p>
                                 <span class="search-meta">${tutorial.category} • ${tutorial.difficulty}</span>
+                                ${tags ? `<div class="search-tags">Tags: ${tags}</div>` : ''}
                             </a>
                         </div>
                     `;
@@ -221,12 +223,32 @@ function initSearchFunctionality() {
             if (projects.length > 0) {
                 html += '<div class="search-section"><h4>Projects</h4>';
                 projects.forEach(project => {
+                    const techStack = project.technology_stack ? project.technology_stack.join(', ') : '';
                     html += `
                         <div class="search-item">
                             <a href="/project/${project.id}">
                                 <h5>${project.title}</h5>
                                 <p>${project.description}</p>
                                 <span class="search-meta">${project.category}</span>
+                                ${techStack ? `<div class="search-tags">Tech: ${techStack}</div>` : ''}
+                            </a>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+            
+            if (blog_posts.length > 0) {
+                html += '<div class="search-section"><h4>Blog Posts</h4>';
+                blog_posts.forEach(post => {
+                    const tags = post.tags ? post.tags.join(', ') : '';
+                    html += `
+                        <div class="search-item">
+                            <a href="/blog/${post.slug}">
+                                <h5>${post.title}</h5>
+                                <p>${post.excerpt}</p>
+                                <span class="search-meta">${post.category} • ${post.read_time} min read</span>
+                                ${tags ? `<div class="search-tags">Tags: ${tags}</div>` : ''}
                             </a>
                         </div>
                     `;
