@@ -98,6 +98,20 @@ TUTORIALS_DATA = [
         'published': True,
         'excerpt': 'Clean, interactive clustering tutorial with mathematical foundations, algorithm implementations, and real-world applications across 15 detailed chapters.',
         'tags': 'clustering,k-means,hierarchical-clustering,dbscan,distance-metrics,unsupervised-learning,interactive'
+    },
+    {
+        'title': 'Interactive Linear Algebra: Matrix-Vector Multiplication',
+        'slug': 'matrix-vector-multiplication',
+        'description': 'Visualize 2D matrix-vector multiplication with interactive animations. Understand linear transformations through drag-and-drop vector manipulation and real-time matrix operations.',
+        'category': 'Linear Algebra',
+        'difficulty': 'beginner',
+        'duration': '25 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/matrix-vector-multiplication/index.html',
+        'published': True,
+        'excerpt': 'Interactive 2D visualization of matrix-vector multiplication with drag-and-drop vectors, real-time transformations, and 3Blue1Brown-inspired animations.',
+        'tags': 'linear-algebra,matrix-multiplication,visualization,interactive,2d-transformations,vectors'
     }
 
     

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tutorial.title }} - Interactive Linear Algebra{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/matrix-vector-multiplication/style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="tutorial-container">
+    <!-- Tutorial Header -->
+    <header class="tutorial-header">
+        <div class="container">
+            <div class="tutorial-meta">
+                <span class="tutorial-category">{{ tutorial.category }}</span>
+                <span class="tutorial-difficulty">{{ tutorial.difficulty.title() }}</span>
+                <span class="tutorial-duration">{{ tutorial.duration }}</span>
+            </div>
+            <h1 class="tutorial-title">{{ tutorial.title }}</h1>
+            <p class="tutorial-description">{{ tutorial.description }}</p>
+        </div>
+    </header>
+
+    <!-- Main Tutorial Content -->
+    <main class="tutorial-main">
+        <div class="container">
+            <!-- Introduction Section -->
+            <section class="tutorial-section">
+                <h2>Understanding Matrix-Vector Multiplication</h2>
+                <p>Matrix-vector multiplication is one of the most fundamental operations in linear algebra. In this interactive tutorial, you'll see exactly how a 2×2 matrix transforms a 2D vector through visual animations.</p>
+                
+                <div class="concept-box">
+                    <h3>Key Concept</h3>
+                    <p>When we multiply a matrix by a vector, we're applying a linear transformation. The matrix acts as a function that takes one vector and produces another vector, potentially changing both its direction and magnitude.</p>
+                </div>
+            </section>
+
+            <!-- Interactive Visualization Section -->
+            <section class="tutorial-section interactive-section">
+                <h2>Interactive 2D Matrix-Vector Multiplication</h2>
+                <p>Drag the vector endpoint (blue dot) to see how the matrix transforms it in real-time. The red vector shows the result of the matrix multiplication.</p>
+                
+                <div class="visualization-container">
+                    <div class="controls-panel">
+                        <div class="matrix-controls">
+                            <h4>Matrix A (2×2)</h4>
+                            <div class="matrix-input">
+                                <div class="matrix-row">
+                                    <input type="number" id="a11" value="2" step="0.1">
+                                    <input type="number" id="a12" value="1" step="0.1">
+                                </div>
+                                <div class="matrix-row">
+                                    <input type="number" id="a21" value="0" step="0.1">
+                                    <input type="number" id="a22" value="1" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="vector-controls">
+                            <h4>Vector v</h4>
+                            <div class="vector-input">
+                                <label>X: <input type="number" id="vx" value="1" step="0.1"></label>
+                                <label>Y: <input type="number" id="vy" value="1" step="0.1"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="preset-buttons">
+                            <h4>Matrix Presets</h4>
+                            <button onclick="setMatrix(2,1,0,1)" class="btn-preset">Identity + Scale</button>
+                            <button onclick="setMatrix(0,-1,1,0)" class="btn-preset">90° Rotation</button>
+                            <button onclick="setMatrix(1,1,0,1)" class="btn-preset">Shear</button>
+                            <button onclick="setMatrix(0.5,0,0,2)" class="btn-preset">Scale</button>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-container">
+                        <canvas id="visualizationCanvas" width="600" height="500"></canvas>
+                        <div class="canvas-info">
+                            <div class="vector-info">
+                                <div class="vector-display">
+                                    <span class="vector-label">Original Vector:</span>
+                                    <span id="originalVector">v = [1, 1]</span>
+                                </div>
+                                <div class="vector-display">
+                                    <span class="vector-label">Transformed:</span>
+                                    <span id="transformedVector">Av = [3, 1]</span>
+                                </div>
+                            </div>
+                            <div class="transformation-info">
+                                <div class="info-item">
+                                    <span class="info-label">Determinant:</span>
+                                    <span id="determinant">2.00</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Angle:</span>
+                                    <span id="angle">45°</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mathematical Explanation -->
+            <section class="tutorial-section">
+                <h2>Mathematical Foundation</h2>
+                <p>The multiplication of a 2×2 matrix A by a 2D vector v is defined as:</p>
+                
+                <div class="math-display">
+                    <div class="matrix-equation">
+                        <div class="matrix-mult">
+                            <div class="matrix-2x2">
+                                <div class="matrix-bracket">[</div>
+                                <div class="matrix-content">
+                                    <span id="math-a11">a₁₁</span> <span id="math-a12">a₁₂</span><br>
+                                    <span id="math-a21">a₂₁</span> <span id="math-a22">a₂₂</span>
+                                </div>
+                                <div class="matrix-bracket">]</div>
+                            </div>
+                            <div class="vector-2d">
+                                <div class="vector-bracket">[</div>
+                                <div class="vector-content">
+                                    <span id="math-vx">vₓ</span><br>
+                                    <span id="math-vy">vᵧ</span>
+                                </div>
+                                <div class="vector-bracket">]</div>
+                            </div>
+                        </div>
+                        <div class="equals">=</div>
+                        <div class="result-vector">
+                            <div class="vector-bracket">[</div>
+                            <div class="vector-content">
+                                <span id="math-result1">a₁₁vₓ + a₁₂vᵧ</span><br>
+                                <span id="math-result2">a₂₁vₓ + a₂₂vᵧ</span>
+                            </div>
+                            <div class="vector-bracket">]</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step-by-Step Calculation -->
+            <section class="tutorial-section">
+                <h2>Step-by-Step Calculation</h2>
+                <div class="calculation-steps">
+                    <div class="step">
+                        <h4>Step 1: Identify Matrix and Vector Elements</h4>
+                        <p>From our current matrix and vector:</p>
+                        <div class="step-math">
+                            <span id="step-matrix">A = [[2, 1], [0, 1]]</span> and 
+                            <span id="step-vector">v = [1, 1]</span>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <h4>Step 2: Apply the Formula</h4>
+                        <p>Calculate each component of the result vector:</p>
+                        <div class="step-math">
+                            <div>First component: <span id="step-calc1">2×1 + 1×1 = 3</span></div>
+                            <div>Second component: <span id="step-calc2">0×1 + 1×1 = 1</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <h4>Step 3: Result</h4>
+                        <p>The transformed vector is:</p>
+                        <div class="step-math">
+                            <span id="step-result">Av = [3, 1]</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Visual Interpretation -->
+            <section class="tutorial-section">
+                <h2>Visual Interpretation</h2>
+                <div class="interpretation-grid">
+                    <div class="interpretation-item">
+                        <h4>Rotation</h4>
+                        <p>Matrices like [[0, -1], [1, 0]] rotate vectors counterclockwise by 90°.</p>
+                    </div>
+                    <div class="interpretation-item">
+                        <h4>Scaling</h4>
+                        <p>Matrices like [[2, 0], [0, 2]] scale vectors by a factor of 2 in both directions.</p>
+                    </div>
+                    <div class="interpretation-item">
+                        <h4>Shearing</h4>
+                        <p>Matrices like [[1, 1], [0, 1]] shear vectors, tilting them horizontally.</p>
+                    </div>
+                    <div class="interpretation-item">
+                        <h4>Reflection</h4>
+                        <p>Matrices like [[-1, 0], [0, 1]] reflect vectors across the y-axis.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Practice Section -->
+            <section class="tutorial-section practice-section">
+                <h2>Practice Problems</h2>
+                <div class="practice-grid">
+                    <div class="practice-problem">
+                        <h4>Problem 1: Rotation Matrix</h4>
+                        <p>Set the matrix to rotate by 45° and observe how it transforms the unit vector [1, 0].</p>
+                        <button onclick="setMatrix(0.707,-0.707,0.707,0.707)" class="btn-practice">Try 45° Rotation</button>
+                    </div>
+                    <div class="practice-problem">
+                        <h4>Problem 2: Scaling Matrix</h4>
+                        <p>Create a matrix that scales by 3 in the x-direction and 0.5 in the y-direction.</p>
+                        <button onclick="setMatrix(3,0,0,0.5)" class="btn-practice">Try Scaling</button>
+                    </div>
+                    <div class="practice-problem">
+                        <h4>Problem 3: Combined Transformation</h4>
+                        <p>Experiment with matrices that combine rotation and scaling.</p>
+                        <button onclick="setMatrix(1.414,1.414,-1.414,1.414)" class="btn-practice">Try Combined</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Takeaways -->
+            <section class="tutorial-section takeaways">
+                <h2>Key Takeaways</h2>
+                <ul class="takeaways-list">
+                    <li><strong>Linear Transformation:</strong> Matrix-vector multiplication represents a linear transformation of space.</li>
+                    <li><strong>Geometric Meaning:</strong> Each matrix corresponds to a specific geometric transformation (rotation, scaling, shearing, reflection).</li>
+                    <li><strong>Determinant:</strong> The determinant tells us about the area scaling factor and whether the transformation preserves orientation.</li>
+                    <li><strong>Composition:</strong> Multiple transformations can be combined by multiplying their matrices.</li>
+                    <li><strong>Reversibility:</strong> If the determinant is non-zero, the transformation can be reversed using the inverse matrix.</li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- JavaScript for Interactive Visualization -->
+<script src="{{ url_for('static', filename='js/tutorials/matrix-vector-multiplication/visualization.js') }}"></script>
+{% endblock %}
+
