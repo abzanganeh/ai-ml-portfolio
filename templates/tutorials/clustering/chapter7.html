@@ -7,9 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter7.js') }}"></script>
+    
+    
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial-python.js') }}"></script>
+    <!-- Chapter-specific functionality now handled by shared-tutorial-python.js -->
 </head>
 <body>
     <header class="azbn-header">
@@ -67,15 +68,15 @@
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
-                    <button class="section-nav-btn" data-section="elbow">Elbow Method</button>
-                    <button class="section-nav-btn" data-section="silhouette">Silhouette Analysis</button>
-                    <button class="section-nav-btn" data-section="gap">Gap Statistic</button>
-                    <button class="section-nav-btn" data-section="information">Information Criteria</button>
-                    <button class="section-nav-btn" data-section="validation">Cross-Validation</button>
-                    <button class="section-nav-btn" data-section="comparison">Method Comparison</button>
-                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
-                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                    <button class="section-nav-btn azbn-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn azbn-btn" data-section="elbow">Elbow Method</button>
+                    <button class="section-nav-btn azbn-btn" data-section="silhouette">Silhouette Analysis</button>
+                    <button class="section-nav-btn azbn-btn" data-section="gap">Gap Statistic</button>
+                    <button class="section-nav-btn azbn-btn" data-section="information">Information Criteria</button>
+                    <button class="section-nav-btn azbn-btn" data-section="validation">Cross-Validation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="comparison">Method Comparison</button>
+                    <button class="section-nav-btn azbn-btn" data-section="interactive">Interactive Demos</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
         </div>
@@ -326,11 +327,14 @@
                             </table>
                         </div>
 
-                        <div class="visualization-placeholder">
-                            <h4>Visualization: Elbow Method Example</h4>
-                            <p><strong>Image Description:</strong> A comprehensive elbow method visualization showing WCSS values plotted against k (number of clusters) from k=1 to k=10. The plot clearly shows the characteristic "elbow" shape with a sharp decrease in WCSS for small k values, followed by a more gradual decline. The optimal k=3 is highlighted at the elbow point where the rate of improvement begins to level off. Additional panels show the second derivative curve for automated elbow detection and confidence intervals from multiple runs.</p>
-                            <p><em>This demonstrates the classic elbow pattern used for optimal k selection</em></p>
-                        </div>
+                        <div class="visualization-container" id="elbow-method-viz">
+                                <h4>Visualization: Elbow Method Example</h4>
+                                <div class="chart-container" id="elbow-chart">
+                                    <div class="loading-spinner">
+                                        <p>Loading elbow method visualization...</p>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
 
                     <!-- Silhouette Analysis Section -->
@@ -482,11 +486,14 @@
                             </table>
                         </div>
 
-                        <div class="visualization-placeholder">
-                            <h4>Visualization: Silhouette Analysis</h4>
-                            <p><strong>Image Description:</strong> A comprehensive silhouette analysis visualization with three panels. Left: Silhouette plot showing individual point coefficients organized by cluster, with cluster averages and overall average marked. Center: Silhouette scores vs k plot showing the optimal k=3 with highest average silhouette score. Right: 2D scatter plot of the data colored by cluster assignments, demonstrating the cluster separation that leads to high silhouette scores.</p>
-                            <p><em>This demonstrates how silhouette analysis provides detailed cluster quality assessment</em></p>
-                        </div>
+                        <div class="visualization-container" id="silhouette-analysis-viz">
+                                <h4>Visualization: Silhouette Analysis</h4>
+                                <div class="chart-container" id="silhouette-chart">
+                                    <div class="loading-spinner">
+                                        <p>Loading silhouette analysis visualization...</p>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
 
                     <!-- Gap Statistic Section -->
@@ -986,11 +993,11 @@
     <!-- Sub-section Navigation Footer -->
     <div class="sub-section-nav-footer">
         <div class="sub-nav-buttons">
-            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+            <button id="prev-subsection" class="sub-nav-btn azbn-btn prev-btn" style="display: none;">
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn">
+            <button id="next-subsection" class="sub-nav-btn azbn-btn next-btn">
                 <span class="sub-nav-label" id="next-label">Elbow Method</span>
                 <span>Next →</span>
             </button>
@@ -1002,6 +1009,47 @@
         <a href="/tutorials/clustering/chapter6" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 6: K-Means Optimization</a>
         <a href="/tutorials/clustering/chapter8" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 8: Hierarchical Clustering →</a>
     </div>
+
+    <!-- Visualization Loading Script -->
+    <!-- Visualization loading now handled by shared-tutorial-python.js -->
+    
+    <!-- Visualization Styles -->
+    <style>
+    .visualization-container {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+    }
+
+    .chart-container {
+        min-height: 400px;
+        margin: 1rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #666;
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 4px;
+    }
+    </style>
 </body>
 </html>
 

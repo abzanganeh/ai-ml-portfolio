@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter5.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial-python.js') }}"></script>
+    <!-- Chapter-specific functionality now handled by shared-tutorial-python.js -->
 </head>
 <body>
     <header class="azbn-header">
@@ -697,11 +697,14 @@
                             </ul>
                         </div>
 
-                        <div class="visualization-placeholder">
-                            <h4>Visualization: K-Means Variants Comparison</h4>
-                            <p><strong>Image Description:</strong> A comparison of different K-means variants showing their performance on the same dataset. Left panel: Standard K-means with centroid-based clusters. Center panel: K-medoids with actual data points as centers. Right panel: Fuzzy C-means showing soft boundaries and membership degrees.</p>
-                            <p><em>This demonstrates the trade-offs between different K-means approaches</em></p>
-                        </div>
+                        <div class="visualization-container" id="kmeans-variants-viz">
+                                <h4>Visualization: K-Means Variants Comparison</h4>
+                                <div class="chart-container" id="kmeans-variants-chart">
+                                    <div class="loading-spinner">
+                                        <p>Loading K-means variants comparison...</p>
+                                    </div>
+                                </div>
+                            </div>
                     </div>
 
                     <!-- Implementation Section -->
@@ -1094,5 +1097,46 @@
         <a href="/tutorials/clustering/chapter4" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 4: Specialized Distance Metrics</a>
         <a href="/tutorials/clustering/chapter6" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 6: K-Means Optimization →</a>
     </div>
+
+    <!-- Visualization Loading Script -->
+    <!-- Visualization loading now handled by shared-tutorial-python.js -->
+    
+    <!-- Visualization Styles -->
+    <style>
+    .visualization-container {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+    }
+
+    .chart-container {
+        min-height: 400px;
+        margin: 1rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #666;
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 4px;
+    }
+    </style>
 </body>
 </html>

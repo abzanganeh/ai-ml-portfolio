@@ -7,9 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-quiz.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter9.js') }}"></script>
+    
+    
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial-python.js') }}"></script>
+    <!-- Chapter-specific functionality now handled by shared-tutorial-python.js -->
 </head>
 <body>
     <header class="azbn-header">
@@ -67,15 +68,15 @@
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="introduction">Introduction</button>
-                    <button class="section-nav-btn" data-section="single">Single Linkage</button>
-                    <button class="section-nav-btn" data-section="complete">Complete Linkage</button>
-                    <button class="section-nav-btn" data-section="average">Average Linkage</button>
-                    <button class="section-nav-btn" data-section="ward">Ward's Method</button>
-                    <button class="section-nav-btn" data-section="other">Other Methods</button>
-                    <button class="section-nav-btn" data-section="comparison">Method Comparison</button>
-                    <button class="section-nav-btn" data-section="interactive">Interactive Demos</button>
-                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                    <button class="section-nav-btn azbn-btn active" data-section="introduction">Introduction</button>
+                    <button class="section-nav-btn azbn-btn" data-section="single">Single Linkage</button>
+                    <button class="section-nav-btn azbn-btn" data-section="complete">Complete Linkage</button>
+                    <button class="section-nav-btn azbn-btn" data-section="average">Average Linkage</button>
+                    <button class="section-nav-btn azbn-btn" data-section="ward">Ward's Method</button>
+                    <button class="section-nav-btn azbn-btn" data-section="other">Other Methods</button>
+                    <button class="section-nav-btn azbn-btn" data-section="comparison">Method Comparison</button>
+                    <button class="section-nav-btn azbn-btn" data-section="interactive">Interactive Demos</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
         </div>
@@ -231,11 +232,14 @@
                                 </ul>
                             </div>
 
-                        <div class="visualization-placeholder">
-                            <h4>Visualization: Linkage Criteria Comparison</h4>
-                            <p><strong>Image Description:</strong> A 2x3 grid showing the same 2D dataset clustered with different linkage criteria. Each panel shows the resulting dendrogram cut at the same height to produce 3 clusters, with different colors for each cluster. Top row: Single linkage (elongated clusters following data streams), Complete linkage (compact spherical clusters), Average linkage (balanced moderate clusters). Bottom row: Ward's method (equal-sized spherical clusters), Centroid linkage (irregular boundaries), and a comparison panel showing all cluster boundaries overlaid with different line styles.</p>
-                            <p><em>This demonstrates how different linkage criteria produce fundamentally different cluster structures from the same data</em></p>
-                        </div>
+                        <div class="visualization-container" id="linkage-comparison-viz">
+                                <h4>Visualization: Linkage Criteria Comparison</h4>
+                                <div class="chart-container" id="linkage-chart">
+                                    <div class="loading-spinner">
+                                        <p>Loading linkage comparison visualization...</p>
+                                    </div>
+                                </div>
+                            </div>
 
                         <h3>Linkage Selection Guidelines</h3>
                         <p>Choosing the appropriate linkage criterion depends on data characteristics, cluster shape expectations, and computational constraints.</p>
@@ -1323,11 +1327,11 @@
     <!-- Sub-section Navigation Footer -->
     <div class="sub-section-nav-footer">
         <div class="sub-nav-buttons">
-            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+            <button id="prev-subsection" class="sub-nav-btn azbn-btn prev-btn" style="display: none;">
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn" style="display: none;">
+            <button id="next-subsection" class="sub-nav-btn azbn-btn next-btn" style="display: none;">
                 <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
                 <span>Next →</span>
             </button>
@@ -1339,6 +1343,47 @@
         <a href="/tutorials/clustering/chapter8" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 8: Hierarchical Clustering</a>
         <a href="/tutorials/clustering/chapter10" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 10: Dendrograms →</a>
     </div>
+
+    <!-- Visualization Loading Script -->
+    <!-- Visualization loading now handled by shared-tutorial-python.js -->
+    
+    <!-- Visualization Styles -->
+    <style>
+    .visualization-container {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+    }
+
+    .chart-container {
+        min-height: 400px;
+        margin: 1rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #666;
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 4px;
+    }
+    </style>
 </body>
 </html>
 

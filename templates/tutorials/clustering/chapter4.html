@@ -7,8 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/clustering/clustering.css') }}">
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/clustering/chapter4.js') }}"></script>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/clustering/shared-tutorial-python.js') }}"></script>
+    <!-- Chapter-specific functionality now handled by shared-tutorial-python.js -->
 </head>
 <body>
     <header class="azbn-header">
@@ -66,13 +67,13 @@
                 
                 <!-- Section Navigation -->
                 <div class="section-nav">
-                    <button class="section-nav-btn active" data-section="algorithm">Algorithm Overview</button>
-                    <button class="section-nav-btn" data-section="mathematics">Mathematical Foundation</button>
-                    <button class="section-nav-btn" data-section="initialization">Initialization Methods</button>
-                    <button class="section-nav-btn" data-section="optimization">Optimization Process</button>
-                    <button class="section-nav-btn" data-section="convergence">Convergence Analysis</button>
-                    <button class="section-nav-btn" data-section="demo">Interactive Demo</button>
-                    <button class="section-nav-btn" data-section="quiz">Quiz</button>
+                    <button class="section-nav-btn azbn-btn active" data-section="algorithm">Algorithm Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="mathematics">Mathematical Foundation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="initialization">Initialization Methods</button>
+                    <button class="section-nav-btn azbn-btn" data-section="optimization">Optimization Process</button>
+                    <button class="section-nav-btn azbn-btn" data-section="convergence">Convergence Analysis</button>
+                    <button class="section-nav-btn azbn-btn" data-section="demo">Interactive Demo</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
                 </div>
             </div>
         </div>
@@ -478,10 +479,15 @@
 
                         <div class="image-container">
                             <h4>Visualization: Convergence Behavior</h4>
-                            <div class="visualization-placeholder">
-                                <p>Graph showing objective function value decreasing over iterations until convergence</p>
+                            <div class="visualization-container" id="convergence-viz">
+                                <div class="chart-container" id="convergence-chart">
+                                    <!-- Python-generated Plotly chart will be inserted here -->
+                                    <div class="loading-spinner">
+                                        <p>Loading convergence visualization...</p>
+                                    </div>
+                                </div>
+                                <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
                             </div>
-                            <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
                         </div>
                     </div>
 
@@ -685,11 +691,11 @@
     <!-- Sub-section Navigation Footer -->
     <div class="sub-section-nav-footer">
         <div class="sub-nav-buttons">
-            <button id="prev-subsection" class="sub-nav-btn prev-btn" style="display: none;">
+            <button id="prev-subsection" class="sub-nav-btn azbn-btn prev-btn" style="display: none;">
                 <span>← Previous</span>
                 <span class="sub-nav-label" id="prev-label"></span>
             </button>
-            <button id="next-subsection" class="sub-nav-btn next-btn">
+            <button id="next-subsection" class="sub-nav-btn azbn-btn next-btn">
                 <span class="sub-nav-label" id="next-label">Mathematical Foundation</span>
                 <span>Next →</span>
             </button>
@@ -701,5 +707,46 @@
         <a href="/tutorials/clustering/chapter3" class="azbn-btn azbn-secondary" onclick="scrollToTop()">← Chapter 3: Minkowski Distance</a>
         <a href="/tutorials/clustering/chapter5" class="azbn-btn azbn-secondary" onclick="scrollToTop()">Chapter 5: K-Means Clustering →</a>
     </div>
+
+    <!-- Python API Tutorial Integration -->
+    
+
+    <!-- Visualization Styles -->
+    <style>
+    .visualization-container {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+    }
+
+    .chart-container {
+        min-height: 400px;
+        margin: 1rem 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #666;
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 400px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 4px;
+    }
+    </style>
 </body>
 </html>

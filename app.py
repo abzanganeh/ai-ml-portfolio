@@ -8,7 +8,10 @@ from flask_sqlalchemy import SQLAlchemy
 from models.tutorial import db, Tutorial
 from models.project import Project  
 from data.tutorials import TUTORIALS_DATA
-from data.projects import PROJECTS_DATA 
+from data.projects import PROJECTS_DATA
+
+# Import new API blueprint for JS-to-Python migration
+from api import api_bp 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-change-this'
@@ -18,6 +21,9 @@ app.config['DEBUG'] = True
 
 # Initialize database
 db.init_app(app)
+
+# Register API blueprint for JS-to-Python migration
+app.register_blueprint(api_bp)
 
 class BlogPost:
     def __init__(self, id, title, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5, content=None, content_file=None, image_url=None):

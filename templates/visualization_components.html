@@ -1,0 +1,270 @@
+<!-- Visualization Components Template -->
+<!-- This template contains reusable components for Python-generated visualizations -->
+
+<!-- Elbow Method Visualization Component -->
+<div class="visualization-container" id="elbow-method-viz">
+    <h4>Visualization: Elbow Method Example</h4>
+    <div class="chart-container" id="elbow-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading elbow method visualization...</p>
+        </div>
+    </div>
+    <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+</div>
+
+<!-- Silhouette Analysis Visualization Component -->
+<div class="visualization-container" id="silhouette-analysis-viz">
+    <h4>Visualization: Silhouette Analysis</h4>
+    <div class="chart-container" id="silhouette-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading silhouette analysis visualization...</p>
+        </div>
+    </div>
+    <p><strong>Analysis:</strong> Higher silhouette scores indicate better cluster separation and cohesion.</p>
+</div>
+
+<!-- Linkage Comparison Visualization Component -->
+<div class="visualization-container" id="linkage-comparison-viz">
+    <h4>Visualization: Linkage Criteria Comparison</h4>
+    <div class="chart-container" id="linkage-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading linkage comparison visualization...</p>
+        </div>
+    </div>
+    <p><strong>Comparison:</strong> Different linkage methods produce different cluster shapes and characteristics.</p>
+</div>
+
+<!-- Convergence Plot Visualization Component -->
+<div class="visualization-container" id="convergence-viz">
+    <h4>Visualization: Convergence Behavior</h4>
+    <div class="chart-container" id="convergence-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading convergence visualization...</p>
+        </div>
+    </div>
+    <p><strong>Convergence Pattern:</strong> Observe how the objective function decreases rapidly in early iterations and then stabilizes.</p>
+</div>
+
+<!-- K-means Variants Comparison Component -->
+<div class="visualization-container" id="kmeans-variants-viz">
+    <h4>Visualization: K-Means Variants Comparison</h4>
+    <div class="chart-container" id="kmeans-variants-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading K-means variants comparison...</p>
+        </div>
+    </div>
+    <p><strong>Comparison:</strong> Different K-means variants show varying performance on the same dataset.</p>
+</div>
+
+<!-- Hierarchical Clustering Process Component -->
+<div class="visualization-container" id="hierarchical-process-viz">
+    <h4>Visualization: Hierarchical Clustering Process</h4>
+    <div class="chart-container" id="hierarchical-chart">
+        <!-- Python-generated Plotly chart will be inserted here -->
+        <div class="loading-spinner">
+            <p>Loading hierarchical clustering process...</p>
+        </div>
+    </div>
+    <p><strong>Process:</strong> Step-by-step visualization of how hierarchical clustering builds the dendrogram.</p>
+</div>
+
+<!-- JavaScript for loading visualizations -->
+<script>
+// Visualization loading functions
+class VisualizationLoader {
+    constructor() {
+        this.baseUrl = '/api/visualizations';
+    }
+
+    async loadElbowMethod() {
+        try {
+            const response = await fetch(`${this.baseUrl}/elbow-method`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    wcss_values: [1000, 800, 600, 450, 350, 300, 280, 270, 265, 263],
+                    k_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                this.renderPlotlyChart('elbow-chart', result.visualization);
+            }
+        } catch (error) {
+            console.error('Error loading elbow method visualization:', error);
+            this.showError('elbow-chart', 'Failed to load elbow method visualization');
+        }
+    }
+
+    async loadSilhouetteAnalysis() {
+        try {
+            const response = await fetch(`${this.baseUrl}/silhouette-analysis`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    silhouette_scores: [0.2, 0.4, 0.6, 0.5, 0.3, 0.2, 0.1, 0.05, 0.02, 0.01],
+                    k_values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    sample_silhouette_values: {
+                        3: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+                    }
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                this.renderPlotlyChart('silhouette-chart', result.visualization);
+            }
+        } catch (error) {
+            console.error('Error loading silhouette analysis visualization:', error);
+            this.showError('silhouette-chart', 'Failed to load silhouette analysis visualization');
+        }
+    }
+
+    async loadLinkageComparison() {
+        try {
+            const response = await fetch(`${this.baseUrl}/linkage-comparison`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    data: Array(30).fill().map(() => ({x: Math.random(), y: Math.random()})),
+                    linkage_methods: ['Single Linkage', 'Complete Linkage', 'Average Linkage', 'Ward\'s Method', 'Centroid Linkage', 'Median Linkage']
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                this.renderPlotlyChart('linkage-chart', result.visualization);
+            }
+        } catch (error) {
+            console.error('Error loading linkage comparison visualization:', error);
+            this.showError('linkage-chart', 'Failed to load linkage comparison visualization');
+        }
+    }
+
+    async loadConvergencePlot() {
+        try {
+            const response = await fetch(`${this.baseUrl}/convergence`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    iterations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                    objective_values: [1000, 800, 650, 550, 480, 430, 400, 385, 375, 370]
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                this.renderPlotlyChart('convergence-chart', result.visualization);
+            }
+        } catch (error) {
+            console.error('Error loading convergence visualization:', error);
+            this.showError('convergence-chart', 'Failed to load convergence visualization');
+        }
+    }
+
+    renderPlotlyChart(containerId, plotlyJson) {
+        const container = document.getElementById(containerId);
+        if (container && window.Plotly) {
+            const plotData = JSON.parse(plotlyJson);
+            Plotly.newPlot(container, plotData.data, plotData.layout, {responsive: true});
+        }
+    }
+
+    showError(containerId, message) {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = `<div class="error-message"><p>${message}</p></div>`;
+        }
+    }
+
+    // Auto-load visualizations when page loads
+    init() {
+        // Load Plotly if not already loaded
+        if (!window.Plotly) {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.plot.ly/plotly-2.26.0.min.js';
+            script.onload = () => this.loadAllVisualizations();
+            document.head.appendChild(script);
+        } else {
+            this.loadAllVisualizations();
+        }
+    }
+
+    loadAllVisualizations() {
+        // Load all visualizations that are present on the page
+        if (document.getElementById('elbow-chart')) this.loadElbowMethod();
+        if (document.getElementById('silhouette-chart')) this.loadSilhouetteAnalysis();
+        if (document.getElementById('linkage-chart')) this.loadLinkageComparison();
+        if (document.getElementById('convergence-chart')) this.loadConvergencePlot();
+    }
+}
+
+// Initialize visualization loader when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new VisualizationLoader().init();
+});
+</script>
+
+<!-- CSS for visualization containers -->
+<style>
+.visualization-container {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.chart-container {
+    min-height: 400px;
+    margin: 1rem 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: #666;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    color: #d32f2f;
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+}
+
+.visualization-container h4 {
+    color: #1976d2;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.visualization-container p {
+    margin-top: 1rem;
+    font-style: italic;
+    color: #666;
+}
+</style>

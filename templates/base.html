@@ -24,6 +24,80 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/main.css') }}?v=2" rel="stylesheet">
     {% block extra_css %}{% endblock %}
+
+    <!-- Notification Styles -->
+    <style>
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        max-width: 400px;
+    }
+    
+    .notification {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-bottom: 10px;
+        overflow: hidden;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .notification-success {
+        border-left: 4px solid #4CAF50;
+    }
+    
+    .notification-error {
+        border-left: 4px solid #f44336;
+    }
+    
+    .notification-warning {
+        border-left: 4px solid #ff9800;
+    }
+    
+    .notification-info {
+        border-left: 4px solid #2196F3;
+    }
+    
+    .notification-content {
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notification-message {
+        flex: 1;
+        margin: 0;
+        color: #333;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        margin-left: 10px;
+    }
+    
+    .notification-close:hover {
+        color: #333;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    </style>
+    
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <!-- Navigation -->
@@ -146,8 +220,8 @@
         <i class="fas fa-chevron-up"></i>
     </button>
 
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- JavaScript - Python API Integration -->
+    <script src="{{ url_for('static', filename='js/main-python.js') }}"></script>
     {% block extra_js %}{% endblock %}
     
     <!-- Search Modal -->
