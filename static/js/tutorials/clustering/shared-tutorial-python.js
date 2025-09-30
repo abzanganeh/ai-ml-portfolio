@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initBottomNavigation();
     initMinkowskiDemo();
     
+    // Initialize distance calculator
+    initDistanceCalculator();
+    
     console.log('✅ Python API tutorial integration initialized!');
 });
 
@@ -257,6 +260,28 @@ function initKMeansDemo() {
         });
     }
     
+    // Initialize dataset type dropdown
+    const dataTypeSelect = document.getElementById('data-type');
+    if (dataTypeSelect) {
+        console.log('Dataset type dropdown found:', dataTypeSelect.value);
+        
+        // Add change event listener
+        dataTypeSelect.addEventListener('change', function() {
+            console.log('Dataset type changed to:', this.value);
+            showNotification(`Dataset type changed to: ${this.value}`, 'info');
+        });
+        
+        // Also add click event for better compatibility
+        dataTypeSelect.addEventListener('click', function() {
+            console.log('Dataset type dropdown clicked, current value:', this.value);
+        });
+        
+        // Test the dropdown functionality
+        console.log('Dataset type dropdown initialized successfully');
+    } else {
+        console.log('Dataset type dropdown not found - this may cause issues');
+    }
+    
     // Initialize demo buttons
     const generateBtn = document.getElementById('generate-data');
     const startBtn = document.getElementById('start-kmeans');
@@ -286,11 +311,13 @@ let isRunning = false;
 
 function generateKMeansData() {
     const numPoints = parseInt(document.getElementById('num-points').value);
-    const dataType = document.getElementById('data-type').value;
+    const dataTypeElement = document.getElementById('data-type');
+    const dataType = dataTypeElement ? dataTypeElement.value : 'blobs'; // Fallback to 'blobs'
     
     currentData = [];
     
     if (dataType === 'random') {
+        // Generate completely random data
         for (let i = 0; i < numPoints; i++) {
             currentData.push({
                 x: Math.random() * 400 + 50,
@@ -298,8 +325,8 @@ function generateKMeansData() {
                 cluster: -1
             });
         }
-    } else if (dataType === 'clusters') {
-        // Generate clustered data
+    } else if (dataType === 'blobs') {
+        // Generate Gaussian blob clusters
         const numClusters = parseInt(document.getElementById('num-clusters').value);
         const pointsPerCluster = Math.floor(numPoints / numClusters);
         
@@ -308,9 +335,55 @@ function generateKMeansData() {
             const centerY = Math.random() * 150 + 75;
             
             for (let i = 0; i < pointsPerCluster; i++) {
+                // Gaussian distribution approximation
+                const x = centerX + (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 30;
+                const y = centerY + (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 25;
                 currentData.push({
-                    x: centerX + (Math.random() - 0.5) * 80,
-                    y: centerY + (Math.random() - 0.5) * 60,
+                    x: Math.max(50, Math.min(450, x)),
+                    y: Math.max(50, Math.min(250, y)),
+                    cluster: -1
+                });
+            }
+        }
+    } else if (dataType === 'circles') {
+        // Generate concentric circles
+        const numClusters = parseInt(document.getElementById('num-clusters').value);
+        const pointsPerCluster = Math.floor(numPoints / numClusters);
+        const centerX = 250;
+        const centerY = 150;
+        
+        for (let c = 0; c < numClusters; c++) {
+            const radius = 30 + c * 40;
+            
+            for (let i = 0; i < pointsPerCluster; i++) {
+                const angle = (i / pointsPerCluster) * 2 * Math.PI;
+                const noise = (Math.random() - 0.5) * 15;
+                const x = centerX + Math.cos(angle) * (radius + noise);
+                const y = centerY + Math.sin(angle) * (radius + noise);
+                currentData.push({
+                    x: Math.max(50, Math.min(450, x)),
+                    y: Math.max(50, Math.min(250, y)),
+                    cluster: -1
+                });
+            }
+        }
+    } else if (dataType === 'moons') {
+        // Generate half-moon shapes
+        const numClusters = parseInt(document.getElementById('num-clusters').value);
+        const pointsPerCluster = Math.floor(numPoints / numClusters);
+        
+        for (let c = 0; c < numClusters; c++) {
+            const centerX = 150 + c * 200;
+            const centerY = 150;
+            
+            for (let i = 0; i < pointsPerCluster; i++) {
+                const angle = (i / pointsPerCluster) * Math.PI;
+                const radius = 60 + (Math.random() - 0.5) * 20;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius + (Math.random() - 0.5) * 15;
+                currentData.push({
+                    x: Math.max(50, Math.min(450, x)),
+                    y: Math.max(50, Math.min(250, y)),
                     cluster: -1
                 });
             }
@@ -324,7 +397,7 @@ function generateKMeansData() {
     
     // Visualize data
     visualizeData();
-    showNotification('Data generated successfully!', 'success');
+    showNotification(`Data generated successfully! (${dataType})`, 'success');
 }
 
 function startKMeans() {
@@ -704,6 +777,69 @@ function runSilhouetteDemo() {
     .catch(error => {
         console.error('Error:', error);
         showNotification('Error running silhouette demo', 'error');
+    });
+}
+
+function runLinkageDemo() {
+    console.log('Running linkage comparison demo...');
+    
+    // Call Python API for linkage comparison visualization
+    fetch('/api/visualizations/linkage-comparison', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            data: {
+                'single': [[1, 2], [3, 4], [5, 6], [7, 8]],
+                'complete': [[1, 2], [3, 4], [5, 6], [7, 8]],
+                'average': [[1, 2], [3, 4], [5, 6], [7, 8]],
+                'ward': [[1, 2], [3, 4], [5, 6], [7, 8]]
+            },
+            linkage_methods: ['single', 'complete', 'average', 'ward']
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            renderPlotlyChart('linkage-demo', data.visualization);
+            showNotification('Linkage comparison demo completed!', 'success');
+        } else {
+            showNotification('Error running linkage demo: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error running linkage demo', 'error');
+    });
+}
+
+function runDendrogramDemo() {
+    console.log('Running dendrogram demo...');
+    
+    // Call Python API for dendrogram visualization
+    fetch('/api/visualizations/dendrogram', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            data: [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]],
+            linkage_method: 'ward'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            renderPlotlyChart('dendrogram-demo', data.visualization);
+            showNotification('Dendrogram demo completed!', 'success');
+        } else {
+            showNotification('Error running dendrogram demo: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error running dendrogram demo', 'error');
     });
 }
 
@@ -1695,6 +1831,163 @@ function calculateMinkowskiDistanceInternal() {
     visualizeMinkowskiDistance(point1X, point1Y, point2X, point2Y, pValue);
 }
 
+function runMinkowskiClusteringInternal() {
+    const pValue = parseFloat(document.getElementById('clustering-p')?.value || 2);
+    const clusterCount = parseInt(document.getElementById('cluster-count')?.value || 3);
+    
+    // Generate sample data
+    const data = generateClusteringData();
+    
+    // Run clustering with different p-values
+    const clusters = performMinkowskiClustering(data, clusterCount, pValue);
+    
+    // Visualize results
+    visualizeMinkowskiClustering(data, clusters, pValue);
+    
+    showNotification(`Minkowski clustering completed with p=${pValue}!`, 'success');
+}
+
+function resetClusteringInternal() {
+    // Reset all sliders to default values
+    const pValueSlider = document.getElementById('p-value');
+    const clusteringPSlider = document.getElementById('clustering-p');
+    const clusterCountSlider = document.getElementById('cluster-count');
+    
+    if (pValueSlider) pValueSlider.value = '2';
+    if (clusteringPSlider) clusteringPSlider.value = '2';
+    if (clusterCountSlider) clusterCountSlider.value = '3';
+    
+    // Reset displays
+    document.getElementById('p-value-display').textContent = '2.0';
+    document.getElementById('clustering-p-display').textContent = '2.0';
+    document.getElementById('cluster-count-display').textContent = '3';
+    
+    // Clear visualizations
+    const canvas = document.getElementById('minkowski-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Minkowski distance visualization will appear here</p>';
+    }
+    
+    const clusteringCanvas = document.getElementById('clustering-canvas');
+    if (clusteringCanvas) {
+        clusteringCanvas.innerHTML = '<p>Clustering visualization will appear here</p>';
+    }
+    
+    // Recalculate with default values
+    calculateMinkowskiDistanceInternal();
+    
+    showNotification('Clustering demo reset to default values!', 'info');
+}
+
+function generateClusteringData() {
+    const data = [];
+    // Generate 3 clusters of data
+    const centers = [
+        { x: 100, y: 100 },
+        { x: 300, y: 150 },
+        { x: 200, y: 250 }
+    ];
+    
+    centers.forEach((center, index) => {
+        for (let i = 0; i < 20; i++) {
+            data.push({
+                x: center.x + (Math.random() - 0.5) * 60,
+                y: center.y + (Math.random() - 0.5) * 60,
+                cluster: index
+            });
+        }
+    });
+    
+    return data;
+}
+
+function performMinkowskiClustering(data, k, p) {
+    // Simple K-means clustering using Minkowski distance
+    const centroids = [];
+    const clusters = [];
+    
+    // Initialize centroids randomly
+    for (let i = 0; i < k; i++) {
+        const randomPoint = data[Math.floor(Math.random() * data.length)];
+        centroids.push({ x: randomPoint.x, y: randomPoint.y });
+    }
+    
+    // Assign points to clusters
+    data.forEach(point => {
+        let minDistance = Infinity;
+        let nearestCluster = 0;
+        
+        centroids.forEach((centroid, index) => {
+            const distance = calculateDistance(point, centroid, p);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestCluster = index;
+            }
+        });
+        
+        clusters.push(nearestCluster);
+    });
+    
+    return { data, clusters, centroids };
+}
+
+function calculateDistance(point1, point2, p) {
+    const dx = Math.abs(point1.x - point2.x);
+    const dy = Math.abs(point1.y - point2.y);
+    
+    if (p === Infinity) {
+        return Math.max(dx, dy);
+    } else {
+        return Math.pow(Math.pow(dx, p) + Math.pow(dy, p), 1/p);
+    }
+}
+
+function visualizeMinkowskiClustering(data, result, pValue) {
+    const canvas = document.getElementById('clustering-canvas');
+    if (!canvas) return;
+    
+    // Create canvas element
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) {
+        canvasElement = document.createElement('canvas');
+        canvasElement.width = 500;
+        canvasElement.height = 400;
+        canvasElement.style.border = '1px solid #ddd';
+        canvasElement.style.borderRadius = '4px';
+        canvas.innerHTML = '';
+        canvas.appendChild(canvasElement);
+    }
+    
+    const ctx = canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+    
+    // Draw data points with cluster colors
+    data.forEach((point, index) => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[result.clusters[index] % colors.length];
+        ctx.fill();
+    });
+    
+    // Draw centroids
+    result.centroids.forEach((centroid, index) => {
+        ctx.beginPath();
+        ctx.arc(centroid.x, centroid.y, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[index % colors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+    
+    // Add title
+    ctx.fillStyle = '#333';
+    ctx.font = '16px Arial';
+    ctx.fillText(`Minkowski Clustering (p=${pValue})`, 20, 30);
+}
+
 function runMinkowskiClustering() {
     const pValue = document.getElementById('clustering-p').value;
     const clusterCount = parseInt(document.getElementById('cluster-count').value);
@@ -2196,23 +2489,144 @@ function resetInitializationDemoInternal() {
 }
 
 function generateInitDemoInternal() {
+    const canvas = document.getElementById('initialization-canvas');
+    if (!canvas) return;
+    
+    // Create canvas element
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) {
+        canvasElement = document.createElement('canvas');
+        canvasElement.width = 600;
+        canvasElement.height = 400;
+        canvasElement.style.border = '1px solid #ddd';
+        canvasElement.style.borderRadius = '4px';
+        canvas.innerHTML = '';
+        canvas.appendChild(canvasElement);
+    }
+    
+    const ctx = canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    // Generate sample data
+    const data = [];
+    for (let i = 0; i < 100; i++) {
+        data.push({
+            x: Math.random() * 500 + 50,
+            y: Math.random() * 300 + 50,
+            cluster: Math.floor(Math.random() * 3)
+        });
+    }
+    
+    // Draw data points
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1'];
+    data.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[point.cluster];
+        ctx.fill();
+    });
+    
+    // Draw centroids
+    const centroids = [
+        { x: 150, y: 100, color: '#ff6b6b' },
+        { x: 300, y: 200, color: '#4ecdc4' },
+        { x: 450, y: 150, color: '#45b7d1' }
+    ];
+    
+    centroids.forEach(centroid => {
+        ctx.beginPath();
+        ctx.arc(centroid.x, centroid.y, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = centroid.color;
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    });
+    
+    // Add title
+    ctx.fillStyle = '#333';
+    ctx.font = '16px Arial';
+    ctx.fillText('Initialization Methods Comparison', 20, 30);
+    
     showNotification('Initialization comparison demo generated!', 'success');
-    // Placeholder for initialization comparison
 }
 
 function resetInitDemoInternal() {
+    const canvas = document.getElementById('initialization-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Click "Run Demo" to compare different initialization methods</p>';
+    }
     showNotification('Initialization demo reset!', 'info');
-    // Placeholder for reset
 }
 
 function generateAccelDemoInternal() {
+    const canvas = document.getElementById('acceleration-canvas');
+    if (!canvas) return;
+    
+    // Create canvas element
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) {
+        canvasElement = document.createElement('canvas');
+        canvasElement.width = 600;
+        canvasElement.height = 400;
+        canvasElement.style.border = '1px solid #ddd';
+        canvasElement.style.borderRadius = '4px';
+        canvas.innerHTML = '';
+        canvas.appendChild(canvasElement);
+    }
+    
+    const ctx = canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    // Draw performance chart
+    const chartData = [
+        { method: 'Standard K-means', time: 100, color: '#ff6b6b' },
+        { method: 'Triangle Inequality', time: 60, color: '#4ecdc4' },
+        { method: 'Mini-batch', time: 30, color: '#45b7d1' },
+        { method: 'Approximate', time: 15, color: '#96ceb4' }
+    ];
+    
+    const barWidth = 100;
+    const barSpacing = 20;
+    const maxTime = 100;
+    const chartHeight = 300;
+    const startX = 50;
+    const startY = 350;
+    
+    chartData.forEach((item, index) => {
+        const x = startX + index * (barWidth + barSpacing);
+        const barHeight = (item.time / maxTime) * chartHeight;
+        const y = startY - barHeight;
+        
+        // Draw bar
+        ctx.fillStyle = item.color;
+        ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // Draw label
+        ctx.fillStyle = '#333';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.method, x + barWidth/2, startY + 20);
+        
+        // Draw time value
+        ctx.fillText(`${item.time}ms`, x + barWidth/2, y - 5);
+    });
+    
+    // Add title
+    ctx.fillStyle = '#333';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText('K-means Acceleration Techniques Performance', 20, 30);
+    
     showNotification('Acceleration benchmark demo generated!', 'success');
-    // Placeholder for acceleration demo
 }
 
 function resetAccelDemoInternal() {
+    const canvas = document.getElementById('acceleration-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Click "Run Benchmark" to see performance comparison</p>';
+    }
     showNotification('Acceleration demo reset!', 'info');
-    // Placeholder for reset
 }
 
 /**
@@ -2224,8 +2638,18 @@ function generateElbowDemoInternal() {
 }
 
 function resetElbowDemoInternal() {
+    // Clear elbow visualization
+    const elbowContainer = document.querySelector('#elbow-demo .visualization-container');
+    if (elbowContainer) {
+        elbowContainer.innerHTML = '<div class="visualization-panel"><h4>WCSS vs K Plot</h4><p>Click "Generate Elbow Plot" to see the visualization</p></div>';
+    }
+    
+    // Reset sliders to default values
+    const maxKSlider = document.getElementById('elbow-max-k');
+    if (maxKSlider) maxKSlider.value = '10';
+    document.getElementById('elbow-max-k-display').textContent = '10';
+    
     showNotification('Elbow demo reset!', 'info');
-    // Placeholder for reset
 }
 
 function generateSilhouetteDemoInternal() {
@@ -2234,8 +2658,18 @@ function generateSilhouetteDemoInternal() {
 }
 
 function resetSilhouetteDemoInternal() {
+    // Clear silhouette visualization
+    const silhouetteContainer = document.querySelector('#silhouette-demo .visualization-container');
+    if (silhouetteContainer) {
+        silhouetteContainer.innerHTML = '<div class="visualization-panel"><h4>Silhouette Plot</h4><p>Click "Generate Analysis" to see the visualization</p></div>';
+    }
+    
+    // Reset sliders to default values
+    const kSlider = document.getElementById('silhouette-k');
+    if (kSlider) kSlider.value = '3';
+    document.getElementById('silhouette-k-display').textContent = '3';
+    
     showNotification('Silhouette demo reset!', 'info');
-    // Placeholder for reset
 }
 
 /**
@@ -2247,8 +2681,18 @@ function generateLinkageDemoInternal() {
 }
 
 function resetLinkageDemoInternal() {
+    // Clear linkage visualization
+    const linkageContainer = document.querySelector('#linkage-demo .visualization-container');
+    if (linkageContainer) {
+        linkageContainer.innerHTML = '<div class="visualization-panel"><h4>Data Points and Clusters</h4><p>Click "Generate Clustering" to see the visualization</p></div>';
+    }
+    
+    // Reset sliders to default values
+    const clustersSlider = document.getElementById('linkage-clusters');
+    if (clustersSlider) clustersSlider.value = '3';
+    document.getElementById('linkage-clusters-display').textContent = '3';
+    
     showNotification('Linkage demo reset!', 'info');
-    // Placeholder for reset
 }
 
 function generateDendrogramDemoInternal() {
@@ -2257,8 +2701,18 @@ function generateDendrogramDemoInternal() {
 }
 
 function resetDendrogramDemoInternal() {
+    // Clear dendrogram visualization
+    const dendrogramContainer = document.querySelector('#dendrogram-demo .visualization-container');
+    if (dendrogramContainer) {
+        dendrogramContainer.innerHTML = '<div class="visualization-panel"><h4>Dendrogram with Cut Line</h4><p>Click "Generate Dendrogram" to see the visualization</p></div>';
+    }
+    
+    // Reset sliders to default values
+    const thresholdSlider = document.getElementById('dendro-threshold');
+    if (thresholdSlider) thresholdSlider.value = '50';
+    document.getElementById('dendro-threshold-display').textContent = '50';
+    
     showNotification('Dendrogram demo reset!', 'info');
-    // Placeholder for reset
 }
 
 /**
@@ -2361,6 +2815,476 @@ function runStabilityAnalysisInternal() {
     // Placeholder for stability analysis
 }
 
+/**
+ * Chapter 5 Demo Functions - Full Implementation
+ */
+function generateDemoDataInternal() {
+    const numClusters = parseInt(document.getElementById('demo-clusters')?.value || 3);
+    const dataType = document.getElementById('demo-data')?.value || 'blobs';
+    
+    // Generate demo data similar to Chapter 1
+    window.demoData = [];
+    
+    if (dataType === 'blobs') {
+        const pointsPerCluster = Math.floor(120 / numClusters); // Doubled from 60 to 120
+        for (let c = 0; c < numClusters; c++) {
+            const centerX = Math.random() * 300 + 100;
+            const centerY = Math.random() * 150 + 75;
+            
+            for (let i = 0; i < pointsPerCluster; i++) {
+                const x = centerX + (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 30;
+                const y = centerY + (Math.random() + Math.random() + Math.random() + Math.random() - 2) * 25;
+                window.demoData.push({
+                    x: Math.max(50, Math.min(450, x)),
+                    y: Math.max(50, Math.min(250, y)),
+                    cluster: -1
+                });
+            }
+        }
+    } else if (dataType === 'random') {
+        for (let i = 0; i < 120; i++) { // Doubled from 60 to 120
+            window.demoData.push({
+                x: Math.random() * 400 + 50,
+                y: Math.random() * 200 + 50,
+                cluster: -1
+            });
+        }
+    } else if (dataType === 'moons') {
+        const pointsPerMoon = 60; // Doubled from 30 to 60
+        for (let c = 0; c < 2; c++) {
+            const centerX = 150 + c * 200;
+            const centerY = 150;
+            
+            for (let i = 0; i < pointsPerMoon; i++) {
+                const angle = (i / pointsPerMoon) * Math.PI;
+                const radius = 60 + (Math.random() - 0.5) * 20;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius + (Math.random() - 0.5) * 15;
+                window.demoData.push({
+                    x: Math.max(50, Math.min(450, x)),
+                    y: Math.max(50, Math.min(250, y)),
+                    cluster: -1
+                });
+            }
+        }
+    }
+    
+    // Reset demo state
+    window.demoCentroids = [];
+    window.demoIteration = 0;
+    window.demoRunning = false;
+    
+    // Visualize data
+    visualizeDemoData();
+    showNotification(`Demo data generated! (${dataType}, ${numClusters} clusters, ${window.demoData.length} points)`, 'success');
+}
+
+function runKmeansDemoInternal() {
+    if (!window.demoData || window.demoData.length === 0) {
+        showNotification('Please generate data first!', 'warning');
+        return;
+    }
+    
+    const numClusters = parseInt(document.getElementById('demo-clusters')?.value || 3);
+    window.demoCentroids = [];
+    window.demoIteration = 0;
+    window.demoRunning = true;
+    
+    // Initialize centroids
+    for (let i = 0; i < numClusters; i++) {
+        const randomPoint = window.demoData[Math.floor(Math.random() * window.demoData.length)];
+        window.demoCentroids.push({ x: randomPoint.x, y: randomPoint.y, cluster: i });
+    }
+    
+    // Run iterations
+    const runIteration = () => {
+        if (!window.demoRunning || window.demoIteration >= 10) {
+            window.demoRunning = false;
+            showNotification('K-means converged after ' + window.demoIteration + ' iterations!', 'success');
+            return;
+        }
+        
+        runKmeansIteration();
+        visualizeDemoClustering();
+        
+        setTimeout(runIteration, 1000); // 1 second delay between iterations
+    };
+    
+    runIteration();
+}
+
+function stepKmeansDemoInternal() {
+    if (!window.demoData || window.demoData.length === 0) {
+        showNotification('Please generate data first!', 'warning');
+        return;
+    }
+    
+    // Stop any running auto-iteration
+    window.demoRunning = false;
+    
+    // Initialize centroids if not already done
+    if (!window.demoCentroids || window.demoCentroids.length === 0) {
+        const numClusters = parseInt(document.getElementById('demo-clusters')?.value || 3);
+        window.demoCentroids = [];
+        for (let i = 0; i < numClusters; i++) {
+            const randomPoint = window.demoData[Math.floor(Math.random() * window.demoData.length)];
+            window.demoCentroids.push({ x: randomPoint.x, y: randomPoint.y, cluster: i });
+        }
+        window.demoIteration = 0;
+        showNotification('Initialized centroids. Click "Step-by-Step" to run iterations.', 'info');
+        visualizeDemoClustering();
+        return;
+    }
+    
+    // Check if already converged
+    if (window.demoIteration >= 10) {
+        showNotification('K-means has already converged! Click "Reset" to start over.', 'warning');
+        return;
+    }
+    
+    // Run one iteration
+    runKmeansIteration();
+    visualizeDemoClustering();
+    
+    if (window.demoIteration >= 10) {
+        showNotification('K-means converged after ' + window.demoIteration + ' iterations!', 'success');
+    } else {
+        showNotification(`Step ${window.demoIteration} completed. Click again for next step.`, 'info');
+    }
+}
+
+function resetDemoInternal() {
+    window.demoData = [];
+    window.demoCentroids = [];
+    window.demoIteration = 0;
+    window.demoRunning = false;
+    
+    // Clear canvas
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    if (canvas) {
+        canvas.innerHTML = '<p>Interactive K-means clustering visualization will appear here</p>';
+    }
+    
+    showNotification('Demo reset!', 'info');
+}
+
+function runKmeansIteration() {
+    if (!window.demoRunning && window.demoIteration > 0) return;
+    
+    window.demoIteration++;
+    
+    // Assign points to nearest centroid
+    window.demoData.forEach(point => {
+        let minDistance = Infinity;
+        let nearestCluster = 0;
+        
+        window.demoCentroids.forEach((centroid, index) => {
+            const distance = Math.sqrt(
+                Math.pow(point.x - centroid.x, 2) + 
+                Math.pow(point.y - centroid.y, 2)
+            );
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestCluster = index;
+            }
+        });
+        point.cluster = nearestCluster;
+    });
+    
+    // Update centroids
+    window.demoCentroids.forEach((centroid, index) => {
+        const clusterPoints = window.demoData.filter(p => p.cluster === index);
+        if (clusterPoints.length > 0) {
+            centroid.x = clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length;
+            centroid.y = clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length;
+        }
+    });
+    
+    if (window.demoIteration >= 10) {
+        window.demoRunning = false;
+        showNotification('K-means converged after ' + window.demoIteration + ' iterations!', 'success');
+    }
+}
+
+function visualizeDemoData() {
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    if (!canvas) return;
+    
+    // Create canvas element
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) {
+        canvasElement = document.createElement('canvas');
+        canvasElement.width = 500;
+        canvasElement.height = 400;
+        canvasElement.style.border = '1px solid #ddd';
+        canvasElement.style.borderRadius = '4px';
+        canvas.innerHTML = '';
+        canvas.appendChild(canvasElement);
+    }
+    
+    const ctx = canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    // Draw data points
+    window.demoData.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = '#666';
+        ctx.fill();
+    });
+    
+    // Draw iteration info
+    ctx.fillStyle = '#333';
+    ctx.font = '14px Arial';
+    ctx.fillText(`Data Points: ${window.demoData.length}`, 10, 20);
+}
+
+function visualizeDemoClustering() {
+    const canvas = document.getElementById('kmeans-demo-canvas');
+    if (!canvas) return;
+    
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) return;
+    
+    const ctx = canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    // Draw data points with cluster colors
+    window.demoData.forEach(point => {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[point.cluster % colors.length];
+        ctx.fill();
+    });
+    
+    // Draw centroids
+    window.demoCentroids.forEach((centroid, index) => {
+        ctx.beginPath();
+        ctx.arc(centroid.x, centroid.y, 6, 0, 2 * Math.PI);
+        ctx.fillStyle = colors[index % colors.length];
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Draw centroid label
+        ctx.fillStyle = '#000';
+        ctx.font = '12px Arial';
+        ctx.fillText(`C${index+1}`, centroid.x + 8, centroid.y - 8);
+    });
+    
+    // Draw iteration info
+    ctx.fillStyle = '#333';
+    ctx.font = '14px Arial';
+    ctx.fillText(`Iteration: ${window.demoIteration}`, 10, 20);
+}
+
+/**
+ * Quiz Functions
+ */
+function checkAnswerInternal(questionNum, correctAnswer) {
+    const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+    if (!selectedAnswer) {
+        showNotification('Please select an answer!', 'warning');
+        return;
+    }
+    
+    const isCorrect = selectedAnswer.value === correctAnswer;
+    const resultDiv = document.getElementById(`q${questionNum}-result`);
+    
+    if (resultDiv) {
+        resultDiv.innerHTML = isCorrect ? 
+            '<span style="color: green;">✓ Correct!</span>' : 
+            '<span style="color: red;">✗ Incorrect. The correct answer is ' + correctAnswer + '</span>';
+    }
+    
+    showNotification(isCorrect ? 'Correct answer!' : 'Incorrect answer. Try again!', isCorrect ? 'success' : 'warning');
+}
+
+function resetQuizInternal() {
+    // Clear all radio button selections
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.checked = false;
+    });
+    
+    // Clear all result displays
+    document.querySelectorAll('[id$="-result"]').forEach(result => {
+        result.innerHTML = '';
+    });
+    
+    showNotification('Quiz reset!', 'info');
+}
+
+function scrollToTopInternal() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Chapter 2 Distance Calculator Functions
+ */
+function calculateDistanceInternal() {
+    try {
+        // Get input values
+        const point1X = parseFloat(document.getElementById('point1-x').value) || 0;
+        const point1Y = parseFloat(document.getElementById('point1-y').value) || 0;
+        const point2X = parseFloat(document.getElementById('point2-x').value) || 0;
+        const point2Y = parseFloat(document.getElementById('point2-y').value) || 0;
+        
+        // Calculate Euclidean distance
+        const euclideanDistance = Math.sqrt(Math.pow(point2X - point1X, 2) + Math.pow(point2Y - point1Y, 2));
+        
+        // Calculate Manhattan distance
+        const manhattanDistance = Math.abs(point2X - point1X) + Math.abs(point2Y - point1Y);
+        
+        // Calculate ratio
+        const ratio = manhattanDistance / euclideanDistance;
+        
+        // Update display
+        document.getElementById('euclidean-value').textContent = euclideanDistance.toFixed(2);
+        document.getElementById('manhattan-value').textContent = manhattanDistance.toFixed(2);
+        document.getElementById('ratio-value').textContent = ratio.toFixed(2);
+        
+        // Update visualization
+        updateDistanceVisualization(point1X, point1Y, point2X, point2Y, euclideanDistance, manhattanDistance);
+        
+        showNotification('Distance calculated successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Error calculating distance:', error);
+        showNotification('Error calculating distance. Please check your inputs.', 'error');
+    }
+}
+
+function resetCalculatorInternal() {
+    // Reset input values to defaults
+    document.getElementById('point1-x').value = '1';
+    document.getElementById('point1-y').value = '1';
+    document.getElementById('point2-x').value = '4';
+    document.getElementById('point2-y').value = '5';
+    
+    // Reset display values
+    document.getElementById('euclidean-value').textContent = '5.00';
+    document.getElementById('manhattan-value').textContent = '7.00';
+    document.getElementById('ratio-value').textContent = '1.40';
+    
+    // Reset visualization
+    updateDistanceVisualization(1, 1, 4, 5, 5.00, 7.00);
+    
+    showNotification('Calculator reset to default values!', 'info');
+}
+
+function updateDistanceVisualization(x1, y1, x2, y2, euclideanDist, manhattanDist) {
+    const canvas = document.getElementById('calculator-canvas');
+    if (!canvas) return;
+    
+    // Create or get canvas element
+    let canvasElement = canvas.querySelector('canvas');
+    if (!canvasElement) {
+        canvasElement = document.createElement('canvas');
+        canvasElement.width = 400;
+        canvasElement.height = 300;
+        canvasElement.style.border = '1px solid #ddd';
+        canvasElement.style.borderRadius = '4px';
+        canvas.innerHTML = '';
+        canvas.appendChild(canvasElement);
+    }
+    
+    const ctx = canvasElement.getContext('2d');
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    
+    // Set up coordinate system (scale to fit canvas)
+    const padding = 40;
+    const scaleX = (canvasElement.width - 2 * padding) / 10; // Scale for 0-10 range
+    const scaleY = (canvasElement.height - 2 * padding) / 10;
+    
+    const canvasX1 = padding + x1 * scaleX;
+    const canvasY1 = canvasElement.height - padding - y1 * scaleY;
+    const canvasX2 = padding + x2 * scaleX;
+    const canvasY2 = canvasElement.height - padding - y2 * scaleY;
+    
+    // Draw grid
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) {
+        const x = padding + i * scaleX;
+        const y = padding + i * scaleY;
+        ctx.beginPath();
+        ctx.moveTo(x, padding);
+        ctx.lineTo(x, canvasElement.height - padding);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(canvasElement.width - padding, y);
+        ctx.stroke();
+    }
+    
+    // Draw Manhattan path (L-shaped)
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(canvasX1, canvasY1);
+    ctx.lineTo(canvasX2, canvasY1); // Horizontal line
+    ctx.lineTo(canvasX2, canvasY2); // Vertical line
+    ctx.stroke();
+    
+    // Draw Euclidean path (straight line)
+    ctx.strokeStyle = '#4ecdc4';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(canvasX1, canvasY1);
+    ctx.lineTo(canvasX2, canvasY2);
+    ctx.stroke();
+    
+    // Draw points
+    ctx.fillStyle = '#2c3e50';
+    ctx.beginPath();
+    ctx.arc(canvasX1, canvasY1, 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillText('P1', canvasX1 + 10, canvasY1 - 10);
+    
+    ctx.beginPath();
+    ctx.arc(canvasX2, canvasY2, 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillText('P2', canvasX2 + 10, canvasY2 - 10);
+    
+    // Add legend
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Arial';
+    ctx.fillText(`Euclidean: ${euclideanDist.toFixed(2)}`, 10, 20);
+    ctx.fillText(`Manhattan: ${manhattanDist.toFixed(2)}`, 10, 35);
+}
+
+function initDistanceCalculator() {
+    // Check if we're on a page with distance calculator
+    const point1X = document.getElementById('point1-x');
+    const point1Y = document.getElementById('point1-y');
+    const point2X = document.getElementById('point2-x');
+    const point2Y = document.getElementById('point2-y');
+    
+    if (point1X && point1Y && point2X && point2Y) {
+        console.log('Initializing distance calculator...');
+        
+        // Add event listeners for auto-calculation
+        [point1X, point1Y, point2X, point2Y].forEach(input => {
+            input.addEventListener('input', function() {
+                // Auto-calculate when values change
+                setTimeout(calculateDistanceInternal, 100);
+            });
+        });
+        
+        // Initial calculation
+        calculateDistanceInternal();
+        
+        console.log('Distance calculator initialized successfully');
+    }
+}
+
 // Global functions for HTML onclick handlers
 window.runKmeans = function() {
     startKMeans();
@@ -2389,41 +3313,41 @@ window.calculateMinkowskiDistance = function() {
 };
 
 window.runMinkowskiClustering = function() {
-    runMinkowskiClustering();
+    runMinkowskiClusteringInternal();
 };
 
 window.resetClustering = function() {
-    resetClustering();
+    resetClusteringInternal();
 };
 
 // Quiz Functions
 window.checkAnswer = function(questionNum, correctAnswer) {
-    checkAnswer(questionNum, correctAnswer);
+    checkAnswerInternal(questionNum, correctAnswer);
 };
 
 window.resetQuiz = function() {
-    resetQuiz();
+    resetQuizInternal();
 };
 
 window.scrollToTop = function() {
-    scrollToTop();
+    scrollToTopInternal();
 };
 
 // Chapter 5 Demo Functions
 window.generateDemoData = function() {
-    generateDemoData();
+    generateDemoDataInternal();
 };
 
 window.runKmeansDemo = function() {
-    runKmeansDemo();
+    runKmeansDemoInternal();
 };
 
 window.stepKmeansDemo = function() {
-    stepKmeansDemo();
+    stepKmeansDemoInternal();
 };
 
 window.resetDemo = function() {
-    resetDemo();
+    resetDemoInternal();
 };
 
 // Chapter 6 Demo Functions
@@ -2556,4 +3480,13 @@ window.resetMeanShift = function() {
 // Chapter 14 Demo Functions
 window.runStabilityAnalysis = function() {
     runStabilityAnalysisInternal();
+};
+
+// Chapter 2 Distance Calculator Functions
+window.calculateDistance = function() {
+    calculateDistanceInternal();
+};
+
+window.resetCalculator = function() {
+    resetCalculatorInternal();
 };

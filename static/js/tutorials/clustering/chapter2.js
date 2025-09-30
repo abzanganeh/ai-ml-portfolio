@@ -8,7 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeChapter2Demos() {
     console.log('Initializing Chapter 2 demos...');
-    // Initialize any chapter-specific demos
+    
+    // Initialize cluster count range slider
+    const clusterCountSlider = document.getElementById('cluster-count');
+    const clusterCountDisplay = document.getElementById('cluster-count-display');
+    
+    if (clusterCountSlider && clusterCountDisplay) {
+        clusterCountSlider.addEventListener('input', function() {
+            clusterCountDisplay.textContent = this.value;
+        });
+    }
 }
 
 // ===== DISTANCE CALCULATOR FUNCTIONS =====

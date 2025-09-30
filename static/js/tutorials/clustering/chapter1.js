@@ -61,6 +61,56 @@ function generateData() {
                 cluster: -1
             });
         }
+    } else if (dataType === 'circles') {
+        // Generate concentric circles
+        const centerX = 250;
+        const centerY = 150;
+        const innerRadius = 40;
+        const outerRadius = 80;
+        
+        for (let i = 0; i < numPoints; i++) {
+            const angle = Math.random() * 2 * Math.PI;
+            const radius = Math.random() < 0.5 ? 
+                Math.random() * innerRadius : 
+                innerRadius + Math.random() * (outerRadius - innerRadius);
+            
+            currentData.push({
+                x: centerX + Math.cos(angle) * radius,
+                y: centerY + Math.sin(angle) * radius,
+                cluster: -1
+            });
+        }
+    } else if (dataType === 'moons') {
+        // Generate two half moons
+        const pointsPerMoon = Math.floor(numPoints / 2);
+        
+        // First moon (top)
+        for (let i = 0; i < pointsPerMoon; i++) {
+            const angle = Math.random() * Math.PI;
+            const radius = 60 + Math.random() * 20;
+            const x = 200 + Math.cos(angle) * radius;
+            const y = 100 + Math.sin(angle) * radius + (Math.random() - 0.5) * 10;
+            
+            currentData.push({
+                x: Math.max(50, Math.min(350, x)),
+                y: Math.max(50, Math.min(250, y)),
+                cluster: -1
+            });
+        }
+        
+        // Second moon (bottom)
+        for (let i = 0; i < numPoints - pointsPerMoon; i++) {
+            const angle = Math.random() * Math.PI;
+            const radius = 60 + Math.random() * 20;
+            const x = 300 + Math.cos(angle) * radius;
+            const y = 200 + Math.sin(angle) * radius + (Math.random() - 0.5) * 10;
+            
+            currentData.push({
+                x: Math.max(50, Math.min(350, x)),
+                y: Math.max(50, Math.min(250, y)),
+                cluster: -1
+            });
+        }
     }
     
     resetKmeans();

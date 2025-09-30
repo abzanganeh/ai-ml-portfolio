@@ -706,4 +706,12 @@ function calculateSilhouetteScore() {
 // Initialize demo when page loads
 document.addEventListener('DOMContentLoaded', function() {
     updateKMeansDemo();
+    
+    // Initialize range slider event listeners
+    const clustersSlider = document.getElementById('demo-clusters');
+    if (clustersSlider) {
+        clustersSlider.addEventListener('input', function() {
+            document.getElementById('demo-clusters-display').textContent = this.value;
+        });
+    }
 });

@@ -3,6 +3,14 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeEvaluationDemo();
+    
+    // Initialize range slider event listeners
+    const initRunsSlider = document.getElementById('init-runs');
+    if (initRunsSlider) {
+        initRunsSlider.addEventListener('input', function() {
+            document.getElementById('init-runs-display').textContent = this.value;
+        });
+    }
 });
 
 // Demo functions for HTML onclick compatibility
