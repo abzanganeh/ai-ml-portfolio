@@ -395,7 +395,7 @@ function drawDendrogramNode(node, svg, leafPositions, maxHeight, depth) {
     const rightPos = drawDendrogramNode(node.right, svg, leafPositions, maxHeight, depth + 1);
     
     const x = (leftPos.x + rightPos.x) / 2;
-    const y = maxHeight - (node.height * 90); // Scale height
+    const y = maxHeight - (node.height * 250); // Scale height
     
     // Draw horizontal line
     const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -551,14 +551,17 @@ function generateLinkageDemo() {
     const dataset = document.getElementById('demo-dataset')?.value || 'blobs';
     const linkage = document.getElementById('demo-linkage')?.value || 'single';
     
-    // Generate dataset visualization
-    drawDatasetVisualization('linkage-dataset-plot', dataset);
+    // Generate the same dataset for both visualizations
+    const data = generateDatasetPoints(dataset, 30);
     
-    // Generate clustering visualization
-    drawClusteringVisualization('linkage-clustering-plot', dataset, linkage);
+    // Generate dataset visualization with the same data
+    drawDatasetVisualization('linkage-dataset-plot', dataset, data);
+    
+    // Generate clustering visualization with the same data
+    drawClusteringVisualization('linkage-clustering-plot', dataset, linkage, data);
 }
 
-function drawDatasetVisualization(svgId, datasetType) {
+function drawDatasetVisualization(svgId, datasetType, data) {
     const svg = document.getElementById(svgId);
     if (!svg) return;
     
@@ -568,8 +571,7 @@ function drawDatasetVisualization(svgId, datasetType) {
     const height = 200;
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     
-    // Generate data points based on dataset type
-    const data = generateDatasetPoints(datasetType, 30);
+    // Use the provided data instead of generating new data
     
     // Draw points
     data.forEach((point, i) => {
@@ -594,7 +596,7 @@ function drawDatasetVisualization(svgId, datasetType) {
     svg.appendChild(title);
 }
 
-function drawClusteringVisualization(svgId, datasetType, linkageMethod) {
+function drawClusteringVisualization(svgId, datasetType, linkageMethod, data) {
     const svg = document.getElementById(svgId);
     if (!svg) return;
     
@@ -604,8 +606,7 @@ function drawClusteringVisualization(svgId, datasetType, linkageMethod) {
     const height = 200;
     const margin = { top: 20, right: 20, bottom: 40, left: 40 };
     
-    // Generate data points and clusters
-    const data = generateDatasetPoints(datasetType, 30);
+    // Use the provided data and perform clustering
     const clusters = performClustering(data, linkageMethod);
     
     // Color palette for clusters

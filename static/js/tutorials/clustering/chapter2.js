@@ -70,18 +70,18 @@ function drawDistanceVisualization(x1, y1, x2, y2, euclidean, manhattan) {
     // Clear previous content
     canvas.innerHTML = '';
     
-    // Create SVG for visualization
+    // Create SVG for visualization (doubled size, centered at 0,0)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '400');
-    svg.setAttribute('height', '300');
-    svg.setAttribute('viewBox', '0 0 400 300');
+    svg.setAttribute('width', '800');
+    svg.setAttribute('height', '600');
+    svg.setAttribute('viewBox', '0 0 800 600');
     svg.style.border = '1px solid #ccc';
     svg.style.background = '#f9f9f9';
     
-    // Scale factor for visualization
-    const scale = 30;
-    const offsetX = 50;
-    const offsetY = 150;
+    // Scale factor for visualization (doubled)
+    const scale = 60;
+    const offsetX = 400; // Center X
+    const offsetY = 300; // Center Y
     
     // Convert coordinates to SVG coordinates
     const svgX1 = x1 * scale + offsetX;
@@ -89,8 +89,8 @@ function drawDistanceVisualization(x1, y1, x2, y2, euclidean, manhattan) {
     const svgX2 = x2 * scale + offsetX;
     const svgY2 = -y2 * scale + offsetY;
     
-    // Draw grid
-    for (let i = 0; i <= 10; i++) {
+    // Draw grid (extended for larger canvas)
+    for (let i = -6; i <= 6; i++) {
         // Vertical lines
         const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line1.setAttribute('x1', offsetX + i * scale);
@@ -103,20 +103,20 @@ function drawDistanceVisualization(x1, y1, x2, y2, euclidean, manhattan) {
         
         // Horizontal lines
         const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line2.setAttribute('x1', offsetX - 5 * scale);
+        line2.setAttribute('x1', offsetX - 6 * scale);
         line2.setAttribute('y1', offsetY - i * scale);
-        line2.setAttribute('x2', offsetX + 5 * scale);
+        line2.setAttribute('x2', offsetX + 6 * scale);
         line2.setAttribute('y2', offsetY - i * scale);
         line2.setAttribute('stroke', '#ddd');
         line2.setAttribute('stroke-width', '1');
         svg.appendChild(line2);
     }
     
-    // Draw axes
+    // Draw axes (extended for larger canvas)
     const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    xAxis.setAttribute('x1', offsetX - 5 * scale);
+    xAxis.setAttribute('x1', offsetX - 6 * scale);
     xAxis.setAttribute('y1', offsetY);
-    xAxis.setAttribute('x2', offsetX + 5 * scale);
+    xAxis.setAttribute('x2', offsetX + 6 * scale);
     xAxis.setAttribute('y2', offsetY);
     xAxis.setAttribute('stroke', '#333');
     xAxis.setAttribute('stroke-width', '2');

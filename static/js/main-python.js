@@ -312,7 +312,7 @@ function initNavigation() {
             
             if (response.ok && result.success) {
                 // Apply any saved navigation state
-                if (result.state.theme) {
+                if (result.state.theme && typeof applyTheme === 'function') {
                     applyTheme(result.state.theme);
                 }
             }

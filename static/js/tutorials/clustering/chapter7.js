@@ -408,8 +408,37 @@ function drawSilhouettePlot(silhouetteData) {
 }
 
 function drawSilhouetteClusters(datasetType, k) {
-    // Reuse the cluster drawing function from elbow demo
-    drawElbowClusters(datasetType, k);
+    const svg = document.getElementById('silhouette-clusters');
+    if (!svg) return;
+    
+    const width = 400;
+    const height = 300;
+    const margin = 20;
+    
+    // Clear previous content
+    svg.innerHTML = '';
+    
+    // Generate cluster data
+    const clusters = generateClusterData(datasetType, k);
+    
+    // Draw clusters
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd'];
+    
+    clusters.forEach((cluster, clusterIndex) => {
+        cluster.points.forEach((point, pointIndex) => {
+            const x = margin + (point.x / 8) * (width - 2 * margin);
+            const y = margin + (point.y / 8) * (height - 2 * margin);
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', colors[clusterIndex % colors.length]);
+            circle.setAttribute('stroke', '#333');
+            circle.setAttribute('stroke-width', '1');
+            svg.appendChild(circle);
+        });
+    });
 }
 
 function updateSilhouetteMetrics(silhouetteData) {
@@ -636,8 +665,10 @@ function updateKMeansStatus() {
     if (status) {
         if (kmeansIteration === 0) {
             status.innerHTML = '<p>Ready to start K-means. Click "Run K-means" to begin.</p>';
+        } else if (kmeansIsRunning) {
+            status.innerHTML = `<p>Iteration ${kmeansIteration}: Running...</p>`;
         } else {
-            status.innerHTML = `<p>Iteration ${kmeansIteration}: ${kmeansIsRunning ? 'Running...' : 'Converged!'}</p>`;
+            status.innerHTML = `<p>Iteration ${kmeansIteration}: Converged!</p>`;
         }
     }
 }

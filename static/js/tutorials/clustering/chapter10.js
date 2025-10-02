@@ -68,6 +68,9 @@ function initializeCuttingDemo() {
             updateCuttingVisualization();
         });
     }
+    
+    // Generate initial visualization
+    updateCuttingVisualization();
 
     // Update on cutting method change
     const cuttingMethods = document.querySelectorAll('input[name="cutting-method"]');
@@ -446,6 +449,67 @@ function drawDendrogramNode(node, svg, leafPositions, maxHeight, depth) {
     return { x, y };
 }
 
+// Draw dendrogram for cutting demo (adapted from existing function)
+function drawDendrogramForCutting(svg, dendrogram) {
+    const width = parseInt(svg.getAttribute('width')) || 900;
+    const height = parseInt(svg.getAttribute('height')) || 600;
+    const margin = 50;
+    
+    // Clear SVG
+    svg.innerHTML = '';
+    
+    // Get leaves for positioning
+    const leaves = getLeaves(dendrogram);
+    const leafPositions = {};
+    leaves.forEach((leaf, index) => {
+        leafPositions[leaf] = margin + (index * (width - 2 * margin)) / (leaves.length - 1);
+    });
+    
+    // Draw dendrogram
+    drawDendrogramNode(dendrogram, svg, leafPositions, height - margin, 0);
+}
+
+// Add cut line to dendrogram
+function addCutLineToDendrogram(svg, cutHeight) {
+    const width = parseInt(svg.getAttribute('width')) || 900;
+    const height = parseInt(svg.getAttribute('height')) || 600;
+    const margin = 50;
+    
+    // Remove any existing cut line
+    const existingCutLine = svg.querySelector('.cut-line');
+    if (existingCutLine) {
+        existingCutLine.remove();
+    }
+    
+    // Calculate cut line position (invert the height so higher values are higher on screen)
+    const cutY = margin + (10 - cutHeight) / 7 * (height - 2 * margin);
+    
+    // Draw cut line
+    const cutLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    cutLine.setAttribute('x1', margin);
+    cutLine.setAttribute('y1', cutY);
+    cutLine.setAttribute('x2', width - margin);
+    cutLine.setAttribute('y2', cutY);
+    cutLine.setAttribute('stroke', '#e74c3c');
+    cutLine.setAttribute('stroke-width', '3');
+    cutLine.setAttribute('stroke-dasharray', '5,5');
+    cutLine.setAttribute('opacity', '0.8');
+    cutLine.setAttribute('class', 'cut-line');
+    svg.appendChild(cutLine);
+    
+    // Add cut height label
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', width - margin - 10);
+    label.setAttribute('y', cutY - 5);
+    label.setAttribute('text-anchor', 'end');
+    label.setAttribute('font-size', '12');
+    label.setAttribute('fill', '#e74c3c');
+    label.setAttribute('font-weight', 'bold');
+    label.setAttribute('class', 'cut-line');
+    label.textContent = `Cut Height: ${cutHeight.toFixed(1)}`;
+    svg.appendChild(label);
+}
+
 // Update cutting visualization
 function updateCuttingVisualization() {
     const cutHeight = parseFloat(document.getElementById('cut-height')?.value || 3.5);
@@ -484,8 +548,15 @@ function drawCuttingVisualization(cutHeight) {
     const clustersSvg = document.getElementById('cutting-clusters');
     
     if (svg) {
-        // Use shared dendrogram function with cut line
-        drawSharedDendrogram('cutting-dendrogram-svg', 3, cutHeight);
+        // Generate dendrogram for cutting demo
+        const dataPoints = generateDataset('gaussian', 25, 0.2); // Reduced to half the points
+        const dendrogram = generateDendrogram(dataPoints, 'average', 'euclidean');
+        
+        // Draw dendrogram using existing function
+        drawDendrogramForCutting(svg, dendrogram);
+        
+        // Add cut line
+        addCutLineToDendrogram(svg, cutHeight);
     }
     
     if (clustersSvg) {
