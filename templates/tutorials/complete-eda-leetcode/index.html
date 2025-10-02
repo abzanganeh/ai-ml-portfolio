@@ -7,19 +7,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Complete Exploratory Data Analysis: LeetCode Dataset</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/complete-eda-leetcode/eda-tutorial.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@3.0.0/dist/chartjs-chart-matrix.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <header class="azbn-header">
-        <nav class="azbn-nav" style="top: 50px;">
-            <div class="azbn-container" style="display: flex; justify-content: space-between; align-items: center;">
-                <a href="/tutorials/complete-eda-leetcode" style="text-decoration: none; color: #4f46e5; display: flex; align-items: center; gap: 0.5rem;">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/complete-eda-leetcode" class="course-link">
                     <span>Complete EDA Tutorial</span>
                 </a>
                 <div class="azbn-links">
@@ -33,14 +36,14 @@
         </nav>
     </header>
 
-    <main style="padding-top: 100px;">
-    <div class="tutorial-header">
-        <div class="header-content">
-            <h1>Complete Exploratory Data Analysis</h1>
-            <p class="subtitle">Master EDA workflow using a real LeetCode dataset with 1,825 coding problems</p>
-            <div class="learning-objectives">
-                <h3>What You'll Learn</h3>
-                <ul>
+    <main class="main-content">
+    <div class="azbn-container">
+        <div class="tutorial-header">
+            <h1 class="tutorial-main-title">Complete Exploratory Data Analysis</h1>
+            <p class="tutorial-subtitle">Master EDA workflow using a real LeetCode dataset with 1,825 coding problems</p>
+            <div class="azbn-card">
+                <h3 class="subsection-title">What You'll Learn</h3>
+                <ul style="color: var(--dark-gray); line-height: 1.8; font-size: 1.1rem;">
                     <li>Strategic missing data handling</li>
                     <li>Data type conversion and validation</li>
                     <li>Outlier detection and treatment</li>
@@ -70,11 +73,12 @@
 
     <!-- Step 1: Dataset Overview -->
     <div id="step1" class="content-section active">
-        <h2>Step 1: Dataset Overview and Initial Exploration</h2>
-        
-        <div class="section-intro">
-            <p>Every EDA starts with understanding your dataset structure. Let's explore the LeetCode dataset containing information about 1,825 coding problems.</p>
-        </div>
+        <div class="azbn-card">
+            <h2 class="section-title">Step 1: Dataset Overview and Initial Exploration</h2>
+            
+            <div class="section-intro">
+                <p style="color: var(--dark-gray); font-size: 1.1rem; line-height: 1.6; text-align: center; margin-bottom: 2rem;">Every EDA starts with understanding your dataset structure. Let's explore the LeetCode dataset containing information about 1,825 coding problems.</p>
+            </div>
 
         <div class="code-demo">
             <h3>Dataset Structure</h3>
@@ -141,8 +145,9 @@ print(f"Data types:\n{df.dtypes}")</code></pre>
             </div>
         </div>
 
-        <div class="section-navigation">
-            <button class="next-btn" onclick="showSection('step2')">Next: Missing Data Strategy →</button>
+            <div class="section-navigation">
+                <button class="next-btn" onclick="showSection('step2')">Next: Missing Data Strategy →</button>
+            </div>
         </div>
     </div>
 
@@ -1386,5 +1391,35 @@ print(f"Ready for advanced analysis and modeling!")</code></pre>
     </main>
 
     <script src="{{ url_for('static', filename='js/tutorials/complete-eda-leetcode.js') }}"></script>
+    
+    <script>
+        // Initialize Prism.js syntax highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            // Re-run Prism highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
+            
+            // Add copy buttons to code blocks
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(function(block) {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    const code = block.querySelector('code');
+                    if (code) {
+                        navigator.clipboard.writeText(code.textContent).then(function() {
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(function() {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        });
+                    }
+                };
+                block.appendChild(copyBtn);
+            });
+        });
+    </script>
 </body>
 </html>
