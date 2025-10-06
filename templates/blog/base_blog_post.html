@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - {{ site_title }}{% endblock %}
+
+{% block meta_description %}{{ post.meta_description }}{% endblock %}
+
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.excerpt }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/blog.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/blog-interactive.css') }}">
+<!-- Prism.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<!-- Plotly.js for interactive graphs -->
+<script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+<!-- MathJax for mathematical expressions -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  }
+};
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Back to Blog Link -->
+<div class="container">
+    <div class="back-to-blog">
+        <a href="{{ url_for('blog') }}">
+            <i class="fas fa-arrow-left"></i> Back to Blog
+        </a>
+    </div>
+</div>
+
+<!-- Post Header -->
+<header class="blog-post-header">
+    <div class="container">
+        <div class="post-header-content" data-bg-image="{{ post.image_url }}">
+            <a href="{{ url_for('blog_category', category=post.category) }}" class="post-category-link">
+                {{ post.category }}
+            </a>
+            
+            <h1>{{ post.title }}</h1>
+            
+            <p class="post-excerpt">{{ post.excerpt }}</p>
+            
+            <div class="post-meta-info">
+                <div class="post-meta-item">
+                    <i class="fas fa-calendar"></i>
+                    <time datetime="{{ post.created_at.isoformat() if post.created_at else '' }}">
+                        {{ post.created_at.strftime('%B %d, %Y') if post.created_at else 'Recently' }}
+                    </time>
+                </div>
+                
+                <div class="post-meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ post.read_time if post.read_time else 5 }} min read</span>
+                </div>
+                
+                <div class="post-meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>{{ post.author if post.author else 'Alireza Barzin Zanganeh' }}</span>
+                </div>
+            </div>
+            
+            <div class="post-tags-header">
+                {% for tag in post.tags[:5] %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Table of Contents (if present) -->
+{% if post.toc %}
+<nav class="table-of-contents">
+    <div class="container">
+        <h3>Table of Contents</h3>
+        <ul>
+            {% for item in post.toc %}
+            <li><a href="#{{ item.id }}">{{ item.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</nav>
+{% endif %}
+
+<!-- Post Content -->
+<article class="post-content-wrapper">
+    <div class="post-content">
+        {{ post.content|safe }}
+    </div>
+</article>
+
+<!-- Interactive Demo Section (if present) -->
+{% if post.interactive_demo %}
+<section class="interactive-demo-section">
+    <div class="container">
+        <h2>Interactive Demo</h2>
+        <div class="demo-container" id="interactive-demo">
+            {{ post.interactive_demo|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Code Playground (if present) -->
+{% if post.code_playground %}
+<section class="code-playground-section">
+    <div class="container">
+        <h2>Try It Yourself</h2>
+        <div class="code-playground" id="code-playground">
+            {{ post.code_playground|safe }}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Post Footer -->
+<footer class="post-footer">
+    <div class="post-footer-content">
+        <!-- Tags -->
+        <div class="post-tags-footer">
+            <h3>Topics Covered</h3>
+            <div class="tags-list">
+                {% for tag in post.tags %}
+                <a href="{{ url_for('blog') }}?tag={{ tag }}" class="tag">{{ tag }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Share -->
+        <div class="post-share">
+            <h3>Share This Article</h3>
+            <div class="share-buttons">
+                <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ post.title }}" 
+                   target="_blank" class="share-btn twitter" aria-label="Share on Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" 
+                   target="_blank" class="share-btn linkedin" aria-label="Share on LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" 
+                   target="_blank" class="share-btn facebook" aria-label="Share on Facebook">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="mailto:?subject={{ post.title }}&body=Check out this article: {{ request.url }}" 
+                   class="share-btn email" aria-label="Share via Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Related Posts -->
+{% if related_posts %}
+<section class="related-posts">
+    <div class="container">
+        <h2 class="section-title">Related Articles</h2>
+        
+        <div class="related-posts-grid">
+            {% for related_post in related_posts %}
+            <article class="related-post-card">
+                <div class="related-post-image">
+                    <img src="{{ related_post.image_url }}" alt="{{ related_post.title }}" loading="lazy">
+                </div>
+                
+                <div class="related-post-content">
+                    <span class="related-post-category">{{ related_post.category }}</span>
+                    
+                    <h3 class="related-post-title">
+                        <a href="{{ url_for('blog_post', slug=related_post.slug) }}">
+                            {{ related_post.title }}
+                        </a>
+                    </h3>
+                    
+                    <div class="related-post-meta">
+                        {{ related_post.created_at.strftime('%B %d, %Y') }} • {{ related_post.read_time }} min read
+                    </div>
+                    
+                    <p class="related-post-excerpt">{{ related_post.excerpt[:100] }}...</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<!-- Prism.js for syntax highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Background image setup
+    const headerContent = document.querySelector('.post-header-content');
+    if (headerContent) {
+        const bgImage = headerContent.getAttribute('data-bg-image');
+        if (bgImage) {
+            headerContent.style.backgroundImage = `linear-gradient(rgba(167, 218, 248, 0.85), rgba(240, 236, 255, 0.75)), url('${bgImage}')`;
+        }
+    }
+    
+    // Reading progress indicator
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: var(--primary-color);
+        z-index: 9999;
+        transition: width 0.1s ease;
+    `;
+    document.body.appendChild(progressBar);
+    
+    window.addEventListener('scroll', function() {
+        const article = document.querySelector('.post-content');
+        if (article) {
+            const articleTop = article.offsetTop;
+            const articleHeight = article.offsetHeight;
+            const windowHeight = window.innerHeight;
+            const scrollTop = window.pageYOffset;
+            
+            const articleBottom = articleTop + articleHeight - windowHeight;
+            const progress = Math.min(Math.max((scrollTop - articleTop) / (articleBottom - articleTop), 0), 1);
+            
+            progressBar.style.width = (progress * 100) + '%';
+        }
+    });
+    
+    // Smooth scrolling for internal links
+    const internalLinks = document.querySelectorAll('a[href^="#"]');
+    internalLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Copy code blocks
+    const codeBlocks = document.querySelectorAll('pre code');
+    codeBlocks.forEach(block => {
+        const button = document.createElement('button');
+        button.textContent = 'Copy';
+        button.className = 'copy-code-btn';
+        button.style.cssText = `
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        `;
+        
+        const pre = block.parentElement;
+        pre.style.position = 'relative';
+        pre.appendChild(button);
+        
+        button.addEventListener('click', function() {
+            navigator.clipboard.writeText(block.textContent);
+            this.textContent = 'Copied!';
+            this.style.background = 'rgba(76, 175, 80, 0.8)';
+            setTimeout(() => {
+                this.textContent = 'Copy';
+                this.style.background = 'rgba(255,255,255,0.2)';
+            }, 2000);
+        });
+    });
+    
+    // Interactive demo initialization
+    if (typeof initializeInteractiveDemo === 'function') {
+        initializeInteractiveDemo();
+    }
+    
+    // Code playground initialization
+    if (typeof initializeCodePlayground === 'function') {
+        initializeCodePlayground();
+    }
+});
+</script>
+{% endblock %}

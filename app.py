@@ -606,4 +606,8 @@ def inject_globals():
     }
 
 if __name__ == '__main__':
+    # For HTTPS testing (optional)
+    # app.run(debug=True, host='0.0.0.0', port=8000, ssl_context='adhoc')
+    
+    # For HTTP (recommended for development)
     app.run(debug=True, host='0.0.0.0', port=8000)
