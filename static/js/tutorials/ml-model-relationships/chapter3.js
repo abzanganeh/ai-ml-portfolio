@@ -183,9 +183,18 @@ function updateDecision(factor, value) {
     recommendation.textContent = explanation;
 }
 
+// Additional Chapter 3 functions that might be missing
+
+// Initialize Chapter 3 when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Chapter 3 interactive functions loaded');
+    
+    // Initialize all demos
     updateRegularizationDemo();
     updateFeatureCoefficients();
     updateRegularizationPath();
+    
+    // Initialize decision factors
+    decisionFactors = {};
 });
 
