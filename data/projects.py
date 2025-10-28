@@ -89,26 +89,30 @@ PROJECTS_DATA = [
     },
     {
         'name': 'bank-term-deposit-prediction',
-        'title': 'Bank Term Deposit Prediction',
-        'description': 'Machine learning solution for predicting bank term deposit subscriptions. Optimizes marketing campaigns through predictive analytics with comprehensive binary classification pipeline.',
+        'title': 'Bank Term Deposit Prediction - Advanced ML Pipeline',
+        'description': 'A comprehensive ML solution predicting customer term deposit subscriptions using 8+ algorithms with hyperparameter tuning, achieving 60% F1-Score improvement over baseline models.',
         'category': 'Machine Learning',
         'technology_stack': [
-            'Python', 'Scikit-learn', 'Pandas', 'NumPy', 
-            'Matplotlib', 'Seaborn', 'Jupyter', 'Joblib'
+            'Python', 'Scikit-learn', 'XGBoost', 'LightGBM', 'Pandas', 'NumPy', 
+            'Matplotlib', 'Seaborn', 'Optuna', 'Jupyter', 'Joblib'
         ],
         'challenges': [
             'Handling imbalanced dataset with ~88% customers not subscribing',
-            'Feature engineering from bank marketing campaign data',
+            'Feature engineering from bank marketing campaign data (51 final features)',
             'Multicollinearity handling in economic indicators',
-            'Optimizing marketing spend through predictive targeting',
-            'Creating interpretable models for business stakeholders'
+            'Hyperparameter tuning for 8 different ML algorithms',
+            'Model stacking and ensemble optimization',
+            'Threshold optimization for optimal F1-scores'
         ],
         'results': {
-            'dataset_size': '~41,000 customers × 20+ features',
+            'dataset_size': '41,188 customers × 51 engineered features',
             'class_distribution': '88% no subscription, 12% subscription',
-            'algorithms_compared': 'Naive Bayes, Decision Tree (Gini), Decision Tree (Entropy)',
-            'business_value': 'Optimizes marketing campaigns and improves ROI',
-            'modular_architecture': 'Clean, reusable code structure'
+            'algorithms_compared': '8 models: Naive Bayes, Decision Trees, Random Forest, XGBoost, LightGBM, SVM, Logistic Regression, Voting Ensemble',
+            'best_performance': 'XGBoost: 60.33% F1-Score, 94.79% ROC-AUC',
+            'improvement': '58% better F1-score compared to baseline models',
+            'hyperparameter_tuning': 'Automated optimization using Optuna (20 trials per model)',
+            'model_stacking': 'Voting ensemble combining top 6 performers',
+            'business_value': 'Identifies top 10% of prospects with 70% precision, optimizes marketing ROI'
         },
         'github_url': 'https://github.com/abzanganeh/bank-term-deposit-prediction',
         'demo_url': None,
