@@ -58,25 +58,31 @@ PROJECTS_DATA = [
     {
         'name': 'churn-risk-intelligence',
         'title': 'Churn Risk Intelligence',
-        'description': 'Customer churn prediction using machine learning. Achieves 82% accuracy with comprehensive analytics pipeline for proactive retention strategies.',
+        'description': 'Production-ready machine learning solution for predicting customer churn with 84.77% ROC-AUC. Features 16 optimized models, SHAP interpretability, Optuna hyperparameter tuning, and comprehensive business insights.',
         'category': 'Machine Learning',
         'technology_stack': [
-            'Python', 'Scikit-learn', 'Pandas', 'NumPy', 
-            'Matplotlib', 'Seaborn', 'Jupyter', 'Joblib'
+            'Python', 'Scikit-learn', 'XGBoost', 'Optuna', 'SHAP', 'Pandas', 'NumPy', 
+            'Matplotlib', 'Seaborn', 'Plotly', 'imbalanced-learn', 'Jupyter', 'Joblib'
         ],
         'challenges': [
             'Handling imbalanced customer churn dataset (26.5% churn rate)',
             'Feature engineering from telecommunications data',
-            'Model selection and hyperparameter optimization',
+            'Hyperparameter optimization with Optuna for 16 models',
             'Class imbalance handling with SMOTE technique',
-            'Business impact interpretation and actionable insights'
+            'Model interpretability with SHAP for actionable insights',
+            'Ensemble learning with Stacking and Voting classifiers',
+            'Production-ready pipeline development'
         ],
         'results': {
-            'best_accuracy': '82.19%',
-            'best_model': 'Logistic Regression',
-            'precision_churn': '69%',
-            'recall_churn': '60%',
-            'business_value': 'Identifies high-risk customers for targeted retention',
+            'best_roc_auc': '84.77%',
+            'best_accuracy': '80.62%',
+            'best_model_roc': 'XGBoost with Optuna',
+            'best_model_accuracy': 'Logistic Regression',
+            'best_precision': '66.78%',
+            'best_recall': '77.27%',
+            'total_models': '16',
+            'ensemble_roc_auc': '84.71%',
+            'business_value': 'Identifies high-risk customers for targeted retention campaigns with 84.77% ROC-AUC',
             'dataset_size': '7,043 customers × 21 features'
         },
         'github_url': 'https://github.com/abzanganeh/churn_risk_intelligence',

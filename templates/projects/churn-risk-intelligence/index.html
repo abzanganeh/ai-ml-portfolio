@@ -43,17 +43,17 @@
             <div class="impact-item">
                 <div class="impact-icon"><i class="fas fa-bullseye"></i></div>
                 <h3>Problem Solved</h3>
-                <p>Customer acquisition costs are 5-25x higher than retention costs. This solution identifies at-risk customers with 82% accuracy.</p>
+                <p>Customer acquisition costs are 5-25x higher than retention costs. This solution identifies at-risk customers with 84.77% ROC-AUC score (80.62% accuracy), enabling proactive retention campaigns.</p>
             </div>
             <div class="impact-item">
                 <div class="impact-icon"><i class="fas fa-dollar-sign"></i></div>
                 <h3>Value Delivered</h3>
-                <p>Enables proactive retention campaigns, reduces revenue loss, and optimizes marketing budget allocation.</p>
+                <p>Identifies high-risk customers for targeted retention campaigns, reduces revenue loss from customer attrition, and optimizes marketing budget allocation with precision targeting.</p>
             </div>
             <div class="impact-item">
                 <div class="impact-icon"><i class="fas fa-chart-bar"></i></div>
                 <h3>Key Results</h3>
-                <p>82.19% accuracy with Logistic Regression, identifying high-risk customers for targeted retention strategies.</p>
+                <p><strong>84.77% ROC-AUC</strong> with XGBoost (Optuna-optimized), <strong>80.62% accuracy</strong> with Logistic Regression. 16 models trained and evaluated with comprehensive business insights.</p>
             </div>
         </div>
     </div>
@@ -61,48 +61,94 @@
     <!-- Model Performance -->
     <div class="model-performance">
         <h2><i class="fas fa-brain"></i> Model Performance</h2>
+        <div class="performance-highlights">
+            <div class="metric-card">
+                <div class="metric-value">84.77%</div>
+                <div class="metric-label">Best ROC-AUC</div>
+                <div class="metric-model">XGBoost (Optuna)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">80.62%</div>
+                <div class="metric-label">Best Accuracy</div>
+                <div class="metric-model">Logistic Regression</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">84.71%</div>
+                <div class="metric-label">Best Ensemble</div>
+                <div class="metric-model">Stacking Classifier</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">16</div>
+                <div class="metric-label">Total Models</div>
+                <div class="metric-model">Trained & Evaluated</div>
+            </div>
+        </div>
         <div class="performance-table">
             <table>
                 <thead>
                     <tr>
                         <th>Model</th>
+                        <th>ROC-AUC</th>
                         <th>Accuracy</th>
-                        <th>Precision (Churn)</th>
-                        <th>Recall (Churn)</th>
-                        <th>Business Use Case</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>Optimization</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="best-model">
-                        <td><strong>Logistic Regression</strong></td>
-                        <td><strong>82.19%</strong></td>
-                        <td><strong>69%</strong></td>
-                        <td><strong>60%</strong></td>
-                        <td><strong>Balanced Performance</strong></td>
+                        <td><strong>XGBoost (Optuna)</strong></td>
+                        <td><strong>84.77%</strong></td>
+                        <td>79.58%</td>
+                        <td>65.12%</td>
+                        <td>71.23%</td>
+                        <td><strong>Optuna</strong></td>
+                    </tr>
+                    <tr class="best-model">
+                        <td><strong>Stacking Classifier</strong></td>
+                        <td><strong>84.71%</strong></td>
+                        <td>79.45%</td>
+                        <td>64.89%</td>
+                        <td>72.15%</td>
+                        <td><strong>Ensemble</strong></td>
                     </tr>
                     <tr>
-                        <td>KNN (k=15)</td>
-                        <td>77.93%</td>
-                        <td>60%</td>
-                        <td>51%</td>
-                        <td>Standard Classification</td>
+                        <td>Logistic Regression</td>
+                        <td>83.12%</td>
+                        <td><strong>80.62%</strong></td>
+                        <td>66.45%</td>
+                        <td>68.32%</td>
+                        <td>Standard</td>
                     </tr>
                     <tr>
-                        <td>Logistic + SMOTE</td>
-                        <td>76.86%</td>
-                        <td>55%</td>
-                        <td>72%</td>
-                        <td>Higher Recall Priority</td>
+                        <td>Random Forest (Optuna)</td>
+                        <td>83.89%</td>
+                        <td>79.12%</td>
+                        <td><strong>66.78%</strong></td>
+                        <td>69.45%</td>
+                        <td><strong>Optuna</strong></td>
                     </tr>
                     <tr>
                         <td>KNN + SMOTE</td>
-                        <td>72.89%</td>
-                        <td>49%</td>
-                        <td><strong>81%</strong></td>
-                        <td><strong>Maximum Churn Detection</strong></td>
+                        <td>81.23%</td>
+                        <td>75.34%</td>
+                        <td>58.92%</td>
+                        <td><strong>77.27%</strong></td>
+                        <td>SMOTE</td>
+                    </tr>
+                    <tr>
+                        <td>Gradient Boosting</td>
+                        <td>83.45%</td>
+                        <td>78.67%</td>
+                        <td>63.21%</td>
+                        <td>70.89%</td>
+                        <td>Standard</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="model-portfolio-info">
+            <p><strong>Model Portfolio:</strong> 16 machine learning models including Logistic Regression, KNN, Random Forest, Gradient Boosting, XGBoost, and ensemble methods (Stacking, Voting). Both regular and SMOTE variants trained with Optuna hyperparameter optimization.</p>
         </div>
     </div>
 
@@ -113,27 +159,74 @@
             <div class="step">
                 <div class="step-number">1</div>
                 <h3>Data Preprocessing</h3>
-                <p>Missing value imputation, categorical encoding, feature scaling, and data leakage detection.</p>
+                <p>Missing value imputation, categorical encoding, feature scaling, and data leakage detection. Modular design with separation of concerns.</p>
             </div>
             <div class="step">
                 <div class="step-number">2</div>
                 <h3>Feature Engineering</h3>
-                <p>One-hot encoding, data leakage detection, and train-test splitting with stratification.</p>
+                <p>One-hot encoding, data leakage detection, and train-test splitting with stratification. Automated pipeline from data loading to model deployment.</p>
             </div>
             <div class="step">
                 <div class="step-number">3</div>
                 <h3>Model Development</h3>
-                <p>Logistic Regression and K-Nearest Neighbors with hyperparameter optimization using GridSearchCV.</p>
+                <p>16 machine learning models: Logistic Regression, KNN, Random Forest, Gradient Boosting, XGBoost. Both regular and SMOTE variants.</p>
             </div>
             <div class="step">
                 <div class="step-number">4</div>
-                <h3>Class Imbalance Handling</h3>
-                <p>SMOTE (Synthetic Minority Oversampling Technique) for balanced model training.</p>
+                <h3>Hyperparameter Optimization</h3>
+                <p>Optuna integration for Bayesian optimization. Automated tuning for XGBoost and Random Forest with cross-validation for reliable performance estimation.</p>
             </div>
             <div class="step">
                 <div class="step-number">5</div>
-                <h3>Evaluation & Insights</h3>
-                <p>Comprehensive metrics analysis with business-focused interpretation and actionable recommendations.</p>
+                <h3>Ensemble Learning</h3>
+                <p>Stacking Classifier with optimized base models and Voting Classifier for robust predictions. Meta-learner optimization for improved performance.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">6</div>
+                <h3>Model Interpretability</h3>
+                <p>SHAP values for feature importance analysis and individual prediction explanations. Business-friendly insights generation.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">7</div>
+                <h3>Comprehensive Evaluation</h3>
+                <p>Multiple metrics: ROC-AUC, PR-AUC, Accuracy, Precision, Recall, F1-Score. Advanced visualizations: ROC curves, Precision-Recall curves, heatmaps, interactive Plotly dashboards.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Features Section -->
+    <div class="advanced-features">
+        <h2><i class="fas fa-rocket"></i> Advanced Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                <h3>Optuna Optimization</h3>
+                <p>Bayesian hyperparameter optimization for XGBoost and Random Forest. Automated tuning with cross-validation for reliable performance estimation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Ensemble Methods</h3>
+                <p>Stacking Classifier with optimized base models achieving 84.71% ROC-AUC. Voting Classifier for robust predictions across multiple scenarios.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+                <h3>SHAP Interpretability</h3>
+                <p>SHAP values provide feature importance analysis and individual prediction explanations. Generate actionable, business-friendly insights.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+                <h3>Interactive Dashboards</h3>
+                <p>Plotly dashboards with ROC curves, Precision-Recall curves, heatmaps, and comprehensive business intelligence reports.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-balance-scale"></i></div>
+                <h3>Class Imbalance Handling</h3>
+                <p>SMOTE implementation for balanced training. Models trained on both balanced and imbalanced data for comprehensive comparison.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-industry"></i></div>
+                <h3>Production-Ready</h3>
+                <p>Automated pipeline with comprehensive error handling, logging, and validation. End-to-end automation from data loading to model deployment.</p>
             </div>
         </div>
     </div>
@@ -207,18 +300,30 @@
         <h2><i class="fas fa-lightbulb"></i> Business Recommendations</h2>
         
         <div class="recommendation-section">
-            <h3>For High-Value Customer Businesses</h3>
+            <h3>For Maximum Churn Detection</h3>
             <ul>
-                <li><strong>Use KNN + SMOTE model</strong> for maximum churn detection (81% recall)</li>
+                <li><strong>Use KNN + SMOTE model</strong> for maximum churn detection (77.27% recall)</li>
                 <li>Implement comprehensive retention campaigns for all flagged customers</li>
                 <li>Focus on customers with fiber optic internet and month-to-month contracts</li>
+                <li>Best for high-value customer businesses where missing churners is costly</li>
+            </ul>
+        </div>
+
+        <div class="recommendation-section">
+            <h3>For Optimal Performance</h3>
+            <ul>
+                <li><strong>Use XGBoost (Optuna-optimized)</strong> for best overall performance (84.77% ROC-AUC)</li>
+                <li>Leverage SHAP values for understanding key churn drivers</li>
+                <li>Use Stacking Classifier (84.71% ROC-AUC) for robust ensemble predictions</li>
+                <li>Ideal for balanced business needs requiring both precision and recall</li>
             </ul>
         </div>
 
         <div class="recommendation-section">
             <h3>For Cost-Conscious Operations</h3>
             <ul>
-                <li><strong>Use Logistic Regression model</strong> for efficient targeting (69% precision)</li>
+                <li><strong>Use Logistic Regression model</strong> for efficient targeting (80.62% accuracy, 66.45% precision)</li>
+                <li><strong>Use Random Forest (Optuna)</strong> for highest precision (66.78%)</li>
                 <li>Prioritize customers with electronic check payments and high monthly charges</li>
                 <li>Develop automated retention workflows for scalability</li>
             </ul>
