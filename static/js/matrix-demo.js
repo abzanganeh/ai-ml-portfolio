@@ -182,7 +182,10 @@ class VectorWorldDemo {
             }
         }
         
+        // Clear canvas and fill with dark background
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = '#1a1a1a';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
         // Draw grid
         this.drawGrid();
@@ -1595,8 +1598,7 @@ class VectorWorldDemo {
         this.updateDisplay();
         this.draw();
     }
-}
-
+    
     drawTransformationComparison() {
         // Title
         this.ctx.fillStyle = '#fff';
@@ -1964,6 +1966,8 @@ class VectorWorldDemo {
 // Global function for mode selection
 function changeDemoMode() {
     const select = document.getElementById('demoMode');
+    if (!select) return;
+    
     const modeName = select.value;
     
     if (window.vectorDemo) {
@@ -1974,6 +1978,9 @@ function changeDemoMode() {
         window.vectorDemo.changeMode(modeName);
     }
 }
+
+// Make function globally available
+window.changeDemoMode = changeDemoMode;
 
 // Initialize demo when page loads
 document.addEventListener('DOMContentLoaded', function() {
