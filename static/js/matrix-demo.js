@@ -1537,6 +1537,13 @@ class VectorWorldDemo {
         this.ctx.stroke();
     }
     
+    drawArrow(endX, endY, startX, startY, color) {
+        // Draw arrowhead at the end point
+        // Note: Parameters are in reverse order (endX, endY, startX, startY, color)
+        // because the line is already drawn, we just need to add the arrowhead
+        this.drawArrowHead(startX, startY, endX, endY, color);
+    }
+    
     drawVectorArrow(x, y, color) {
         // Draw a small horizontal arrow above the vector label
         this.ctx.strokeStyle = color;
