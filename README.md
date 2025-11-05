@@ -17,6 +17,8 @@ This website serves as a comprehensive portfolio for machine learning and data s
 ### Project Showcase
 - **Titanic Survival Prediction**: Interactive ML demo with ensemble methods
 - **Satellite Signal Strength Prediction**: Advanced regression pipeline with weather data integration
+- **Churn Risk Intelligence**: Production-ready ML solution with 84.77% ROC-AUC, featuring 16 optimized models, SHAP interpretability, and Optuna hyperparameter tuning
+- **Bank Term Deposit Prediction**: Comprehensive ML pipeline with 8+ algorithms, achieving 60% F1-Score improvement over baseline models
 - **Filterable Categories**: Organize projects by domain (Machine Learning, Data Science, Deep Learning)
 - **GitHub Integration**: Direct links to source code repositories
 
