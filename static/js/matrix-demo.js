@@ -48,8 +48,8 @@ class VectorWorldDemo {
             },
             transformation: {
                 name: "Matrix Transformation",
-                explanation: "Watch how matrix [[3,1],[1,2]] transforms the grid and vectors (inspired by 3Blue1Brown)",
-                steps: ["Original grid", "Transform î to [3,1]", "Transform ĵ to [1,2]", "Show component vectors", "Show final result"]
+                explanation: "Watch how matrix [[2,1],[1,2]] transforms the grid and vectors (inspired by 3Blue1Brown)",
+                steps: ["Original grid", "Transform î to [2,1]", "Transform ĵ to [1,2]", "Show component vectors", "Show final result"]
             },
             eigen: {
                 name: "Eigenvectors & Eigenvalues",
@@ -80,8 +80,10 @@ class VectorWorldDemo {
         this.currentScalar = 0;
         
         // Matrix transformation properties
+        // Using [[2,1],[1,2]] so that [1,1] and [1,-1] are actual eigenvectors
+        // with eigenvalues 3 and 1 respectively
         this.transformationMatrix = {
-            a11: 3, a12: 1,
+            a11: 2, a12: 1,
             a21: 1, a22: 2
         };
         this.animationProgress = 0;
@@ -610,8 +612,8 @@ class VectorWorldDemo {
                 this.ctx.fillStyle = '#fff';
                 this.ctx.font = '16px Arial';
                 this.ctx.textAlign = 'left';
-                this.ctx.fillText('Matrix transforms î=[1,0] to [3,1]', 30, 40);
-                this.ctx.fillText('First column of matrix [[3,1],[1,2]]', 30, 65);
+                this.ctx.fillText('Matrix transforms î=[1,0] to [2,1]', 30, 40);
+                this.ctx.fillText('First column of matrix [[2,1],[1,2]]', 30, 65);
                 this.ctx.fillText('Grid starts transforming based on î', 30, 90);
                 break;
             case 2:
@@ -626,7 +628,7 @@ class VectorWorldDemo {
                 this.ctx.font = '16px Arial';
                 this.ctx.textAlign = 'left';
                 this.ctx.fillText('Matrix transforms ĵ=[0,1] to [1,2]', 30, 40);
-                this.ctx.fillText('Second column of matrix [[3,1],[1,2]]', 30, 65);
+                this.ctx.fillText('Second column of matrix [[2,1],[1,2]]', 30, 65);
                 this.ctx.fillText('Grid fully transforms to new coordinate system!', 30, 90);
                 break;
             case 3:
@@ -641,7 +643,7 @@ class VectorWorldDemo {
                 this.ctx.font = '16px Arial';
                 this.ctx.textAlign = 'left';
                 this.ctx.fillText('v=[2,3] = 2×î + 3×ĵ in original basis', 30, 40);
-                this.ctx.fillText('Transformed v = 2×[3,1] + 3×[1,2]', 30, 65);
+                this.ctx.fillText('Transformed v = 2×[2,1] + 3×[1,2]', 30, 65);
                 this.ctx.fillText('= 2×Transformed î + 3×Transformed ĵ', 30, 90);
                 break;
             case 4:
@@ -656,8 +658,8 @@ class VectorWorldDemo {
                 this.ctx.font = '16px Arial';
                 this.ctx.textAlign = 'left';
                 this.ctx.fillText('Final calculation:', 30, 40);
-                this.ctx.fillText('Transformed v = [2×3+3×1, 2×1+3×2]', 30, 65);
-                this.ctx.fillText('= [6+3, 2+6] = [9, 8]', 30, 90);
+                this.ctx.fillText('Transformed v = [2×2+3×1, 2×1+3×2]', 30, 65);
+                this.ctx.fillText('= [4+3, 2+6] = [7, 8]', 30, 90);
                 break;
         }
     }
@@ -940,11 +942,11 @@ class VectorWorldDemo {
         this.drawArrowHead(this.centerX, this.centerY, endX, endY, v.color);
         this.ctx.fillStyle = v.color;
         this.ctx.font = 'bold 20px Arial';
-        this.ctx.fillText('Transformed v = [9,8]', endX + 30, endY - 15);
+        this.ctx.fillText('Transformed v = [7,8]', endX + 30, endY - 15);
     }
     
     drawEigenDemo() {
-        const lambda1 = 4;
+        const lambda1 = 3;
         const lambda2 = 1;
         
         // Clear canvas
@@ -1084,8 +1086,8 @@ class VectorWorldDemo {
             const originalEndX = this.centerX + vec.x * this.scale;
             const originalEndY = this.centerY - vec.y * this.scale;
             
-            // Transformed vector
-            const transformedX = 3 * vec.x + 1 * vec.y;
+            // Transformed vector using matrix [[2,1],[1,2]]
+            const transformedX = 2 * vec.x + 1 * vec.y;
             const transformedY = 1 * vec.x + 2 * vec.y;
             const transformedEndX = this.centerX + transformedX * this.scale;
             const transformedEndY = this.centerY - transformedY * this.scale;
@@ -1208,8 +1210,8 @@ class VectorWorldDemo {
             const originalEndX = this.centerX + vec.x * this.scale;
             const originalEndY = this.centerY - vec.y * this.scale;
             
-            // Transformed vector
-            const transformedX = 3 * vec.x + 1 * vec.y;
+            // Transformed vector using matrix [[2,1],[1,2]]
+            const transformedX = 2 * vec.x + 1 * vec.y;
             const transformedY = 1 * vec.x + 2 * vec.y;
             const transformedEndX = this.centerX + transformedX * this.scale;
             const transformedEndY = this.centerY - transformedY * this.scale;
@@ -1317,8 +1319,8 @@ class VectorWorldDemo {
             const originalEndX = this.centerX + vec.x * this.scale;
             const originalEndY = this.centerY - vec.y * this.scale;
             
-            // Transformed vector
-            const transformedX = 3 * vec.x + 1 * vec.y;
+            // Transformed vector using matrix [[2,1],[1,2]]
+            const transformedX = 2 * vec.x + 1 * vec.y;
             const transformedY = 1 * vec.x + 2 * vec.y;
             const transformedEndX = this.centerX + transformedX * this.scale;
             const transformedEndY = this.centerY - transformedY * this.scale;
@@ -1467,11 +1469,11 @@ class VectorWorldDemo {
         this.ctx.textAlign = 'left';
         this.ctx.fillText('Mathematical Verification:', 50, 120);
         this.ctx.fillText('For v₁=[1,1]:', 70, 145);
-        this.ctx.fillText('  Av₁ = [[3,1],[1,2]] × [1,1] = [4,4] = 4×[1,1]', 90, 170);
-        this.ctx.fillText('  Therefore λ₁ = 4', 90, 195);
+        this.ctx.fillText('  Av₁ = [[2,1],[1,2]] × [1,1] = [3,3] = 3×[1,1]', 90, 170);
+        this.ctx.fillText('  Therefore λ₁ = 3', 90, 195);
         
         this.ctx.fillText('For v₂=[1,-1]:', 70, 230);
-        this.ctx.fillText('  Av₂ = [[3,1],[1,2]] × [1,-1] = [1,-1] = 1×[1,-1]', 90, 255);
+        this.ctx.fillText('  Av₂ = [[2,1],[1,2]] × [1,-1] = [1,-1] = 1×[1,-1]', 90, 255);
         this.ctx.fillText('  Therefore λ₂ = 1', 90, 280);
         
         this.ctx.fillText('Key insight:', 50, 315);
@@ -1609,7 +1611,7 @@ class VectorWorldDemo {
         // Show the transformation matrix
         this.ctx.fillStyle = '#4ecdc4';
         this.ctx.font = '18px Arial';
-        this.ctx.fillText('Matrix A = [[3,1],[1,2]]', this.centerX, 80);
+        this.ctx.fillText('Matrix A = [[2,1],[1,2]]', this.centerX, 80);
         
         // Test vectors
         const testVectors = [
@@ -1627,8 +1629,8 @@ class VectorWorldDemo {
             const originalEndX = this.centerX - 150 + vec.x * 30;
             const originalEndY = yOffset - vec.y * 30;
             
-            // Transformed vector
-            const transformedX = 3 * vec.x + 1 * vec.y;
+            // Transformed vector using matrix [[2,1],[1,2]]
+            const transformedX = 2 * vec.x + 1 * vec.y;
             const transformedY = 1 * vec.x + 2 * vec.y;
             const transformedEndX = this.centerX + 150 + transformedX * 30;
             const transformedEndY = yOffset - transformedY * 30;
@@ -1750,8 +1752,8 @@ class VectorWorldDemo {
             const originalEndX = this.centerX - 200 + vec.x * 20;
             const originalEndY = yOffset - vec.y * 20;
             
-            // Transformed vector
-            const transformedX = 3 * vec.x + 1 * vec.y;
+            // Transformed vector using matrix [[2,1],[1,2]]
+            const transformedX = 2 * vec.x + 1 * vec.y;
             const transformedY = 1 * vec.x + 2 * vec.y;
             const transformedEndX = this.centerX + 200 + transformedX * 20;
             const transformedEndY = yOffset - transformedY * 20;
@@ -1784,7 +1786,7 @@ class VectorWorldDemo {
         this.ctx.font = '16px Arial';
         this.ctx.textAlign = 'left';
         this.ctx.fillText('Discovery:', 50, 600);
-        this.ctx.fillText('• v₁ = [1,1] is an eigenvector with λ₁ = 4', 70, 625);
+        this.ctx.fillText('• v₁ = [1,1] is an eigenvector with λ₁ = 3', 70, 625);
         this.ctx.fillText('• v₂ = [1,-1] is an eigenvector with λ₂ = 1', 70, 650);
         this.ctx.fillText('• All vectors get "pulled" toward these directions!', 70, 675);
     }
@@ -1805,39 +1807,40 @@ class VectorWorldDemo {
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '16px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('Matrix A = [[3,1],[1,2]]', 50, 140);
+        this.ctx.fillText('Matrix A = [[2,1],[1,2]]', 50, 140);
         
         // Show A - λI
-        this.ctx.fillText('A - λI = [[3-λ, 1],[1, 2-λ]]', 50, 170);
+        this.ctx.fillText('A - λI = [[2-λ, 1],[1, 2-λ]]', 50, 170);
         
         // Show determinant calculation
-        this.ctx.fillText('det(A - λI) = (3-λ)(2-λ) - 1×1', 50, 200);
-        this.ctx.fillText('            = 6 - 3λ - 2λ + λ² - 1', 50, 230);
-        this.ctx.fillText('            = λ² - 5λ + 5', 50, 260);
+        this.ctx.fillText('det(A - λI) = (2-λ)(2-λ) - 1×1', 50, 200);
+        this.ctx.fillText('            = 4 - 4λ + λ² - 1', 50, 230);
+        this.ctx.fillText('            = λ² - 4λ + 3', 50, 260);
         
         // Show quadratic equation
         this.ctx.fillStyle = '#f39c12';
         this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('λ² - 5λ + 5 = 0', 50, 300);
+        this.ctx.fillText('λ² - 4λ + 3 = 0', 50, 300);
         
         // Show solution using quadratic formula
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '16px Arial';
-        this.ctx.fillText('Using quadratic formula:', 50, 340);
-        this.ctx.fillText('λ = (5 ± √(25-20))/2', 70, 370);
-        this.ctx.fillText('λ = (5 ± √5)/2', 70, 400);
+        this.ctx.fillText('Using quadratic formula or factoring:', 50, 340);
+        this.ctx.fillText('λ = (4 ± √(16-12))/2', 70, 370);
+        this.ctx.fillText('λ = (4 ± 2)/2', 70, 400);
         
         // Show the two eigenvalues
         this.ctx.fillStyle = '#2ecc71';
         this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('λ₁ = (5 + √5)/2 ≈ 4.618', 50, 450);
-        this.ctx.fillText('λ₂ = (5 - √5)/2 ≈ 0.382', 50, 480);
+        this.ctx.fillText('λ₁ = 3', 50, 450);
+        this.ctx.fillText('λ₂ = 1', 50, 480);
         
-        // Show simplified values for demo
-        this.ctx.fillStyle = '#e74c3c';
+        // Verify eigenvectors
+        this.ctx.fillStyle = '#4ecdc4';
         this.ctx.font = '16px Arial';
-        this.ctx.fillText('For our demo, we use simplified values:', 50, 520);
-        this.ctx.fillText('λ₁ = 4 and λ₂ = 1', 70, 550);
+        this.ctx.fillText('Verification:', 50, 520);
+        this.ctx.fillText('• For λ₁ = 3: eigenvector is [1,1]', 70, 550);
+        this.ctx.fillText('• For λ₂ = 1: eigenvector is [1,-1]', 70, 575);
     }
     
     drawMathematicalProof(lambda1, lambda2) {
@@ -1851,22 +1854,21 @@ class VectorWorldDemo {
         this.ctx.fillStyle = '#2ecc71';
         this.ctx.font = 'bold 18px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('Proof for v₁ = [1,1] with λ₁ = 4:', 50, 100);
+        this.ctx.fillText('Proof for v₁ = [1,1] with λ₁ = 3:', 50, 100);
         
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '16px Arial';
-        this.ctx.fillText('Av₁ = [[3,1],[1,2]] × [1,1]', 70, 130);
-        this.ctx.fillText('     = [3×1 + 1×1, 1×1 + 2×1]', 70, 160);
-        this.ctx.fillText('     = [4, 3]', 70, 190);
+        this.ctx.fillText('Av₁ = [[2,1],[1,2]] × [1,1]', 70, 130);
+        this.ctx.fillText('     = [2×1 + 1×1, 1×1 + 2×1]', 70, 160);
+        this.ctx.fillText('     = [3, 3]', 70, 190);
         
-        this.ctx.fillText('λ₁v₁ = 4 × [1,1]', 70, 220);
-        this.ctx.fillText('      = [4, 4]', 70, 250);
+        this.ctx.fillText('λ₁v₁ = 3 × [1,1]', 70, 220);
+        this.ctx.fillText('      = [3, 3]', 70, 250);
         
-        // Show that they're not equal (this is a simplified demo)
-        this.ctx.fillStyle = '#f39c12';
-        this.ctx.fillText('Note: This is a simplified demo. In reality:', 70, 290);
-        this.ctx.fillText('• We would use exact eigenvalues', 90, 320);
-        this.ctx.fillText('• Av₁ would exactly equal λ₁v₁', 90, 350);
+        // Show that they are equal!
+        this.ctx.fillStyle = '#2ecc71';
+        this.ctx.fillText('✅ Av₁ = λ₁v₁ ✓', 70, 290);
+        this.ctx.fillText('Perfect! [1,1] is truly an eigenvector!', 90, 320);
         
         // Show the proof for v₂ = [1,-1]
         this.ctx.fillStyle = '#e74c3c';
@@ -1875,12 +1877,17 @@ class VectorWorldDemo {
         
         this.ctx.fillStyle = '#fff';
         this.ctx.font = '16px Arial';
-        this.ctx.fillText('Av₂ = [[3,1],[1,2]] × [1,-1]', 70, 430);
-        this.ctx.fillText('     = [3×1 + 1×(-1), 1×1 + 2×(-1)]', 70, 460);
-        this.ctx.fillText('     = [2, -1]', 70, 490);
+        this.ctx.fillText('Av₂ = [[2,1],[1,2]] × [1,-1]', 70, 430);
+        this.ctx.fillText('     = [2×1 + 1×(-1), 1×1 + 2×(-1)]', 70, 460);
+        this.ctx.fillText('     = [1, -1]', 70, 490);
         
         this.ctx.fillText('λ₂v₂ = 1 × [1,-1]', 70, 520);
         this.ctx.fillText('      = [1, -1]', 70, 550);
+        
+        // Show that they are equal!
+        this.ctx.fillStyle = '#2ecc71';
+        this.ctx.fillText('✅ Av₂ = λ₂v₂ ✓', 70, 580);
+        this.ctx.fillText('Perfect! [1,-1] is truly an eigenvector!', 90, 610);
         
         // Key insight
         this.ctx.fillStyle = '#9b59b6';
