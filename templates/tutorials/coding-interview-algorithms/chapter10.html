@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 10: Bit Manipulation - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 10: Bit Manipulation</h1>
+            <p class="tutorial-subtitle">
+                Master bitwise operations, common tricks, and XOR patterns. Learn when and where to use bit manipulation.
+            </p>
+
+            <!-- Bit Operations -->
+            <div class="algorithm-card">
+                <h2>1. Bitwise Operations</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Efficient operations:</strong> Faster than arithmetic operations</li>
+                        <li><strong>Set operations:</strong> Representing sets as bits</li>
+                        <li><strong>Flags:</strong> Storing multiple boolean flags in one integer</li>
+                        <li><strong>Real-world example:</strong> Permission systems, feature flags, set operations, or optimization problems</li>
+                    </ul>
+                </div>
+
+                <h3>Common Bitwise Operations</h3>
+                <pre><code># AND: & (both bits must be 1)
+5 & 3  # 101 & 011 = 001 = 1
+
+# OR: | (at least one bit is 1)
+5 | 3  # 101 | 011 = 111 = 7
+
+# XOR: ^ (bits differ)
+5 ^ 3  # 101 ^ 011 = 110 = 6
+
+# NOT: ~ (flip all bits)
+~5     # ~101 = ...11111010 (depends on bit width)
+
+# Left Shift: << (multiply by 2^n)
+5 << 2  # 101 << 2 = 10100 = 20 (5 * 4)
+
+# Right Shift: >> (divide by 2^n)
+20 >> 2  # 10100 >> 2 = 101 = 5 (20 / 4)</code></pre>
+            </div>
+
+            <!-- Single Number -->
+            <div class="algorithm-card">
+                <h2>2. Single Number (XOR Pattern)</h2>
+                
+                <h3>Example: Find Single Number</h3>
+                <p><strong>Problem:</strong> Every number appears twice except one. Find the single number.</p>
+                
+                <pre><code>def single_number(nums):
+    """
+    Find single number using XOR.
+    
+    Args:
+        nums: List where every number appears twice except one
+    
+    Returns:
+        The single number
+    """
+    # Step 1: Initialize result
+    result = 0
+    
+    # Step 2: XOR all numbers
+    for num in nums:
+        # Step 2a: XOR operation
+        # XOR properties:
+        # - a ^ a = 0 (same number cancels out)
+        # - a ^ 0 = a (XOR with 0 returns number)
+        # - XOR is commutative and associative
+        result ^= num
+    
+    # Step 3: Return result
+    # All pairs cancel out (a ^ a = 0)
+    # Only single number remains
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Start with result = 0.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - XOR All:</strong> For each number:
+                        <ul>
+                            <li><strong>Step 2a:</strong> XOR with result</li>
+                            <li>Pairs cancel out (a ^ a = 0)</li>
+                            <li>Single number remains</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Return:</strong> Result contains the single number.
+                    </div>
+                    <div class="code-step">
+                        <strong>Why it works:</strong> XOR is commutative and associative. All pairs cancel to 0, leaving only the single number.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>nums = [4, 1, 2, 1, 2]</p>
+                <p>4 ^ 1 ^ 2 ^ 1 ^ 2 = 4 ^ (1 ^ 1) ^ (2 ^ 2) = 4 ^ 0 ^ 0 = 4</p>
+            </div>
+
+            <!-- Count Set Bits -->
+            <div class="algorithm-card">
+                <h2>3. Count Set Bits</h2>
+                
+                <h3>Example: Number of 1 Bits</h3>
+                <pre><code>def count_bits(n):
+    """
+    Count number of set bits (1s) in binary representation.
+    
+    Args:
+        n: Integer
+    
+    Returns:
+        Number of set bits
+    """
+    count = 0
+    
+    # Step 1: Continue while n > 0
+    while n:
+        # Step 2: Check if least significant bit is 1
+        # n & 1 checks if last bit is set
+        if n & 1:
+            count += 1
+        
+        # Step 3: Right shift to check next bit
+        # n >>= 1 moves to next bit
+        n >>= 1
+    
+    return count</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Loop:</strong> Continue while n > 0.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Check Bit:</strong> n & 1 checks if least significant bit is 1. If yes, increment count.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Shift:</strong> n >>= 1 right shifts to check next bit.
+                    </div>
+                </div>
+
+                <h3>Optimized Version (Brian Kernighan's Algorithm)</h3>
+                <pre><code>def count_bits_optimized(n):
+    """
+    Count set bits using Brian Kernighan's algorithm.
+    
+    Key insight: n & (n - 1) clears the rightmost set bit.
+    """
+    count = 0
+    
+    # Step 1: Continue while n > 0
+    while n:
+        # Step 2: Clear rightmost set bit
+        # n & (n - 1) removes the rightmost 1
+        n = n & (n - 1)
+        count += 1
+    
+    return count</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Loop:</strong> Continue while n > 0.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Clear Bit:</strong> n & (n - 1) clears the rightmost set bit. Each iteration removes one set bit.
+                    </div>
+                    <div class="code-step">
+                        <strong>Time Complexity:</strong> O(k) where k is number of set bits (better than O(log n)).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Power of Two -->
+            <div class="algorithm-card">
+                <h2>4. Power of Two</h2>
+                
+                <h3>Example: Check if Number is Power of 2</h3>
+                <pre><code>def is_power_of_two(n):
+    """
+    Check if n is a power of 2.
+    
+    Args:
+        n: Positive integer
+    
+    Returns:
+        True if n is power of 2, False otherwise
+    """
+    # Step 1: Handle edge case
+    if n <= 0:
+        return False
+    
+    # Step 2: Power of 2 has exactly one set bit
+    # n & (n - 1) clears the rightmost set bit
+    # If result is 0, n had exactly one set bit
+    return (n & (n - 1)) == 0</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Case:</strong> Powers of 2 are positive, so n must be > 0.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Check:</strong> Powers of 2 have exactly one set bit. n & (n - 1) clears it. If result is 0, n is power of 2.
+                    </div>
+                    <div class="code-step">
+                        <strong>Example:</strong> 8 = 1000, 8 & 7 = 1000 & 0111 = 0 → True
+                    </div>
+                </div>
+            </div>
+
+            <!-- Missing Number -->
+            <div class="algorithm-card">
+                <h2>5. Missing Number</h2>
+                
+                <h3>Example: Find Missing Number Using XOR</h3>
+                <p><strong>Problem:</strong> Array contains n distinct numbers in range [0, n]. One is missing. Find it.</p>
+                
+                <pre><code>def missing_number(nums):
+    """
+    Find missing number using XOR.
+    
+    Args:
+        nums: Array of n distinct numbers in range [0, n] (one missing)
+    
+    Returns:
+        Missing number
+    """
+    # Step 1: XOR all numbers in array
+    result = 0
+    for num in nums:
+        result ^= num
+    
+    # Step 2: XOR with all numbers from 0 to n
+    # This includes the missing number
+    for i in range(len(nums) + 1):
+        result ^= i
+    
+    # Step 3: Result is the missing number
+    # All numbers appear twice (once in nums, once in range)
+    # Except missing number (appears only in range)
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - XOR Array:</strong> XOR all numbers in the array.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - XOR Range:</strong> XOR with all numbers from 0 to n (complete range).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Result:</strong> All numbers appear twice (cancel out) except the missing number.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>nums = [3, 0, 1], n = 3</p>
+                <p>XOR array: 3 ^ 0 ^ 1 = 2</p>
+                <p>XOR range: 2 ^ 0 ^ 1 ^ 2 ^ 3 = 2</p>
+                <p>Missing: 2</p>
+            </div>
+
+            <!-- Reverse Bits -->
+            <div class="algorithm-card">
+                <h2>6. Reverse Bits</h2>
+                
+                <h3>Example: Reverse Bits of 32-bit Integer</h3>
+                <pre><code>def reverse_bits(n):
+    """
+    Reverse bits of 32-bit unsigned integer.
+    
+    Args:
+        n: 32-bit unsigned integer
+    
+    Returns:
+        Integer with reversed bits
+    """
+    result = 0
+    
+    # Step 1: Process all 32 bits
+    for i in range(32):
+        # Step 2: Extract bit at position i
+        # (n >> i) & 1 gets the i-th bit
+        bit = (n >> i) & 1
+        
+        # Step 3: Place bit at reversed position
+        # Position i should go to position (31 - i)
+        # Left shift to correct position and OR with result
+        result |= (bit << (31 - i))
+    
+    # Step 4: Return reversed bits
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Loop:</strong> Process all 32 bits.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Extract Bit:</strong> (n >> i) & 1 gets the i-th bit from right.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Place Bit:</strong> Place bit at position (31 - i) using left shift and OR.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Result contains reversed bits.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>XOR Properties:</strong> a ^ a = 0, a ^ 0 = a, commutative and associative</li>
+                    <li><strong>Common Tricks:</strong> n & (n - 1) clears rightmost set bit, n & 1 checks if odd</li>
+                    <li><strong>Set Bits:</strong> Count using loop or Brian Kernighan's algorithm</li>
+                    <li><strong>Power of 2:</strong> Check if (n & (n - 1)) == 0</li>
+                    <li><strong>Bit Manipulation:</strong> Often more efficient than arithmetic operations</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Bit manipulation is powerful for optimization and set operations. XOR is particularly useful for finding unique elements. Remember common patterns like clearing rightmost bit.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter9" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 9
+                </a>
+                <a href="/tutorials/coding-interview-algorithms" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Back to Index
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
