@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 2: Linked Lists - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 2: Linked Lists</h1>
+            <p class="tutorial-subtitle">
+                Master linked list operations including traversal, reversal, fast/slow pointers, and cycle detection. Learn when and where to use each technique.
+            </p>
+
+            <!-- Linked List Basics -->
+            <div class="algorithm-card">
+                <h2>1. Linked List Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Dynamic size:</strong> When you need a data structure that can grow/shrink efficiently</li>
+                        <li><strong>Insertion/deletion:</strong> When frequent insertions/deletions are needed (O(1) at known position)</li>
+                        <li><strong>Memory efficiency:</strong> When you don't know the size in advance</li>
+                        <li><strong>Real-world example:</strong> Browser history (back/forward), undo/redo functionality, music playlists, or implementing stacks/queues</li>
+                    </ul>
+                </div>
+
+                <h3>Linked List Structure</h3>
+                <pre><code>class ListNode:
+    """Node in a singly linked list"""
+    def __init__(self, val=0, next=None):
+        # Step 1: Store the value
+        self.val = val
+        # Step 2: Store reference to next node
+        # None means this is the last node (tail)
+        self.next = next</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Explanation:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Value Storage:</strong> Each node stores a value (the data we care about).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Next Pointer:</strong> Each node has a reference to the next node. If <code>next</code> is <code>None</code>, it's the tail (last node).
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Difference from Arrays:</strong> Arrays store elements contiguously in memory. Linked lists store elements anywhere, connected by pointers.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reversing Linked List -->
+            <div class="algorithm-card">
+                <h2>2. Reversing a Linked List</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Palindrome checking:</strong> Reverse and compare</li>
+                        <li><strong>Stack implementation:</strong> Using linked list as stack</li>
+                        <li><strong>Problem transformations:</strong> Many problems become easier with reversed list</li>
+                        <li><strong>Real-world example:</strong> Reversing a playlist, implementing undo functionality, or processing data in reverse order</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>To reverse a linked list, we need to reverse the direction of all <code>next</code> pointers. We do this iteratively by maintaining three pointers:</p>
+                <ul>
+                    <li><strong>prev:</strong> The previous node (starts as None)</li>
+                    <li><strong>curr:</strong> The current node we're processing</li>
+                    <li><strong>next:</strong> The next node (we save it before breaking the link)</li>
+                </ul>
+
+                <h3>Example: Reverse Linked List</h3>
+                <pre><code>def reverse_list(head):
+    """
+    Reverse a singly linked list iteratively.
+    
+    Args:
+        head: First node of the linked list
+    
+    Returns:
+        New head of the reversed list
+    """
+    # Step 1: Initialize pointers
+    # prev will become the new head (starts as None)
+    prev = None
+    # curr starts at the original head
+    curr = head
+    
+    # Step 2: Iterate through the list
+    while curr is not None:
+        # Step 3: Save the next node
+        # We need to save this because we're about to break the link
+        next_node = curr.next
+        
+        # Step 4: Reverse the link
+        # Point current node's next to previous node
+        curr.next = prev
+        
+        # Step 5: Move pointers forward
+        # prev moves to current position
+        prev = curr
+        # curr moves to next position (which we saved earlier)
+        curr = next_node
+    
+    # Step 6: Return new head
+    # prev is now pointing to the last node (which is the new head)
+    return prev</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> 
+                        <ul>
+                            <li><code>prev = None</code>: Will eventually become the new head</li>
+                            <li><code>curr = head</code>: Start from the original head</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Loop:</strong> Continue until we've processed all nodes (<code>curr is not None</code>).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Save Next:</strong> Before breaking the link, save <code>curr.next</code> in <code>next_node</code>. We'll need it to continue traversal.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Reverse Link:</strong> Point <code>curr.next</code> to <code>prev</code>. This reverses the direction of the arrow.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Advance:</strong> Move <code>prev</code> to <code>curr</code> and <code>curr</code> to <code>next_node</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Return:</strong> When loop ends, <code>prev</code> points to the last node of original list, which is now the new head.
+                    </div>
+                </div>
+
+                <h4>Visualization:</h4>
+                <p>Original: 1 → 2 → 3 → 4 → None</p>
+                <p>After reversal: None ← 1 ← 2 ← 3 ← 4 (head)</p>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Visit each node once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using constant extra space</p>
+            </div>
+
+            <!-- Fast and Slow Pointers -->
+            <div class="algorithm-card">
+                <h2>3. Fast and Slow Pointers (Floyd's Cycle Detection)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Cycle detection:</strong> Finding if linked list has a cycle</li>
+                        <li><strong>Middle element:</strong> Finding middle of linked list</li>
+                        <li><strong>Nth from end:</strong> Finding kth node from end</li>
+                        <li><strong>Real-world example:</strong> Detecting infinite loops in state machines, finding the middle of a playlist, or detecting circular references in data structures</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>Also known as "tortoise and hare" algorithm:</p>
+                <ul>
+                    <li><strong>Slow pointer:</strong> Moves one step at a time</li>
+                    <li><strong>Fast pointer:</strong> Moves two steps at a time</li>
+                    <li><strong>Key insight:</strong> If there's a cycle, fast pointer will eventually catch up to slow pointer</li>
+                    <li><strong>If no cycle:</strong> Fast pointer reaches the end (None)</li>
+                </ul>
+
+                <h3>Example: Detect Cycle in Linked List</h3>
+                <pre><code>def has_cycle(head):
+    """
+    Detect if linked list has a cycle using Floyd's algorithm.
+    
+    Args:
+        head: First node of the linked list
+    
+    Returns:
+        True if cycle exists, False otherwise
+    """
+    # Step 1: Handle empty list
+    if head is None:
+        return False
+    
+    # Step 2: Initialize two pointers
+    # slow moves one step at a time
+    slow = head
+    # fast moves two steps at a time
+    fast = head
+    
+    # Step 3: Move pointers until they meet or fast reaches end
+    while fast is not None and fast.next is not None:
+        # Step 3a: Move slow pointer one step
+        slow = slow.next
+        
+        # Step 3b: Move fast pointer two steps
+        fast = fast.next.next
+        
+        # Step 3c: Check if they meet
+        # If slow == fast, we have a cycle!
+        if slow == fast:
+            return True
+    
+    # Step 4: No cycle found
+    # Fast pointer reached the end (None)
+    return False</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Case:</strong> If list is empty, no cycle exists.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize:</strong> Both pointers start at head. They'll move at different speeds.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Loop:</strong> Continue while fast can move (fast and fast.next are not None).
+                        <ul>
+                            <li><strong>Step 3a:</strong> Move slow one step → <code>slow = slow.next</code></li>
+                            <li><strong>Step 3b:</strong> Move fast two steps → <code>fast = fast.next.next</code></li>
+                            <li><strong>Step 3c:</strong> If they meet (<code>slow == fast</code>), cycle exists!</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Why it works:</strong> If there's a cycle, fast will eventually enter it. Once both are in the cycle, fast (moving 2x speed) will catch up to slow.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - No Cycle:</strong> If fast reaches None, there's no cycle.
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - In worst case, fast pointer traverses the list once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using two pointers</p>
+            </div>
+
+            <!-- Finding Middle Element -->
+            <div class="algorithm-card">
+                <h2>4. Finding Middle Element</h2>
+                
+                <h3>Example: Middle of Linked List</h3>
+                <pre><code>def find_middle(head):
+    """
+    Find middle element of linked list using fast/slow pointers.
+    
+    Args:
+        head: First node of the linked list
+    
+    Returns:
+        Middle node (or second middle if even number of nodes)
+    """
+    # Step 1: Handle edge cases
+    if head is None or head.next is None:
+        return head
+    
+    # Step 2: Initialize two pointers
+    slow = head
+    fast = head
+    
+    # Step 3: Move pointers
+    # When fast reaches end, slow will be at middle
+    while fast is not None and fast.next is not None:
+        # Step 3a: Slow moves one step
+        slow = slow.next
+        
+        # Step 3b: Fast moves two steps
+        fast = fast.next.next
+    
+    # Step 4: Return middle node
+    # slow is now at the middle
+    return slow</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Cases:</strong> If list is empty or has one node, return head.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize:</strong> Both start at head.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Move:</strong> 
+                        <ul>
+                            <li>Slow moves 1 step per iteration</li>
+                            <li>Fast moves 2 steps per iteration</li>
+                            <li>When fast reaches end, slow is at middle!</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Why it works:</strong> Fast covers twice the distance. When fast finishes, slow is halfway.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Slow pointer is at the middle node.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>List: 1 → 2 → 3 → 4 → 5</p>
+                <ul>
+                    <li>After iteration 1: slow=2, fast=3</li>
+                    <li>After iteration 2: slow=3, fast=5</li>
+                    <li>Fast.next is None → stop. Middle is 3</li>
+                </ul>
+            </div>
+
+            <!-- Merging Linked Lists -->
+            <div class="algorithm-card">
+                <h2>5. Merging Two Sorted Linked Lists</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Merge operations:</strong> Combining two sorted lists into one</li>
+                        <li><strong>Merge sort:</strong> Part of merge sort algorithm for linked lists</li>
+                        <li><strong>Real-world example:</strong> Merging two sorted playlists, combining sorted transaction logs, or merging sorted user lists</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Merge Two Sorted Lists</h3>
+                <pre><code>def merge_two_lists(list1, list2):
+    """
+    Merge two sorted linked lists into one sorted list.
+    
+    Args:
+        list1: Head of first sorted linked list
+        list2: Head of second sorted linked list
+    
+    Returns:
+        Head of merged sorted linked list
+    """
+    # Step 1: Create dummy node
+    # This simplifies the code by avoiding special cases for head
+    dummy = ListNode(0)
+    # current tracks where we are in the merged list
+    current = dummy
+    
+    # Step 2: Compare and merge
+    # Continue while both lists have nodes
+    while list1 is not None and list2 is not None:
+        # Step 2a: Compare values
+        if list1.val <= list2.val:
+            # list1's value is smaller or equal
+            # Step 2b: Add list1's node to merged list
+            current.next = list1
+            # Step 2c: Move list1 pointer forward
+            list1 = list1.next
+        else:
+            # list2's value is smaller
+            # Step 2d: Add list2's node to merged list
+            current.next = list2
+            # Step 2e: Move list2 pointer forward
+            list2 = list2.next
+        
+        # Step 2f: Move current pointer forward
+        current = current.next
+    
+    # Step 3: Append remaining nodes
+    # One list is exhausted, append the other
+    if list1 is not None:
+        current.next = list1
+    else:
+        current.next = list2
+    
+    # Step 4: Return merged list
+    # dummy.next is the actual head (skip dummy node)
+    return dummy.next</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Dummy Node:</strong> Create a dummy node to simplify code. We'll build the merged list starting from <code>dummy.next</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Compare and Merge:</strong> While both lists have nodes:
+                        <ul>
+                            <li><strong>Step 2a:</strong> Compare values at current positions</li>
+                            <li><strong>Step 2b/2d:</strong> Add the smaller node to merged list</li>
+                            <li><strong>Step 2c/2e:</strong> Move the pointer of the list we took from</li>
+                            <li><strong>Step 2f:</strong> Move current pointer forward</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Append Remaining:</strong> When one list is exhausted, append the rest of the other list (it's already sorted).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Return <code>dummy.next</code> (the actual head, skipping the dummy).
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>list1: 1 → 3 → 5</p>
+                <p>list2: 2 → 4 → 6</p>
+                <p>Result: 1 → 2 → 3 → 4 → 5 → 6</p>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n + m) - Visit each node once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using constant extra space (dummy node)</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Reversal:</strong> Use three pointers (prev, curr, next) to reverse links iteratively</li>
+                    <li><strong>Fast/Slow Pointers:</strong> Use for cycle detection, finding middle, or nth from end</li>
+                    <li><strong>Merging:</strong> Compare nodes from both lists and build merged list incrementally</li>
+                    <li><strong>Key Insight:</strong> Linked lists require careful pointer management - always save next before modifying</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Most linked list problems can be solved with pointer manipulation. The trick is maintaining references correctly and handling edge cases (empty list, single node, etc.).</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter1" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 1
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter3" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 3 - Stacks & Queues →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
