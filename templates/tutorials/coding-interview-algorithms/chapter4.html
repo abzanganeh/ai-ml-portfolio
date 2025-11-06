@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 4: Trees & Binary Trees - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 4: Trees & Binary Trees</h1>
+            <p class="tutorial-subtitle">
+                Master tree traversals (DFS, BFS), Binary Search Trees, tree construction, and common tree algorithms. Learn when and where to use each technique.
+            </p>
+
+            <!-- Tree Structure -->
+            <div class="algorithm-card">
+                <h2>1. Tree Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Hierarchical data:</strong> Representing hierarchical relationships</li>
+                        <li><strong>Search operations:</strong> Binary Search Trees for O(log n) search</li>
+                        <li><strong>Decision making:</strong> Decision trees in AI/ML</li>
+                        <li><strong>Real-world example:</strong> File systems, organization charts, HTML DOM, expression trees, or database indexes</li>
+                    </ul>
+                </div>
+
+                <h3>Tree Node Structure</h3>
+                <pre><code>class TreeNode:
+    """Node in a binary tree"""
+    def __init__(self, val=0, left=None, right=None):
+        # Step 1: Store the value
+        self.val = val
+        # Step 2: Store reference to left child
+        self.left = left
+        # Step 3: Store reference to right child
+        self.right = right</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Explanation:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Value:</strong> Each node stores a value.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Left Child:</strong> Reference to left subtree (None if no left child).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Right Child:</strong> Reference to right subtree (None if no right child).
+                    </div>
+                </div>
+            </div>
+
+            <!-- DFS Traversals -->
+            <div class="algorithm-card">
+                <h2>2. DFS Traversals (Inorder, Preorder, Postorder)</h2>
+                
+                <h3>Inorder Traversal (Left, Root, Right)</h3>
+                <pre><code>def inorder_traversal(root):
+    """
+    Inorder traversal: Left → Root → Right
+    For BST: Returns nodes in sorted order
+    
+    Args:
+        root: Root node of binary tree
+    
+    Returns:
+        List of node values in inorder
+    """
+    result = []
+    
+    def dfs(node):
+        # Step 1: Base case - if node is None, return
+        if node is None:
+            return
+        
+        # Step 2: Traverse left subtree first
+        dfs(node.left)
+        
+        # Step 3: Process current node (root)
+        result.append(node.val)
+        
+        # Step 4: Traverse right subtree
+        dfs(node.right)
+    
+    # Step 5: Start traversal from root
+    dfs(root)
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If node is None, we've reached a leaf's child → return.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Left:</strong> Recursively traverse left subtree first.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Root:</strong> Process current node (add to result).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Right:</strong> Recursively traverse right subtree.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Start:</strong> Begin traversal from root.
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Property:</strong> For BST, inorder gives sorted order!
+                    </div>
+                </div>
+
+                <h3>Preorder Traversal (Root, Left, Right)</h3>
+                <pre><code>def preorder_traversal(root):
+    """
+    Preorder traversal: Root → Left → Right
+    Useful for copying tree structure
+    
+    Args:
+        root: Root node of binary tree
+    
+    Returns:
+        List of node values in preorder
+    """
+    result = []
+    
+    def dfs(node):
+        if node is None:
+            return
+        
+        # Step 1: Process root first
+        result.append(node.val)
+        
+        # Step 2: Then left subtree
+        dfs(node.left)
+        
+        # Step 3: Then right subtree
+        dfs(node.right)
+    
+    dfs(root)
+    return result</code></pre>
+
+                <h3>Postorder Traversal (Left, Right, Root)</h3>
+                <pre><code>def postorder_traversal(root):
+    """
+    Postorder traversal: Left → Right → Root
+    Useful for deleting tree (process children before parent)
+    
+    Args:
+        root: Root node of binary tree
+    
+    Returns:
+        List of node values in postorder
+    """
+    result = []
+    
+    def dfs(node):
+        if node is None:
+            return
+        
+        # Step 1: Traverse left first
+        dfs(node.left)
+        
+        # Step 2: Then right
+        dfs(node.right)
+        
+        # Step 3: Process root last
+        result.append(node.val)
+    
+    dfs(root)
+    return result</code></pre>
+            </div>
+
+            <!-- Binary Search Tree -->
+            <div class="algorithm-card">
+                <h2>3. Binary Search Tree (BST)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Ordered data:</strong> When you need sorted data with efficient search</li>
+                        <li><strong>Range queries:</strong> Finding all elements in a range</li>
+                        <li><strong>Dynamic sets:</strong> Insert/delete/search operations</li>
+                        <li><strong>Real-world example:</strong> Database indexes, priority queues, symbol tables, or maintaining sorted data with insertions</li>
+                    </ul>
+                </div>
+
+                <h3>BST Property</h3>
+                <p>For every node:</p>
+                <ul>
+                    <li>All nodes in left subtree have values < node.val</li>
+                    <li>All nodes in right subtree have values > node.val</li>
+                </ul>
+
+                <h3>Example: Search in BST</h3>
+                <pre><code>def search_bst(root, val):
+    """
+    Search for value in Binary Search Tree.
+    
+    Args:
+        root: Root node of BST
+        val: Value to search for
+    
+    Returns:
+        Node containing val, or None if not found
+    """
+    # Step 1: Base case - empty tree or found
+    if root is None or root.val == val:
+        return root
+    
+    # Step 2: Compare with current node
+    if val < root.val:
+        # Step 3: Search left subtree
+        # Value is smaller, must be in left subtree
+        return search_bst(root.left, val)
+    else:
+        # Step 4: Search right subtree
+        # Value is larger, must be in right subtree
+        return search_bst(root.right, val)</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If root is None (not found) or root.val == val (found), return.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Compare:</strong> Compare val with current node's value.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Left:</strong> If val < root.val, search left subtree (BST property).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Right:</strong> If val > root.val, search right subtree (BST property).
+                    </div>
+                    <div class="code-step">
+                        <strong>Time Complexity:</strong> O(h) where h is height. O(log n) for balanced tree, O(n) worst case.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validate BST -->
+            <div class="algorithm-card">
+                <h2>4. Validate Binary Search Tree</h2>
+                
+                <h3>Example: Check if Tree is Valid BST</h3>
+                <pre><code>def is_valid_bst(root):
+    """
+    Validate if binary tree is a valid BST.
+    
+    Args:
+        root: Root node of binary tree
+    
+    Returns:
+        True if valid BST, False otherwise
+    """
+    def validate(node, min_val, max_val):
+        # Step 1: Base case - empty tree is valid
+        if node is None:
+            return True
+        
+        # Step 2: Check current node
+        # Value must be within (min_val, max_val) range
+        if node.val <= min_val or node.val >= max_val:
+            return False
+        
+        # Step 3: Validate left subtree
+        # All values in left must be < current node
+        # So max_val becomes current node's value
+        left_valid = validate(node.left, min_val, node.val)
+        
+        # Step 4: Validate right subtree
+        # All values in right must be > current node
+        # So min_val becomes current node's value
+        right_valid = validate(node.right, node.val, max_val)
+        
+        # Step 5: Both subtrees must be valid
+        return left_valid and right_valid
+    
+    # Step 6: Start with infinite range
+    # Use float('inf') to represent no upper/lower bound initially
+    return validate(root, float('-inf'), float('inf'))</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> Empty tree is valid BST.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Check Range:</strong> Current node's value must be strictly between min_val and max_val.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Left Subtree:</strong> Validate left with updated max_val = node.val (all left values must be < node.val).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Right Subtree:</strong> Validate right with updated min_val = node.val (all right values must be > node.val).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Combine:</strong> Both subtrees must be valid.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Initialize:</strong> Start with infinite range (no constraints initially).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lowest Common Ancestor -->
+            <div class="algorithm-card">
+                <h2>5. Lowest Common Ancestor (LCA)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Tree queries:</strong> Finding common ancestor of two nodes</li>
+                        <li><strong>Path problems:</strong> Finding distance between nodes</li>
+                        <li><strong>Real-world example:</strong> Finding common manager in org chart, finding common parent in file system, or Git merge base</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Find LCA in Binary Tree</h3>
+                <pre><code>def lowest_common_ancestor(root, p, q):
+    """
+    Find lowest common ancestor of two nodes in binary tree.
+    
+    Args:
+        root: Root node of binary tree
+        p: First node
+        q: Second node
+    
+    Returns:
+        Lowest common ancestor node
+    """
+    # Step 1: Base case
+    if root is None or root == p or root == q:
+        # If we found p or q, return it
+        # This node might be the LCA
+        return root
+    
+    # Step 2: Search in left subtree
+    left = lowest_common_ancestor(root.left, p, q)
+    
+    # Step 3: Search in right subtree
+    right = lowest_common_ancestor(root.right, p, q)
+    
+    # Step 4: Analyze results
+    if left and right:
+        # Step 4a: Both found in different subtrees
+        # Current root is the LCA
+        return root
+    elif left:
+        # Step 4b: Found in left subtree
+        # LCA is in left subtree
+        return left
+    else:
+        # Step 4c: Found in right subtree (or not found)
+        # LCA is in right subtree, or None if not found
+        return right</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If root is None or equals p or q, return root (found one of the nodes).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Search Left:</strong> Recursively search for p and q in left subtree.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Search Right:</strong> Recursively search for p and q in right subtree.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Analyze:</strong>
+                        <ul>
+                            <li><strong>Step 4a:</strong> If both left and right return non-None, p and q are in different subtrees → current root is LCA!</li>
+                            <li><strong>Step 4b:</strong> If only left returns non-None, LCA is in left subtree</li>
+                            <li><strong>Step 4c:</strong> Otherwise, LCA is in right subtree (or not found)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tree Construction -->
+            <div class="algorithm-card">
+                <h2>6. Construct Binary Tree from Preorder and Inorder</h2>
+                
+                <h3>Example: Build Tree from Traversals</h3>
+                <pre><code>def build_tree(preorder, inorder):
+    """
+    Construct binary tree from preorder and inorder traversals.
+    
+    Args:
+        preorder: List of values in preorder
+        inorder: List of values in inorder
+    
+    Returns:
+        Root node of constructed tree
+    """
+    # Step 1: Base case
+    if not preorder or not inorder:
+        return None
+    
+    # Step 2: Root is first element in preorder
+    # Preorder: Root → Left → Right
+    root_val = preorder[0]
+    root = TreeNode(root_val)
+    
+    # Step 3: Find root position in inorder
+    # Inorder: Left → Root → Right
+    root_idx = inorder.index(root_val)
+    
+    # Step 4: Split inorder into left and right
+    # Left subtree: elements before root in inorder
+    left_inorder = inorder[:root_idx]
+    # Right subtree: elements after root in inorder
+    right_inorder = inorder[root_idx + 1:]
+    
+    # Step 5: Split preorder (skip root, match sizes)
+    # Left preorder: next len(left_inorder) elements
+    left_preorder = preorder[1:1 + len(left_inorder)]
+    # Right preorder: remaining elements
+    right_preorder = preorder[1 + len(left_inorder):]
+    
+    # Step 6: Recursively build subtrees
+    root.left = build_tree(left_preorder, left_inorder)
+    root.right = build_tree(right_preorder, right_inorder)
+    
+    return root</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If either list is empty, return None.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Root:</strong> First element in preorder is the root (preorder starts with root).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Find Root:</strong> Locate root's position in inorder to split left/right subtrees.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Split Inorder:</strong> 
+                        <ul>
+                            <li>Left: elements before root</li>
+                            <li>Right: elements after root</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Split Preorder:</strong> Match sizes with inorder splits (skip root, take appropriate lengths).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Recurse:</strong> Recursively build left and right subtrees.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>DFS Traversals:</strong> Inorder (sorted for BST), Preorder (copy tree), Postorder (delete tree)</li>
+                    <li><strong>BST:</strong> Left < Root < Right property enables O(log n) search</li>
+                    <li><strong>LCA:</strong> Use recursive search, LCA is where both nodes found in different subtrees</li>
+                    <li><strong>Tree Construction:</strong> Use preorder for root, inorder to split left/right</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Most tree problems use recursion. The key is understanding tree properties (BST, complete, balanced) and choosing the right traversal order.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter3" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 3
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter5" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 5 - Graphs →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
