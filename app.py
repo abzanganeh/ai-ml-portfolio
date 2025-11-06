@@ -369,6 +369,21 @@ def decision_trees_chapter(chapter_num):
     except:
         abort(404)
 
+# Coding Interview Algorithms tutorial chapter routes
+@app.route('/tutorials/coding-interview-algorithms/chapter<int:chapter_num>')
+def coding_algorithms_chapter(chapter_num):
+    """Coding Interview Algorithms tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 10:
+        abort(404)
+    
+    template_path = f'tutorials/coding-interview-algorithms/chapter{chapter_num}.html'
+    
+    # Check if template exists, otherwise 404
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
 
 @app.route('/blog')
 def blog():
