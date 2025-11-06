@@ -26,7 +26,7 @@
     </div>
     
     <!-- Navigation -->
-    <div class="course-nav">
+    <div id="course-navigation" class="course-nav">
         <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
         <button class="nav-btn" onclick="showSection('text-repr')">Text Representation</button>
         <button class="nav-btn" onclick="showSection('embeddings')">Word Embeddings</button>
@@ -1752,5 +1752,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+</script>
+
+{% block footer_navigation %}
+    <button class="footer-nav-btn" onclick="scrollToCourseNav()" aria-label="Go to course navigation">
+        <i class="fas fa-list"></i> Course Navigation
+    </button>
+    <a href="{{ url_for('tutorials') }}" class="footer-nav-btn">
+        <i class="fas fa-book"></i> All Tutorials
+    </a>
+    <a href="{{ url_for('projects') }}" class="footer-nav-btn">
+        <i class="fas fa-code"></i> View Projects
+    </a>
+    <a href="{{ url_for('contact') }}" class="footer-nav-btn">
+        <i class="fas fa-envelope"></i> Get in Touch
+    </a>
+{% endblock %}
+
+<script>
+function scrollToCourseNav() {
+    const courseNav = document.getElementById('course-navigation');
+    if (courseNav) {
+        courseNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
 </script>
 {% endblock %}
