@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 7: Backtracking - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 7: Backtracking</h1>
+            <p class="tutorial-subtitle">
+                Master backtracking algorithms for permutations, combinations, and constraint satisfaction problems. Learn when and where to use backtracking.
+            </p>
+
+            <!-- Backtracking Fundamentals -->
+            <div class="algorithm-card">
+                <h2>1. Backtracking Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Constraint satisfaction:</strong> Problems with constraints (N-Queens, Sudoku)</li>
+                        <li><strong>Combinatorial problems:</strong> Permutations, combinations, subsets</li>
+                        <li><strong>Search problems:</strong> Finding all solutions or one solution</li>
+                        <li><strong>Real-world example:</strong> Scheduling with constraints, puzzle solving, generating all possible configurations, or resource allocation with rules</li>
+                    </ul>
+                </div>
+
+                <h3>Backtracking Template</h3>
+                <pre><code>def backtrack(choices, path, result):
+    """
+    General backtracking template.
+    
+    Args:
+        choices: Available choices at current step
+        path: Current partial solution
+        result: List to store all valid solutions
+    """
+    # Step 1: Base case - solution found
+    if is_solution(path):
+        result.append(path.copy())  # Save a copy
+        return
+    
+    # Step 2: Try each choice
+    for choice in choices:
+        # Step 3: Check if choice is valid
+        if is_valid(choice, path):
+            # Step 4: Make choice (add to path)
+            path.append(choice)
+            
+            # Step 5: Recurse with updated path
+            backtrack(updated_choices, path, result)
+            
+            # Step 6: Backtrack (undo choice)
+            path.pop()</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Explanation:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If current path is a complete solution, save it.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Try Choices:</strong> Iterate through all possible choices.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Validate:</strong> Check if choice is valid given current path.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Make Choice:</strong> Add choice to path.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Recurse:</strong> Explore further with this choice.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Backtrack:</strong> Remove choice (undo) to try other possibilities.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permutations -->
+            <div class="algorithm-card">
+                <h2>2. Permutations</h2>
+                
+                <h3>Example: All Permutations</h3>
+                <pre><code>def permute(nums):
+    """
+    Generate all permutations of array.
+    
+    Args:
+        nums: List of distinct integers
+    
+    Returns:
+        List of all permutations
+    """
+    result = []
+    
+    def backtrack(path, remaining):
+        # Step 1: Base case - all elements used
+        if len(remaining) == 0:
+            result.append(path.copy())
+            return
+        
+        # Step 2: Try each remaining element
+        for i in range(len(remaining)):
+            # Step 3: Make choice
+            # Add current element to path
+            path.append(remaining[i])
+            
+            # Step 4: Update remaining (remove chosen element)
+            new_remaining = remaining[:i] + remaining[i + 1:]
+            
+            # Step 5: Recurse
+            backtrack(path, new_remaining)
+            
+            # Step 6: Backtrack
+            path.pop()
+    
+    # Step 7: Start backtracking
+    backtrack([], nums)
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If no elements remaining, we have a complete permutation.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Try Each:</strong> For each remaining element, try adding it to path.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Make Choice:</strong> Add element to current path.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Update Remaining:</strong> Remove chosen element from remaining list.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Recurse:</strong> Continue building permutation with updated path and remaining.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Backtrack:</strong> Remove element from path to try other choices.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 7 - Start:</strong> Begin with empty path and all elements as remaining.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>nums = [1, 2, 3]</p>
+                <p>Result: [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]</p>
+            </div>
+
+            <!-- Combinations -->
+            <div class="algorithm-card">
+                <h2>3. Combinations</h2>
+                
+                <h3>Example: All Combinations of Size K</h3>
+                <pre><code>def combine(n, k):
+    """
+    Generate all combinations of k numbers from 1 to n.
+    
+    Args:
+        n: Range [1, n]
+        k: Size of combination
+    
+    Returns:
+        List of all combinations
+    """
+    result = []
+    
+    def backtrack(start, path):
+        # Step 1: Base case - combination of size k found
+        if len(path) == k:
+            result.append(path.copy())
+            return
+        
+        # Step 2: Try each number from start to n
+        for i in range(start, n + 1):
+            # Step 3: Make choice
+            path.append(i)
+            
+            # Step 4: Recurse with next start (avoid duplicates)
+            # Start from i+1 to ensure increasing order
+            backtrack(i + 1, path)
+            
+            # Step 5: Backtrack
+            path.pop()
+    
+    # Step 6: Start from 1
+    backtrack(1, [])
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Case:</strong> If path has k elements, we have a valid combination.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Try Numbers:</strong> Try each number from start to n.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Make Choice:</strong> Add number to path.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Recurse:</strong> Continue with next start = i+1 (ensures increasing order, avoids duplicates).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Backtrack:</strong> Remove number to try other choices.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Start:</strong> Begin from number 1.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>n = 4, k = 2</p>
+                <p>Result: [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]</p>
+            </div>
+
+            <!-- N-Queens -->
+            <div class="algorithm-card">
+                <h2>4. N-Queens Problem</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Constraint satisfaction:</strong> Placing items with constraints</li>
+                        <li><strong>Real-world example:</strong> Scheduling with conflicts, resource allocation with restrictions, or layout problems</li>
+                    </ul>
+                </div>
+
+                <h3>Example: N-Queens Solution</h3>
+                <pre><code>def solve_n_queens(n):
+    """
+    Place n queens on n×n board so no two attack each other.
+    
+    Args:
+        n: Size of board and number of queens
+    
+    Returns:
+        List of all solutions (each solution is list of queen positions)
+    """
+    result = []
+    
+    def is_safe(row, col, board):
+        # Step 1: Check column
+        for i in range(row):
+            if board[i] == col:
+                return False
+        
+        # Step 2: Check diagonal (top-left to bottom-right)
+        for i in range(row):
+            if board[i] - i == col - row:
+                return False
+        
+        # Step 3: Check anti-diagonal (top-right to bottom-left)
+        for i in range(row):
+            if board[i] + i == col + row:
+                return False
+        
+        return True
+    
+    def backtrack(row, board):
+        # Step 4: Base case - all queens placed
+        if row == n:
+            result.append(board.copy())
+            return
+        
+        # Step 5: Try each column in current row
+        for col in range(n):
+            # Step 6: Check if safe to place queen
+            if is_safe(row, col, board):
+                # Step 7: Place queen
+                board[row] = col
+                
+                # Step 8: Recurse to next row
+                backtrack(row + 1, board)
+                
+                # Step 9: Backtrack (board[row] will be overwritten)
+                # No explicit undo needed as we overwrite
+    
+    # Step 10: Start from row 0
+    backtrack(0, [-1] * n)
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>is_safe function:</strong>
+                        <ul>
+                            <li><strong>Step 1:</strong> Check if any previous queen is in same column</li>
+                            <li><strong>Step 2:</strong> Check diagonal (same difference: row-col)</li>
+                            <li><strong>Step 3:</strong> Check anti-diagonal (same sum: row+col)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>backtrack function:</strong>
+                        <ul>
+                            <li><strong>Step 4:</strong> If all rows processed, save solution</li>
+                            <li><strong>Step 5:</strong> Try each column in current row</li>
+                            <li><strong>Step 6:</strong> Check if placing queen here is safe</li>
+                            <li><strong>Step 7:</strong> Place queen (store column in board[row])</li>
+                            <li><strong>Step 8:</strong> Recurse to next row</li>
+                            <li><strong>Step 9:</strong> Backtrack (will be overwritten in next iteration)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 10:</strong> Start from row 0 with empty board.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subsets -->
+            <div class="algorithm-card">
+                <h2>5. Subsets</h2>
+                
+                <h3>Example: All Subsets</h3>
+                <pre><code>def subsets(nums):
+    """
+    Generate all subsets of array.
+    
+    Args:
+        nums: List of integers
+    
+    Returns:
+        List of all subsets
+    """
+    result = []
+    
+    def backtrack(start, path):
+        # Step 1: Add current path (subset) to result
+        # Add at every step, not just at base case
+        result.append(path.copy())
+        
+        # Step 2: Try each element from start to end
+        for i in range(start, len(nums)):
+            # Step 3: Make choice
+            path.append(nums[i])
+            
+            # Step 4: Recurse with next start
+            backtrack(i + 1, path)
+            
+            # Step 5: Backtrack
+            path.pop()
+    
+    # Step 6: Start from index 0
+    backtrack(0, [])
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Add Subset:</strong> Add current path to result (every path is a valid subset).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Try Elements:</strong> Try each element from start position.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Make Choice:</strong> Include element in subset.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Recurse:</strong> Continue with next start (i+1) to avoid duplicates.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Backtrack:</strong> Remove element to try subsets without it.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Start:</strong> Begin from index 0.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>nums = [1, 2, 3]</p>
+                <p>Result: [[], [1], [1,2], [1,2,3], [1,3], [2], [2,3], [3]]</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Template:</strong> Make choice → Recurse → Backtrack (undo choice)</li>
+                    <li><strong>Permutations:</strong> Order matters, use all elements</li>
+                    <li><strong>Combinations:</strong> Order doesn't matter, use subset</li>
+                    <li><strong>Subsets:</strong> All possible subsets (power set)</li>
+                    <li><strong>Constraint Problems:</strong> Add validation (is_safe) before making choice</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Backtracking explores all possibilities by trying choices, recursing, and undoing choices. Pruning (early termination) is crucial for efficiency.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter6" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 6
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter8" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 8 - Greedy Algorithms →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
