@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 6: Dynamic Programming - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 6: Dynamic Programming</h1>
+            <p class="tutorial-subtitle">
+                Master dynamic programming techniques including 1D/2D DP, memoization, and classic patterns. Learn when and where to use DP.
+            </p>
+
+            <!-- DP Fundamentals -->
+            <div class="algorithm-card">
+                <h2>1. Dynamic Programming Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Overlapping subproblems:</strong> Same subproblems computed multiple times</li>
+                        <li><strong>Optimal substructure:</strong> Optimal solution contains optimal solutions to subproblems</li>
+                        <li><strong>Optimization problems:</strong> Finding maximum, minimum, or count</li>
+                        <li><strong>Real-world example:</strong> Stock trading (max profit), text alignment, resource allocation, or shortest path problems</li>
+                    </ul>
+                </div>
+
+                <h3>DP Approach</h3>
+                <ol>
+                    <li><strong>Identify subproblems:</strong> What are the smaller versions of the problem?</li>
+                    <li><strong>Define state:</strong> What information do we need to track?</li>
+                    <li><strong>Find recurrence:</strong> How do we build solution from subproblems?</li>
+                    <li><strong>Base cases:</strong> What are the smallest subproblems?</li>
+                    <li><strong>Build solution:</strong> Fill DP table bottom-up or use memoization</li>
+                </ol>
+            </div>
+
+            <!-- Fibonacci -->
+            <div class="algorithm-card">
+                <h2>2. Fibonacci (Classic DP Example)</h2>
+                
+                <h3>Example: Fibonacci with Memoization</h3>
+                <pre><code>def fibonacci(n, memo={}):
+    """
+    Calculate nth Fibonacci number using memoization.
+    
+    Args:
+        n: Position in Fibonacci sequence
+        memo: Dictionary to cache computed values
+    
+    Returns:
+        nth Fibonacci number
+    """
+    # Step 1: Base cases
+    if n <= 1:
+        return n
+    
+    # Step 2: Check if already computed
+    if n in memo:
+        return memo[n]
+    
+    # Step 3: Compute and store in memo
+    # Fibonacci(n) = Fibonacci(n-1) + Fibonacci(n-2)
+    memo[n] = fibonacci(n - 1, memo) + fibonacci(n - 2, memo)
+    
+    # Step 4: Return cached result
+    return memo[n]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Cases:</strong> fib(0) = 0, fib(1) = 1.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Check Memo:</strong> If already computed, return cached value (avoids recomputation).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Compute:</strong> Calculate using recurrence relation and store in memo.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Return the computed value.
+                    </div>
+                    <div class="code-step">
+                        <strong>Time Complexity:</strong> O(n) - each number computed once
+                    </div>
+                    <div class="code-step">
+                        <strong>Space Complexity:</strong> O(n) - memo dictionary
+                    </div>
+                </div>
+
+                <h3>Bottom-Up Approach</h3>
+                <pre><code>def fibonacci_bottom_up(n):
+    """
+    Calculate nth Fibonacci using bottom-up DP.
+    
+    Args:
+        n: Position in Fibonacci sequence
+    
+    Returns:
+        nth Fibonacci number
+    """
+    # Step 1: Base cases
+    if n <= 1:
+        return n
+    
+    # Step 2: Initialize DP array
+    # dp[i] represents ith Fibonacci number
+    dp = [0] * (n + 1)
+    dp[0] = 0
+    dp[1] = 1
+    
+    # Step 3: Fill DP array bottom-up
+    for i in range(2, n + 1):
+        # Step 3a: Build solution from previous subproblems
+        dp[i] = dp[i - 1] + dp[i - 2]
+    
+    # Step 4: Return result
+    return dp[n]</code></pre>
+            </div>
+
+            <!-- Climbing Stairs -->
+            <div class="algorithm-card">
+                <h2>3. Climbing Stairs</h2>
+                
+                <h3>Example: Ways to Climb Stairs</h3>
+                <p><strong>Problem:</strong> You can climb 1 or 2 steps at a time. How many ways to reach the top?</p>
+                
+                <pre><code>def climb_stairs(n):
+    """
+    Count ways to climb n stairs (1 or 2 steps at a time).
+    
+    Args:
+        n: Number of stairs
+    
+    Returns:
+        Number of distinct ways to climb
+    """
+    # Step 1: Base cases
+    if n <= 2:
+        return n
+    
+    # Step 2: Initialize DP array
+    # dp[i] = ways to reach step i
+    dp = [0] * (n + 1)
+    dp[1] = 1  # One way: 1 step
+    dp[2] = 2  # Two ways: 1+1 or 2
+    
+    # Step 3: Fill DP array
+    for i in range(3, n + 1):
+        # Step 3a: Recurrence relation
+        # To reach step i, we can come from step i-1 or i-2
+        # Ways to reach i = ways to reach (i-1) + ways to reach (i-2)
+        dp[i] = dp[i - 1] + dp[i - 2]
+    
+    # Step 4: Return result
+    return dp[n]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Base Cases:</strong> 1 stair = 1 way, 2 stairs = 2 ways.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize:</strong> DP array stores ways to reach each step.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Fill DP:</strong> For each step i:
+                        <ul>
+                            <li><strong>Step 3a:</strong> Ways to reach i = ways to reach (i-1) + ways to reach (i-2)</li>
+                            <li>We can come from previous step (1 step) or step before that (2 steps)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Return ways to reach top step.
+                    </div>
+                    <div class="code-step">
+                        <strong>Note:</strong> This is essentially Fibonacci! dp[i] = fib(i+1)
+                    </div>
+                </div>
+            </div>
+
+            <!-- House Robber -->
+            <div class="algorithm-card">
+                <h2>4. House Robber</h2>
+                
+                <h3>Example: Maximum Money Without Adjacent</h3>
+                <p><strong>Problem:</strong> Rob houses to maximize money, but can't rob two adjacent houses.</p>
+                
+                <pre><code>def rob(nums):
+    """
+    Maximum money from robbing houses (no adjacent).
+    
+    Args:
+        nums: List of money in each house
+    
+    Returns:
+        Maximum money that can be robbed
+    """
+    # Step 1: Handle edge cases
+    if not nums:
+        return 0
+    if len(nums) == 1:
+        return nums[0]
+    
+    # Step 2: Initialize DP array
+    # dp[i] = maximum money from robbing houses 0 to i
+    n = len(nums)
+    dp = [0] * n
+    dp[0] = nums[0]  # Only one house
+    dp[1] = max(nums[0], nums[1])  # Two houses: take max
+    
+    # Step 3: Fill DP array
+    for i in range(2, n):
+        # Step 3a: Decision at house i
+        # Option 1: Rob house i + best from houses 0 to i-2
+        # Option 2: Skip house i, take best from houses 0 to i-1
+        dp[i] = max(
+            nums[i] + dp[i - 2],  # Rob current house
+            dp[i - 1]              # Skip current house
+        )
+    
+    # Step 4: Return maximum
+    return dp[n - 1]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Cases:</strong> Handle empty array and single house.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize:</strong> 
+                        <ul>
+                            <li>dp[0] = money from first house</li>
+                            <li>dp[1] = max of first two houses</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Fill DP:</strong> For each house i:
+                        <ul>
+                            <li><strong>Step 3a:</strong> Two choices:
+                                <ul>
+                                    <li>Rob house i: nums[i] + dp[i-2] (can't rob i-1)</li>
+                                    <li>Skip house i: dp[i-1] (best from previous houses)</li>
+                                </ul>
+                            </li>
+                            <li>Take the maximum</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Return:</strong> Maximum money from all houses.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Longest Common Subsequence -->
+            <div class="algorithm-card">
+                <h2>5. Longest Common Subsequence (2D DP)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>String comparison:</strong> Finding common subsequences</li>
+                        <li><strong>Edit distance:</strong> Similarity between strings</li>
+                        <li><strong>Real-world example:</strong> DNA sequence alignment, diff algorithms, or version control systems</li>
+                    </ul>
+                </div>
+
+                <h3>Example: LCS</h3>
+                <pre><code>def longest_common_subsequence(text1, text2):
+    """
+    Find length of longest common subsequence.
+    
+    Args:
+        text1: First string
+        text2: Second string
+    
+    Returns:
+        Length of LCS
+    """
+    m, n = len(text1), len(text2)
+    
+    # Step 1: Initialize 2D DP array
+    # dp[i][j] = LCS of text1[0:i] and text2[0:j]
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    # Step 2: Fill DP array
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            # Step 2a: If characters match
+            if text1[i - 1] == text2[j - 1]:
+                # Extend LCS from previous subproblem
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                # Step 2b: Characters don't match
+                # Take maximum of two options:
+                # Option 1: Skip character from text1
+                # Option 2: Skip character from text2
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    # Step 3: Return result
+    return dp[m][n]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> 2D DP array, dp[i][j] = LCS of first i chars of text1 and first j chars of text2.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Fill DP:</strong> For each position (i, j):
+                        <ul>
+                            <li><strong>Step 2a:</strong> If characters match, extend LCS: dp[i][j] = dp[i-1][j-1] + 1</li>
+                            <li><strong>Step 2b:</strong> If don't match, take max of skipping one character from either string</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Return:</strong> dp[m][n] contains LCS of entire strings.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>text1 = "abcde", text2 = "ace"</p>
+                <p>LCS = "ace" (length 3)</p>
+            </div>
+
+            <!-- Coin Change -->
+            <div class="algorithm-card">
+                <h2>6. Coin Change</h2>
+                
+                <h3>Example: Minimum Coins for Amount</h3>
+                <p><strong>Problem:</strong> Find minimum number of coins to make amount.</p>
+                
+                <pre><code>def coin_change(coins, amount):
+    """
+    Find minimum coins to make amount.
+    
+    Args:
+        coins: List of coin denominations
+        amount: Target amount
+    
+    Returns:
+        Minimum number of coins, or -1 if impossible
+    """
+    # Step 1: Initialize DP array
+    # dp[i] = minimum coins to make amount i
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0  # Base case: 0 coins for amount 0
+    
+    # Step 2: Fill DP array
+    for i in range(1, amount + 1):
+        # Step 2a: Try each coin
+        for coin in coins:
+            # Step 2b: Check if coin can be used
+            if coin <= i:
+                # Step 2c: Update minimum
+                # Use this coin + minimum for remaining amount
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+    
+    # Step 3: Return result
+    # If dp[amount] is still infinity, impossible
+    return dp[amount] if dp[amount] != float('inf') else -1</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> DP array with infinity (impossible), dp[0] = 0 (base case).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Fill DP:</strong> For each amount i:
+                        <ul>
+                            <li><strong>Step 2a:</strong> Try each coin denomination</li>
+                            <li><strong>Step 2b:</strong> If coin <= amount, can use it</li>
+                            <li><strong>Step 2c:</strong> Update minimum: dp[i] = min(dp[i], dp[i-coin] + 1)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Return:</strong> If dp[amount] is infinity, impossible; otherwise return minimum coins.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>1D DP:</strong> Problems with one changing parameter (stairs, house robber)</li>
+                    <li><strong>2D DP:</strong> Problems with two changing parameters (LCS, edit distance)</li>
+                    <li><strong>Memoization:</strong> Top-down approach (recursive with caching)</li>
+                    <li><strong>Bottom-up:</strong> Iterative approach (fill DP table)</li>
+                    <li><strong>Key Steps:</strong> Identify subproblems → Define state → Find recurrence → Base cases → Build solution</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> DP is about breaking problems into overlapping subproblems and storing results to avoid recomputation. Look for optimization problems with optimal substructure.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter5" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 5
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter7" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 7 - Backtracking →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
