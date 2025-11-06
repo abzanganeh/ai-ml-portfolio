@@ -112,6 +112,20 @@ TUTORIALS_DATA = [
         'published': True,
         'excerpt': 'Interactive 2D visualization of matrix-vector multiplication with drag-and-drop vectors, real-time transformations, and 3Blue1Brown-inspired animations.',
         'tags': 'linear-algebra,matrix-multiplication,visualization,interactive,2d-transformations,vectors'
+    },
+    {
+        'title': 'Coding Interview Algorithms: Complete Guide',
+        'slug': 'coding-interview-algorithms',
+        'description': 'Master all essential coding interview algorithms with detailed explanations, step-by-step implementations, and real-world examples. Learn when and where to use each algorithm.',
+        'category': 'Algorithms',
+        'difficulty': 'intermediate',
+        'duration': '600 minutes',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/coding-interview-algorithms/index.html',
+        'published': True,
+        'excerpt': 'Comprehensive guide to coding interview algorithms covering Arrays, Linked Lists, Trees, Graphs, Dynamic Programming, and more with step-by-step code explanations.',
+        'tags': 'algorithms,data-structures,coding-interviews,leetcode,problem-solving,arrays,trees,graphs,dynamic-programming'
     }
 
     

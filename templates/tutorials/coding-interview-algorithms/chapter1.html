@@ -1,0 +1,556 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 1: Arrays & Strings - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 1: Arrays & Strings</h1>
+            <p class="tutorial-subtitle">
+                Master array and string manipulation techniques essential for coding interviews. Learn when and where to use each algorithm with detailed step-by-step explanations.
+            </p>
+
+            <!-- Two Pointers Technique -->
+            <div class="algorithm-card">
+                <h2>1. Two Pointers Technique</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Sorted arrays:</strong> Finding pairs, triplets, or subarrays that meet certain conditions</li>
+                        <li><strong>Palindrome checking:</strong> Comparing characters from both ends</li>
+                        <li><strong>Removing duplicates:</strong> In-place array modification</li>
+                        <li><strong>Partitioning:</strong> Separating elements based on conditions</li>
+                        <li><strong>Real-world example:</strong> Finding two numbers in a sorted array that sum to a target (like finding two products in a sorted price list)</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>The two pointers technique uses two pointers (indices) that traverse the array from different positions, typically:</p>
+                <ul>
+                    <li><strong>Opposite ends:</strong> One pointer starts at the beginning, another at the end</li>
+                    <li><strong>Same direction:</strong> Both pointers move in the same direction at different speeds</li>
+                    <li><strong>Key insight:</strong> By moving pointers based on conditions, we can solve problems in O(n) time instead of O(n²)</li>
+                </ul>
+
+                <h3>Example: Two Sum in Sorted Array</h3>
+                <p><strong>Problem:</strong> Given a sorted array and a target, find two numbers that add up to the target.</p>
+                
+                <pre><code>def two_sum_sorted(nums, target):
+    """
+    Find two numbers in sorted array that sum to target.
+    
+    Args:
+        nums: List of integers (sorted in ascending order)
+        target: Target sum
+    
+    Returns:
+        List of two indices [i, j] where nums[i] + nums[j] == target
+        Returns [-1, -1] if no such pair exists
+    """
+    # Step 1: Initialize two pointers
+    # left starts at the beginning (smallest values)
+    # right starts at the end (largest values)
+    left = 0
+    right = len(nums) - 1
+    
+    # Step 2: Continue until pointers meet
+    while left < right:
+        # Step 3: Calculate current sum
+        current_sum = nums[left] + nums[right]
+        
+        # Step 4: Compare with target
+        if current_sum == target:
+            # Found the pair!
+            return [left, right]
+        elif current_sum < target:
+            # Sum is too small, move left pointer right
+            # Why? Because array is sorted, moving left right increases sum
+            left += 1
+        else:
+            # Sum is too large, move right pointer left
+            # Why? Moving right left decreases sum
+            right -= 1
+    
+    # Step 5: No pair found
+    return [-1, -1]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialization:</strong> We set <code>left = 0</code> (first element) and <code>right = len(nums) - 1</code> (last element). This gives us the smallest and largest values in the sorted array.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Loop Condition:</strong> We continue while <code>left < right</code>. When they meet or cross, we've checked all possible pairs.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Calculate Sum:</strong> At each iteration, we compute <code>nums[left] + nums[right]</code> to see if it equals our target.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Decision Logic:</strong>
+                        <ul>
+                            <li>If sum equals target → Found! Return indices</li>
+                            <li>If sum < target → Need larger sum → Move left pointer right (to larger values)</li>
+                            <li>If sum > target → Need smaller sum → Move right pointer left (to smaller values)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Termination:</strong> If loop ends without finding a pair, return [-1, -1] indicating no solution.
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Each element is visited at most once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using a constant amount of extra space</p>
+            </div>
+
+            <!-- Sliding Window -->
+            <div class="algorithm-card">
+                <h2>2. Sliding Window Technique</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Subarray problems:</strong> Finding subarrays of fixed or variable size</li>
+                        <li><strong>String problems:</strong> Finding longest substring with unique characters</li>
+                        <li><strong>Maximum/minimum:</strong> Finding max/min in all subarrays of size k</li>
+                        <li><strong>Real-world example:</strong> Finding the maximum sum of k consecutive days in a sales dataset, or the longest unique product ID sequence in a shopping cart</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>The sliding window technique maintains a "window" of elements in the array/string. Instead of recalculating everything, we:</p>
+                <ul>
+                    <li><strong>Expand:</strong> Add elements to the window</li>
+                    <li><strong>Shrink:</strong> Remove elements from the window</li>
+                    <li><strong>Update:</strong> Maintain the current state (sum, count, etc.) incrementally</li>
+                </ul>
+
+                <h3>Example: Maximum Sum Subarray of Size K</h3>
+                <p><strong>Problem:</strong> Find the maximum sum of any contiguous subarray of size k.</p>
+                
+                <pre><code>def max_sum_subarray_k(nums, k):
+    """
+    Find maximum sum of subarray of size k using sliding window.
+    
+    Args:
+        nums: List of integers
+        k: Size of subarray
+    
+    Returns:
+        Maximum sum of any subarray of size k
+    """
+    # Step 1: Handle edge case
+    if len(nums) < k:
+        return 0
+    
+    # Step 2: Calculate sum of first window
+    # We start by computing the sum of the first k elements
+    window_sum = sum(nums[:k])
+    max_sum = window_sum
+    
+    # Step 3: Slide the window
+    # Start from index k (after the first window)
+    for i in range(k, len(nums)):
+        # Step 3a: Remove leftmost element from window
+        # Subtract the element that's leaving the window
+        window_sum -= nums[i - k]
+        
+        # Step 3b: Add new element to window
+        # Add the element that's entering the window
+        window_sum += nums[i]
+        
+        # Step 3c: Update maximum sum
+        # Compare current window sum with maximum seen so far
+        max_sum = max(max_sum, window_sum)
+    
+    return max_sum</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Case:</strong> If array length is less than k, no valid subarray exists, return 0.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initial Window:</strong> Calculate sum of first k elements: <code>nums[0] + nums[1] + ... + nums[k-1]</code>. This is our starting window.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Sliding:</strong> For each position i from k to len(nums)-1:
+                        <ul>
+                            <li><strong>Remove:</strong> Subtract <code>nums[i-k]</code> (element leaving window)</li>
+                            <li><strong>Add:</strong> Add <code>nums[i]</code> (element entering window)</li>
+                            <li><strong>Update:</strong> Compare current sum with maximum</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Insight:</strong> Instead of recalculating sum from scratch (O(k) each time), we update in O(1) by subtracting one element and adding another.
+                    </div>
+                </div>
+
+                <h4>Visualization Example:</h4>
+                <p>Array: [1, 4, 2, 10, 23, 3, 1, 0, 20], k = 4</p>
+                <ul>
+                    <li>Window 1: [1, 4, 2, 10] → sum = 17</li>
+                    <li>Window 2: [4, 2, 10, 23] → sum = 17 - 1 + 23 = 39</li>
+                    <li>Window 3: [2, 10, 23, 3] → sum = 39 - 4 + 3 = 38</li>
+                    <li>... and so on</li>
+                </ul>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Each element is visited exactly once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using constant extra space</p>
+            </div>
+
+            <!-- Hash Maps -->
+            <div class="algorithm-card">
+                <h2>3. Hash Maps and Hash Sets</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Frequency counting:</strong> Counting occurrences of elements</li>
+                        <li><strong>Lookup optimization:</strong> O(1) average time lookups instead of O(n)</li>
+                        <li><strong>Duplicate detection:</strong> Checking if element exists</li>
+                        <li><strong>Complement finding:</strong> Finding pairs where one complements the other</li>
+                        <li><strong>Real-world example:</strong> Tracking user sessions, counting word frequencies in text analysis, or finding duplicate transactions in a payment system</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>Hash maps (dictionaries) and hash sets provide:</p>
+                <ul>
+                    <li><strong>O(1) average:</strong> Insert, lookup, and delete operations</li>
+                    <li><strong>Key-value storage:</strong> Maps store key-value pairs</li>
+                    <li><strong>Set operations:</strong> Sets store unique elements</li>
+                    <li><strong>Trade-off:</strong> Uses extra space for speed</li>
+                </ul>
+
+                <h3>Example: Two Sum (Unsorted Array)</h3>
+                <p><strong>Problem:</strong> Find two numbers in an unsorted array that sum to target.</p>
+                
+                <pre><code>def two_sum_unsorted(nums, target):
+    """
+    Find two numbers that sum to target using hash map.
+    
+    Args:
+        nums: List of integers (unsorted)
+        target: Target sum
+    
+    Returns:
+        List of two indices [i, j] where nums[i] + nums[j] == target
+    """
+    # Step 1: Create hash map to store number -> index mapping
+    # Key: number value, Value: its index in array
+    num_map = {}
+    
+    # Step 2: Iterate through array
+    for i, num in enumerate(nums):
+        # Step 3: Calculate complement
+        # If nums[i] + complement == target, then complement = target - nums[i]
+        complement = target - num
+        
+        # Step 4: Check if complement exists in map
+        if complement in num_map:
+            # Found! Return indices
+            # num_map[complement] is the index where we saw the complement
+            return [num_map[complement], i]
+        
+        # Step 5: Store current number and its index
+        # We store it after checking to avoid using same element twice
+        num_map[num] = i
+    
+    # Step 6: No pair found
+    return [-1, -1]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize Map:</strong> Create empty dictionary to store number → index mappings. This allows O(1) lookup of where we've seen a number.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Go through each element with its index using <code>enumerate()</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Calculate Complement:</strong> For number <code>num</code>, the complement is <code>target - num</code>. If we've seen the complement before, we have a pair!
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Check Map:</strong> If complement exists in map, return the index where we saw it (<code>num_map[complement]</code>) and current index <code>i</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Store Current:</strong> Store current number and index in map for future lookups. We do this AFTER checking to avoid using the same element twice.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Not Found:</strong> If loop completes without finding a pair, return [-1, -1].
+                    </div>
+                </div>
+
+                <h4>Example Trace:</h4>
+                <p>nums = [2, 7, 11, 15], target = 9</p>
+                <ul>
+                    <li>i=0, num=2: complement=7, not in map → store {2: 0}</li>
+                    <li>i=1, num=7: complement=2, found in map! → return [0, 1]</li>
+                </ul>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Single pass through array</p>
+                <h4>Space Complexity:</h4>
+                <p>O(n) - Hash map can store up to n elements</p>
+            </div>
+
+            <!-- Kadane's Algorithm -->
+            <div class="algorithm-card">
+                <h2>4. Kadane's Algorithm (Maximum Subarray Sum)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Maximum subarray:</strong> Finding contiguous subarray with maximum sum</li>
+                        <li><strong>Stock prices:</strong> Best time to buy and sell stock (one transaction)</li>
+                        <li><strong>Profit analysis:</strong> Finding maximum profit in time series data</li>
+                        <li><strong>Real-world example:</strong> Finding the most profitable consecutive days in stock trading, or the best consecutive period in sales data</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>Kadane's algorithm uses dynamic programming thinking:</p>
+                <ul>
+                    <li><strong>Key insight:</strong> At each position, decide whether to extend the previous subarray or start fresh</li>
+                    <li><strong>Decision rule:</strong> If current element makes the sum negative, start fresh (negative sum can't help future sums)</li>
+                    <li><strong>Optimal substructure:</strong> Maximum sum ending at position i depends on maximum sum ending at position i-1</li>
+                </ul>
+
+                <h3>Example: Maximum Subarray Sum</h3>
+                <p><strong>Problem:</strong> Find the contiguous subarray with the largest sum.</p>
+                
+                <pre><code>def max_subarray_sum(nums):
+    """
+    Find maximum sum of contiguous subarray using Kadane's algorithm.
+    
+    Args:
+        nums: List of integers (can contain negative numbers)
+    
+    Returns:
+        Maximum sum of any contiguous subarray
+    """
+    # Step 1: Initialize
+    # max_ending_here: maximum sum of subarray ending at current position
+    # max_so_far: maximum sum seen so far (our answer)
+    max_ending_here = nums[0]
+    max_so_far = nums[0]
+    
+    # Step 2: Process each element
+    for i in range(1, len(nums)):
+        # Step 3: Decision: extend or start fresh?
+        # Option 1: Extend previous subarray: max_ending_here + nums[i]
+        # Option 2: Start fresh: nums[i]
+        # Choose the maximum (greedy choice)
+        max_ending_here = max(max_ending_here + nums[i], nums[i])
+        
+        # Step 4: Update global maximum
+        # Track the best sum we've seen across all positions
+        max_so_far = max(max_so_far, max_ending_here)
+    
+    return max_so_far</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong>
+                        <ul>
+                            <li><code>max_ending_here</code>: Tracks maximum sum of subarray ending at current position</li>
+                            <li><code>max_so_far</code>: Tracks the overall maximum sum we've seen</li>
+                            <li>Both start with first element</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Process each element from index 1 onwards.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Decision:</strong> At each position i, we have two choices:
+                        <ul>
+                            <li><strong>Extend:</strong> Add nums[i] to previous subarray → <code>max_ending_here + nums[i]</code></li>
+                            <li><strong>Start fresh:</strong> Begin new subarray from nums[i] → <code>nums[i]</code></li>
+                            <li>Choose the maximum (greedy choice)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Update Global:</strong> Compare <code>max_ending_here</code> with <code>max_so_far</code> and update if we found a better sum.
+                    </div>
+                </div>
+
+                <h4>Example Trace:</h4>
+                <p>nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]</p>
+                <ul>
+                    <li>i=0: max_ending_here=-2, max_so_far=-2</li>
+                    <li>i=1: max_ending_here=max(-2+1, 1)=1, max_so_far=max(-2, 1)=1</li>
+                    <li>i=2: max_ending_here=max(1-3, -3)=-2, max_so_far=1</li>
+                    <li>i=3: max_ending_here=max(-2+4, 4)=4, max_so_far=4</li>
+                    <li>i=4: max_ending_here=max(4-1, -1)=3, max_so_far=4</li>
+                    <li>i=5: max_ending_here=max(3+2, 2)=5, max_so_far=5</li>
+                    <li>i=6: max_ending_here=max(5+1, 1)=6, max_so_far=6</li>
+                    <li>... final answer: 6 (subarray [4, -1, 2, 1])</li>
+                </ul>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Single pass through array</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using constant extra space</p>
+            </div>
+
+            <!-- String Manipulation -->
+            <div class="algorithm-card">
+                <h2>5. String Manipulation Techniques</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Palindrome checking:</strong> Validating if string reads same forwards and backwards</li>
+                        <li><strong>Anagram detection:</strong> Checking if two strings contain same characters</li>
+                        <li><strong>Pattern matching:</strong> Finding patterns in strings</li>
+                        <li><strong>Real-world example:</strong> Validating credit card numbers, checking if product codes are palindromes, or detecting duplicate usernames</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Valid Palindrome</h3>
+                <p><strong>Problem:</strong> Check if a string is a palindrome (ignoring case and non-alphanumeric characters).</p>
+                
+                <pre><code>def is_palindrome(s):
+    """
+    Check if string is palindrome using two pointers.
+    
+    Args:
+        s: Input string (may contain spaces, punctuation)
+    
+    Returns:
+        True if palindrome, False otherwise
+    """
+    # Step 1: Initialize two pointers
+    left = 0
+    right = len(s) - 1
+    
+    # Step 2: Continue until pointers meet
+    while left < right:
+        # Step 3: Skip non-alphanumeric characters
+        # Move left pointer until we find alphanumeric
+        while left < right and not s[left].isalnum():
+            left += 1
+        
+        # Move right pointer until we find alphanumeric
+        while left < right and not s[right].isalnum():
+            right -= 1
+        
+        # Step 4: Compare characters (case-insensitive)
+        if s[left].lower() != s[right].lower():
+            return False
+        
+        # Step 5: Move pointers inward
+        left += 1
+        right -= 1
+    
+    # Step 6: All characters matched
+    return True</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Set pointers at both ends of string.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Loop:</strong> Continue while left < right.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Skip Non-Alphanumeric:</strong> Move pointers past spaces, punctuation, etc. until we find valid characters to compare.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Compare:</strong> Compare characters at both pointers (case-insensitive). If different, not a palindrome.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Advance:</strong> Move both pointers inward for next comparison.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Success:</strong> If loop completes, all characters matched → palindrome!
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n) - Each character visited at most once</p>
+                <h4>Space Complexity:</h4>
+                <p>O(1) - Only using constant extra space</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Two Pointers:</strong> Use for sorted arrays, palindrome checking, in-place modifications</li>
+                    <li><strong>Sliding Window:</strong> Use for subarray/substring problems with fixed or variable size</li>
+                    <li><strong>Hash Maps:</strong> Use when you need O(1) lookups, frequency counting, or complement finding</li>
+                    <li><strong>Kadane's Algorithm:</strong> Use for maximum subarray sum problems</li>
+                    <li><strong>String Manipulation:</strong> Combine two pointers with string-specific operations</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> These techniques often reduce time complexity from O(n²) to O(n) by avoiding nested loops and using smart pointer movement or hash-based lookups.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter2" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 2 - Linked Lists →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
