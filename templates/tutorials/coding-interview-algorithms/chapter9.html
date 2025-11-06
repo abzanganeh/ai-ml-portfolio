@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 9: Binary Search - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 9: Binary Search</h1>
+            <p class="tutorial-subtitle">
+                Master binary search for sorted arrays, rotated arrays, and search space reduction. Learn when and where to use binary search.
+            </p>
+
+            <!-- Binary Search Fundamentals -->
+            <div class="algorithm-card">
+                <h2>1. Binary Search Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Sorted arrays:</strong> Searching in sorted data</li>
+                        <li><strong>Search space reduction:</strong> Finding boundaries or optimal value</li>
+                        <li><strong>Monotonic functions:</strong> Finding point where condition changes</li>
+                        <li><strong>Real-world example:</strong> Finding element in sorted database, finding insertion point, or binary search on answer</li>
+                    </ul>
+                </div>
+
+                <h3>Key Properties</h3>
+                <ul>
+                    <li><strong>Time Complexity:</strong> O(log n) instead of O(n)</li>
+                    <li><strong>Requirement:</strong> Data must be sorted (or have monotonic property)</li>
+                    <li><strong>Strategy:</strong> Eliminate half of search space at each step</li>
+                </ul>
+            </div>
+
+            <!-- Classic Binary Search -->
+            <div class="algorithm-card">
+                <h2>2. Classic Binary Search</h2>
+                
+                <h3>Example: Search in Sorted Array</h3>
+                <pre><code>def binary_search(nums, target):
+    """
+    Binary search in sorted array.
+    
+    Args:
+        nums: Sorted array of integers
+        target: Value to search for
+    
+    Returns:
+        Index of target, or -1 if not found
+    """
+    # Step 1: Initialize search boundaries
+    left = 0
+    right = len(nums) - 1
+    
+    # Step 2: Continue while search space is valid
+    while left <= right:
+        # Step 3: Calculate middle index
+        # Use (left + right) // 2 to avoid overflow
+        mid = left + (right - left) // 2
+        
+        # Step 4: Compare with target
+        if nums[mid] == target:
+            # Step 4a: Found target!
+            return mid
+        elif nums[mid] < target:
+            # Step 4b: Target is in right half
+            # Move left boundary to mid + 1
+            left = mid + 1
+        else:
+            # Step 4c: Target is in left half
+            # Move right boundary to mid - 1
+            right = mid - 1
+    
+    # Step 5: Target not found
+    return -1</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Set left = 0, right = len(nums) - 1 (entire array).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Loop:</strong> Continue while left <= right (valid search space).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Calculate Mid:</strong> mid = left + (right - left) // 2 (avoids overflow).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Compare:</strong>
+                        <ul>
+                            <li><strong>Step 4a:</strong> If nums[mid] == target, found! Return mid</li>
+                            <li><strong>Step 4b:</strong> If nums[mid] < target, search right half (left = mid + 1)</li>
+                            <li><strong>Step 4c:</strong> If nums[mid] > target, search left half (right = mid - 1)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Not Found:</strong> If loop ends, target not in array.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search in Rotated Array -->
+            <div class="algorithm-card">
+                <h2>3. Search in Rotated Sorted Array</h2>
+                
+                <h3>Example: Find Target in Rotated Array</h3>
+                <p><strong>Problem:</strong> Array was sorted but rotated. Find target.</p>
+                
+                <pre><code>def search_rotated(nums, target):
+    """
+    Search target in rotated sorted array.
+    
+    Args:
+        nums: Rotated sorted array (e.g., [4,5,6,7,0,1,2])
+        target: Value to search for
+    
+    Returns:
+        Index of target, or -1 if not found
+    """
+    left, right = 0, len(nums) - 1
+    
+    while left <= right:
+        mid = left + (right - left) // 2
+        
+        # Step 1: Check if found
+        if nums[mid] == target:
+            return mid
+        
+        # Step 2: Determine which half is sorted
+        if nums[left] <= nums[mid]:
+            # Step 2a: Left half is sorted
+            # Check if target is in left half
+            if nums[left] <= target < nums[mid]:
+                # Target in left half
+                right = mid - 1
+            else:
+                # Target in right half
+                left = mid + 1
+        else:
+            # Step 2b: Right half is sorted
+            # Check if target is in right half
+            if nums[mid] < target <= nums[right]:
+                # Target in right half
+                left = mid + 1
+            else:
+                # Target in left half
+                right = mid - 1
+    
+    return -1</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Check Found:</strong> If nums[mid] == target, return mid.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Find Sorted Half:</strong>
+                        <ul>
+                            <li><strong>Step 2a:</strong> If nums[left] <= nums[mid], left half is sorted
+                                <ul>
+                                    <li>If target in [nums[left], nums[mid]), search left</li>
+                                    <li>Otherwise, search right</li>
+                                </ul>
+                            </li>
+                            <li><strong>Step 2b:</strong> Otherwise, right half is sorted
+                                <ul>
+                                    <li>If target in (nums[mid], nums[right]], search right</li>
+                                    <li>Otherwise, search left</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Insight:</strong> At least one half is always sorted. Use that to determine which half to search.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Find First/Last Position -->
+            <div class="algorithm-card">
+                <h2>4. Find First and Last Position</h2>
+                
+                <h3>Example: Search Range</h3>
+                <p><strong>Problem:</strong> Find first and last position of target in sorted array.</p>
+                
+                <pre><code>def search_range(nums, target):
+    """
+    Find first and last position of target.
+    
+    Args:
+        nums: Sorted array (may contain duplicates)
+        target: Value to find
+    
+    Returns:
+        [first_index, last_index] or [-1, -1] if not found
+    """
+    def find_first(nums, target):
+        # Step 1: Binary search for first occurrence
+        left, right = 0, len(nums) - 1
+        first = -1
+        
+        while left <= right:
+            mid = left + (right - left) // 2
+            
+            if nums[mid] == target:
+                # Step 1a: Found target, but might not be first
+                first = mid
+                # Step 1b: Continue searching left for earlier occurrence
+                right = mid - 1
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        return first
+    
+    def find_last(nums, target):
+        # Step 2: Binary search for last occurrence
+        left, right = 0, len(nums) - 1
+        last = -1
+        
+        while left <= right:
+            mid = left + (right - left) // 2
+            
+            if nums[mid] == target:
+                # Step 2a: Found target, but might not be last
+                last = mid
+                # Step 2b: Continue searching right for later occurrence
+                left = mid + 1
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        return last
+    
+    # Step 3: Find both positions
+    first = find_first(nums, target)
+    if first == -1:
+        return [-1, -1]
+    
+    last = find_last(nums, target)
+    return [first, last]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>find_first function:</strong>
+                        <ul>
+                            <li><strong>Step 1a:</strong> When nums[mid] == target, save position</li>
+                            <li><strong>Step 1b:</strong> Continue searching left (right = mid - 1) to find first occurrence</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>find_last function:</strong>
+                        <ul>
+                            <li><strong>Step 2a:</strong> When nums[mid] == target, save position</li>
+                            <li><strong>Step 2b:</strong> Continue searching right (left = mid + 1) to find last occurrence</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Combine:</strong> Find both first and last positions.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Binary Search on Answer -->
+            <div class="algorithm-card">
+                <h2>5. Binary Search on Answer</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Optimization problems:</strong> Finding minimum/maximum value that satisfies condition</li>
+                        <li><strong>Monotonic property:</strong> If x works, then x+1 works (or vice versa)</li>
+                        <li><strong>Real-world example:</strong> Finding minimum capacity, maximum distance, or optimal threshold</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Find Minimum in Rotated Array</h3>
+                <pre><code>def find_min_rotated(nums):
+    """
+    Find minimum element in rotated sorted array.
+    
+    Args:
+        nums: Rotated sorted array
+    
+    Returns:
+        Minimum element
+    """
+    left, right = 0, len(nums) - 1
+    
+    while left < right:
+        mid = left + (right - left) // 2
+        
+        # Step 1: Compare mid with right
+        if nums[mid] > nums[right]:
+            # Step 1a: Minimum is in right half
+            # Left half is sorted, minimum must be right
+            left = mid + 1
+        else:
+            # Step 1b: Minimum is in left half (including mid)
+            # Right half is sorted, minimum is left
+            right = mid
+    
+    # Step 2: left == right, this is the minimum
+    return nums[left]</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Compare:</strong>
+                        <ul>
+                            <li><strong>Step 1a:</strong> If nums[mid] > nums[right], minimum is in right half (left = mid + 1)</li>
+                            <li><strong>Step 1b:</strong> Otherwise, minimum is in left half including mid (right = mid)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Result:</strong> When left == right, we've found the minimum.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Classic Binary Search:</strong> O(log n) search in sorted array</li>
+                    <li><strong>Rotated Array:</strong> Find sorted half, then search appropriately</li>
+                    <li><strong>First/Last Position:</strong> Continue searching after finding target</li>
+                    <li><strong>Binary Search on Answer:</strong> Search for optimal value that satisfies condition</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Binary search reduces search space by half at each step. Works on sorted data or when there's a monotonic property. Be careful with boundary conditions (left <= right vs left < right).</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter8" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 8
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter10" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 10 - Bit Manipulation →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
