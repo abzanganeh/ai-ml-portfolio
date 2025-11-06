@@ -103,10 +103,63 @@
         <h2>Text Representation Techniques</h2>
         
         <h3>1. Bag of Words (BoW)</h3>
-        <p>BoW represents text by the frequency of words within a document, ignoring grammar and word order.</p>
+        
+        <div class="explanation-box">
+            <h4>What is Bag of Words?</h4>
+            <p>Bag of Words (BoW) is one of the simplest and most fundamental techniques for converting text into numerical representations that machine learning algorithms can process. The name "Bag of Words" comes from the fact that it treats text as an unordered collection (or "bag") of words, completely ignoring grammar, word order, and context.</p>
+            
+            <h5>How Does BoW Work?</h5>
+            <p>The process involves three main steps:</p>
+            <ol>
+                <li><strong>Vocabulary Creation:</strong> Collect all unique words from all documents in your corpus to create a vocabulary.</li>
+                <li><strong>Word Counting:</strong> For each document, count how many times each word from the vocabulary appears.</li>
+                <li><strong>Vector Representation:</strong> Create a vector where each dimension represents a word from the vocabulary, and the value is the count (or presence) of that word in the document.</li>
+            </ol>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                <p>For a document <code>d</code> and vocabulary <code>V = {w₁, w₂, ..., wₙ}</code>, the BoW vector is:</p>
+                <p><strong>BoW(d) = [count(w₁, d), count(w₂, d), ..., count(wₙ, d)]</strong></p>
+                <p>Where <code>count(wᵢ, d)</code> is the number of times word <code>wᵢ</code> appears in document <code>d</code>.</p>
+                
+                <p><strong>Binary BoW (Presence/Absence):</strong></p>
+                <p>BoW(d) = [1 if w₁ ∈ d else 0, 1 if w₂ ∈ d else 0, ..., 1 if wₙ ∈ d else 0]</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Common Use Cases</h5>
+                <ul>
+                    <li><strong>Text Classification:</strong> Spam detection, sentiment analysis, topic classification</li>
+                    <li><strong>Information Retrieval:</strong> Search engines, document similarity measurement</li>
+                    <li><strong>Feature Extraction:</strong> As a baseline method before applying more advanced techniques</li>
+                    <li><strong>Document Clustering:</strong> Grouping similar documents together</li>
+                </ul>
+                
+                <h5>When to Use BoW</h5>
+                <ul>
+                    <li>When you have a small to medium-sized vocabulary</li>
+                    <li>When word order is not critical for your task</li>
+                    <li>As a baseline for text classification tasks</li>
+                    <li>When computational efficiency is important</li>
+                    <li>For simple document similarity tasks</li>
+                </ul>
+            </div>
+            
+            <h5>Example</h5>
+            <p>Consider these two documents:</p>
+            <ul>
+                <li>Document 1: "I love machine learning"</li>
+                <li>Document 2: "Machine learning is powerful"</li>
+            </ul>
+            <p><strong>Vocabulary:</strong> {"I", "love", "machine", "learning", "is", "powerful"}</p>
+            <p><strong>BoW for Document 1:</strong> [1, 1, 1, 1, 0, 0]</p>
+            <p><strong>BoW for Document 2:</strong> [0, 0, 1, 1, 1, 1]</p>
+            <p>Notice how both documents share the words "machine" and "learning", which creates a similarity connection between them!</p>
+        </div>
 
         <div class="interactive-demo">
             <h4>Bag of Words Demo</h4>
+            <p>Try creating your own Bag of Words vectors. Enter multiple sentences separated by | and see how they're converted into numerical vectors.</p>
             <input type="text" class="demo-input" id="bowInput" placeholder="Enter sentences separated by | (e.g., I love NLP | NLP is amazing)" value="I love machine learning | Machine learning is powerful">
             <button class="demo-btn" onclick="demonstrateBOW()">Create BoW</button>
             <div class="demo-output" id="bowOutput"></div>
@@ -133,18 +186,111 @@
         </div>
 
         <h3>2. TF-IDF (Term Frequency-Inverse Document Frequency)</h3>
-        <p>TF-IDF reflects the importance of a word in a document relative to a collection of documents.</p>
-
-        <div class="example-box">
-            <strong>Formula:</strong><br>
-            TF-IDF(t,d) = TF(t,d) × IDF(t)<br>
-            Where:<br>
-            • TF = (Number of times term appears in document) / (Total number of terms in document)<br>
-            • IDF = log(Total number of documents / Number of documents containing the term)
+        
+        <div class="explanation-box">
+            <h4>What is TF-IDF?</h4>
+            <p>TF-IDF is a statistical measure used to evaluate how important a word is to a document in a collection or corpus. It's one of the most popular weighting schemes in text mining and information retrieval. Unlike Bag of Words, which treats all words equally, TF-IDF gives higher weights to words that are frequent in a document but rare across the entire corpus.</p>
+            
+            <h5>Why TF-IDF?</h5>
+            <p>The intuition behind TF-IDF is twofold:</p>
+            <ul>
+                <li><strong>Term Frequency (TF):</strong> Words that appear more frequently in a document are likely more important to that document.</li>
+                <li><strong>Inverse Document Frequency (IDF):</strong> Words that appear in many documents are less distinctive and should be weighted lower. Common words like "the", "is", "a" appear in almost every document, so they get low IDF scores.</li>
+            </ul>
+            <p>By combining these two factors, TF-IDF identifies words that are distinctive to a particular document while filtering out common words that appear everywhere.</p>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>TF-IDF Formula:</strong></p>
+                <p><strong>TF-IDF(t, d, D) = TF(t, d) × IDF(t, D)</strong></p>
+                
+                <p>Where:</p>
+                <ul>
+                    <li><code>t</code> = term (word)</li>
+                    <li><code>d</code> = document</li>
+                    <li><code>D</code> = collection of documents (corpus)</li>
+                </ul>
+                
+                <h5>Term Frequency (TF)</h5>
+                <p>There are several ways to calculate TF:</p>
+                <p><strong>Raw Count:</strong> TF(t, d) = count(t, d)</p>
+                <p><strong>Normalized (Most Common):</strong></p>
+                <p>TF(t, d) = count(t, d) / total_words_in_d</p>
+                <p><strong>Log Scale:</strong> TF(t, d) = log(1 + count(t, d))</p>
+                <p><strong>Double Normalization:</strong> TF(t, d) = 0.5 + 0.5 × (count(t, d) / max_count_in_d)</p>
+                
+                <h5>Inverse Document Frequency (IDF)</h5>
+                <p><strong>Standard IDF:</strong></p>
+                <p>IDF(t, D) = log(N / |{d ∈ D : t ∈ d}|)</p>
+                <p>Where:</p>
+                <ul>
+                    <li><code>N</code> = total number of documents in corpus D</li>
+                    <li><code>|{d ∈ D : t ∈ d}|</code> = number of documents containing term t</li>
+                </ul>
+                
+                <p><strong>Smoothed IDF (to avoid division by zero):</strong></p>
+                <p>IDF(t, D) = log(1 + N / (1 + |{d ∈ D : t ∈ d}|))</p>
+                
+                <p><strong>IDF with Add-One Smoothing:</strong></p>
+                <p>IDF(t, D) = log(N / (1 + |{d ∈ D : t ∈ d}|))</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Common Use Cases</h5>
+                <ul>
+                    <li><strong>Information Retrieval:</strong> Search engines use TF-IDF to rank documents by relevance to search queries</li>
+                    <li><strong>Text Classification:</strong> Feature extraction for machine learning models (Naive Bayes, SVM, etc.)</li>
+                    <li><strong>Document Similarity:</strong> Computing cosine similarity between TF-IDF vectors to find similar documents</li>
+                    <li><strong>Keyword Extraction:</strong> Identifying the most important words in a document</li>
+                    <li><strong>Content Recommendation:</strong> Recommending similar articles or products based on content</li>
+                    <li><strong>Topic Modeling:</strong> As a preprocessing step for algorithms like LDA (Latent Dirichlet Allocation)</li>
+                </ul>
+                
+                <h5>When to Use TF-IDF</h5>
+                <ul>
+                    <li>When you need to identify distinctive words in documents</li>
+                    <li>For search and information retrieval tasks</li>
+                    <li>When building text classification models</li>
+                    <li>For document similarity and clustering tasks</li>
+                    <li>When you want to filter out common stop words automatically</li>
+                    <li>As an improvement over simple word counts (BoW)</li>
+                </ul>
+                
+                <h5>Advantages over BoW</h5>
+                <ul>
+                    <li>Automatically downweights common words</li>
+                    <li>Better captures document-specific important terms</li>
+                    <li>More effective for information retrieval</li>
+                    <li>Produces more meaningful feature vectors for ML models</li>
+                </ul>
+            </div>
+            
+            <h5>Example Walkthrough</h5>
+            <p>Consider a corpus with 3 documents:</p>
+            <ul>
+                <li>Doc 1: "The cat sat on the mat"</li>
+                <li>Doc 2: "The dog ran in the park"</li>
+                <li>Doc 3: "Cats and dogs are pets"</li>
+            </ul>
+            <p>For the word "cat" in Doc 1:</p>
+            <ul>
+                <li><strong>TF:</strong> count("cat", Doc1) / total_words = 1 / 6 = 0.167</li>
+                <li><strong>IDF:</strong> log(3 / 2) = log(1.5) = 0.405 (since "cat" appears in 2 documents)</li>
+                <li><strong>TF-IDF:</strong> 0.167 × 0.405 = 0.068</li>
+            </ul>
+            <p>For the word "the" in Doc 1:</p>
+            <ul>
+                <li><strong>TF:</strong> 2 / 6 = 0.333 (appears twice)</li>
+                <li><strong>IDF:</strong> log(3 / 3) = log(1) = 0 (appears in all documents)</li>
+                <li><strong>TF-IDF:</strong> 0.333 × 0 = 0 (correctly weighted as unimportant!)</li>
+            </ul>
+            <p>This shows how TF-IDF correctly identifies "cat" as more important than "the" for document classification!</p>
         </div>
 
         <div class="interactive-demo">
             <h4>TF-IDF Demo</h4>
+            <p>Enter multiple documents separated by | and see how TF-IDF calculates the importance of each word. Notice how common words get lower scores and distinctive words get higher scores!</p>
             <input type="text" class="demo-input" id="tfidfInput" placeholder="Enter documents separated by |" value="The cat sat on the mat | The dog ran in the park | Cats and dogs are pets">
             <button class="demo-btn" onclick="demonstrateTFIDF()">Calculate TF-IDF</button>
             <div class="demo-output" id="tfidfOutput"></div>
