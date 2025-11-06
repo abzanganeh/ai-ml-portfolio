@@ -301,7 +301,32 @@
     <div id="embeddings" class="nlp-section">
         <h2>Word Embeddings</h2>
         
-        <p>Word embeddings are dense vector representations of words that capture their semantic meaning. Unlike BoW and TF-IDF, embeddings consider the context in which words appear.</p>
+        <div class="explanation-box">
+            <h4>What are Word Embeddings?</h4>
+            <p>Word embeddings are dense, low-dimensional vector representations of words that capture semantic and syntactic relationships. Unlike sparse representations like BoW and TF-IDF, embeddings are dense vectors (typically 100-300 dimensions) where semantically similar words are positioned close to each other in the vector space.</p>
+            
+            <h5>Why Word Embeddings?</h5>
+            <p>The key advantages of word embeddings include:</p>
+            <ul>
+                <li><strong>Semantic Similarity:</strong> Similar words have similar vectors (e.g., "king" and "queen" are close)</li>
+                <li><strong>Context Awareness:</strong> Words with similar contexts have similar embeddings</li>
+                <li><strong>Dense Representation:</strong> Much smaller than sparse BoW vectors (300 dimensions vs. thousands)</li>
+                <li><strong>Transfer Learning:</strong> Pre-trained embeddings can be used across different tasks</li>
+                <li><strong>Mathematical Operations:</strong> Can perform analogical reasoning (king - man + woman ≈ queen)</li>
+            </ul>
+            
+            <div class="usage-section">
+                <h5>Common Use Cases</h5>
+                <ul>
+                    <li><strong>Feature Extraction:</strong> Initial word representations for neural networks</li>
+                    <li><strong>Semantic Search:</strong> Finding similar words or documents</li>
+                    <li><strong>Recommendation Systems:</strong> Understanding user preferences from text</li>
+                    <li><strong>Machine Translation:</strong> Cross-lingual word representations</li>
+                    <li><strong>Question Answering:</strong> Understanding query semantics</li>
+                    <li><strong>Text Classification:</strong> Input features for classifiers</li>
+                </ul>
+            </div>
+        </div>
 
         <div class="example-box">
             <strong>Famous Example:</strong><br>
@@ -310,6 +335,50 @@
         </div>
 
         <h3>1. Word2Vec</h3>
+        
+        <div class="explanation-box">
+            <h4>What is Word2Vec?</h4>
+            <p>Word2Vec is a neural network-based technique introduced by Google in 2013 that learns word embeddings by predicting words in context. It uses a shallow neural network (typically 2-3 layers) to learn word representations from large text corpora. The key insight is that words appearing in similar contexts should have similar meanings.</p>
+            
+            <h5>How Word2Vec Works</h5>
+            <p>Word2Vec uses the distributional hypothesis: "You shall know a word by the company it keeps." It learns embeddings by training a neural network to predict:</p>
+            <ul>
+                <li><strong>CBOW:</strong> Predict the target word from surrounding context words</li>
+                <li><strong>Skip-gram:</strong> Predict context words from a target word</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Skip-gram Objective:</strong></p>
+                <p>Maximize: <strong>P(w<sub>t-c</sub>, ..., w<sub>t+c</sub> | w<sub>t</sub>)</strong></p>
+                <p>Where <code>w<sub>t</sub></code> is the target word and <code>w<sub>t-c</sub>, ..., w<sub>t+c</sub></code> are context words.</p>
+                
+                <p><strong>CBOW Objective:</strong></p>
+                <p>Maximize: <strong>P(w<sub>t</sub> | w<sub>t-c</sub>, ..., w<sub>t-1</sub>, w<sub>t+1</sub>, ..., w<sub>t+c</sub>)</strong></p>
+                
+                <p><strong>Word Similarity (Cosine Similarity):</strong></p>
+                <p>similarity(w₁, w₂) = <strong>(w₁ · w₂) / (||w₁|| × ||w₂||)</strong></p>
+                <p>Where · is dot product and ||w|| is the vector norm.</p>
+                
+                <p><strong>Negative Sampling (Efficient Training):</strong></p>
+                <p>Instead of updating all vocabulary weights, sample negative examples:</p>
+                <p>P(w<sub>neg</sub>) ∝ <strong>(freq(w<sub>neg</sub>))<sup>3/4</sup></strong></p>
+                <p>Where <code>freq(w)</code> is the frequency of word <code>w</code> in the corpus.</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>When to Use Word2Vec</h5>
+                <ul>
+                    <li>When you need semantic word representations</li>
+                    <li>For tasks requiring word similarity calculations</li>
+                    <li>When working with large text corpora</li>
+                    <li>As a baseline for more advanced embedding methods</li>
+                    <li>For downstream NLP tasks (classification, clustering, etc.)</li>
+                </ul>
+            </div>
+        </div>
+        
         <p>Word2Vec uses neural networks to learn word associations from a large corpus of text.</p>
 
         <div class="architecture-diagram">
@@ -352,6 +421,57 @@
         </div>
 
         <h3>2. GloVe (Global Vectors)</h3>
+        
+        <div class="explanation-box">
+            <h4>What is GloVe?</h4>
+            <p>GloVe (Global Vectors for Word Representation) is an unsupervised learning algorithm developed by Stanford in 2014 that combines the advantages of global matrix factorization methods (like LSA) with local context window methods (like Word2Vec). It learns word embeddings by leveraging global word-word co-occurrence statistics from a corpus.</p>
+            
+            <h5>How GloVe Works</h5>
+            <p>GloVe constructs a co-occurrence matrix from the entire corpus, then learns embeddings that preserve the ratios of co-occurrence probabilities. The key insight is that the ratio of co-occurrence probabilities encodes meaningful semantic relationships.</p>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Co-occurrence Matrix:</strong></p>
+                <p>X<sub>ij</sub> = number of times word <code>j</code> appears in the context of word <code>i</code></p>
+                
+                <p><strong>Objective Function:</strong></p>
+                <p>Minimize: <strong>J = Σ<sub>i,j=1</sub><sup>V</sup> f(X<sub>ij</sub>)(w<sub>i</sub>·w̃<sub>j</sub> + b<sub>i</sub> + b̃<sub>j</sub> - log X<sub>ij</sub>)²</strong></p>
+                <p>Where:</p>
+                <ul>
+                    <li><code>w<sub>i</sub></code> = word embedding vector for word i</li>
+                    <li><code>w̃<sub>j</sub></code> = context embedding vector for word j</li>
+                    <li><code>b<sub>i</sub>, b̃<sub>j</sub></code> = bias terms</li>
+                    <li><code>f(X<sub>ij</sub>)</code> = weighting function</li>
+                </ul>
+                
+                <p><strong>Weighting Function:</strong></p>
+                <p>f(x) = <strong>(x/x<sub>max</sub>)<sup>α</sup></strong> if x < x<sub>max</sub>, else 1</p>
+                <p>Typical values: α = 0.75, x<sub>max</sub> = 100</p>
+                
+                <p><strong>Final Embedding:</strong></p>
+                <p>w<sub>i</sub><sup>final</sup> = <strong>(w<sub>i</sub> + w̃<sub>i</sub>) / 2</strong></p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Advantages of GloVe</h5>
+                <ul>
+                    <li>Captures global statistics efficiently</li>
+                    <li>Better performance on word analogy tasks</li>
+                    <li>Faster training than Word2Vec on large corpora</li>
+                    <li>Produces high-quality embeddings</li>
+                </ul>
+                
+                <h5>When to Use GloVe</h5>
+                <ul>
+                    <li>When you have access to large corpora</li>
+                    <li>For tasks requiring word analogy reasoning</li>
+                    <li>When you need global word relationships</li>
+                    <li>As an alternative to Word2Vec for pre-trained embeddings</li>
+                </ul>
+            </div>
+        </div>
+        
         <p>GloVe generates word vectors based on co-occurrence statistics in a large corpus.</p>
 
         <div class="interactive-demo">
@@ -362,6 +482,60 @@
         </div>
 
         <h3>3. FastText</h3>
+        
+        <div class="explanation-box">
+            <h4>What is FastText?</h4>
+            <p>FastText is an extension of Word2Vec developed by Facebook AI Research in 2016. Unlike Word2Vec, which treats each word as an atomic unit, FastText represents words as bags of character n-grams. This allows it to handle out-of-vocabulary (OOV) words and morphologically rich languages effectively.</p>
+            
+            <h5>How FastText Works</h5>
+            <p>FastText breaks words into character n-grams (substrings) and represents each word as the sum of its n-gram vectors. For example, "hello" with n=3 becomes: "&lt;he", "hel", "ell", "llo", "lo&gt;". This approach allows the model to:</p>
+            <ul>
+                <li>Handle rare words by sharing representations with similar words</li>
+                <li>Handle OOV words by composing their n-grams</li>
+                <li>Better understand morphologically rich languages</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Word Representation:</strong></p>
+                <p>w = <strong>Σ<sub>g∈G<sub>w</sub></sub> z<sub>g</sub></strong></p>
+                <p>Where:</p>
+                <ul>
+                    <li><code>G<sub>w</sub></code> = set of n-grams in word w</li>
+                    <li><code>z<sub>g</sub></code> = vector representation of n-gram g</li>
+                </ul>
+                
+                <p><strong>N-gram Generation:</strong></p>
+                <p>For word "hello" with n=3:</p>
+                <p>G<sub>hello</sub> = {"&lt;he", "hel", "ell", "llo", "lo&gt;"}</p>
+                <p>Note: &lt; and &gt; are special boundary characters</p>
+                
+                <p><strong>Skip-gram with N-grams:</strong></p>
+                <p>Same objective as Word2Vec, but uses word representation w instead of word vector</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Advantages of FastText</h5>
+                <ul>
+                    <li>Handles OOV words effectively</li>
+                    <li>Better for morphologically rich languages</li>
+                    <li>Can represent rare words better</li>
+                    <li>Faster training than Word2Vec</li>
+                    <li>Better performance on small datasets</li>
+                </ul>
+                
+                <h5>When to Use FastText</h5>
+                <ul>
+                    <li>When dealing with morphologically rich languages</li>
+                    <li>For tasks with many rare or unseen words</li>
+                    <li>When working with social media text (misspellings, slang)</li>
+                    <li>For multilingual applications</li>
+                    <li>When you need word-level and subword-level features</li>
+                </ul>
+            </div>
+        </div>
+        
         <p>FastText extends Word2Vec by using subword representations (character n-grams), making it excellent for handling out-of-vocabulary words.</p>
 
         <div class="example-box">
@@ -374,6 +548,61 @@
     <!-- Sentiment Analysis Section -->
     <div id="sentiment" class="nlp-section">
         <h2>Sentiment Analysis</h2>
+        
+        <div class="explanation-box">
+            <h4>What is Sentiment Analysis?</h4>
+            <p>Sentiment analysis (also known as opinion mining) is a natural language processing technique that identifies and extracts subjective information from text, determining the emotional tone, attitude, or opinion expressed. It classifies text as positive, negative, or neutral, and can also detect specific emotions like joy, anger, sadness, etc.</p>
+            
+            <h5>Why Sentiment Analysis Matters</h5>
+            <p>Sentiment analysis is crucial because:</p>
+            <ul>
+                <li><strong>Business Intelligence:</strong> Companies monitor customer opinions about products and services</li>
+                <li><strong>Social Media Monitoring:</strong> Track public opinion and brand reputation</li>
+                <li><strong>Market Research:</strong> Understand consumer preferences and trends</li>
+                <li><strong>Customer Service:</strong> Prioritize negative feedback for immediate attention</li>
+                <li><strong>Political Analysis:</strong> Gauge public opinion on policies and candidates</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Binary Classification:</strong></p>
+                <p>P(sentiment | text) = <strong>softmax(W · f(text) + b)</strong></p>
+                <p>Where <code>f(text)</code> is the feature representation (BoW, TF-IDF, embeddings)</p>
+                
+                <p><strong>Multi-class Sentiment:</strong></p>
+                <p>P(s<sub>i</sub> | text) = <strong>exp(W<sub>i</sub> · f(text) + b<sub>i</sub>) / Σ<sub>j</sub> exp(W<sub>j</sub> · f(text) + b<sub>j</sub>)</strong></p>
+                <p>Where <code>s<sub>i</sub></code> represents sentiment class i (positive, negative, neutral)</p>
+                
+                <p><strong>Sentiment Score (Continuous):</strong></p>
+                <p>score(text) = <strong>Σ<sub>w∈text</sub> sentiment_weight(w) × tfidf(w, text)</strong></p>
+                <p>Normalized to range [-1, 1] where -1 = negative, 0 = neutral, 1 = positive</p>
+                
+                <p><strong>Attention-based Sentiment:</strong></p>
+                <p>sentiment = <strong>Σ<sub>i</sub> α<sub>i</sub> · h<sub>i</sub></strong></p>
+                <p>Where <code>α<sub>i</sub></code> is attention weight and <code>h<sub>i</sub></code> is hidden state</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Common Approaches</h5>
+                <ul>
+                    <li><strong>Lexicon-based:</strong> Uses sentiment dictionaries (e.g., VADER, TextBlob)</li>
+                    <li><strong>Machine Learning:</strong> Naive Bayes, SVM, Logistic Regression with features</li>
+                    <li><strong>Deep Learning:</strong> LSTM, CNN, BERT for sequence understanding</li>
+                    <li><strong>Hybrid:</strong> Combines lexicon and ML approaches</li>
+                </ul>
+                
+                <h5>When to Use Sentiment Analysis</h5>
+                <ul>
+                    <li>Customer feedback analysis</li>
+                    <li>Social media monitoring</li>
+                    <li>Product review analysis</li>
+                    <li>Brand reputation management</li>
+                    <li>Market research and trend analysis</li>
+                    <li>Political opinion tracking</li>
+                </ul>
+            </div>
+        </div>
         
         <p>Sentiment analysis determines the emotional tone behind words, helping understand opinions, attitudes, and emotions expressed in text.</p>
 
@@ -439,6 +668,66 @@
     <!-- Seq2Seq Section -->
     <div id="seq2seq" class="nlp-section">
         <h2>Sequence-to-Sequence Models</h2>
+        
+        <div class="explanation-box">
+            <h4>What are Seq2Seq Models?</h4>
+            <p>Sequence-to-Sequence (Seq2Seq) models are neural network architectures designed to map variable-length input sequences to variable-length output sequences. They revolutionized NLP tasks like machine translation, text summarization, and conversational AI by learning to generate sequences rather than just classify them.</p>
+            
+            <h5>Why Seq2Seq Models?</h5>
+            <p>Seq2Seq models are essential because:</p>
+            <ul>
+                <li><strong>Variable Length:</strong> Handle inputs and outputs of different lengths</li>
+                <li><strong>Context Preservation:</strong> Encode entire input sequence into a context vector</li>
+                <li><strong>Generation:</strong> Generate new sequences token by token</li>
+                <li><strong>Flexibility:</strong> Applicable to many sequence generation tasks</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Encoder:</strong></p>
+                <p>h<sub>t</sub> = <strong>RNN(x<sub>t</sub>, h<sub>t-1</sub>)</strong></p>
+                <p>c = <strong>h<sub>T</sub></strong> (context vector = final hidden state)</p>
+                
+                <p><strong>Decoder:</strong></p>
+                <p>s<sub>t</sub> = <strong>RNN(y<sub>t-1</sub>, s<sub>t-1</sub>, c)</strong></p>
+                <p>P(y<sub>t</sub> | y<sub>&lt;t</sub>, c) = <strong>softmax(W · s<sub>t</sub> + b)</strong></p>
+                <p>Where:</p>
+                <ul>
+                    <li><code>h<sub>t</sub></code> = encoder hidden state at time t</li>
+                    <li><code>s<sub>t</sub></code> = decoder hidden state at time t</li>
+                    <li><code>c</code> = context vector</li>
+                    <li><code>x<sub>t</sub></code> = input token at time t</li>
+                    <li><code>y<sub>t</sub></code> = output token at time t</code></li>
+                </ul>
+                
+                <p><strong>Attention Mechanism (Extended):</strong></p>
+                <p>α<sub>t,i</sub> = <strong>exp(score(s<sub>t</sub>, h<sub>i</sub>)) / Σ<sub>j</sub> exp(score(s<sub>t</sub>, h<sub>j</sub>))</strong></p>
+                <p>c<sub>t</sub> = <strong>Σ<sub>i</sub> α<sub>t,i</sub> · h<sub>i</sub></strong></p>
+                <p>Where <code>c<sub>t</sub></code> is the context vector at decoding step t</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Common Applications</h5>
+                <ul>
+                    <li><strong>Machine Translation:</strong> English → French, etc.</li>
+                    <li><strong>Text Summarization:</strong> Long article → short summary</li>
+                    <li><strong>Chatbots:</strong> User query → response</li>
+                    <li><strong>Question Answering:</strong> Context + question → answer</li>
+                    <li><strong>Image Captioning:</strong> Image → text description</li>
+                    <li><strong>Code Generation:</strong> Natural language → code</li>
+                </ul>
+                
+                <h5>When to Use Seq2Seq</h5>
+                <ul>
+                    <li>When input and output are both sequences</li>
+                    <li>For generation tasks (translation, summarization)</li>
+                    <li>When sequence length varies</li>
+                    <li>For conversational AI applications</li>
+                    <li>Before transformers were available (now often replaced by them)</li>
+                </ul>
+            </div>
+        </div>
         
         <p>Seq2Seq models are specialized neural network architectures designed to handle sequences as both input and output. They're perfect for tasks like translation, summarization, and chatbots.</p>
 
@@ -514,6 +803,61 @@
     <!-- Transformers Section -->
     <div id="transformers" class="nlp-section">
         <h2>Transformers: The Revolution</h2>
+        
+        <div class="explanation-box">
+            <h4>What are Transformers?</h4>
+            <p>Transformers are a revolutionary neural network architecture introduced in 2017 by the paper "Attention is All You Need". They replaced RNNs and LSTMs by using self-attention mechanisms to process entire sequences in parallel, achieving state-of-the-art performance on virtually all NLP tasks.</p>
+            
+            <h5>Why Transformers Changed Everything</h5>
+            <p>Transformers revolutionized NLP because:</p>
+            <ul>
+                <li><strong>Parallelization:</strong> Process all positions simultaneously (not sequential like RNNs)</li>
+                <li><strong>Long-range Dependencies:</strong> Direct connections between all positions via attention</li>
+                <li><strong>Scalability:</strong> Easy to scale to billions of parameters</li>
+                <li><strong>Transfer Learning:</strong> Pre-trained models (BERT, GPT) work across many tasks</li>
+                <li><strong>State-of-the-art:</strong> Best performance on translation, summarization, QA, etc.</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Multi-Head Attention:</strong></p>
+                <p>MultiHead(Q, K, V) = <strong>Concat(head₁, ..., head<sub>h</sub>)W<sup>O</sup></strong></p>
+                <p>head<sub>i</sub> = <strong>Attention(QW<sub>i</sub><sup>Q</sup>, KW<sub>i</sub><sup>K</sup>, VW<sub>i</sub><sup>V</sup>)</strong></p>
+                
+                <p><strong>Position Encoding:</strong></p>
+                <p>PE<sub>(pos, 2i)</sub> = <strong>sin(pos / 10000<sup>2i/d<sub>model</sub></sup>)</strong></p>
+                <p>PE<sub>(pos, 2i+1)</sub> = <strong>cos(pos / 10000<sup>2i/d<sub>model</sub></sup>)</strong></p>
+                
+                <p><strong>Feed-Forward Network:</strong></p>
+                <p>FFN(x) = <strong>max(0, xW₁ + b₁)W₂ + b₂</strong></p>
+                
+                <p><strong>Layer Normalization:</strong></p>
+                <p>LayerNorm(x) = <strong>γ · (x - μ) / √(σ² + ε) + β</strong></p>
+                <p>Where μ and σ² are mean and variance, γ and β are learnable parameters</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Key Components</h5>
+                <ul>
+                    <li><strong>Self-Attention:</strong> Allows each position to attend to all positions</li>
+                    <li><strong>Multi-Head Attention:</strong> Multiple attention heads capture different relationships</li>
+                    <li><strong>Position Encoding:</strong> Adds positional information to embeddings</li>
+                    <li><strong>Feed-Forward Networks:</strong> Non-linear transformations</li>
+                    <li><strong>Residual Connections:</strong> Helps with gradient flow</li>
+                    <li><strong>Layer Normalization:</strong> Stabilizes training</li>
+                </ul>
+                
+                <h5>When to Use Transformers</h5>
+                <ul>
+                    <li>For any NLP task (translation, summarization, QA, etc.)</li>
+                    <li>When you need state-of-the-art performance</li>
+                    <li>For transfer learning (use pre-trained models)</li>
+                    <li>When working with long sequences</li>
+                    <li>For tasks requiring understanding of context</li>
+                </ul>
+            </div>
+        </div>
         
         <p>Transformers revolutionized NLP by introducing the "Attention is All You Need" paradigm, eliminating the need for recurrent connections while achieving superior performance.</p>
 
@@ -593,6 +937,70 @@
     <div id="attention" class="nlp-section">
         <h2>Self-Attention Mechanism</h2>
         
+        <div class="explanation-box">
+            <h4>What is Self-Attention?</h4>
+            <p>Self-attention (also called intra-attention) is a mechanism that allows each position in a sequence to attend to all positions in the same sequence, including itself. It computes a weighted sum of all positions, where the weights are learned based on how relevant each position is to the current position.</p>
+            
+            <h5>Why Self-Attention is Revolutionary</h5>
+            <p>Self-attention is transformative because:</p>
+            <ul>
+                <li><strong>Direct Connections:</strong> Directly connects all positions, avoiding information bottleneck</li>
+                <li><strong>Parallel Computation:</strong> All attention scores can be computed in parallel</li>
+                <li><strong>Interpretability:</strong> Attention weights show which parts are important</li>
+                <li><strong>Long-range Dependencies:</strong> Easily captures relationships between distant positions</li>
+                <li><strong>Flexibility:</strong> Dynamically focuses on relevant parts of the sequence</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Mathematical Formulation</h5>
+                
+                <p><strong>Self-Attention Formula:</strong></p>
+                <p>Attention(Q, K, V) = <strong>softmax(QK<sup>T</sup> / √d<sub>k</sub>)V</strong></p>
+                <p>Where:</p>
+                <ul>
+                    <li><code>Q</code> = Query matrix (n × d<sub>k</sub>)</li>
+                    <li><code>K</code> = Key matrix (n × d<sub>k</sub>)</li>
+                    <li><code>V</code> = Value matrix (n × d<sub>v</sub>)</li>
+                    <li><code>d<sub>k</sub></code> = dimension of queries/keys</li>
+                    <li><code>√d<sub>k</sub></code> = scaling factor (prevents small gradients)</li>
+                </ul>
+                
+                <p><strong>Query, Key, Value Generation:</strong></p>
+                <p>Q = <strong>XW<sup>Q</sup></strong>, K = <strong>XW<sup>K</sup></strong>, V = <strong>XW<sup>V</sup></strong></p>
+                <p>Where <code>X</code> is the input embedding matrix</p>
+                
+                <p><strong>Attention Scores:</strong></p>
+                <p>scores = <strong>QK<sup>T</sup> / √d<sub>k</sub></strong></p>
+                <p>attention_weights = <strong>softmax(scores)</strong></p>
+                <p>output = <strong>attention_weights × V</strong></p>
+                
+                <p><strong>Multi-Head Attention:</strong></p>
+                <p>head<sub>i</sub> = <strong>Attention(QW<sub>i</sub><sup>Q</sup>, KW<sub>i</sub><sup>K</sup>, VW<sub>i</sub><sup>V</sup>)</strong></p>
+                <p>MultiHead = <strong>Concat(head₁, ..., head<sub>h</sub>)W<sup>O</sup></strong></p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>How Self-Attention Works (Step by Step)</h5>
+                <ol>
+                    <li><strong>Create Q, K, V:</strong> Transform input into Query, Key, Value matrices</li>
+                    <li><strong>Compute Scores:</strong> Calculate similarity between queries and keys</li>
+                    <li><strong>Scale:</strong> Divide scores by √d<sub>k</sub> to prevent extreme values</li>
+                    <li><strong>Softmax:</strong> Convert scores to attention weights (probabilities)</li>
+                    <li><strong>Weighted Sum:</strong> Multiply attention weights with values</li>
+                    <li><strong>Output:</strong> Result is the weighted combination of all positions</li>
+                </ol>
+                
+                <h5>When to Use Self-Attention</h5>
+                <ul>
+                    <li>In Transformer architectures</li>
+                    <li>When you need to model long-range dependencies</li>
+                    <li>For tasks requiring understanding of relationships between all positions</li>
+                    <li>When you want interpretability (attention weights)</li>
+                    <li>For parallel processing of sequences</li>
+                </ul>
+            </div>
+        </div>
+        
         <p>Self-attention is the core innovation of Transformers. It allows each position in a sequence to attend to all positions in the same sequence to compute a representation.</p>
 
         <div class="interactive-demo">
@@ -664,6 +1072,67 @@ Where:
     <!-- Applications Section -->
     <div id="applications" class="nlp-section">
         <h2>Modern NLP Applications</h2>
+        
+        <div class="explanation-box">
+            <h4>Real-World NLP Applications</h4>
+            <p>Natural Language Processing has transformed countless industries and applications. Modern NLP technologies power everything from search engines to virtual assistants, enabling machines to understand, interpret, and generate human language at unprecedented levels.</p>
+            
+            <h5>Why NLP Applications Matter</h5>
+            <p>NLP applications are revolutionizing how we interact with technology because:</p>
+            <ul>
+                <li><strong>Automation:</strong> Automate repetitive text-based tasks</li>
+                <li><strong>Accessibility:</strong> Make technology accessible through natural language</li>
+                <li><strong>Insights:</strong> Extract valuable insights from unstructured text data</li>
+                <li><strong>Efficiency:</strong> Process and analyze massive amounts of text quickly</li>
+                <li><strong>Personalization:</strong> Provide personalized experiences through language understanding</li>
+            </ul>
+            
+            <div class="formula-section">
+                <h5>Key NLP Tasks and Their Applications</h5>
+                
+                <p><strong>Text Classification:</strong></p>
+                <p>P(class | text) = <strong>model(text)</strong></p>
+                <p>Applications: Spam detection, sentiment analysis, topic classification</p>
+                
+                <p><strong>Named Entity Recognition:</strong></p>
+                <p>P(entities | text) = <strong>sequence_model(text)</strong></p>
+                <p>Applications: Information extraction, knowledge graphs, document indexing</p>
+                
+                <p><strong>Text Summarization:</strong></p>
+                <p>summary = <strong>argmax<sub>s</sub> P(s | text)</strong></p>
+                <p>Applications: News summarization, document summarization, meeting notes</p>
+                
+                <p><strong>Question Answering:</strong></p>
+                <p>answer = <strong>argmax<sub>a</sub> P(a | context, question)</strong></p>
+                <p>Applications: Chatbots, search engines, virtual assistants</p>
+                
+                <p><strong>Machine Translation:</strong></p>
+                <p>translation = <strong>argmax<sub>t</sub> P(t | source_text)</strong></p>
+                <p>Applications: Real-time translation, multilingual support, localization</p>
+            </div>
+            
+            <div class="usage-section">
+                <h5>Major Application Categories</h5>
+                <ul>
+                    <li><strong>Information Retrieval:</strong> Search engines, document retrieval, recommendation systems</li>
+                    <li><strong>Text Generation:</strong> Content creation, chatbots, code generation, creative writing</li>
+                    <li><strong>Text Analysis:</strong> Sentiment analysis, topic modeling, text classification</li>
+                    <li><strong>Language Understanding:</strong> Question answering, reading comprehension, reasoning</li>
+                    <li><strong>Language Translation:</strong> Machine translation, multilingual communication</li>
+                    <li><strong>Speech Processing:</strong> Speech-to-text, text-to-speech, voice assistants</li>
+                </ul>
+                
+                <h5>Industry Impact</h5>
+                <ul>
+                    <li><strong>Healthcare:</strong> Clinical documentation, drug discovery, patient care</li>
+                    <li><strong>Finance:</strong> Fraud detection, risk assessment, algorithmic trading</li>
+                    <li><strong>E-commerce:</strong> Product recommendations, review analysis, search</li>
+                    <li><strong>Education:</strong> Automated grading, personalized learning, tutoring</li>
+                    <li><strong>Customer Service:</strong> Chatbots, email routing, support automation</li>
+                    <li><strong>Media:</strong> Content generation, fact-checking, news summarization</li>
+                </ul>
+            </div>
+        </div>
         
         <p>Modern NLP has enabled countless applications that we use daily. Let's explore some cutting-edge applications and try them out!</p>
 
