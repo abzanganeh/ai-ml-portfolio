@@ -1,0 +1,505 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 5: Graphs - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 5: Graphs</h1>
+            <p class="tutorial-subtitle">
+                Master graph algorithms including DFS, BFS, shortest paths, topological sort, and Union-Find. Learn when and where to use each technique.
+            </p>
+
+            <!-- Graph Representation -->
+            <div class="algorithm-card">
+                <h2>1. Graph Representation</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Adjacency List:</strong> Sparse graphs (few edges), most common in interviews</li>
+                        <li><strong>Adjacency Matrix:</strong> Dense graphs (many edges), fast edge lookup</li>
+                        <li><strong>Real-world example:</strong> Social networks, web pages (links), road maps, dependencies in build systems, or network routing</li>
+                    </ul>
+                </div>
+
+                <h3>Adjacency List (Most Common)</h3>
+                <pre><code># Graph representation using adjacency list
+# graph[i] is a list of neighbors of node i
+
+graph = {
+    0: [1, 2],      # Node 0 connects to nodes 1 and 2
+    1: [0, 3],      # Node 1 connects to nodes 0 and 3
+    2: [0, 3],      # Node 2 connects to nodes 0 and 3
+    3: [1, 2]       # Node 3 connects to nodes 1 and 2
+}
+
+# For weighted graphs, store tuples (neighbor, weight)
+weighted_graph = {
+    0: [(1, 5), (2, 3)],  # Node 0: edge to 1 with weight 5, edge to 2 with weight 3
+    1: [(0, 5), (3, 2)],
+    2: [(0, 3), (3, 1)],
+    3: [(1, 2), (2, 1)]
+}</code></pre>
+            </div>
+
+            <!-- DFS -->
+            <div class="algorithm-card">
+                <h2>2. DFS (Depth-First Search)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Path finding:</strong> Finding any path between nodes</li>
+                        <li><strong>Cycle detection:</strong> Detecting cycles in directed/undirected graphs</li>
+                        <li><strong>Connected components:</strong> Finding all connected components</li>
+                        <li><strong>Topological sort:</strong> Ordering nodes with dependencies</li>
+                        <li><strong>Real-world example:</strong> Maze solving, finding connected users in social network, detecting circular dependencies, or exploring all reachable nodes</li>
+                    </ul>
+                </div>
+
+                <h3>Example: DFS Traversal</h3>
+                <pre><code>def dfs(graph, start):
+    """
+    Depth-First Search traversal of graph.
+    
+    Args:
+        graph: Adjacency list representation
+        start: Starting node
+    
+    Returns:
+        List of visited nodes in DFS order
+    """
+    # Step 1: Initialize visited set and result
+    visited = set()
+    result = []
+    
+    def dfs_helper(node):
+        # Step 2: Mark current node as visited
+        visited.add(node)
+        result.append(node)
+        
+        # Step 3: Visit all unvisited neighbors
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                # Step 3a: Recursively visit neighbor
+                dfs_helper(neighbor)
+    
+    # Step 4: Start DFS from start node
+    dfs_helper(start)
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Create visited set to track visited nodes and result list.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Mark Visited:</strong> Add current node to visited set and result.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Visit Neighbors:</strong> For each neighbor:
+                        <ul>
+                            <li><strong>Step 3a:</strong> If not visited, recursively call DFS on it</li>
+                            <li>This explores as deep as possible before backtracking</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Start:</strong> Begin DFS from start node.
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Property:</strong> DFS explores one path completely before backtracking.
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>O(V + E) where V = vertices, E = edges</p>
+                <h4>Space Complexity:</h4>
+                <p>O(V) for visited set and recursion stack</p>
+            </div>
+
+            <!-- BFS -->
+            <div class="algorithm-card">
+                <h2>3. BFS (Breadth-First Search)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Shortest path (unweighted):</strong> Finding shortest path in unweighted graphs</li>
+                        <li><strong>Level-order:</strong> Processing nodes level by level</li>
+                        <li><strong>Minimum steps:</strong> Finding minimum steps to reach target</li>
+                        <li><strong>Real-world example:</strong> Finding shortest route in unweighted network, social network degrees of separation, or level-order processing</li>
+                    </ul>
+                </div>
+
+                <h3>Example: BFS Traversal</h3>
+                <pre><code>from collections import deque
+
+def bfs(graph, start):
+    """
+    Breadth-First Search traversal of graph.
+    
+    Args:
+        graph: Adjacency list representation
+        start: Starting node
+    
+    Returns:
+        List of visited nodes in BFS order
+    """
+    # Step 1: Initialize queue and visited set
+    queue = deque([start])
+    visited = set([start])
+    result = []
+    
+    # Step 2: Process nodes level by level
+    while queue:
+        # Step 3: Dequeue current node
+        node = queue.popleft()
+        result.append(node)
+        
+        # Step 4: Visit all unvisited neighbors
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                # Step 4a: Mark as visited
+                visited.add(neighbor)
+                # Step 4b: Add to queue for next level
+                queue.append(neighbor)
+    
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Queue starts with start node, mark it as visited.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Loop:</strong> Continue while queue has nodes (process level by level).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Dequeue:</strong> Remove node from front of queue and add to result.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Visit Neighbors:</strong> For each unvisited neighbor:
+                        <ul>
+                            <li><strong>Step 4a:</strong> Mark as visited</li>
+                            <li><strong>Step 4b:</strong> Add to queue (will be processed in next level)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Property:</strong> BFS processes all nodes at distance k before nodes at distance k+1.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shortest Path BFS -->
+            <div class="algorithm-card">
+                <h2>4. Shortest Path (Unweighted Graph)</h2>
+                
+                <h3>Example: Shortest Path Using BFS</h3>
+                <pre><code>from collections import deque
+
+def shortest_path(graph, start, end):
+    """
+    Find shortest path between two nodes using BFS.
+    
+    Args:
+        graph: Adjacency list representation
+        start: Starting node
+        end: Target node
+    
+    Returns:
+        List representing shortest path, or [] if no path exists
+    """
+    # Step 1: Initialize queue and parent map
+    queue = deque([start])
+    visited = set([start])
+    parent = {start: None}  # Track parent to reconstruct path
+    
+    # Step 2: BFS to find target
+    while queue:
+        node = queue.popleft()
+        
+        # Step 3: Check if we reached target
+        if node == end:
+            # Step 3a: Reconstruct path using parent map
+            path = []
+            current = end
+            while current is not None:
+                path.append(current)
+                current = parent[current]
+            return path[::-1]  # Reverse to get start → end
+        
+        # Step 4: Explore neighbors
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                parent[neighbor] = node  # Track parent for path reconstruction
+                queue.append(neighbor)
+    
+    # Step 5: No path found
+    return []</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Queue, visited set, and parent map (to reconstruct path).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - BFS:</strong> Standard BFS traversal.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Target Found:</strong> If we reach target:
+                        <ul>
+                            <li><strong>Step 3a:</strong> Reconstruct path by following parent pointers backwards</li>
+                            <li>Reverse to get path from start to end</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Explore:</strong> For each neighbor, mark visited, set parent, and add to queue.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - No Path:</strong> If BFS completes without finding target, return empty list.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topological Sort -->
+            <div class="algorithm-card">
+                <h2>5. Topological Sort</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Dependency resolution:</strong> Ordering tasks with dependencies</li>
+                        <li><strong>Course prerequisites:</strong> Ordering courses based on prerequisites</li>
+                        <li><strong>Build systems:</strong> Determining build order</li>
+                        <li><strong>Real-world example:</strong> Compiling source files with dependencies, installing packages with dependencies, or scheduling tasks with prerequisites</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Topological Sort (Kahn's Algorithm)</h3>
+                <pre><code>from collections import deque
+
+def topological_sort(graph):
+    """
+    Topological sort using Kahn's algorithm (BFS-based).
+    
+    Args:
+        graph: Adjacency list (directed acyclic graph)
+    
+    Returns:
+        List of nodes in topological order, or [] if cycle exists
+    """
+    # Step 1: Calculate in-degree for each node
+    # In-degree = number of incoming edges
+    in_degree = {node: 0 for node in graph}
+    for node in graph:
+        for neighbor in graph[node]:
+            in_degree[neighbor] = in_degree.get(neighbor, 0) + 1
+    
+    # Step 2: Initialize queue with nodes having in-degree 0
+    # These have no dependencies, can be processed first
+    queue = deque([node for node in in_degree if in_degree[node] == 0])
+    result = []
+    
+    # Step 3: Process nodes
+    while queue:
+        # Step 3a: Dequeue node with no dependencies
+        node = queue.popleft()
+        result.append(node)
+        
+        # Step 3b: Reduce in-degree of neighbors
+        for neighbor in graph.get(node, []):
+            in_degree[neighbor] -= 1
+            # Step 3c: If neighbor has no dependencies, add to queue
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    
+    # Step 4: Check for cycle
+    # If result length < total nodes, cycle exists
+    if len(result) != len(graph):
+        return []  # Cycle detected
+    
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Calculate In-Degree:</strong> Count incoming edges for each node (dependencies).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize Queue:</strong> Start with nodes having in-degree 0 (no dependencies).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Process:</strong>
+                        <ul>
+                            <li><strong>Step 3a:</strong> Dequeue node (add to result)</li>
+                            <li><strong>Step 3b:</strong> Reduce in-degree of all neighbors</li>
+                            <li><strong>Step 3c:</strong> If neighbor's in-degree becomes 0, add to queue</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Cycle Check:</strong> If not all nodes processed, cycle exists (can't topologically sort).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Union-Find -->
+            <div class="algorithm-card">
+                <h2>6. Union-Find (Disjoint Set)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Connected components:</strong> Finding connected components efficiently</li>
+                        <li><strong>Cycle detection:</strong> Detecting cycles in undirected graphs</li>
+                        <li><strong>Kruskal's algorithm:</strong> Minimum spanning tree</li>
+                        <li><strong>Real-world example:</strong> Network connectivity, image segmentation, or grouping related items</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Union-Find Implementation</h3>
+                <pre><code>class UnionFind:
+    """Union-Find data structure with path compression and union by rank"""
+    
+    def __init__(self, n):
+        # Step 1: Initialize parent array
+        # Initially, each node is its own parent
+        self.parent = list(range(n))
+        # Step 2: Initialize rank array (for union by rank)
+        self.rank = [0] * n
+    
+    def find(self, x):
+        # Step 3: Find root with path compression
+        if self.parent[x] != x:
+            # Step 3a: Recursively find root
+            # Step 3b: Path compression: make parent point directly to root
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+    
+    def union(self, x, y):
+        # Step 4: Union two sets
+        root_x = self.find(x)
+        root_y = self.find(y)
+        
+        # Step 5: If already in same set, return
+        if root_x == root_y:
+            return
+        
+        # Step 6: Union by rank
+        if self.rank[root_x] < self.rank[root_y]:
+            # Attach smaller tree under larger tree
+            self.parent[root_x] = root_y
+        elif self.rank[root_x] > self.rank[root_y]:
+            self.parent[root_y] = root_x
+        else:
+            # Same rank, attach one to other and increase rank
+            self.parent[root_y] = root_x
+            self.rank[root_x] += 1</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize Parent:</strong> Each node starts as its own parent (separate sets).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize Rank:</strong> Track tree height for union by rank optimization.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Find:</strong> Find root with path compression:
+                        <ul>
+                            <li><strong>Step 3a:</strong> Recursively find root</li>
+                            <li><strong>Step 3b:</strong> Make parent point directly to root (compression)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Union:</strong> Find roots of both sets.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Same Set:</strong> If same root, already connected.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 6 - Union by Rank:</strong> Attach smaller tree under larger tree to keep tree balanced.
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>Nearly O(1) per operation with path compression and union by rank</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>DFS:</strong> Use for path finding, cycle detection, connected components</li>
+                    <li><strong>BFS:</strong> Use for shortest path (unweighted), level-order processing</li>
+                    <li><strong>Topological Sort:</strong> Use for dependency ordering, prerequisite problems</li>
+                    <li><strong>Union-Find:</strong> Use for connected components, cycle detection, MST</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Graph problems often require choosing between DFS (deep exploration) and BFS (level-by-level). Use topological sort for dependency problems and Union-Find for connectivity.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter4" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 4
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter6" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 6 - Dynamic Programming →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
