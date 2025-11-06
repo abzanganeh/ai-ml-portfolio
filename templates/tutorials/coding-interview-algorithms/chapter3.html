@@ -1,0 +1,539 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 3: Stacks & Queues - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 3: Stacks & Queues</h1>
+            <p class="tutorial-subtitle">
+                Master stack and queue operations, monotonic stacks, priority queues, and BFS traversal. Learn when and where to use each data structure.
+            </p>
+
+            <!-- Stack Fundamentals -->
+            <div class="algorithm-card">
+                <h2>1. Stack Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>LIFO operations:</strong> Last In First Out - most recent element processed first</li>
+                        <li><strong>Expression evaluation:</strong> Parsing and evaluating mathematical expressions</li>
+                        <li><strong>Parenthesis matching:</strong> Checking balanced parentheses, brackets, braces</li>
+                        <li><strong>Backtracking:</strong> Undo operations, DFS traversal</li>
+                        <li><strong>Real-world example:</strong> Browser back button, function call stack, undo/redo in text editors, or matching HTML tags</li>
+                    </ul>
+                </div>
+
+                <h3>Stack Operations</h3>
+                <pre><code>class Stack:
+    """Stack implementation using list"""
+    def __init__(self):
+        # Step 1: Initialize empty list
+        # List will store stack elements
+        self.items = []
+    
+    def push(self, item):
+        # Step 2: Add element to top of stack
+        # Append adds to end of list (top of stack)
+        self.items.append(item)
+    
+    def pop(self):
+        # Step 3: Remove and return top element
+        # Pop removes from end of list (LIFO)
+        if self.is_empty():
+            return None
+        return self.items.pop()
+    
+    def peek(self):
+        # Step 4: Return top element without removing
+        if self.is_empty():
+            return None
+        return self.items[-1]
+    
+    def is_empty(self):
+        # Step 5: Check if stack is empty
+        return len(self.items) == 0</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Explanation:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Create empty list to store stack elements.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Push:</strong> Add element using <code>append()</code> - adds to end (top of stack).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Pop:</strong> Remove and return last element using <code>pop()</code> - LIFO behavior.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Peek:</strong> View top element without removing it.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Empty Check:</strong> Verify if stack has elements.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Valid Parentheses -->
+            <div class="algorithm-card">
+                <h2>2. Valid Parentheses</h2>
+                
+                <h3>Example: Check Balanced Parentheses</h3>
+                <pre><code>def is_valid(s):
+    """
+    Check if string has valid parentheses using stack.
+    
+    Args:
+        s: String containing only '(', ')', '{', '}', '[', ']'
+    
+    Returns:
+        True if parentheses are balanced, False otherwise
+    """
+    # Step 1: Initialize stack and mapping
+    stack = []
+    # Map closing brackets to their corresponding opening brackets
+    mapping = {')': '(', '}': '{', ']': '['}
+    
+    # Step 2: Iterate through each character
+    for char in s:
+        # Step 3: Check if it's a closing bracket
+        if char in mapping:
+            # Step 3a: It's a closing bracket
+            # Check if stack is empty or top doesn't match
+            if not stack or stack.pop() != mapping[char]:
+                return False
+        else:
+            # Step 3b: It's an opening bracket
+            # Push it onto stack
+            stack.append(char)
+    
+    # Step 4: Check if stack is empty
+    # If empty, all brackets were matched
+    return len(stack) == 0</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> 
+                        <ul>
+                            <li>Create empty stack to store opening brackets</li>
+                            <li>Create mapping: closing → opening brackets</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Process each character in the string.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Process Character:</strong>
+                        <ul>
+                            <li><strong>Step 3a - Closing Bracket:</strong> If it's a closing bracket, check if stack top matches. If not, invalid.</li>
+                            <li><strong>Step 3b - Opening Bracket:</strong> Push onto stack (we'll match it later)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Final Check:</strong> If stack is empty, all brackets were matched. Otherwise, some opening brackets weren't closed.
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>Input: "()[]{}"</p>
+                <ul>
+                    <li>'(': push → stack = ['(']</li>
+                    <li>')': pop '(' → matches! → stack = []</li>
+                    <li>'[': push → stack = ['[']</li>
+                    <li>']': pop '[' → matches! → stack = []</li>
+                    <li>'{': push → stack = ['{']</li>
+                    <li>'}': pop '{' → matches! → stack = []</li>
+                    <li>Stack empty → Valid!</li>
+                </ul>
+            </div>
+
+            <!-- Monotonic Stack -->
+            <div class="algorithm-card">
+                <h2>3. Monotonic Stack</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Next greater/smaller element:</strong> Finding next greater or smaller element for each position</li>
+                        <li><strong>Largest rectangle:</strong> Finding largest rectangle in histogram</li>
+                        <li><strong>Trapping rainwater:</strong> Calculating trapped rainwater between bars</li>
+                        <li><strong>Real-world example:</strong> Finding next higher stock price, calculating maximum area in bar charts, or finding next warmer day</li>
+                    </ul>
+                </div>
+
+                <h3>Algorithm Explanation</h3>
+                <p>A monotonic stack maintains elements in monotonic (increasing or decreasing) order:</p>
+                <ul>
+                    <li><strong>Monotonic increasing:</strong> Elements increase from bottom to top</li>
+                    <li><strong>Monotonic decreasing:</strong> Elements decrease from bottom to top</li>
+                    <li><strong>Key insight:</strong> When we see an element that breaks monotonicity, we can process previous elements</li>
+                </ul>
+
+                <h3>Example: Next Greater Element</h3>
+                <pre><code>def next_greater_element(nums):
+    """
+    Find next greater element for each position using monotonic stack.
+    
+    Args:
+        nums: List of integers
+    
+    Returns:
+        List where result[i] is next greater element of nums[i], or -1 if none
+    """
+    # Step 1: Initialize result and stack
+    n = len(nums)
+    result = [-1] * n  # Default: no greater element
+    stack = []  # Monotonic decreasing stack (stores indices)
+    
+    # Step 2: Iterate through array
+    for i in range(n):
+        # Step 3: While current element breaks monotonicity
+        # Current element is greater than stack top
+        while stack and nums[stack[-1]] < nums[i]:
+            # Step 3a: Found next greater for stack top
+            # Pop index from stack
+            idx = stack.pop()
+            # Step 3b: Set result for that index
+            result[idx] = nums[i]
+        
+        # Step 4: Push current index
+        # Current element might be next greater for future elements
+        stack.append(i)
+    
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> 
+                        <ul>
+                            <li>Result array initialized with -1 (no greater element found)</li>
+                            <li>Stack stores indices (monotonic decreasing)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Process each element.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Process Stack:</strong> While current element is greater than stack top:
+                        <ul>
+                            <li><strong>Step 3a:</strong> Pop index from stack</li>
+                            <li><strong>Step 3b:</strong> Set result[idx] = current element (found next greater!)</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Push:</strong> Add current index to stack (waiting for its next greater element).
+                    </div>
+                </div>
+
+                <h4>Example:</h4>
+                <p>nums = [4, 5, 2, 10]</p>
+                <ul>
+                    <li>i=0, num=4: stack=[0]</li>
+                    <li>i=1, num=5: 5 > 4 → result[0]=5, stack=[1]</li>
+                    <li>i=2, num=2: stack=[1, 2]</li>
+                    <li>i=3, num=10: 10 > 2 → result[2]=10, 10 > 5 → result[1]=10, stack=[3]</li>
+                    <li>Result: [5, 10, 10, -1]</li>
+                </ul>
+            </div>
+
+            <!-- Queue Fundamentals -->
+            <div class="algorithm-card">
+                <h2>4. Queue Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>FIFO operations:</strong> First In First Out - oldest element processed first</li>
+                        <li><strong>BFS traversal:</strong> Level-order traversal in trees/graphs</li>
+                        <li><strong>Task scheduling:</strong> Processing tasks in order</li>
+                        <li><strong>Real-world example:</strong> Print queue, message queues, customer service queues, or BFS pathfinding</li>
+                    </ul>
+                </div>
+
+                <h3>Queue Operations</h3>
+                <pre><code>from collections import deque
+
+class Queue:
+    """Queue implementation using deque"""
+    def __init__(self):
+        # Step 1: Initialize deque (double-ended queue)
+        # Deque provides O(1) operations on both ends
+        self.items = deque()
+    
+    def enqueue(self, item):
+        # Step 2: Add element to rear (end) of queue
+        self.items.append(item)
+    
+    def dequeue(self):
+        # Step 3: Remove and return front (beginning) element
+        # popleft removes from left (FIFO)
+        if self.is_empty():
+            return None
+        return self.items.popleft()
+    
+    def peek(self):
+        # Step 4: Return front element without removing
+        if self.is_empty():
+            return None
+        return self.items[0]
+    
+    def is_empty(self):
+        # Step 5: Check if queue is empty
+        return len(self.items) == 0</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Explanation:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Use <code>deque</code> for efficient O(1) operations.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Enqueue:</strong> Add to end using <code>append()</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Dequeue:</strong> Remove from front using <code>popleft()</code> - FIFO behavior.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Peek:</strong> View front element without removing.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Empty Check:</strong> Verify if queue has elements.
+                    </div>
+                </div>
+            </div>
+
+            <!-- BFS with Queue -->
+            <div class="algorithm-card">
+                <h2>5. BFS (Breadth-First Search) with Queue</h2>
+                
+                <h3>Example: Level-Order Traversal</h3>
+                <pre><code>from collections import deque
+
+def level_order_traversal(root):
+    """
+    Traverse binary tree level by level using BFS.
+    
+    Args:
+        root: Root node of binary tree
+    
+    Returns:
+        List of lists, where each inner list is a level
+    """
+    # Step 1: Handle empty tree
+    if root is None:
+        return []
+    
+    # Step 2: Initialize queue and result
+    queue = deque([root])  # Start with root node
+    result = []
+    
+    # Step 3: Process each level
+    while queue:
+        # Step 3a: Get current level size
+        # This tells us how many nodes are in current level
+        level_size = len(queue)
+        level_nodes = []
+        
+        # Step 3b: Process all nodes in current level
+        for _ in range(level_size):
+            # Step 3c: Dequeue node
+            node = queue.popleft()
+            # Step 3d: Add to current level
+            level_nodes.append(node.val)
+            
+            # Step 3e: Enqueue children
+            # Add left and right children for next level
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        
+        # Step 3f: Add level to result
+        result.append(level_nodes)
+    
+    # Step 4: Return all levels
+    return result</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Edge Case:</strong> If tree is empty, return empty list.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Initialize:</strong> Queue starts with root, result stores levels.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Process Levels:</strong>
+                        <ul>
+                            <li><strong>Step 3a:</strong> Get current level size (nodes at this level)</li>
+                            <li><strong>Step 3b:</strong> Process all nodes in current level</li>
+                            <li><strong>Step 3c:</strong> Dequeue node</li>
+                            <li><strong>Step 3d:</strong> Add value to current level</li>
+                            <li><strong>Step 3e:</strong> Enqueue children (for next level)</li>
+                            <li><strong>Step 3f:</strong> Add completed level to result</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Key Insight:</strong> By processing level_size nodes at a time, we ensure we complete one level before moving to the next.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority Queue / Heap -->
+            <div class="algorithm-card">
+                <h2>6. Priority Queue (Heap)</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>K largest/smallest:</strong> Finding k largest or smallest elements</li>
+                        <li><strong>Merge k sorted lists:</strong> Efficiently merging multiple sorted lists</li>
+                        <li><strong>Dijkstra's algorithm:</strong> Finding shortest paths</li>
+                        <li><strong>Real-world example:</strong> Task scheduler (priority-based), finding top K products by sales, or merging sorted logs from multiple servers</li>
+                    </ul>
+                </div>
+
+                <h3>Example: Find K Largest Elements</h3>
+                <pre><code>import heapq
+
+def find_k_largest(nums, k):
+    """
+    Find k largest elements using min heap.
+    
+    Args:
+        nums: List of integers
+        k: Number of largest elements to find
+    
+    Returns:
+        List of k largest elements
+    """
+    # Step 1: Initialize min heap
+    # Min heap of size k (smallest at top)
+    heap = []
+    
+    # Step 2: Process each number
+    for num in nums:
+        # Step 3: Add to heap
+        heapq.heappush(heap, num)
+        
+        # Step 4: Maintain heap size k
+        # If heap exceeds k, remove smallest
+        if len(heap) > k:
+            # Step 4a: Remove smallest element
+            # This keeps only k largest elements
+            heapq.heappop(heap)
+    
+    # Step 5: Return k largest elements
+    # Heap now contains k largest (convert to list)
+    return list(heap)</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Create empty min heap (Python's heapq is min heap).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Process each number in the array.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Push:</strong> Add number to heap using <code>heappush()</code>.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Maintain Size:</strong> If heap size > k:
+                        <ul>
+                            <li><strong>Step 4a:</strong> Remove smallest element using <code>heappop()</code></li>
+                            <li>This keeps only the k largest elements</li>
+                        </ul>
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Return:</strong> Heap now contains k largest elements.
+                    </div>
+                    <div class="code-step">
+                        <strong>Why Min Heap:</strong> We want to easily remove the smallest element when heap exceeds k, keeping only the largest.
+                    </div>
+                </div>
+
+                <h4>Time Complexity:</h4>
+                <p>O(n log k) - n elements, each heap operation is O(log k)</p>
+                <h4>Space Complexity:</h4>
+                <p>O(k) - Heap stores at most k elements</p>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Stack (LIFO):</strong> Use for parentheses matching, expression evaluation, backtracking</li>
+                    <li><strong>Monotonic Stack:</strong> Use for next greater/smaller element problems</li>
+                    <li><strong>Queue (FIFO):</strong> Use for BFS, task scheduling, level-order traversal</li>
+                    <li><strong>Priority Queue/Heap:</strong> Use for k largest/smallest, merging sorted lists, Dijkstra's</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Stacks and queues are fundamental for many algorithms. Choose based on processing order needed (LIFO vs FIFO) and whether you need priority-based processing.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter2" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 2
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter4" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 4 - Trees & Binary Trees →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
