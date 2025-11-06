@@ -208,9 +208,52 @@
                 </div>
             </div>
             
+            <div class="footer-navigation">
+                <button id="footer-back-to-top" class="footer-nav-btn" onclick="scrollToTop()" aria-label="Back to top">
+                    <i class="fas fa-arrow-up"></i> Back to Top
+                </button>
+                <button class="footer-nav-btn" onclick="scrollToNavigation()" aria-label="Go to navigation">
+                    <i class="fas fa-bars"></i> Main Navigation
+                </button>
+                {% block footer_navigation %}
+                    {% if request.endpoint == 'tutorial_detail' or request.endpoint == 'tutorials' %}
+                        <a href="{{ url_for('tutorials') }}" class="footer-nav-btn">
+                            <i class="fas fa-book"></i> All Tutorials
+                        </a>
+                        <a href="{{ url_for('projects') }}" class="footer-nav-btn">
+                            <i class="fas fa-code"></i> View Projects
+                        </a>
+                    {% elif request.endpoint == 'project_detail' or request.endpoint == 'projects' %}
+                        <a href="{{ url_for('projects') }}" class="footer-nav-btn">
+                            <i class="fas fa-code"></i> All Projects
+                        </a>
+                        <a href="{{ url_for('tutorials') }}" class="footer-nav-btn">
+                            <i class="fas fa-book"></i> View Tutorials
+                        </a>
+                    {% elif request.endpoint == 'blog_post' or request.endpoint == 'blog' %}
+                        <a href="{{ url_for('blog') }}" class="footer-nav-btn">
+                            <i class="fas fa-edit"></i> All Posts
+                        </a>
+                        <a href="{{ url_for('tutorials') }}" class="footer-nav-btn">
+                            <i class="fas fa-book"></i> Tutorials
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('projects') }}" class="footer-nav-btn">
+                            <i class="fas fa-code"></i> View Projects
+                        </a>
+                        <a href="{{ url_for('tutorials') }}" class="footer-nav-btn">
+                            <i class="fas fa-book"></i> View Tutorials
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('contact') }}" class="footer-nav-btn">
+                        <i class="fas fa-envelope"></i> Get in Touch
+                    </a>
+                {% endblock %}
+            </div>
+            
             <div class="footer-bottom">
                 <p>&copy; {{ current_year }} Alireza Barzin Zanganeh. All rights reserved.</p>
-                <p>Built with <i class="fas fa-heart text-red"></i> using Flask and Python</p>
+                <p>Built using Flask/Python</p>
             </div>
         </div>
     </footer>

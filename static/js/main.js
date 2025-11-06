@@ -86,6 +86,22 @@ function initScrollEffects() {
         });
     }
     
+    // Global scrollToTop function for footer buttons
+    window.scrollToTop = function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+    
+    // Global scrollToNavigation function for footer buttons
+    window.scrollToNavigation = function() {
+        const navbar = document.getElementById('navbar');
+        if (navbar) {
+            navbar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+    
     // Smooth scrolling for anchor links
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
     anchorLinks.forEach(link => {
