@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Chapter 8: Greedy Algorithms - Coding Interview Algorithms{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/coding-algorithms/coding-algorithms.css') }}">
+<style>
+    .code-explanation {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .code-step {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .use-case-box {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    .algorithm-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main style="padding-top: 100px;">
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <div style="margin-bottom: 2rem;">
+                <a href="/tutorials/coding-interview-algorithms" style="color: #007bff; text-decoration: none;">
+                    ← Back to Tutorial Index
+                </a>
+            </div>
+            
+            <h1 class="tutorial-main-title">Chapter 8: Greedy Algorithms</h1>
+            <p class="tutorial-subtitle">
+                Master greedy algorithms for optimization problems. Learn when greedy works and when it doesn't.
+            </p>
+
+            <!-- Greedy Fundamentals -->
+            <div class="algorithm-card">
+                <h2>1. Greedy Algorithm Fundamentals</h2>
+                
+                <div class="use-case-box">
+                    <h3>📌 When and Where to Use</h3>
+                    <ul>
+                        <li><strong>Optimization problems:</strong> Finding maximum or minimum</li>
+                        <li><strong>Greedy choice property:</strong> Locally optimal choice leads to globally optimal solution</li>
+                        <li><strong>Real-world example:</strong> Activity selection, interval scheduling, minimum spanning tree, or change-making (with certain coin systems)</li>
+                    </ul>
+                </div>
+
+                <h3>Greedy Strategy</h3>
+                <ol>
+                    <li><strong>Make greedy choice:</strong> Choose the best option at current step</li>
+                    <li><strong>Reduce problem:</strong> Solve smaller subproblem</li>
+                    <li><strong>No backtracking:</strong> Once choice is made, don't reconsider</li>
+                </ol>
+
+                <h3>When Greedy Works</h3>
+                <ul>
+                    <li><strong>Greedy choice property:</strong> Optimal solution contains greedy choice</li>
+                    <li><strong>Optimal substructure:</strong> Optimal solution to subproblem is part of optimal solution</li>
+                </ul>
+            </div>
+
+            <!-- Activity Selection -->
+            <div class="algorithm-card">
+                <h2>2. Activity Selection Problem</h2>
+                
+                <h3>Example: Maximum Non-Overlapping Activities</h3>
+                <p><strong>Problem:</strong> Select maximum number of activities that don't overlap.</p>
+                
+                <pre><code>def activity_selection(activities):
+    """
+    Select maximum non-overlapping activities.
+    
+    Args:
+        activities: List of (start, end) tuples
+    
+    Returns:
+        List of selected activity indices
+    """
+    # Step 1: Sort activities by end time
+    # Greedy choice: always pick activity that ends earliest
+    sorted_activities = sorted(enumerate(activities), key=lambda x: x[1][1])
+    
+    selected = []
+    last_end = -1
+    
+    # Step 2: Greedily select activities
+    for idx, (start, end) in sorted_activities:
+        # Step 3: Check if activity doesn't overlap
+        if start >= last_end:
+            # Step 4: Select this activity
+            selected.append(idx)
+            # Step 5: Update last end time
+            last_end = end
+    
+    return selected</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Sort:</strong> Sort activities by end time. Greedy choice: pick activity ending earliest.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Go through sorted activities.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Check Overlap:</strong> If activity starts after last selected ends, no overlap.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Select:</strong> Add activity to selected list.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Update:</strong> Update last_end to current activity's end time.
+                    </div>
+                    <div class="code-step">
+                        <strong>Why it works:</strong> By choosing earliest-ending activity, we leave maximum time for remaining activities.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jump Game -->
+            <div class="algorithm-card">
+                <h2>3. Jump Game</h2>
+                
+                <h3>Example: Can Reach End</h3>
+                <p><strong>Problem:</strong> Can you reach the last index? (nums[i] = max jump from position i)</p>
+                
+                <pre><code>def can_jump(nums):
+    """
+    Check if can reach last index using greedy approach.
+    
+    Args:
+        nums: List where nums[i] is max jump from position i
+    
+    Returns:
+        True if can reach last index, False otherwise
+    """
+    # Step 1: Track farthest reachable position
+    max_reach = 0
+    
+    # Step 2: Iterate through array
+    for i in range(len(nums)):
+        # Step 3: Check if current position is reachable
+        if i > max_reach:
+            # Can't reach current position
+            return False
+        
+        # Step 4: Update farthest reachable position
+        # From position i, can reach i + nums[i]
+        max_reach = max(max_reach, i + nums[i])
+        
+        # Step 5: Early termination
+        # If can already reach end, return True
+        if max_reach >= len(nums) - 1:
+            return True
+    
+    return True</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Initialize:</strong> Track farthest position we can reach (starts at 0).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Iterate:</strong> Check each position.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Check Reachability:</strong> If current position > max_reach, can't reach it → return False.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Update:</strong> From position i, can reach i + nums[i]. Update max_reach.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Early Exit:</strong> If max_reach >= last index, can reach end → return True.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Minimum Coins (Greedy) -->
+            <div class="algorithm-card">
+                <h2>4. Minimum Coins (Greedy - When It Works)</h2>
+                
+                <h3>Example: Greedy Coin Change</h3>
+                <p><strong>Note:</strong> Greedy only works for certain coin systems (e.g., US coins).</p>
+                
+                <pre><code>def coin_change_greedy(coins, amount):
+    """
+    Greedy coin change (only works for certain systems).
+    
+    Args:
+        coins: List of coin denominations (sorted descending)
+        amount: Target amount
+    
+    Returns:
+        Minimum number of coins, or -1 if impossible
+    """
+    # Step 1: Sort coins in descending order
+    coins.sort(reverse=True)
+    
+    count = 0
+    
+    # Step 2: Greedily use largest coins first
+    for coin in coins:
+        # Step 3: Use as many of this coin as possible
+        if amount >= coin:
+            num_coins = amount // coin
+            count += num_coins
+            amount -= num_coins * coin
+        
+        # Step 4: Early termination
+        if amount == 0:
+            break
+    
+    # Step 5: Check if solved
+    return count if amount == 0 else -1</code></pre>
+
+                <div class="code-explanation">
+                    <h4>Step-by-Step Code Walkthrough:</h4>
+                    <div class="code-step">
+                        <strong>Step 1 - Sort:</strong> Sort coins descending (largest first).
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 2 - Greedy:</strong> Try largest coins first.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 3 - Use Coins:</strong> Use as many of current coin as possible.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 4 - Early Exit:</strong> If amount becomes 0, done.
+                    </div>
+                    <div class="code-step">
+                        <strong>Step 5 - Check:</strong> If amount > 0, impossible with given coins.
+                    </div>
+                    <div class="code-step">
+                        <strong>Warning:</strong> This only works for "canonical" coin systems. For general case, use DP!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="algorithm-card" style="background: #f0f8ff; border: 2px solid #007bff;">
+                <h2>📚 Chapter Summary</h2>
+                <ul>
+                    <li><strong>Greedy Strategy:</strong> Make locally optimal choice at each step</li>
+                    <li><strong>When it works:</strong> Greedy choice property + optimal substructure</li>
+                    <li><strong>Common patterns:</strong> Sort first, then make greedy choices</li>
+                    <li><strong>Activity Selection:</strong> Sort by end time, pick earliest ending</li>
+                    <li><strong>Jump Game:</strong> Track farthest reachable position</li>
+                </ul>
+                <p><strong>Key Takeaway:</strong> Greedy is efficient but only works when locally optimal choices lead to globally optimal solution. When in doubt, verify with proof or use DP.</p>
+            </div>
+
+            <div style="margin-top: 3rem; text-align: center;">
+                <a href="/tutorials/coding-interview-algorithms/chapter7" class="azbn-btn" style="text-decoration: none; display: inline-block; margin-right: 1rem;">
+                    ← Previous: Chapter 7
+                </a>
+                <a href="/tutorials/coding-interview-algorithms/chapter9" class="azbn-btn" style="text-decoration: none; display: inline-block;">
+                    Next: Chapter 9 - Binary Search →
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
