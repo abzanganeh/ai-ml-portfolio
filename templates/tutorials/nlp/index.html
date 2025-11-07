@@ -28,6 +28,7 @@
     <!-- Navigation -->
     <div id="course-navigation" class="course-nav">
         <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+        <button class="nav-btn" onclick="showSection('workflow')">Complete Workflow</button>
         <button class="nav-btn" onclick="showSection('text-repr')">Text Representation</button>
         <button class="nav-btn" onclick="showSection('embeddings')">Word Embeddings</button>
         <button class="nav-btn" onclick="showSection('sentiment')">Sentiment Analysis</button>
@@ -95,6 +96,124 @@
             <div class="quiz-option" onclick="checkAnswer(this, false)">B) Language translation</div>
             <div class="quiz-option" onclick="checkAnswer(this, true)">C) Image object detection</div>
             <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sentiment analysis</div>
+        </div>
+    </div>
+
+    <!-- Workflow Section -->
+    <div id="workflow" class="nlp-section">
+        <h2>Complete Workflow: Classical NLP to Transformers</h2>
+
+        <div class="explanation-box">
+            <h4>The Big Picture</h4>
+            <p>Modern NLP has evolved through two broad eras. Classical pipelines relied on heavy preprocessing and feature engineering, while transformers learn rich representations directly from raw text. Understanding both perspectives clarifies why the transformer paradigm is so powerful.</p>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>Era 1 &mdash; Classical (pre-2017)</h4>
+                    <ul>
+                        <li>Extensive text cleaning and normalization</li>
+                        <li>Tokenization, stemming, lemmatization, POS tagging</li>
+                        <li>Feature engineering (BoW, TF, TF-IDF, n-grams)</li>
+                        <li>Statistical / traditional ML models (Naive Bayes, SVM)</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>Era 2 &mdash; Transformers (2017+)</h4>
+                    <ul>
+                        <li>Minimal preprocessing beyond basic normalization</li>
+                        <li>Subword tokenization feeds trainable embeddings</li>
+                        <li>Self-attention learns context on the fly</li>
+                        <li>Large pre-trained models fine-tuned per task</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h3>Classical Text Processing Pipeline</h3>
+        <div class="architecture-diagram">
+            <div class="layer">Text Cleaning</div>
+            <span class="arrow">→</span>
+            <div class="layer">Tokenization</div>
+            <span class="arrow">→</span>
+            <div class="layer">Linguistic Features (POS/NER)</div>
+            <span class="arrow">→</span>
+            <div class="layer">Vectorization (BoW / TF-IDF)</div>
+            <span class="arrow">→</span>
+            <div class="layer">Classical ML Model</div>
+        </div>
+
+        <div class="explanation-box">
+            <h4>Step-by-Step</h4>
+            <ol>
+                <li><strong>Text Cleaning &amp; Normalization:</strong> Lowercasing, punctuation removal, handling contractions.</li>
+                <li><strong>Tokenization:</strong> Split into words, subwords, or characters.</li>
+                <li><strong>Advanced Linguistics:</strong> Stemming, lemmatization, POS tagging, NER, dependency parsing.</li>
+                <li><strong>Feature Engineering:</strong> BoW, TF, TF-IDF, n-grams capture frequency and limited context.</li>
+                <li><strong>Statistical Modeling:</strong> Train algorithms like Naive Bayes, SVM, logistic regression.</li>
+            </ol>
+            <p>Strengths: transparent, lightweight, works on small datasets. Limitations: sparse features, no deep context, heavy manual engineering.</p>
+        </div>
+
+        <h3>Modern Transformer Workflow</h3>
+        <div class="architecture-diagram">
+            <div class="layer">Minimal Cleanup</div>
+            <span class="arrow">→</span>
+            <div class="layer">Subword Tokenizer</div>
+            <span class="arrow">→</span>
+            <div class="layer">Embedding + Positional Encoding</div>
+            <span class="arrow">→</span>
+            <div class="layer">Transformer Stack</div>
+            <span class="arrow">→</span>
+            <div class="layer">Task Head &amp; Predictions</div>
+        </div>
+
+        <div class="explanation-box">
+            <h4>What Changes with Transformers?</h4>
+            <ul>
+                <li><strong>Contextual Embeddings:</strong> Each token gains meaning from its surroundings (bank → financial vs. river).</li>
+                <li><strong>Self-Attention Layers:</strong> Learn relationships such as subject-verb, coreference, syntax, and semantics in parallel.</li>
+                <li><strong>Feed-Forward Blocks &amp; Residuals:</strong> Provide depth, non-linearity, and stable training.</li>
+                <li><strong>Task Heads:</strong> Add a classifier, decoder, or generation head depending on the downstream use case.</li>
+            </ul>
+        </div>
+
+        <h3>Bridging the Two Eras</h3>
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>Keep from Classical</h4>
+                <ul>
+                    <li>Basic normalization and quality checks</li>
+                    <li>Domain dictionaries for evaluation and interpretability</li>
+                    <li>Lightweight baselines for quick prototypes</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>Superseded by Transformers</h4>
+                <ul>
+                    <li>Manual feature engineering for semantics</li>
+                    <li>Separate POS/NER pipelines for deep models</li>
+                    <li>Fixed embeddings with one vector per word</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Learning Path to Master Transformers</h3>
+        <div class="explanation-box">
+            <ol>
+                <li><strong>Foundations:</strong> Practice with BoW and TF-IDF to see how text becomes vectors.</li>
+                <li><strong>Neural Basics:</strong> Grasp forward/backward passes, matrix operations, activation functions.</li>
+                <li><strong>Static Embeddings:</strong> Understand Word2Vec/GloVe, then their limitations.</li>
+                <li><strong>Attention Mechanism:</strong> Compute Q/K/V, scaling, softmax weighting.</li>
+                <li><strong>Full Transformer Stack:</strong> Position encodings, encoder/decoder roles, masked attention.</li>
+                <li><strong>Hands-on Fine-Tuning:</strong> Use Hugging Face to adapt BERT/GPT-style models for real tasks.</li>
+            </ol>
+        </div>
+
+        <div class="example-box">
+            <strong>Quick Reference:</strong><br>
+            Small labeled dataset → start with TF-IDF + SVM baseline.<br>
+            Need deep context or multilingual support → fine-tune a transformer.<br>
+            Interpretability critical → compare classical features with transformer outputs.
         </div>
     </div>
 
@@ -1221,7 +1340,7 @@ Where:
 {% block extra_js %}
 <script>
 let currentSection = 'intro';
-const sections = ['intro', 'text-repr', 'embeddings', 'sentiment', 'seq2seq', 'transformers', 'attention', 'applications'];
+const sections = ['intro', 'workflow', 'text-repr', 'embeddings', 'sentiment', 'seq2seq', 'transformers', 'attention', 'applications'];
 
 function showSection(sectionId) {
     // Hide all sections
