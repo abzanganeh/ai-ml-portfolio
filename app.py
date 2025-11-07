@@ -18,6 +18,9 @@ app.config['SECRET_KEY'] = 'your-secret-key-change-this'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tutorials.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
+app.config['GA_MEASUREMENT_ID'] = os.getenv('GA_MEASUREMENT_ID', 'G-L61S9JFG77')
+app.config['PLAUSIBLE_DOMAIN'] = os.getenv('PLAUSIBLE_DOMAIN')
+app.config['PLAUSIBLE_API_HOST'] = os.getenv('PLAUSIBLE_API_HOST', 'https://plausible.io')
 
 # Initialize database
 db.init_app(app)
@@ -617,7 +620,11 @@ def inject_globals():
             'linkedin': 'https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126',
             'github': 'https://github.com/abzanganeh',
             'email': 'alireza@zanganehai.com'
-        }
+        },
+        'google_analytics_id': app.config.get('GA_MEASUREMENT_ID'),
+        'plausible_domain': app.config.get('PLAUSIBLE_DOMAIN'),
+        'plausible_api_host': app.config.get('PLAUSIBLE_API_HOST'),
+        'canonical_url': request.base_url.rstrip('/') if request.base_url else None
     }
 
 if __name__ == '__main__':

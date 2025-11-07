@@ -6,6 +6,7 @@
     <meta name="description" content="{% block meta_description %}{{ site_title }} - Professional AI/ML Engineer and Data Scientist{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}machine learning, artificial intelligence, data science, python, flask, portfolio{% endblock %}">
     <meta name="author" content="Alireza Barzin Zanganeh">
+    <link rel="canonical" href="{% block canonical_url %}{{ canonical_url or request.base_url }}{% endblock %}">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="{% block og_title %}{{ site_title }}{% endblock %}">
@@ -24,6 +25,44 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/main.css') }}?v=2" rel="stylesheet">
     {% block extra_css %}{% endblock %}
+
+    {% block structured_data %}
+        {% if request.endpoint == 'blog_post' and post %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "{{ post.title|e }}",
+            "description": "{{ post.meta_description|e }}",
+            "datePublished": "{{ post.created_at.isoformat() }}",
+            "author": {
+                "@type": "Person",
+                "name": "{{ post.author|e }}"
+            },
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "{{ canonical_url or request.base_url }}"
+            }
+        }
+        </script>
+        {% elif request.endpoint == 'tutorial_detail' and tutorial %}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            "headline": "{{ tutorial.title|e }}",
+            "description": "{{ tutorial.description|e }}",
+            "datePublished": "{{ tutorial.created_at.isoformat() if tutorial.created_at else current_year }}",
+            "author": {
+                "@type": "Person",
+                "name": "Alireza Barzin Zanganeh"
+            },
+            "proficiencyLevel": "{{ tutorial.difficulty|default('Intermediate') }}",
+            "timeRequired": "PT{{ tutorial.duration|default('60') }}M"
+        }
+        </script>
+        {% endif %}
+    {% endblock %}
 
     <!-- Notification Styles -->
     <style>
@@ -266,6 +305,18 @@
     <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main-python.js') }}"></script>
+    {% if google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ google_analytics_id }}');
+    </script>
+    {% endif %}
+    {% if plausible_domain %}
+    <script defer data-domain="{{ plausible_domain }}" src="{{ plausible_api_host }}/js/script.js"></script>
+    {% endif %}
     {% block extra_js %}{% endblock %}
     
     <!-- Search Modal -->
