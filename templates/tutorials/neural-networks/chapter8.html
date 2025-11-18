@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 8: Training Tips & Best Practices - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 8: Training Tips & Best Practices</h1>
+                <p class="chapter-subtitle">Practical strategies for successful neural network training</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="100"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn active">Chapter 8</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="learning">Learning Rate</button>
+                    <button class="section-nav-btn azbn-btn" data-section="regularization">Regularization</button>
+                    <button class="section-nav-btn azbn-btn" data-section="optimization">Optimizers</button>
+                    <button class="section-nav-btn azbn-btn" data-section="monitoring">Monitoring</button>
+                    <button class="section-nav-btn azbn-btn" data-section="checklist">Training Checklist</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand learning rate selection and scheduling</li>
+                        <li>Master regularization techniques (dropout, L2, early stopping)</li>
+                        <li>Learn different optimization algorithms</li>
+                        <li>Understand how to monitor training effectively</li>
+                        <li>Develop a systematic approach to training neural networks</li>
+                        <li>Recognize and fix common training problems</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>Training Neural Networks Successfully</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 The Art and Science of Training</h3>
+                            <p><strong>Training neural networks requires balancing many hyperparameters and techniques.</strong> This chapter covers practical strategies that make the difference between a network that learns and one that doesn't.</p>
+                            
+                            <p><strong>Key Areas:</strong></p>
+                            <ul>
+                                <li><strong>Learning Rate:</strong> Most critical hyperparameter</li>
+                                <li><strong>Regularization:</strong> Prevent overfitting</li>
+                                <li><strong>Optimization:</strong> Better algorithms than basic gradient descent</li>
+                                <li><strong>Monitoring:</strong> Know when to stop, what to adjust</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="learning" class="content-section">
+                        <h2>Learning Rate Selection</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚡ The Most Important Hyperparameter</h3>
+                            <p><strong>The learning rate controls how big steps we take during optimization.</strong> Too large: overshoot minimum. Too small: takes forever or gets stuck.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Learning Rate in Gradient Descent</h4>
+                            
+                            <div class="formula-display">
+                                <strong>W ← W - η × (∂L/∂W)</strong>
+                            </div>
+                            
+                            <p>Where <strong>η</strong> (eta) is the learning rate</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Typical Values:</h5>
+                                <ul>
+                                    <li><strong>Too Large (> 0.1):</strong> Loss explodes, training unstable</li>
+                                    <li><strong>Good Range:</strong> 0.001 to 0.01 (common starting point)</li>
+                                    <li><strong>Too Small (< 0.0001):</strong> Training very slow, may not converge</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 Learning Rate Schedules</h4>
+                            <p><strong>Common strategies:</strong></p>
+                            <ul>
+                                <li><strong>Fixed:</strong> Same rate throughout (simple but suboptimal)</li>
+                                <li><strong>Step Decay:</strong> Reduce by factor every N epochs</li>
+                                <li><strong>Exponential Decay:</strong> η_t = η₀ × decay^t</li>
+                                <li><strong>Cosine Annealing:</strong> Smooth decrease following cosine curve</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Learning Rate Finder</h4>
+                            <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+def find_learning_rate(model, train_data, start_lr=1e-8, end_lr=1.0, num_iterations=100):
+    """
+    Learning rate range test
+    
+    Strategy: Train with exponentially increasing learning rates,
+    plot loss vs learning rate to find optimal range
+    """
+    learning_rates = np.logspace(np.log10(start_lr), np.log10(end_lr), num_iterations)
+    losses = []
+    
+    for lr in learning_rates:
+        # Train for a few iterations with this learning rate
+        loss = train_with_lr(model, train_data, lr, iterations=10)
+        losses.append(loss)
+    
+    # Plot to find optimal range
+    # Optimal: steepest downward slope in loss curve
+    return learning_rates, losses
+
+# Best practice: Start with learning rate finder, then use schedule
+# Typical: Start at 10x lower than where loss starts increasing</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="regularization" class="content-section">
+                        <h2>Regularization Techniques</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🛡️ Preventing Overfitting</h3>
+                            <p><strong>Regularization techniques prevent neural networks from memorizing training data and help them generalize to new data.</strong></p>
+                        </div>
+
+                        <h3>1. Dropout</h3>
+                        <div class="formula-box">
+                            <h4>Dropout Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>During Training:</strong><br>
+                                <strong>h_drop = h ⊙ mask / (1 - p)</strong><br><br>
+                                <strong>During Inference:</strong><br>
+                                <strong>h_drop = h × (1 - p)</strong>
+                            </div>
+                            
+                            <p>Where <strong>p</strong> is dropout probability and <strong>mask</strong> is random binary vector</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>How It Works:</h5>
+                                <ul>
+                                    <li>Randomly set some neurons to zero during training</li>
+                                    <li>Forces network to not rely on specific neurons</li>
+                                    <li>At test time, scale outputs by (1-p)</li>
+                                    <li>Common values: p = 0.5 for hidden layers, p = 0.2 for input layer</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>2. L2 Regularization (Weight Decay)</h3>
+                        <div class="formula-box">
+                            <h4>L2 Regularization</h4>
+                            
+                            <div class="formula-display">
+                                <strong>L_total = L_data + λ × Σ||W||²</strong>
+                            </div>
+                            
+                            <p>Where <strong>λ</strong> (lambda) is the regularization strength</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Effect:</h5>
+                                <ul>
+                                    <li>Penalizes large weights</li>
+                                    <li>Encourages simpler models</li>
+                                    <li>Prevents overfitting</li>
+                                    <li>Typical λ: 0.0001 to 0.01</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>3. Early Stopping</h3>
+                        <div class="explanation-box">
+                            <p><strong>Stop training when validation loss stops improving.</strong></p>
+                            <ul>
+                                <li>Monitor validation loss during training</li>
+                                <li>If no improvement for N epochs (patience), stop</li>
+                                <li>Use best model (lowest validation loss)</li>
+                                <li>Prevents overfitting by stopping before memorization</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="optimization" class="content-section">
+                        <h2>Optimization Algorithms</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🚀 Beyond Basic Gradient Descent</h3>
+                            <p><strong>Modern optimizers use adaptive learning rates and momentum to train faster and more reliably.</strong></p>
+                        </div>
+
+                        <h3>1. Momentum</h3>
+                        <div class="formula-box">
+                            <h4>Momentum Update</h4>
+                            
+                            <div class="formula-display">
+                                <strong>v_t = β × v_{t-1} + (1 - β) × ∇L</strong><br>
+                                <strong>W ← W - η × v_t</strong>
+                            </div>
+                            
+                            <p>Where <strong>β</strong> is momentum coefficient (typically 0.9)</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Benefits:</h5>
+                                <ul>
+                                    <li>Accumulates gradient over time (like momentum in physics)</li>
+                                    <li>Smooths out noisy gradients</li>
+                                    <li>Faster convergence, especially in narrow valleys</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>2. Adam (Adaptive Moment Estimation)</h3>
+                        <div class="formula-box">
+                            <h4>Adam Algorithm</h4>
+                            
+                            <div class="formula-display">
+                                <strong>m_t = β₁ × m_{t-1} + (1 - β₁) × ∇L</strong> (first moment)<br>
+                                <strong>v_t = β₂ × v_{t-1} + (1 - β₂) × (∇L)²</strong> (second moment)<br>
+                                <strong>m̂_t = m_t / (1 - β₁^t)</strong> (bias correction)<br>
+                                <strong>v̂_t = v_t / (1 - β₂^t)</strong> (bias correction)<br>
+                                <strong>W ← W - η × m̂_t / (√v̂_t + ε)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Default Parameters:</h5>
+                                <ul>
+                                    <li><strong>β₁ = 0.9:</strong> Momentum decay</li>
+                                    <li><strong>β₂ = 0.999:</strong> Variance decay</li>
+                                    <li><strong>ε = 1e-8:</strong> Small constant (prevents division by zero)</li>
+                                    <li><strong>η = 0.001:</strong> Learning rate (often works well as-is)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Adam Optimizer Implementation</h4>
+                            <pre><code>import numpy as np
+
+class AdamOptimizer:
+    """Adam (Adaptive Moment Estimation) Optimizer"""
+    
+    def __init__(self, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-8):
+        self.lr = learning_rate
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.t = 0  # Time step
+        
+        # Per-parameter moments
+        self.m = {}  # First moment
+        self.v = {}  # Second moment
+    
+    def update(self, params, grads):
+        """Update parameters using Adam"""
+        self.t += 1
+        
+        for key in params.keys():
+            # Initialize moments if needed
+            if key not in self.m:
+                self.m[key] = np.zeros_like(params[key])
+                self.v[key] = np.zeros_like(params[key])
+            
+            # Update biased first moment
+            self.m[key] = self.beta1 * self.m[key] + (1 - self.beta1) * grads[key]
+            
+            # Update biased second moment
+            self.v[key] = self.beta2 * self.v[key] + (1 - self.beta2) * (grads[key]**2)
+            
+            # Bias correction
+            m_hat = self.m[key] / (1 - self.beta1**self.t)
+            v_hat = self.v[key] / (1 - self.beta2**self.t)
+            
+            # Update parameters
+            params[key] -= self.lr * m_hat / (np.sqrt(v_hat) + self.epsilon)
+        
+        return params
+
+# Usage
+optimizer = AdamOptimizer(learning_rate=0.001)
+# Use in training loop: params = optimizer.update(params, grads)</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="monitoring" class="content-section">
+                        <h2>Monitoring Training</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>📊 What to Watch</h3>
+                            <p><strong>Effective monitoring helps you understand what's happening during training and when to make adjustments.</strong></p>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📈 Key Metrics to Monitor</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Metric</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">What It Tells You</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Good Sign</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Bad Sign</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Training Loss</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">How well model fits training data</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Decreasing smoothly</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Not decreasing, or NaN</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Validation Loss</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Generalization ability</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Decreasing, close to training loss</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Increasing while training decreases (overfitting)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Accuracy</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Classification performance</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Increasing</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Stuck or decreasing</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Gradient Norm</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Training health</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Reasonable values (0.1-10)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Very small (vanishing) or very large (exploding)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="checklist" class="content-section">
+                        <h2>Training Checklist</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>✅ Systematic Approach</h3>
+                            <p><strong>Follow this checklist for successful training:</strong></p>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📋 Pre-Training Checklist</h4>
+                            <ul>
+                                <li>[ ] Data is properly preprocessed and normalized</li>
+                                <li>[ ] Train/validation/test splits are appropriate</li>
+                                <li>[ ] Network architecture is suitable for the task</li>
+                                <li>[ ] Weights are properly initialized (He/Xavier)</li>
+                                <li>[ ] Learning rate is reasonable (start with 0.001)</li>
+                                <li>[ ] Loss function is appropriate for the task</li>
+                            </ul>
+                            
+                            <h4>📋 During Training Checklist</h4>
+                            <ul>
+                                <li>[ ] Monitor training and validation loss</li>
+                                <li>[ ] Check for overfitting (validation loss increasing)</li>
+                                <li>[ ] Watch for vanishing/exploding gradients</li>
+                                <li>[ ] Save best model (lowest validation loss)</li>
+                                <li>[ ] Use early stopping if validation not improving</li>
+                                <li>[ ] Adjust learning rate if loss not decreasing</li>
+                            </ul>
+                            
+                            <h4>📋 Post-Training Checklist</h4>
+                            <ul>
+                                <li>[ ] Evaluate on test set (only once!)</li>
+                                <li>[ ] Compare train/val/test performance</li>
+                                <li>[ ] Check for overfitting or underfitting</li>
+                                <li>[ ] Document hyperparameters and results</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What is the most critical hyperparameter in neural network training?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Learning rate</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Number of layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Batch size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Activation function</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What does dropout do during training?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Randomly sets some neurons to zero to prevent overfitting</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Removes layers from the network</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Increases learning rate</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Stops training early</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is early stopping?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Stopping training when loss reaches zero</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Stopping training when validation loss stops improving</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Using a smaller learning rate</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Removing regularization</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/neural-networks/chapter7" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 7</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

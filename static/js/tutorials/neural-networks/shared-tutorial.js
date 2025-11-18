@@ -102,7 +102,18 @@ function updateSectionProgress(sectionName) {
 
 // Progress Bar Functions
 function initializeProgressBars() {
-    // Chapter progress is set in HTML
-    // Section progress is updated by showSection()
+    // CRITICAL: Initialize chapter progress from data-progress attribute
+    const chapterProgressFill = document.querySelector('.chapter-progress-fill');
+    if (chapterProgressFill) {
+        const progress = chapterProgressFill.getAttribute('data-progress');
+        if (progress) {
+            chapterProgressFill.style.width = progress + '%';
+        }
+    }
+    
+    // Initialize section progress for first section
+    if (sections.length > 0) {
+        updateSectionProgress(sections[0]);
+    }
 }
 

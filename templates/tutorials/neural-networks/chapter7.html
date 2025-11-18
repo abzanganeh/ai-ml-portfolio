@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 7: Long Short-Term Memory (LSTM) - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 7: Long Short-Term Memory (LSTM)</h1>
+                <p class="chapter-subtitle">Solving the vanishing gradient problem with gated memory cells</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="87.5"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn active">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="problem">The Problem</button>
+                    <button class="section-nav-btn azbn-btn" data-section="gates">LSTM Gates</button>
+                    <button class="section-nav-btn azbn-btn" data-section="cell">Cell State</button>
+                    <button class="section-nav-btn azbn-btn" data-section="formulas">LSTM Formulas</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand why LSTMs solve the vanishing gradient problem</li>
+                        <li>Master the three gates: forget, input, and output</li>
+                        <li>Learn the cell state and hidden state mechanism</li>
+                        <li>Understand the complete LSTM forward pass</li>
+                        <li>Implement an LSTM from scratch</li>
+                        <li>Compare LSTMs with standard RNNs</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>What is LSTM?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧠 Gated Memory Networks</h3>
+                            <p><strong>Long Short-Term Memory (LSTM) networks are a special type of RNN designed to solve the vanishing gradient problem.</strong> They use gating mechanisms to selectively remember or forget information, allowing them to learn long-term dependencies.</p>
+                            
+                            <p><strong>Key Innovation:</strong></p>
+                            <ul>
+                                <li><strong>Cell State:</strong> Highway for information flow (gradients flow easily)</li>
+                                <li><strong>Gates:</strong> Control what information to keep, forget, or output</li>
+                                <li><strong>Additive Updates:</strong> Information added to cell state (not multiplied)</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Analogy: Memory System</h4>
+                            <p><strong>Think of LSTM like a filing cabinet:</strong></p>
+                            <ul>
+                                <li><strong>Cell State:</strong> The cabinet itself (long-term storage)</li>
+                                <li><strong>Forget Gate:</strong> Decides which files to throw away</li>
+                                <li><strong>Input Gate:</strong> Decides which new files to add</li>
+                                <li><strong>Output Gate:</strong> Decides which files to show you</li>
+                            </ul>
+                            <p><strong>Key:</strong> Information can flow through the cabinet (cell state) without being lost, solving the vanishing gradient problem!</p>
+                        </div>
+                    </div>
+
+                    <div id="problem" class="content-section">
+                        <h2>The Problem LSTMs Solve</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚠️ Vanishing Gradients in RNNs</h3>
+                            <p><strong>Standard RNNs suffer from vanishing gradients because:</strong></p>
+                            <ul>
+                                <li>Gradients are multiplied by W_hh at each time step</li>
+                                <li>If |W_hh| < 1, gradients shrink exponentially</li>
+                                <li>Early time steps receive almost no gradient</li>
+                                <li>Can't learn long-term dependencies</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>RNN Gradient Problem</h4>
+                            <p><strong>In RNNs, gradient at time t-k:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂h_{t-k} = ∂L/∂h_t × (W_hh)^k × tanh'(z_{t-k}) × ... × tanh'(z_t)</strong>
+                            </div>
+                            
+                            <p><strong>Problem:</strong> If W_hh < 1, (W_hh)^k → 0 as k increases</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>LSTM Solution:</h5>
+                                <ul>
+                                    <li>Uses <strong>additive</strong> updates instead of multiplicative</li>
+                                    <li>Cell state: C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t</li>
+                                    <li>Gradients can flow through addition (no shrinking!)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="gates" class="content-section">
+                        <h2>The Three Gates</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🚪 Gate Mechanism</h3>
+                            <p><strong>LSTMs use three gates to control information flow:</strong></p>
+                        </div>
+
+                        <h3>1. Forget Gate</h3>
+                        <div class="formula-box">
+                            <h4>Forget Gate Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>f_t = σ(W_f × [h_{t-1}, x_t] + b_f)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Purpose:</h5>
+                                <ul>
+                                    <li>Decides what information to <strong>forget</strong> from cell state</li>
+                                    <li>Output: 0 (forget) to 1 (keep)</li>
+                                    <li>Applied to previous cell state: f_t ⊙ C_{t-1}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>2. Input Gate</h3>
+                        <div class="formula-box">
+                            <h4>Input Gate Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>i_t = σ(W_i × [h_{t-1}, x_t] + b_i)</strong><br>
+                                <strong>C̃_t = tanh(W_C × [h_{t-1}, x_t] + b_C)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Purpose:</h5>
+                                <ul>
+                                    <li><strong>i_t:</strong> Decides which values to update</li>
+                                    <li><strong>C̃_t:</strong> New candidate values</li>
+                                    <li>Together: i_t ⊙ C̃_t (what new information to add)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>3. Output Gate</h3>
+                        <div class="formula-box">
+                            <h4>Output Gate Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>o_t = σ(W_o × [h_{t-1}, x_t] + b_o)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Purpose:</h5>
+                                <ul>
+                                    <li>Decides what parts of cell state to <strong>output</strong></li>
+                                    <li>Applied to tanh(C_t): o_t ⊙ tanh(C_t)</li>
+                                    <li>This becomes the hidden state h_t</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cell" class="content-section">
+                        <h2>Cell State and Hidden State</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔄 Two-State System</h3>
+                            <p><strong>LSTMs maintain two states:</strong></p>
+                            <ul>
+                                <li><strong>Cell State (C_t):</strong> Long-term memory (gradients flow easily)</li>
+                                <li><strong>Hidden State (h_t):</strong> Short-term memory (used for predictions)</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Cell State Update</h4>
+                            
+                            <div class="formula-display">
+                                <strong>C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Breakdown:</h5>
+                                <ul>
+                                    <li><strong>f_t ⊙ C_{t-1}:</strong> What to keep from previous state</li>
+                                    <li><strong>i_t ⊙ C̃_t:</strong> What new information to add</li>
+                                    <li><strong>Addition:</strong> Key! Gradients flow through addition</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Hidden State Update</h4>
+                            
+                            <div class="formula-display">
+                                <strong>h_t = o_t ⊙ tanh(C_t)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Purpose:</h5>
+                                <ul>
+                                    <li>Hidden state is a filtered version of cell state</li>
+                                    <li>Output gate controls what information to expose</li>
+                                    <li>Used for predictions and next time step</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="formulas" class="content-section">
+                        <h2>Complete LSTM Formulas</h2>
+                        
+                        <div class="formula-box">
+                            <h4>Full LSTM Forward Pass</h4>
+                            <p><strong>At each time step t:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>Step 1: Compute Gates</strong><br>
+                                <strong>f_t = σ(W_f × [h_{t-1}, x_t] + b_f)</strong><br>
+                                <strong>i_t = σ(W_i × [h_{t-1}, x_t] + b_i)</strong><br>
+                                <strong>o_t = σ(W_o × [h_{t-1}, x_t] + b_o)</strong><br><br>
+                                
+                                <strong>Step 2: Candidate Values</strong><br>
+                                <strong>C̃_t = tanh(W_C × [h_{t-1}, x_t] + b_C)</strong><br><br>
+                                
+                                <strong>Step 3: Update Cell State</strong><br>
+                                <strong>C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t</strong><br><br>
+                                
+                                <strong>Step 4: Update Hidden State</strong><br>
+                                <strong>h_t = o_t ⊙ tanh(C_t)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Notation:</h5>
+                                <ul>
+                                    <li><strong>⊙:</strong> Element-wise multiplication (Hadamard product)</li>
+                                    <li><strong>[h_{t-1}, x_t]:</strong> Concatenation of hidden state and input</li>
+                                    <li><strong>σ:</strong> Sigmoid function (outputs 0-1)</li>
+                                    <li><strong>tanh:</strong> Hyperbolic tangent (outputs -1 to 1)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="implementation" class="content-section">
+                        <h2>LSTM Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Complete LSTM Implementation</h4>
+                            <pre><code>import numpy as np
+
+class LSTM:
+    """Long Short-Term Memory Network"""
+    
+    def __init__(self, input_size, hidden_size):
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        
+        # Weight matrices for forget gate
+        self.W_f = np.random.randn(hidden_size, hidden_size + input_size) * 0.1
+        self.b_f = np.zeros((hidden_size, 1))
+        
+        # Weight matrices for input gate
+        self.W_i = np.random.randn(hidden_size, hidden_size + input_size) * 0.1
+        self.b_i = np.zeros((hidden_size, 1))
+        
+        # Weight matrices for candidate values
+        self.W_C = np.random.randn(hidden_size, hidden_size + input_size) * 0.1
+        self.b_C = np.zeros((hidden_size, 1))
+        
+        # Weight matrices for output gate
+        self.W_o = np.random.randn(hidden_size, hidden_size + input_size) * 0.1
+        self.b_o = np.zeros((hidden_size, 1))
+    
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-np.clip(x, -250, 250)))
+    
+    def tanh(self, x):
+        return np.tanh(x)
+    
+    def forward_step(self, x, h_prev, C_prev):
+        """One LSTM forward step"""
+        # Concatenate hidden state and input
+        concat = np.vstack([h_prev, x])
+        
+        # Forget gate
+        f_t = self.sigmoid(np.dot(self.W_f, concat) + self.b_f)
+        
+        # Input gate
+        i_t = self.sigmoid(np.dot(self.W_i, concat) + self.b_i)
+        
+        # Candidate values
+        C_tilde = self.tanh(np.dot(self.W_C, concat) + self.b_C)
+        
+        # Update cell state
+        C_t = f_t * C_prev + i_t * C_tilde
+        
+        # Output gate
+        o_t = self.sigmoid(np.dot(self.W_o, concat) + self.b_o)
+        
+        # Update hidden state
+        h_t = o_t * self.tanh(C_t)
+        
+        return h_t, C_t
+    
+    def forward(self, sequence):
+        """Forward pass through sequence"""
+        h = np.zeros((self.hidden_size, 1))
+        C = np.zeros((self.hidden_size, 1))
+        outputs = []
+        
+        for x in sequence:
+            h, C = self.forward_step(x, h, C)
+            outputs.append(h)
+        
+        return outputs
+
+# Example usage
+lstm = LSTM(input_size=10, hidden_size=20)
+sequence = [np.random.randn(10, 1) for _ in range(5)]
+outputs = lstm.forward(sequence)
+print(f"Processed {len(outputs)} time steps")</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: How do LSTMs solve the vanishing gradient problem?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) By using fewer layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) By using additive updates to cell state instead of multiplicative</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By removing hidden states</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) By using larger learning rates</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What does the forget gate do?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Decides what information to forget from the cell state</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Removes all previous information</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Controls the output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Adds new information</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is the difference between cell state and hidden state?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Cell state is long-term memory, hidden state is short-term memory used for predictions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are the same thing</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Cell state is input, hidden state is output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) There is no difference</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/neural-networks/chapter6" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 6</a>
+                <a href="/tutorials/neural-networks/chapter8" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 8: Training Tips →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
