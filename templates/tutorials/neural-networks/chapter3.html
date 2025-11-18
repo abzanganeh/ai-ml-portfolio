@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Activation Functions - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 3: Activation Functions</h1>
+                <p class="chapter-subtitle">Non-linearity and Network Capacity - Understanding how activation functions enable neural networks to learn complex patterns</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="37.5"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn active">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="why">Why Activation?</button>
+                    <button class="section-nav-btn azbn-btn" data-section="sigmoid">Sigmoid</button>
+                    <button class="section-nav-btn azbn-btn" data-section="tanh">Tanh</button>
+                    <button class="section-nav-btn azbn-btn" data-section="relu">ReLU</button>
+                    <button class="section-nav-btn azbn-btn" data-section="variants">ReLU Variants</button>
+                    <button class="section-nav-btn azbn-btn" data-section="choosing">Choosing Activation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand why activation functions are essential</li>
+                        <li>Master sigmoid, tanh, and ReLU functions</li>
+                        <li>Learn ReLU variants (Leaky ReLU, ELU, Swish)</li>
+                        <li>Understand the vanishing gradient problem</li>
+                        <li>Know when to use each activation function</li>
+                        <li>Implement activation functions from scratch</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="why" class="content-section active">
+                        <h2>Why Do We Need Activation Functions?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔑 The Key to Non-Linearity</h3>
+                            <p><strong>Without activation functions, neural networks would just be linear transformations!</strong> No matter how many layers you stack, a network without activations can only learn linear relationships. Activation functions introduce non-linearity, enabling networks to learn complex, non-linear patterns.</p>
+                            
+                            <p><strong>Mathematical Proof:</strong></p>
+                            <p>Consider a network without activations:</p>
+                            <ul>
+                                <li>Layer 1: z₁ = W₁x + b₁</li>
+                                <li>Layer 2: z₂ = W₂z₁ + b₂ = W₂(W₁x + b₁) + b₂ = W₂W₁x + W₂b₁ + b₂</li>
+                                <li>This is just: <strong>z₂ = W'x + b'</strong> (still linear!)</li>
+                            </ul>
+                            <p><strong>Result:</strong> Multiple layers collapse into a single linear transformation!</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Without Activation Functions</h4>
+                            <p>For L layers without activation:</p>
+                            
+                            <div class="formula-display">
+                                <strong>y = W_L W_{L-1} ... W_1 x + (bias terms)</strong><br>
+                                <strong>= W'x + b'</strong> (single linear transformation)
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>What This Means:</h5>
+                                <ul>
+                                    <li>No matter how deep the network, it's equivalent to one layer</li>
+                                    <li>Cannot learn non-linear patterns (curves, circles, XOR, etc.)</li>
+                                    <li>Limited to linear regression capabilities</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>With Activation Functions</h4>
+                            <p>For L layers with activation f(·):</p>
+                            
+                            <div class="formula-display">
+                                <strong>a₁ = f(W₁x + b₁)</strong><br>
+                                <strong>a₂ = f(W₂a₁ + b₂)</strong><br>
+                                <strong>...</strong><br>
+                                <strong>y = f(W_L a_{L-1} + b_L)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>What This Enables:</h5>
+                                <ul>
+                                    <li>Each layer applies a non-linear transformation</li>
+                                    <li>Composition of non-linear functions = complex patterns</li>
+                                    <li>Can approximate any continuous function (Universal Approximation Theorem)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Analogy: Building Blocks</h4>
+                            <p><strong>Think of activation functions like different types of building blocks:</strong></p>
+                            <ul>
+                                <li><strong>Without activations:</strong> Only straight blocks → can only build straight lines</li>
+                                <li><strong>With activations:</strong> Curved blocks, angled blocks → can build complex structures</li>
+                            </ul>
+                            <p><strong>Example:</strong> To draw a circle, you need curves. Linear transformations can only create straight lines. Activation functions provide the "curves" needed for complex shapes!</p>
+                        </div>
+
+                        <h3>Properties of Good Activation Functions</h3>
+                        
+                        <div class="explanation-box">
+                            <p><strong>An ideal activation function should have:</strong></p>
+                            <ul>
+                                <li><strong>Non-linearity:</strong> Enables learning complex patterns</li>
+                                <li><strong>Differentiability:</strong> Required for backpropagation (gradient computation)</li>
+                                <li><strong>Bounded output:</strong> Prevents activations from exploding</li>
+                                <li><strong>Computational efficiency:</strong> Fast to compute (used millions of times)</li>
+                                <li><strong>Non-zero gradients:</strong> Avoids vanishing gradients</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="sigmoid" class="content-section">
+                        <h2>Sigmoid Activation Function</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>📈 The Classic Choice</h3>
+                            <p><strong>The sigmoid function was one of the first activation functions used in neural networks.</strong> It squashes any input into a range between 0 and 1, making it perfect for binary classification and probability outputs.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Sigmoid Function</h4>
+                            
+                            <div class="formula-display">
+                                <strong>σ(x) = 1 / (1 + e^(-x))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> (0, 1) - outputs between 0 and 1</li>
+                                    <li><strong>Monotonic:</strong> Always increasing</li>
+                                    <li><strong>Smooth:</strong> Infinitely differentiable</li>
+                                    <li><strong>S-shaped:</strong> Sigmoid curve</li>
+                                    <li><strong>Centered at 0.5:</strong> σ(0) = 0.5</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Sigmoid Derivative</h4>
+                            <p><strong>Critical for backpropagation:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>σ'(x) = σ(x)(1 - σ(x))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Key Insight:</h5>
+                                <ul>
+                                    <li>Derivative is maximum at x = 0 (σ(0) = 0.5, derivative = 0.25)</li>
+                                    <li>Derivative approaches 0 as |x| → ∞</li>
+                                    <li><strong>Problem:</strong> Vanishing gradients for large inputs!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Sigmoid Examples</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Input x</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">σ(x)</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">σ'(x)</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Interpretation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">-5</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.007</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.007</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Very negative → almost 0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">-2</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.119</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.105</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Negative</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.500</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.250</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Neutral (maximum gradient)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">2</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.881</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.105</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Positive</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">5</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.993</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.007</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Very positive → almost 1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Sigmoid Implementation</h4>
+                            <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+def sigmoid(x):
+    """
+    Sigmoid activation function
+    
+    Parameters:
+    x: Input (can be scalar, vector, or matrix)
+    
+    Returns:
+    Sigmoid of x, clipped to prevent overflow
+    """
+    # Clip to prevent overflow
+    x_clipped = np.clip(x, -250, 250)
+    return 1 / (1 + np.exp(-x_clipped))
+
+def sigmoid_derivative(x):
+    """
+    Derivative of sigmoid function
+    
+    Uses the identity: σ'(x) = σ(x)(1 - σ(x))
+    """
+    s = sigmoid(x)
+    return s * (1 - s)
+
+# Example usage
+x = np.linspace(-10, 10, 100)
+y = sigmoid(x)
+dy = sigmoid_derivative(x)
+
+print(f"Sigmoid(0) = {sigmoid(0):.4f}")
+print(f"Sigmoid(5) = {sigmoid(5):.4f}")
+print(f"Max derivative = {sigmoid_derivative(0):.4f}")</code></pre>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>⚠️ Problems with Sigmoid</h4>
+                            <ul>
+                                <li><strong>Vanishing Gradients:</strong> For |x| > 5, gradient ≈ 0 → learning stops</li>
+                                <li><strong>Not Zero-Centered:</strong> Output always positive → gradients always same sign</li>
+                                <li><strong>Slow Convergence:</strong> Saturated neurons learn slowly</li>
+                                <li><strong>Computational Cost:</strong> Expensive exponential operation</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="tanh" class="content-section">
+                        <h2>Hyperbolic Tangent (Tanh)</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>📊 Zero-Centered Alternative</h3>
+                            <p><strong>Tanh is similar to sigmoid but outputs values between -1 and 1.</strong> This zero-centered property makes it often perform better than sigmoid in practice, especially in hidden layers.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Tanh Function</h4>
+                            
+                            <div class="formula-display">
+                                <strong>tanh(x) = (e^x - e^(-x)) / (e^x + e^(-x))</strong><br>
+                                <strong>= 2σ(2x) - 1</strong> (related to sigmoid)
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> (-1, 1) - zero-centered!</li>
+                                    <li><strong>Shape:</strong> Similar S-curve to sigmoid, but symmetric</li>
+                                    <li><strong>tanh(0) = 0:</strong> Centered at origin</li>
+                                    <li><strong>Steeper:</strong> Gradient is steeper than sigmoid</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Tanh Derivative</h4>
+                            
+                            <div class="formula-display">
+                                <strong>tanh'(x) = 1 - tanh²(x)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Comparison with Sigmoid:</h5>
+                                <ul>
+                                    <li>Maximum gradient = 1 (at x = 0) vs sigmoid's 0.25</li>
+                                    <li>Still suffers from vanishing gradients for large |x|</li>
+                                    <li>But better than sigmoid due to zero-centered output</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Tanh Implementation</h4>
+                            <pre><code>import numpy as np
+
+def tanh(x):
+    """Hyperbolic tangent activation"""
+    return np.tanh(x)
+
+def tanh_derivative(x):
+    """Derivative of tanh"""
+    return 1 - np.tanh(x)**2
+
+# Comparison: Sigmoid vs Tanh
+x = np.array([-2, -1, 0, 1, 2])
+sigmoid_vals = 1 / (1 + np.exp(-x))
+tanh_vals = np.tanh(x)
+
+print("Input:", x)
+print("Sigmoid:", sigmoid_vals)
+print("Tanh:   ", tanh_vals)
+print("\nNote: Tanh is zero-centered, sigmoid is not!")</code></pre>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 When to Use Tanh vs Sigmoid</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Aspect</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Sigmoid</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Tanh</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Output Range</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(0, 1)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(-1, 1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Zero-Centered</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Yes ✓</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Max Gradient</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.25</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1.0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Best For</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output layer (probabilities)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Hidden layers</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="relu" class="content-section">
+                        <h2>ReLU (Rectified Linear Unit)</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚡ The Modern Standard</h3>
+                            <p><strong>ReLU is the most popular activation function for deep neural networks today.</strong> It's simple, fast, and solves the vanishing gradient problem for positive inputs. Almost all modern deep learning architectures use ReLU or its variants.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>ReLU Function</h4>
+                            
+                            <div class="formula-display">
+                                <strong>ReLU(x) = max(0, x) = { x  if x > 0<br>
+                                                              0  if x ≤ 0 }</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> [0, ∞) - unbounded above</li>
+                                    <li><strong>Simple:</strong> Just returns max(0, x)</li>
+                                    <li><strong>Fast:</strong> No expensive exponentials</li>
+                                    <li><strong>Sparsity:</strong> Sets negative inputs to 0 (sparse activations)</li>
+                                    <li><strong>No Saturation:</strong> For positive x, gradient = 1 (constant!)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>ReLU Derivative</h4>
+                            
+                            <div class="formula-display">
+                                <strong>ReLU'(x) = { 1  if x > 0<br>
+                                                    0  if x ≤ 0 }</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Key Advantages:</h5>
+                                <ul>
+                                    <li><strong>Constant gradient:</strong> For positive inputs, gradient = 1 (no vanishing!)</li>
+                                    <li><strong>Computational efficiency:</strong> Just a simple comparison</li>
+                                    <li><strong>Problem:</strong> Dead ReLU problem (gradient = 0 for negative inputs)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 ReLU Examples</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Input x</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">ReLU(x)</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">ReLU'(x)</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Interpretation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">-5</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Dead neuron (no gradient)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">-1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Dead neuron</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Threshold</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Active (full gradient)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">10</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">10</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Active (no saturation!)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 ReLU Implementation</h4>
+                            <pre><code>import numpy as np
+
+def relu(x):
+    """Rectified Linear Unit"""
+    return np.maximum(0, x)
+
+def relu_derivative(x):
+    """Derivative of ReLU"""
+    return (x > 0).astype(float)
+
+# Vectorized implementation (handles arrays)
+def relu_vectorized(x):
+    """ReLU that works with arrays"""
+    return np.where(x > 0, x, 0)
+
+# Example
+x = np.array([-2, -1, 0, 1, 2, 5])
+print("Input:    ", x)
+print("ReLU(x):  ", relu(x))
+print("ReLU'(x): ", relu_derivative(x))
+
+# Performance comparison
+import time
+large_x = np.random.randn(1000000)
+
+start = time.time()
+result1 = np.maximum(0, large_x)
+time1 = time.time() - start
+
+start = time.time()
+result2 = np.where(large_x > 0, large_x, 0)
+time2 = time.time() - start
+
+print(f"\nmax(0, x) time: {time1:.6f}s")
+print(f"where() time:   {time2:.6f}s")</code></pre>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>✅ Advantages of ReLU</h4>
+                            <ul>
+                                <li><strong>No Vanishing Gradient (for positive inputs):</strong> Gradient = 1, constant!</li>
+                                <li><strong>Computational Efficiency:</strong> Just max(0, x) - very fast</li>
+                                <li><strong>Sparsity:</strong> Creates sparse representations (many zeros)</li>
+                                <li><strong>Biological Plausibility:</strong> Mimics neuron firing (threshold behavior)</li>
+                            </ul>
+                            
+                            <h4>⚠️ Disadvantages of ReLU</h4>
+                            <ul>
+                                <li><strong>Dead ReLU Problem:</strong> Neurons with negative inputs never activate</li>
+                                <li><strong>Not Zero-Centered:</strong> Output always ≥ 0</li>
+                                <li><strong>Unbounded:</strong> Can output very large values</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="variants" class="content-section">
+                        <h2>ReLU Variants</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔧 Solving ReLU's Problems</h3>
+                            <p><strong>Several variants of ReLU have been developed to address its limitations,</strong> particularly the "dead ReLU" problem where neurons with negative inputs never activate.</p>
+                        </div>
+
+                        <h3>1. Leaky ReLU</h3>
+                        
+                        <div class="formula-box">
+                            <h4>Leaky ReLU Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>LeakyReLU(x) = { x      if x > 0<br>
+                                                      αx     if x ≤ 0 }</strong>
+                            </div>
+                            
+                            <p>Where <strong>α</strong> is a small positive constant (typically 0.01)</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Key Improvement:</h5>
+                                <ul>
+                                    <li>Small gradient (α) for negative inputs</li>
+                                    <li>Prevents "dead" neurons</li>
+                                    <li>Allows some information flow even for negative values</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Leaky ReLU Implementation</h4>
+                            <pre><code>import numpy as np
+
+def leaky_relu(x, alpha=0.01):
+    """Leaky ReLU activation"""
+    return np.where(x > 0, x, alpha * x)
+
+def leaky_relu_derivative(x, alpha=0.01):
+    """Derivative of Leaky ReLU"""
+    return np.where(x > 0, 1, alpha)
+
+# Comparison
+x = np.array([-2, -1, 0, 1, 2])
+print("Input:        ", x)
+print("ReLU:         ", np.maximum(0, x))
+print("Leaky ReLU:   ", leaky_relu(x))
+print("Gradient ReLU:", (x > 0).astype(float))
+print("Gradient LReLU:", leaky_relu_derivative(x))</code></pre>
+                        </div>
+
+                        <h3>2. ELU (Exponential Linear Unit)</h3>
+                        
+                        <div class="formula-box">
+                            <h4>ELU Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>ELU(x) = { x           if x > 0<br>
+                                                 α(e^x - 1)  if x ≤ 0 }</strong>
+                            </div>
+                            
+                            <p>Where <strong>α</strong> is typically 1.0</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Advantages:</h5>
+                                <ul>
+                                    <li>Smooth curve (differentiable everywhere)</li>
+                                    <li>Negative outputs (zero-centered-like behavior)</li>
+                                    <li>No dead neurons</li>
+                                    <li>Better performance than ReLU in some cases</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>3. Swish (Self-Gated Activation)</h3>
+                        
+                        <div class="formula-box">
+                            <h4>Swish Function</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Swish(x) = x · σ(x) = x / (1 + e^(-x))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Non-monotonic:</strong> Can decrease for negative x</li>
+                                    <li><strong>Smooth:</strong> Differentiable everywhere</li>
+                                    <li><strong>Bounded below:</strong> Approaches 0 as x → -∞</li>
+                                    <li><strong>Unbounded above:</strong> Grows linearly as x → ∞</li>
+                                    <li><strong>Performance:</strong> Often outperforms ReLU</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 All ReLU Variants</h4>
+                            <pre><code>import numpy as np
+
+def relu(x):
+    return np.maximum(0, x)
+
+def leaky_relu(x, alpha=0.01):
+    return np.where(x > 0, x, alpha * x)
+
+def elu(x, alpha=1.0):
+    return np.where(x > 0, x, alpha * (np.exp(x) - 1))
+
+def swish(x):
+    """Swish: x * sigmoid(x)"""
+    sigmoid_x = 1 / (1 + np.exp(-np.clip(x, -250, 250)))
+    return x * sigmoid_x
+
+# Comparison
+x = np.linspace(-5, 5, 100)
+relu_vals = relu(x)
+leaky_vals = leaky_relu(x)
+elu_vals = elu(x)
+swish_vals = swish(x)
+
+print("Comparison at x = -2:")
+print(f"ReLU:       {relu(-2):.4f}")
+print(f"Leaky ReLU: {leaky_relu(-2):.4f}")
+print(f"ELU:        {elu(-2):.4f}")
+print(f"Swish:      {swish(-2):.4f}")</code></pre>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 Activation Function Comparison</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Function</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Range</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Gradient at x=0</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Dead Neurons?</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Best For</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Sigmoid</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(0, 1)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.25</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No (but saturates)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output layer</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Tanh</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(-1, 1)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1.0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No (but saturates)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">RNNs, hidden layers</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>ReLU</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">[0, ∞)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1.0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Yes (for x ≤ 0)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Most deep networks</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Leaky ReLU</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(-∞, ∞)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1.0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">When ReLU fails</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>ELU</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(-α, ∞)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1.0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">When smoothness needed</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Swish</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">(-∞, ∞)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0.5</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">No</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Modern architectures</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="choosing" class="content-section">
+                        <h2>Choosing the Right Activation Function</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 Decision Guide</h3>
+                            <p><strong>There's no one-size-fits-all activation function.</strong> The choice depends on your network architecture, task, and layer position.</p>
+                        </div>
+
+                        <h3>By Layer Type</h3>
+                        
+                        <div class="example-box">
+                            <h4>📋 Layer-Specific Recommendations</h4>
+                            
+                            <p><strong>Input Layer:</strong></p>
+                            <ul>
+                                <li>Usually no activation (just passes data through)</li>
+                                <li>Sometimes normalization instead</li>
+                            </ul>
+                            
+                            <p><strong>Hidden Layers:</strong></p>
+                            <ul>
+                                <li><strong>ReLU:</strong> Default choice for most deep networks</li>
+                                <li><strong>Leaky ReLU:</strong> If you see many dead neurons</li>
+                                <li><strong>ELU:</strong> When you need smooth gradients</li>
+                                <li><strong>Swish:</strong> For modern architectures (often better than ReLU)</li>
+                                <li><strong>Tanh:</strong> For RNNs and LSTMs</li>
+                            </ul>
+                            
+                            <p><strong>Output Layer:</strong></p>
+                            <ul>
+                                <li><strong>Binary Classification:</strong> Sigmoid (outputs probability)</li>
+                                <li><strong>Multi-class Classification:</strong> Softmax (outputs probability distribution)</li>
+                                <li><strong>Regression:</strong> Linear (no activation) or ReLU (if output ≥ 0)</li>
+                            </ul>
+                        </div>
+
+                        <h3>By Task Type</h3>
+                        
+                        <div class="example-box">
+                            <h4>📊 Task-Specific Guidelines</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Task</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Hidden Layers</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Output Layer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Image Classification</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">ReLU / Swish</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Softmax</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Binary Classification</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">ReLU / Leaky ReLU</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Sigmoid</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Regression</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">ReLU / ELU</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Linear / ReLU</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>RNN / LSTM</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Tanh / Sigmoid</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Softmax / Linear</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Activation Function Factory</h4>
+                            <pre><code>import numpy as np
+
+class ActivationFunction:
+    """Factory for activation functions"""
+    
+    @staticmethod
+    def get(name):
+        """Get activation function by name"""
+        activations = {
+            'sigmoid': ActivationFunction.sigmoid,
+            'tanh': ActivationFunction.tanh,
+            'relu': ActivationFunction.relu,
+            'leaky_relu': ActivationFunction.leaky_relu,
+            'elu': ActivationFunction.elu,
+            'swish': ActivationFunction.swish,
+            'linear': ActivationFunction.linear
+        }
+        return activations.get(name, ActivationFunction.relu)
+    
+    @staticmethod
+    def sigmoid(x):
+        x = np.clip(x, -250, 250)
+        return 1 / (1 + np.exp(-x))
+    
+    @staticmethod
+    def tanh(x):
+        return np.tanh(x)
+    
+    @staticmethod
+    def relu(x):
+        return np.maximum(0, x)
+    
+    @staticmethod
+    def leaky_relu(x, alpha=0.01):
+        return np.where(x > 0, x, alpha * x)
+    
+    @staticmethod
+    def elu(x, alpha=1.0):
+        return np.where(x > 0, x, alpha * (np.exp(x) - 1))
+    
+    @staticmethod
+    def swish(x):
+        sigmoid_x = 1 / (1 + np.exp(-np.clip(x, -250, 250)))
+        return x * sigmoid_x
+    
+    @staticmethod
+    def linear(x):
+        return x
+
+# Usage
+activation = ActivationFunction.get('relu')
+x = np.array([-2, -1, 0, 1, 2])
+print(activation(x))</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: Why do we need activation functions in neural networks?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To make computation faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To introduce non-linearity and enable learning complex patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory usage</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the main problem with sigmoid activation?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It's too slow</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Vanishing gradients for large inputs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It outputs negative values</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not differentiable</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is the "dead ReLU" problem?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Neurons with negative inputs never activate and stop learning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) ReLU is too slow</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) ReLU outputs are always zero</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) ReLU causes overfitting</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Section navigation
+        document.querySelectorAll('.section-nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.dataset.section;
+                document.querySelectorAll('.section-nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                const sections = ['why', 'sigmoid', 'tanh', 'relu', 'variants', 'choosing', 'quiz'];
+                const progress = ((sections.indexOf(section) + 1) / sections.length) * 100;
+                document.querySelector('.section-progress-fill').style.width = progress + '%';
+            });
+        });
+
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

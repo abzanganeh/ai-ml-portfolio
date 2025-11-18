@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Backpropagation Algorithm - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 4: Backpropagation Algorithm</h1>
+                <p class="chapter-subtitle">The Learning Mechanism - Understanding how neural networks learn by computing gradients and updating weights</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="50"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn active">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="12.5"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="chain">Chain Rule</button>
+                    <button class="section-nav-btn azbn-btn" data-section="loss">Loss Functions</button>
+                    <button class="section-nav-btn azbn-btn" data-section="backward">Backward Pass</button>
+                    <button class="section-nav-btn azbn-btn" data-section="gradients">Gradient Computation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="update">Weight Updates</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the chain rule and its role in backpropagation</li>
+                        <li>Master loss functions and error computation</li>
+                        <li>Learn the backward pass step-by-step</li>
+                        <li>Understand gradient computation for each layer</li>
+                        <li>Implement backpropagation from scratch</li>
+                        <li>Understand vanishing and exploding gradients</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>What is Backpropagation?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔄 The Learning Algorithm</h3>
+                            <p><strong>Backpropagation (backward propagation of errors) is the algorithm that enables neural networks to learn.</strong> It computes gradients of the loss function with respect to each weight and bias, allowing the network to update its parameters and improve predictions.</p>
+                            
+                            <p><strong>The Process:</strong></p>
+                            <ol>
+                                <li><strong>Forward Pass:</strong> Compute predictions using current weights</li>
+                                <li><strong>Compute Loss:</strong> Measure how wrong predictions are</li>
+                                <li><strong>Backward Pass:</strong> Compute gradients (how to change weights)</li>
+                                <li><strong>Update Weights:</strong> Adjust weights to reduce loss</li>
+                                <li><strong>Repeat:</strong> Continue until loss is minimized</li>
+                            </ol>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Analogy: Learning to Throw</h4>
+                            <p><strong>Think of learning to throw a ball into a basket:</strong></p>
+                            <ul>
+                                <li><strong>Forward Pass:</strong> You throw the ball (make a prediction)</li>
+                                <li><strong>Loss:</strong> You see how far off you were (measure error)</li>
+                                <li><strong>Backpropagation:</strong> You figure out what to adjust (angle, force, etc.)</li>
+                                <li><strong>Update:</strong> You adjust your throwing technique</li>
+                                <li><strong>Repeat:</strong> Keep practicing until you get it right!</li>
+                            </ul>
+                            <p><strong>Key Insight:</strong> Backpropagation tells you exactly how to adjust each "muscle" (weight) to improve your "throw" (prediction)!</p>
+                        </div>
+
+                        <h3>Why "Backward"?</h3>
+                        
+                        <div class="explanation-box">
+                            <p><strong>Backpropagation works backward through the network because:</strong></p>
+                            <ul>
+                                <li><strong>Error starts at output:</strong> We know the error at the final layer</li>
+                                <li><strong>Propagate backward:</strong> We compute how much each previous layer contributed to the error</li>
+                                <li><strong>Chain rule:</strong> Errors flow backward through the network using calculus</li>
+                                <li><strong>Efficient:</strong> One backward pass computes all gradients at once</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="chain" class="content-section">
+                        <h2>The Chain Rule: Foundation of Backpropagation</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔗 Mathematical Foundation</h3>
+                            <p><strong>The chain rule from calculus is the mathematical foundation of backpropagation.</strong> It allows us to compute derivatives of composite functions, which is exactly what neural networks are!</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Chain Rule for Single Variable</h4>
+                            
+                            <div class="formula-display">
+                                <strong>If y = f(g(x)), then:</strong><br>
+                                <strong>dy/dx = (df/dg) × (dg/dx)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Intuition:</h5>
+                                <p>To find how y changes with x, we need to know:</p>
+                                <ul>
+                                    <li>How y changes with g (df/dg)</li>
+                                    <li>How g changes with x (dg/dx)</li>
+                                </ul>
+                                <p><strong>Multiply them together!</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Simple Example</h4>
+                            <p><strong>Example:</strong> y = (2x + 1)³</p>
+                            <p>Let g = 2x + 1, so y = g³</p>
+                            <p><strong>Using chain rule:</strong></p>
+                            <ul>
+                                <li>dy/dg = 3g² = 3(2x + 1)²</li>
+                                <li>dg/dx = 2</li>
+                                <li>dy/dx = (dy/dg) × (dg/dx) = 3(2x + 1)² × 2 = 6(2x + 1)²</li>
+                            </ul>
+                            <p><strong>Verification:</strong> Direct differentiation gives the same result!</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Chain Rule for Multiple Variables</h4>
+                            <p><strong>For neural networks, we need the multivariable chain rule:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>If z = f(x, y) where x = g(t) and y = h(t), then:</strong><br>
+                                <strong>dz/dt = (∂f/∂x)(dx/dt) + (∂f/∂y)(dy/dt)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>In Neural Networks:</h5>
+                                <ul>
+                                    <li>Each layer's output depends on previous layers</li>
+                                    <li>Error propagates backward through all paths</li>
+                                    <li>We sum contributions from all paths (sum rule)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Chain Rule Visualization</h4>
+                            <pre><code>import numpy as np
+
+# Example: Computing gradient through a simple network
+# y = f(g(h(x)))
+# where h(x) = x², g(u) = 2u + 1, f(v) = v³
+
+def h(x):
+    return x**2
+
+def g(u):
+    return 2*u + 1
+
+def f(v):
+    return v**3
+
+# Forward pass
+x = 3
+u = h(x)  # u = 9
+v = g(u)  # v = 19
+y = f(v)  # y = 6859
+
+# Backward pass (chain rule)
+df_dv = 3 * v**2  # = 3 * 19² = 1083
+dg_du = 2
+dh_dx = 2 * x     # = 2 * 3 = 6
+
+# Chain rule: dy/dx = (df/dv) × (dg/du) × (dh/dx)
+dy_dx = df_dv * dg_du * dh_dx
+print(f"dy/dx = {dy_dx}")
+
+# Verification: y = (2x² + 1)³
+# dy/dx = 3(2x² + 1)² × 4x = 12x(2x² + 1)²
+# At x=3: 12×3×(2×9+1)² = 36×19² = 12996 ✓</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="loss" class="content-section">
+                        <h2>Loss Functions: Measuring Error</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>📏 What is a Loss Function?</h3>
+                            <p><strong>A loss function measures how wrong our predictions are.</strong> It quantifies the difference between predicted and actual values. The goal of training is to minimize this loss.</p>
+                        </div>
+
+                        <h3>Common Loss Functions</h3>
+                        
+                        <div class="formula-box">
+                            <h4>1. Mean Squared Error (MSE) - For Regression</h4>
+                            
+                            <div class="formula-display">
+                                <strong>L = (1/n) Σ(y_pred - y_true)²</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Always positive:</strong> Squared terms ensure L ≥ 0</li>
+                                    <li><strong>Penalizes large errors:</strong> Squaring amplifies big mistakes</li>
+                                    <li><strong>Differentiable:</strong> Smooth curve, easy to optimize</li>
+                                    <li><strong>Best for:</strong> Regression tasks (predicting continuous values)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>2. Cross-Entropy Loss - For Classification</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Binary Cross-Entropy:</strong><br>
+                                <strong>L = -(1/n) Σ[y_true × log(y_pred) + (1-y_true) × log(1-y_pred)]</strong><br><br>
+                                
+                                <strong>Multi-class Cross-Entropy:</strong><br>
+                                <strong>L = -(1/n) Σ Σ y_true × log(y_pred)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why Cross-Entropy?</h5>
+                                <ul>
+                                    <li><strong>Works with probabilities:</strong> Designed for classification</li>
+                                    <li><strong>Large penalty for confident wrong predictions:</strong> If y_pred ≈ 0 but y_true = 1, loss → ∞</li>
+                                    <li><strong>Small penalty for correct predictions:</strong> If y_pred ≈ y_true, loss → 0</li>
+                                    <li><strong>Best for:</strong> Classification tasks</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Loss Function Implementation</h4>
+                            <pre><code>import numpy as np
+
+def mse_loss(y_pred, y_true):
+    """
+    Mean Squared Error
+    
+    Parameters:
+    y_pred: Predicted values (n_samples,)
+    y_true: True values (n_samples,)
+    """
+    return np.mean((y_pred - y_true)**2)
+
+def mse_loss_derivative(y_pred, y_true):
+    """Derivative of MSE with respect to y_pred"""
+    return 2 * (y_pred - y_true) / len(y_pred)
+
+def binary_cross_entropy(y_pred, y_true, epsilon=1e-15):
+    """
+    Binary Cross-Entropy Loss
+    
+    Parameters:
+    y_pred: Predicted probabilities (n_samples,)
+    y_true: True labels (0 or 1) (n_samples,)
+    epsilon: Small value to prevent log(0)
+    """
+    # Clip to prevent log(0)
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+def binary_cross_entropy_derivative(y_pred, y_true, epsilon=1e-15):
+    """Derivative of BCE with respect to y_pred"""
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -(y_true / y_pred - (1 - y_true) / (1 - y_pred)) / len(y_pred)
+
+def cross_entropy(y_pred, y_true, epsilon=1e-15):
+    """
+    Multi-class Cross-Entropy Loss
+    
+    Parameters:
+    y_pred: Predicted probabilities (n_samples, n_classes)
+    y_true: True labels (one-hot encoded) (n_samples, n_classes)
+    """
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(np.sum(y_true * np.log(y_pred), axis=1))
+
+# Example usage
+y_pred_reg = np.array([2.1, 3.5, 1.8])
+y_true_reg = np.array([2.0, 3.0, 2.0])
+print(f"MSE: {mse_loss(y_pred_reg, y_true_reg):.4f}")
+
+y_pred_cls = np.array([0.9, 0.1, 0.8])
+y_true_cls = np.array([1, 0, 1])
+print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="backward" class="content-section">
+                        <h2>The Backward Pass: Computing Gradients</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⬅️ Working Backward Through Layers</h3>
+                            <p><strong>The backward pass computes gradients starting from the output layer and moving backward to the input layer.</strong> We use the chain rule to propagate errors through each layer.</p>
+                        </div>
+
+                        <h3>Step-by-Step Backward Pass</h3>
+                        
+                        <div class="formula-box">
+                            <h4>1. Output Layer Gradient</h4>
+                            <p><strong>Start with the loss gradient at the output:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂a⁽ᴸ⁾</strong> = derivative of loss with respect to output
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>For MSE Loss:</h5>
+                                <ul>
+                                    <li>L = (1/2)(y_pred - y_true)²</li>
+                                    <li>∂L/∂y_pred = y_pred - y_true (error signal!)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>2. Gradient Through Activation</h4>
+                            <p><strong>Apply chain rule through activation function:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂z⁽ᴸ⁾ = (∂L/∂a⁽ᴸ⁾) × f'(z⁽ᴸ⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Example with Sigmoid:</h5>
+                                <ul>
+                                    <li>If a = σ(z), then ∂a/∂z = σ(z)(1 - σ(z))</li>
+                                    <li>∂L/∂z = (∂L/∂a) × σ(z)(1 - σ(z))</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>3. Gradient for Weights and Biases</h4>
+                            <p><strong>Compute gradients for parameters:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂W⁽ᴸ⁾ = (∂L/∂z⁽ᴸ⁾) × a⁽ᴸ⁻¹⁾ᵀ</strong><br>
+                                <strong>∂L/∂b⁽ᴸ⁾ = Σ(∂L/∂z⁽ᴸ⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Intuition:</h5>
+                                <ul>
+                                    <li><strong>Weight gradient:</strong> How much did each input contribute to the error?</li>
+                                    <li><strong>Bias gradient:</strong> Sum of errors (bias affects all outputs equally)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>4. Propagate to Previous Layer</h4>
+                            <p><strong>Compute error for previous layer:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂a⁽ᴸ⁻¹⁾ = W⁽ᴸ⁾ᵀ × (∂L/∂z⁽ᴸ⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>This becomes the error signal for layer L-1:</h5>
+                                <ul>
+                                    <li>Weights transpose: "distribute" error back to previous layer</li>
+                                    <li>This error signal is used to compute gradients for layer L-1</li>
+                                    <li>Process repeats for all layers</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Complete Example: 2-Layer Network</h4>
+                            <p><strong>Network:</strong> 2 inputs → 3 hidden → 1 output</p>
+                            
+                            <p><strong>Forward Pass (already computed):</strong></p>
+                            <ul>
+                                <li>a⁽⁰⁾ = [0.5, 0.8] (input)</li>
+                                <li>z⁽¹⁾ = [0.39, 0.62, 0.85] (hidden pre-activation)</li>
+                                <li>a⁽¹⁾ = [0.39, 0.62, 0.85] (hidden activation, using ReLU)</li>
+                                <li>z⁽²⁾ = 1.076 (output pre-activation)</li>
+                                <li>a⁽²⁾ = 0.746 (output, using sigmoid)</li>
+                            </ul>
+                            
+                            <p><strong>True value:</strong> y_true = 1.0</p>
+                            
+                            <p><strong>Backward Pass:</strong></p>
+                            <ol>
+                                <li><strong>Output layer error:</strong> ∂L/∂a⁽²⁾ = a⁽²⁾ - y_true = 0.746 - 1.0 = -0.254</li>
+                                <li><strong>Through sigmoid:</strong> ∂L/∂z⁽²⁾ = -0.254 × 0.746(1-0.746) = -0.254 × 0.190 = -0.048</li>
+                                <li><strong>Weight gradient:</strong> ∂L/∂W⁽²⁾ = -0.048 × a⁽¹⁾ = -0.048 × [0.39, 0.62, 0.85]</li>
+                                <li><strong>Bias gradient:</strong> ∂L/∂b⁽²⁾ = -0.048</li>
+                                <li><strong>Propagate to hidden:</strong> ∂L/∂a⁽¹⁾ = W⁽²⁾ᵀ × (-0.048) = [0.4, 0.5, 0.6]ᵀ × (-0.048)</li>
+                                <li><strong>Continue for layer 1...</strong></li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div id="gradients" class="content-section">
+                        <h2>Gradient Computation: The Math</h2>
+                        
+                        <div class="formula-box">
+                            <h4>Complete Gradient Formulas</h4>
+                            <p><strong>For a network with L layers:</strong></p>
+                            
+                            <p><strong>Output Layer (L):</strong></p>
+                            <div class="formula-display">
+                                <strong>δ⁽ᴸ⁾ = ∂L/∂a⁽ᴸ⁾ ⊙ f'⁽ᴸ⁾(z⁽ᴸ⁾)</strong>
+                            </div>
+                            <p>Where ⊙ is element-wise multiplication</p>
+                            
+                            <p><strong>Hidden Layers (l = L-1, L-2, ..., 1):</strong></p>
+                            <div class="formula-display">
+                                <strong>δ⁽ˡ⁾ = (W⁽ˡ⁺¹⁾ᵀ × δ⁽ˡ⁺¹⁾) ⊙ f'⁽ˡ⁾(z⁽ˡ⁾)</strong>
+                            </div>
+                            
+                            <p><strong>Weight Gradients:</strong></p>
+                            <div class="formula-display">
+                                <strong>∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ × a⁽ˡ⁻¹⁾ᵀ</strong>
+                            </div>
+                            
+                            <p><strong>Bias Gradients:</strong></p>
+                            <div class="formula-display">
+                                <strong>∂L/∂b⁽ˡ⁾ = δ⁽ˡ⁾</strong> (sum over batch dimension)
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Notation:</h5>
+                                <ul>
+                                    <li><strong>δ⁽ˡ⁾</strong>: Error signal (gradient w.r.t. pre-activation) for layer l</li>
+                                    <li><strong>f'⁽ˡ⁾</strong>: Derivative of activation function for layer l</li>
+                                    <li><strong>⊙</strong>: Element-wise (Hadamard) product</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Backpropagation Implementation</h4>
+                            <pre><code>import numpy as np
+
+class NeuralNetwork:
+    """Neural Network with Backpropagation"""
+    
+    def __init__(self, layer_sizes, activation='relu'):
+        self.layer_sizes = layer_sizes
+        self.activation = activation
+        self.weights = []
+        self.biases = []
+        
+        # Initialize weights (He initialization for ReLU)
+        for i in range(len(layer_sizes) - 1):
+            W = np.random.randn(layer_sizes[i+1], layer_sizes[i]) * np.sqrt(2.0 / layer_sizes[i])
+            b = np.zeros((layer_sizes[i+1], 1))
+            self.weights.append(W)
+            self.biases.append(b)
+    
+    def _activate(self, z):
+        """Activation function"""
+        if self.activation == 'relu':
+            return np.maximum(0, z)
+        elif self.activation == 'sigmoid':
+            z = np.clip(z, -250, 250)
+            return 1 / (1 + np.exp(-z))
+        return z
+    
+    def _activate_derivative(self, z):
+        """Derivative of activation function"""
+        if self.activation == 'relu':
+            return (z > 0).astype(float)
+        elif self.activation == 'sigmoid':
+            s = self._activate(z)
+            return s * (1 - s)
+        return np.ones_like(z)
+    
+    def forward(self, X):
+        """Forward propagation"""
+        activations = [X]
+        z_values = []
+        current = X
+        
+        for W, b in zip(self.weights, self.biases):
+            z = np.dot(W, current) + b
+            z_values.append(z)
+            a = self._activate(z)
+            activations.append(a)
+            current = a
+        
+        return activations, z_values
+    
+    def backward(self, X, y_true, activations, z_values):
+        """
+        Backpropagation
+        
+        Returns gradients for weights and biases
+        """
+        m = X.shape[1]  # batch size
+        grads_W = []
+        grads_b = []
+        
+        # Output layer error
+        a_L = activations[-1]
+        delta = a_L - y_true  # For MSE loss
+        
+        # Backpropagate through layers
+        for l in range(len(self.weights) - 1, -1, -1):
+            # Gradient through activation
+            delta = delta * self._activate_derivative(z_values[l])
+            
+            # Weight and bias gradients
+            grad_W = np.dot(delta, activations[l].T) / m
+            grad_b = np.sum(delta, axis=1, keepdims=True) / m
+            
+            grads_W.insert(0, grad_W)
+            grads_b.insert(0, grad_b)
+            
+            # Propagate error to previous layer (if not first layer)
+            if l > 0:
+                delta = np.dot(self.weights[l].T, delta)
+        
+        return grads_W, grads_b
+    
+    def update_weights(self, grads_W, grads_b, learning_rate=0.01):
+        """Update weights using gradients"""
+        for i in range(len(self.weights)):
+            self.weights[i] -= learning_rate * grads_W[i]
+            self.biases[i] -= learning_rate * grads_b[i]
+    
+    def train_step(self, X, y_true, learning_rate=0.01):
+        """One training step: forward + backward + update"""
+        activations, z_values = self.forward(X)
+        grads_W, grads_b = self.backward(X, y_true, activations, z_values)
+        self.update_weights(grads_W, grads_b, learning_rate)
+        
+        # Return loss
+        loss = np.mean((activations[-1] - y_true)**2)
+        return loss
+
+# Example usage
+network = NeuralNetwork([2, 3, 1], activation='sigmoid')
+X = np.array([[0.5, 0.8]]).T
+y = np.array([[1.0]])
+
+# Training loop
+for epoch in range(100):
+    loss = network.train_step(X, y, learning_rate=0.1)
+    if epoch % 20 == 0:
+        print(f"Epoch {epoch}, Loss: {loss:.4f}")</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="update" class="content-section">
+                        <h2>Weight Updates: Gradient Descent</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⬇️ Minimizing the Loss</h3>
+                            <p><strong>Once we have gradients, we update weights to reduce the loss.</strong> We move in the direction opposite to the gradient (gradient descent).</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Gradient Descent Update Rule</h4>
+                            
+                            <div class="formula-display">
+                                <strong>W ← W - η × (∂L/∂W)</strong><br>
+                                <strong>b ← b - η × (∂L/∂b)</strong>
+                            </div>
+                            
+                            <p>Where <strong>η</strong> (eta) is the learning rate</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why Subtract?</h5>
+                                <ul>
+                                    <li><strong>Gradient points uphill:</strong> Direction of steepest increase</li>
+                                    <li><strong>We want to go downhill:</strong> Direction of steepest decrease</li>
+                                    <li><strong>Solution:</strong> Move in opposite direction (subtract gradient)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Analogy: Finding the Bottom of a Valley</h4>
+                            <p><strong>Imagine you're blindfolded in a valley and want to reach the bottom:</strong></p>
+                            <ul>
+                                <li><strong>Loss function:</strong> Height of the valley (we want to minimize it)</li>
+                                <li><strong>Gradient:</strong> Direction of steepest uphill (we feel the slope)</li>
+                                <li><strong>Gradient descent:</strong> Walk in opposite direction (downhill)</li>
+                                <li><strong>Learning rate:</strong> Step size (how big steps you take)</li>
+                            </ul>
+                            <p><strong>Too small steps:</strong> Takes forever to reach bottom</p>
+                            <p><strong>Too large steps:</strong> Might overshoot and miss the bottom</p>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Complete Training Loop</h4>
+                            <pre><code>import numpy as np
+
+def train_network(network, X_train, y_train, epochs=1000, learning_rate=0.01):
+    """
+    Complete training loop
+    
+    Parameters:
+    network: NeuralNetwork instance
+    X_train: Training inputs (n_features, n_samples)
+    y_train: Training targets (n_outputs, n_samples)
+    epochs: Number of training iterations
+    learning_rate: Step size for gradient descent
+    """
+    losses = []
+    
+    for epoch in range(epochs):
+        # Forward pass
+        activations, z_values = network.forward(X_train)
+        
+        # Compute loss
+        loss = np.mean((activations[-1] - y_train)**2)
+        losses.append(loss)
+        
+        # Backward pass
+        grads_W, grads_b = network.backward(X_train, y_train, activations, z_values)
+        
+        # Update weights
+        network.update_weights(grads_W, grads_b, learning_rate)
+        
+        # Print progress
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}, Loss: {loss:.6f}")
+    
+    return losses
+
+# Example: Learn XOR function
+X = np.array([[0, 0, 1, 1],
+              [0, 1, 0, 1]]).T.T  # (2, 4)
+y = np.array([[0, 1, 1, 0]])  # (1, 4) - XOR output
+
+network = NeuralNetwork([2, 4, 1], activation='sigmoid')
+losses = train_network(network, X, y, epochs=1000, learning_rate=0.5)
+
+# Test
+predictions = network.forward(X)[0][-1]
+print("\nPredictions:", predictions.flatten())
+print("True values:", y.flatten())</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="implementation" class="content-section">
+                        <h2>Complete Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Full Backpropagation Implementation</h4>
+                            <pre><code>import numpy as np
+
+class FeedforwardNetwork:
+    """Complete Feedforward Network with Backpropagation"""
+    
+    def __init__(self, layer_sizes, activation='relu', init_method='he'):
+        self.layer_sizes = layer_sizes
+        self.activation = activation
+        self.weights = []
+        self.biases = []
+        
+        # Initialize
+        for i in range(len(layer_sizes) - 1):
+            n_in, n_out = layer_sizes[i], layer_sizes[i+1]
+            if init_method == 'he':
+                W = np.random.randn(n_out, n_in) * np.sqrt(2.0 / n_in)
+            else:
+                W = np.random.randn(n_out, n_in) * 0.01
+            b = np.zeros((n_out, 1))
+            self.weights.append(W)
+            self.biases.append(b)
+    
+    def _activate(self, z):
+        if self.activation == 'relu':
+            return np.maximum(0, z)
+        elif self.activation == 'sigmoid':
+            z = np.clip(z, -250, 250)
+            return 1 / (1 + np.exp(-z))
+        return z
+    
+    def _activate_derivative(self, z):
+        if self.activation == 'relu':
+            return (z > 0).astype(float)
+        elif self.activation == 'sigmoid':
+            s = self._activate(z)
+            return s * (1 - s)
+        return np.ones_like(z)
+    
+    def forward(self, X):
+        """Forward propagation"""
+        activations = [X]
+        z_values = []
+        current = X
+        
+        for W, b in zip(self.weights, self.biases):
+            z = np.dot(W, current) + b
+            z_values.append(z)
+            a = self._activate(z)
+            activations.append(a)
+            current = a
+        
+        return activations, z_values
+    
+    def backward(self, X, y_true, activations, z_values, loss='mse'):
+        """Backpropagation"""
+        m = X.shape[1]  # batch size
+        grads_W = []
+        grads_b = []
+        
+        # Output layer error (depends on loss function)
+        a_L = activations[-1]
+        if loss == 'mse':
+            delta = (a_L - y_true) / m
+        elif loss == 'cross_entropy':
+            # For cross-entropy with sigmoid output
+            delta = (a_L - y_true) / m
+        
+        # Backpropagate
+        for l in range(len(self.weights) - 1, -1, -1):
+            # Gradient through activation
+            delta = delta * self._activate_derivative(z_values[l])
+            
+            # Compute gradients
+            grad_W = np.dot(delta, activations[l].T)
+            grad_b = np.sum(delta, axis=1, keepdims=True)
+            
+            grads_W.insert(0, grad_W)
+            grads_b.insert(0, grad_b)
+            
+            # Propagate to previous layer
+            if l > 0:
+                delta = np.dot(self.weights[l].T, delta)
+        
+        return grads_W, grads_b
+    
+    def update(self, grads_W, grads_b, learning_rate):
+        """Update weights"""
+        for i in range(len(self.weights)):
+            self.weights[i] -= learning_rate * grads_W[i]
+            self.biases[i] -= learning_rate * grads_b[i]
+    
+    def train(self, X, y, epochs=1000, learning_rate=0.01, verbose=True):
+        """Training loop"""
+        losses = []
+        for epoch in range(epochs):
+            activations, z_values = self.forward(X)
+            loss = np.mean((activations[-1] - y)**2)
+            losses.append(loss)
+            
+            grads_W, grads_b = self.backward(X, y, activations, z_values)
+            self.update(grads_W, grads_b, learning_rate)
+            
+            if verbose and epoch % (epochs // 10) == 0:
+                print(f"Epoch {epoch}: Loss = {loss:.6f}")
+        
+        return losses
+
+# Usage example
+np.random.seed(42)
+network = FeedforwardNetwork([2, 4, 1], activation='sigmoid')
+X = np.array([[0, 0, 1, 1], [0, 1, 0, 1]])
+y = np.array([[0, 1, 1, 0]])
+losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: Why is backpropagation called "backward" propagation?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Because it's slower than forward propagation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Because it computes gradients starting from the output layer and moving backward to the input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Because it reverses the network architecture</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Because it's done after forward propagation</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What mathematical principle is backpropagation based on?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Chain rule from calculus</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Matrix multiplication</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Linear algebra</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Probability theory</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: In gradient descent, why do we subtract the gradient from weights?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To increase the loss</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To move in the direction that decreases the loss</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To normalize the weights</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.section-nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.dataset.section;
+                document.querySelectorAll('.section-nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                const sections = ['overview', 'chain', 'loss', 'backward', 'gradients', 'update', 'implementation', 'quiz'];
+                const progress = ((sections.indexOf(section) + 1) / sections.length) * 100;
+                document.querySelector('.section-progress-fill').style.width = progress + '%';
+            });
+        });
+
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
