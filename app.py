@@ -387,6 +387,77 @@ def coding_algorithms_chapter(chapter_num):
     except:
         abort(404)
 
+# Neural Networks tutorial chapter routes
+@app.route('/tutorials/neural-networks/chapter<int:chapter_num>')
+def neural_networks_chapter(chapter_num):
+    """Neural Networks tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 8:
+        abort(404)
+    
+    template_path = f'tutorials/neural-networks/chapter{chapter_num}.html'
+    
+    # Check if template exists, otherwise 404
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
+# Transformers tutorial chapter routes
+@app.route('/tutorials/transformers/chapter<int:chapter_num>')
+def transformers_chapter(chapter_num):
+    """Transformer Architecture tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 10:
+        abort(404)
+    
+    template_path = f'tutorials/transformers/chapter{chapter_num}.html'
+    
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
+# LLMs tutorial chapter routes
+@app.route('/tutorials/llms/chapter<int:chapter_num>')
+def llms_chapter(chapter_num):
+    """Large Language Models tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 8:
+        abort(404)
+    
+    template_path = f'tutorials/llms/chapter{chapter_num}.html'
+    
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
+# RAG tutorial chapter routes
+@app.route('/tutorials/rag/chapter<int:chapter_num>')
+def rag_chapter(chapter_num):
+    """RAG & Retrieval Systems tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 7:
+        abort(404)
+    
+    template_path = f'tutorials/rag/chapter{chapter_num}.html'
+    
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
+# Agentic AI tutorial chapter routes
+@app.route('/tutorials/agentic-ai/chapter<int:chapter_num>')
+def agentic_ai_chapter(chapter_num):
+    """Agentic AI & LLM Agents tutorial chapters"""
+    if chapter_num < 1 or chapter_num > 8:
+        abort(404)
+    
+    template_path = f'tutorials/agentic-ai/chapter{chapter_num}.html'
+    
+    try:
+        return render_template(template_path)
+    except:
+        abort(404)
+
 
 @app.route('/blog')
 def blog():
