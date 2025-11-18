@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Feedforward Networks & Forward Propagation - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 2: Feedforward Networks & Forward Propagation</h1>
+                <p class="chapter-subtitle">Understanding how information flows through neural networks layer by layer</p>
+                
+                <!-- Chapter Progress Bar (2/8) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="25"></div>
+                </div>
+                
+                <!-- Chapter Navigation -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn active">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="layers">Network Layers</button>
+                    <button class="section-nav-btn azbn-btn" data-section="forward">Forward Propagation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="matrix">Matrix Operations</button>
+                    <button class="section-nav-btn azbn-btn" data-section="initialization">Weight Initialization</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the architecture of feedforward neural networks</li>
+                        <li>Master forward propagation step-by-step</li>
+                        <li>Learn matrix operations in neural networks</li>
+                        <li>Understand weight initialization strategies</li>
+                        <li>Implement forward propagation from scratch</li>
+                        <li>Visualize information flow through layers</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Overview Section -->
+                    <div id="overview" class="content-section active">
+                        <h2>What is a Feedforward Network?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔄 Information Flow: One Direction Only</h3>
+                            <p><strong>A feedforward neural network is called "feedforward" because information flows in only one direction:</strong> from input → hidden layers → output. There are no loops or cycles - data moves forward through the network like water flowing down a river.</p>
+                            
+                            <p><strong>Key Characteristics:</strong></p>
+                            <ul>
+                                <li><strong>Unidirectional:</strong> Information flows from input to output only</li>
+                                <li><strong>No Feedback:</strong> Outputs don't feed back into earlier layers</li>
+                                <li><strong>Layered Structure:</strong> Organized into distinct layers (input, hidden, output)</li>
+                                <li><strong>Fully Connected:</strong> Each neuron connects to all neurons in the next layer</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Analogy: Assembly Line</h4>
+                            <p><strong>Think of a feedforward network like an assembly line in a factory:</strong></p>
+                            <ul>
+                                <li><strong>Input Layer:</strong> Raw materials arrive (like car parts)</li>
+                                <li><strong>Hidden Layer 1:</strong> First processing station (workers assemble engine)</li>
+                                <li><strong>Hidden Layer 2:</strong> Second processing station (workers add body)</li>
+                                <li><strong>Output Layer:</strong> Final product (complete car)</li>
+                            </ul>
+                            <p><strong>Key Point:</strong> Just like an assembly line, information moves in one direction only - you can't go backwards! Each layer processes the output from the previous layer and passes it forward.</p>
+                        </div>
+
+                        <h3>Why "Feedforward"?</h3>
+                        
+                        <div class="explanation-box">
+                            <p><strong>The term "feedforward" distinguishes these networks from other types:</strong></p>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Network Type</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Information Flow</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Feedforward</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Input → Hidden → Output (one direction)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Image classification</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Recurrent (RNN)</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Has loops, information cycles back</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Text generation, time series</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Convolutional (CNN)</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Feedforward with special layer types</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Image recognition</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Network Layers Section -->
+                    <div id="layers" class="content-section">
+                        <h2>Understanding Network Layers</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🏗️ The Building Blocks</h3>
+                            <p><strong>A neural network is organized into layers, each serving a specific purpose:</strong></p>
+                            
+                            <h4>1. Input Layer</h4>
+                            <ul>
+                                <li><strong>Purpose:</strong> Receives the raw input data</li>
+                                <li><strong>Size:</strong> Number of input features (e.g., 784 for 28×28 images)</li>
+                                <li><strong>No Computation:</strong> Just passes data to the next layer</li>
+                                <li><strong>Example:</strong> For house price prediction, inputs might be: [size, bedrooms, age, location]</li>
+                            </ul>
+                            
+                            <h4>2. Hidden Layers</h4>
+                            <ul>
+                                <li><strong>Purpose:</strong> Learn complex patterns and feature combinations</li>
+                                <li><strong>Number:</strong> Can have 1 to 100+ hidden layers (depth)</li>
+                                <li><strong>Size:</strong> Number of neurons per layer (width)</li>
+                                <li><strong>Computation:</strong> Performs weighted sums and activations</li>
+                                <li><strong>Example:</strong> A hidden layer might learn: "houses with 3+ bedrooms AND size > 2000 sqft are expensive"</li>
+                            </ul>
+                            
+                            <h4>3. Output Layer</h4>
+                            <ul>
+                                <li><strong>Purpose:</strong> Produces the final prediction</li>
+                                <li><strong>Size:</strong> Depends on task (1 for regression, N for N-class classification)</li>
+                                <li><strong>Activation:</strong> Different from hidden layers (sigmoid for binary, softmax for multi-class)</li>
+                                <li><strong>Example:</strong> For classification: [0.1, 0.8, 0.1] means 80% confidence in class 2</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-box">
+                            <h3>Layer Notation</h3>
+                            <p>We use superscripts to denote layers:</p>
+                            
+                            <div class="formula-display">
+                                <strong>a⁽⁰⁾</strong> = Input layer (raw features)<br>
+                                <strong>a⁽¹⁾</strong> = First hidden layer output<br>
+                                <strong>a⁽²⁾</strong> = Second hidden layer output<br>
+                                <strong>a⁽ᴸ⁾</strong> = Output layer (L = number of layers)
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why This Notation?</h5>
+                                <ul>
+                                    <li><strong>a</strong> stands for "activation" (the output of a layer)</li>
+                                    <li><strong>Superscript number</strong> tells us which layer we're talking about</li>
+                                    <li><strong>a⁽⁰⁾</strong> is special - it's the input, not computed by the network</li>
+                                    <li>For a 3-layer network: a⁽⁰⁾ → a⁽¹⁾ → a⁽²⁾ (input → hidden → output)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Concrete Example: 3-Layer Network</h4>
+                            <p><strong>Architecture:</strong> 4 inputs → 5 hidden neurons → 3 outputs</p>
+                            
+                            <p><strong>Layer Sizes:</strong></p>
+                            <ul>
+                                <li><strong>Input Layer (a⁽⁰⁾):</strong> 4 neurons (e.g., [price, size, bedrooms, age])</li>
+                                <li><strong>Hidden Layer (a⁽¹⁾):</strong> 5 neurons (learns feature combinations)</li>
+                                <li><strong>Output Layer (a⁽²⁾):</strong> 3 neurons (e.g., [low_price, medium_price, high_price])</li>
+                            </ul>
+                            
+                            <p><strong>Total Parameters:</strong></p>
+                            <ul>
+                                <li>Weights from input to hidden: 4 × 5 = 20 weights</li>
+                                <li>Biases for hidden layer: 5 biases</li>
+                                <li>Weights from hidden to output: 5 × 3 = 15 weights</li>
+                                <li>Biases for output layer: 3 biases</li>
+                                <li><strong>Total: 20 + 5 + 15 + 3 = 43 parameters</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Forward Propagation Section -->
+                    <div id="forward" class="content-section">
+                        <h2>Forward Propagation: Step by Step</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚡ What is Forward Propagation?</h3>
+                            <p><strong>Forward propagation is the process of passing input data through the network to compute the output.</strong> It's called "forward" because we move from input to output, computing each layer's activations in sequence.</p>
+                            
+                            <p><strong>The Process:</strong></p>
+                            <ol>
+                                <li>Start with input features</li>
+                                <li>For each layer, compute weighted sum + bias</li>
+                                <li>Apply activation function</li>
+                                <li>Use this output as input to next layer</li>
+                                <li>Repeat until reaching output layer</li>
+                            </ol>
+                        </div>
+
+                        <h3>Mathematical Formulation</h3>
+                        
+                        <div class="formula-box">
+                            <h4>Forward Propagation Formula</h4>
+                            <p>For each layer <strong>l = 1, 2, ..., L</strong>:</p>
+                            
+                            <div class="formula-display">
+                                <strong>Step 1: Compute Pre-activation (Weighted Sum)</strong><br>
+                                <strong>z⁽ˡ⁾ = W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾</strong><br><br>
+                                
+                                <strong>Step 2: Apply Activation Function</strong><br>
+                                <strong>a⁽ˡ⁾ = f(z⁽ˡ⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Detailed Breakdown:</h5>
+                                <ul>
+                                    <li><strong>z⁽ˡ⁾</strong>: Pre-activation vector (before applying activation function)</li>
+                                    <li><strong>W⁽ˡ⁾</strong>: Weight matrix for layer l (rows = neurons in layer l, columns = neurons in layer l-1)</li>
+                                    <li><strong>a⁽ˡ⁻¹⁾</strong>: Activations from previous layer (input to current layer)</li>
+                                    <li><strong>b⁽ˡ⁾</strong>: Bias vector for layer l</li>
+                                    <li><strong>f(·)</strong>: Activation function (ReLU, sigmoid, tanh, etc.)</li>
+                                    <li><strong>a⁽ˡ⁾</strong>: Final activations (output of layer l)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Step-by-Step Example</h4>
+                            <p><strong>Simple 2-Layer Network:</strong> 2 inputs → 3 hidden → 1 output</p>
+                            
+                            <p><strong>Input:</strong> x = [0.5, 0.8]</p>
+                            
+                            <p><strong>Layer 1 (Hidden Layer):</strong></p>
+                            <p>Weight matrix W⁽¹⁾ (3×2):</p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+W⁽¹⁾ = [0.1  0.3]
+       [0.2  0.4]
+       [0.3  0.5]</pre>
+                            
+                            <p>Bias b⁽¹⁾ = [0.1, 0.2, 0.3]</p>
+                            
+                            <p><strong>Step 1: Compute z⁽¹⁾</strong></p>
+                            <p>z⁽¹⁾ = W⁽¹⁾x + b⁽¹⁾</p>
+                            <p>z⁽¹⁾ = [0.1×0.5 + 0.3×0.8 + 0.1,  0.2×0.5 + 0.4×0.8 + 0.2,  0.3×0.5 + 0.5×0.8 + 0.3]</p>
+                            <p>z⁽¹⁾ = [0.05 + 0.24 + 0.1,  0.10 + 0.32 + 0.2,  0.15 + 0.40 + 0.3]</p>
+                            <p>z⁽¹⁾ = [0.39,  0.62,  0.85]</p>
+                            
+                            <p><strong>Step 2: Apply ReLU activation</strong></p>
+                            <p>a⁽¹⁾ = ReLU(z⁽¹⁾) = [max(0, 0.39), max(0, 0.62), max(0, 0.85)]</p>
+                            <p>a⁽¹⁾ = [0.39,  0.62,  0.85]</p>
+                            
+                            <p><strong>Layer 2 (Output Layer):</strong></p>
+                            <p>Weight matrix W⁽²⁾ (1×3): W⁽²⁾ = [0.4, 0.5, 0.6]</p>
+                            <p>Bias b⁽²⁾ = [0.1]</p>
+                            
+                            <p><strong>Step 1: Compute z⁽²⁾</strong></p>
+                            <p>z⁽²⁾ = W⁽²⁾a⁽¹⁾ + b⁽²⁾</p>
+                            <p>z⁽²⁾ = 0.4×0.39 + 0.5×0.62 + 0.6×0.85 + 0.1</p>
+                            <p>z⁽²⁾ = 0.156 + 0.310 + 0.510 + 0.1</p>
+                            <p>z⁽²⁾ = 1.076</p>
+                            
+                            <p><strong>Step 2: Apply sigmoid activation</strong></p>
+                            <p>a⁽²⁾ = σ(z⁽²⁾) = 1 / (1 + e^(-1.076))</p>
+                            <p>a⁽²⁾ ≈ 0.746</p>
+                            
+                            <p><strong>Final Output:</strong> 0.746 (74.6% confidence in positive class)</p>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎯 Why Forward Propagation Matters</h4>
+                            <p><strong>Forward propagation is the foundation of neural network computation:</strong></p>
+                            <ul>
+                                <li><strong>Prediction:</strong> Used every time you make a prediction (inference)</li>
+                                <li><strong>Training:</strong> Required before backpropagation (need to compute error)</li>
+                                <li><strong>Understanding:</strong> Helps visualize how networks process information</li>
+                                <li><strong>Debugging:</strong> Can check intermediate values to find problems</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Matrix Operations Section -->
+                    <div id="matrix" class="content-section">
+                        <h2>Matrix Operations in Neural Networks</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔢 Why Matrices?</h3>
+                            <p><strong>Neural networks use matrix operations because they're incredibly efficient!</strong> Instead of computing each neuron one by one, we can process entire layers simultaneously using matrix multiplication.</p>
+                            
+                            <p><strong>Benefits of Matrix Operations:</strong></p>
+                            <ul>
+                                <li><strong>Parallelization:</strong> GPUs excel at matrix operations</li>
+                                <li><strong>Efficiency:</strong> Optimized linear algebra libraries (BLAS, cuBLAS)</li>
+                                <li><strong>Simplicity:</strong> Clean, concise code</li>
+                                <li><strong>Speed:</strong> Can process thousands of examples at once (batch processing)</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Matrix Dimensions</h4>
+                            <p>Understanding matrix dimensions is crucial:</p>
+                            
+                            <div class="formula-display">
+                                <strong>For layer l:</strong><br>
+                                <strong>W⁽ˡ⁾</strong>: (n⁽ˡ⁾ × n⁽ˡ⁻¹⁾) matrix<br>
+                                <strong>a⁽ˡ⁻¹⁾</strong>: (n⁽ˡ⁻¹⁾ × m) matrix (m = batch size)<br>
+                                <strong>b⁽ˡ⁾</strong>: (n⁽ˡ⁾ × 1) vector<br>
+                                <strong>z⁽ˡ⁾</strong>: (n⁽ˡ⁾ × m) matrix<br>
+                                <strong>a⁽ˡ⁾</strong>: (n⁽ˡ⁾ × m) matrix
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Dimension Rules:</h5>
+                                <ul>
+                                    <li><strong>n⁽ˡ⁾</strong>: Number of neurons in layer l</li>
+                                    <li><strong>m</strong>: Batch size (number of examples processed together)</li>
+                                    <li><strong>W⁽ˡ⁾ × a⁽ˡ⁻¹⁾</strong>: (n⁽ˡ⁾ × n⁽ˡ⁻¹⁾) × (n⁽ˡ⁻¹⁾ × m) = (n⁽ˡ⁾ × m) ✓</li>
+                                    <li><strong>Broadcasting:</strong> Bias b⁽ˡ⁾ is automatically broadcast to all examples in batch</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Matrix Multiplication Example</h4>
+                            <p><strong>Single Example (m=1):</strong></p>
+                            
+                            <p><strong>Input:</strong> a⁽⁰⁾ = [2, 3]ᵀ (2×1 vector)</p>
+                            
+                            <p><strong>Weight Matrix W⁽¹⁾ (3×2):</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+W⁽¹⁾ = [w₁₁  w₁₂]  = [0.1  0.2]
+       [w₂₁  w₂₂]    [0.3  0.4]
+       [w₃₁  w₃₂]    [0.5  0.6]</pre>
+                            
+                            <p><strong>Bias:</strong> b⁽¹⁾ = [0.1, 0.2, 0.3]ᵀ</p>
+                            
+                            <p><strong>Computation:</strong></p>
+                            <p>z⁽¹⁾ = W⁽¹⁾a⁽⁰⁾ + b⁽¹⁾</p>
+                            
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+z⁽¹⁾ = [0.1  0.2] [2]   [0.1]
+       [0.3  0.4] [3] + [0.2]
+       [0.5  0.6]       [0.3]
+
+     = [0.1×2 + 0.2×3]   [0.1]
+       [0.3×2 + 0.4×3] + [0.2]
+       [0.5×2 + 0.6×3]   [0.3]
+
+     = [0.8]   [0.1]   [0.9]
+       [1.8] + [0.2] = [2.0]
+       [2.8]   [0.3]   [3.1]</pre>
+                            
+                            <p><strong>Batch Processing (m=3):</strong></p>
+                            <p>Process 3 examples at once:</p>
+                            
+                            <p><strong>Input Batch:</strong> a⁽⁰⁾ = [[2, 3], [1, 4], [3, 1]]ᵀ (2×3 matrix)</p>
+                            
+                            <p><strong>Computation:</strong></p>
+                            <p>z⁽¹⁾ = W⁽¹⁾a⁽⁰⁾ + b⁽¹⁾</p>
+                            <p>Result: (3×3) matrix - each column is the output for one example!</p>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Matrix Operations in NumPy</h4>
+                            <pre><code>import numpy as np
+
+# Example: Forward propagation with matrices
+def forward_propagation(X, weights, biases, activation='relu'):
+    """
+    Forward propagation through a neural network
+    
+    Parameters:
+    X: Input data (n_features, n_samples)
+    weights: List of weight matrices
+    biases: List of bias vectors
+    activation: Activation function name
+    """
+    activations = [X]  # Store all layer activations
+    current_input = X
+    
+    for W, b in zip(weights, biases):
+        # Matrix multiplication: z = W @ X + b
+        z = np.dot(W, current_input) + b
+        
+        # Apply activation function
+        if activation == 'relu':
+            a = np.maximum(0, z)
+        elif activation == 'sigmoid':
+            a = 1 / (1 + np.exp(-np.clip(z, -250, 250)))
+        elif activation == 'tanh':
+            a = np.tanh(z)
+        else:
+            a = z
+        
+        activations.append(a)
+        current_input = a  # Output becomes input for next layer
+    
+    return activations
+
+# Example usage
+# Input: 2 features, 4 samples
+X = np.array([[1, 2, 3, 4],
+              [5, 6, 7, 8]])
+
+# Layer 1: 2 inputs → 3 hidden neurons
+W1 = np.random.randn(3, 2) * 0.1
+b1 = np.zeros((3, 1))
+
+# Layer 2: 3 hidden → 1 output
+W2 = np.random.randn(1, 3) * 0.1
+b2 = np.zeros((1, 1))
+
+weights = [W1, W2]
+biases = [b1, b2]
+
+# Forward pass
+activations = forward_propagation(X, weights, biases, activation='relu')
+print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4 samples</code></pre>
+                            
+                            <div class="code-explanation">
+                                <h5>Code Explanation:</h5>
+                                <ul>
+                                    <li><strong>np.dot(W, X):</strong> Matrix multiplication (more efficient than loops)</li>
+                                    <li><strong>Broadcasting:</strong> b automatically broadcasts to all samples</li>
+                                    <li><strong>Vectorized Operations:</strong> Activation function applied to entire matrix at once</li>
+                                    <li><strong>Batch Processing:</strong> Can process multiple examples simultaneously</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weight Initialization Section -->
+                    <div id="initialization" class="content-section">
+                        <h2>Weight Initialization Strategies</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎲 Why Initialization Matters</h3>
+                            <p><strong>Weight initialization is crucial for training neural networks!</strong> Starting with the wrong weights can cause:</p>
+                            <ul>
+                                <li><strong>Vanishing Gradients:</strong> Weights too small → gradients shrink to zero</li>
+                                <li><strong>Exploding Gradients:</strong> Weights too large → gradients explode</li>
+                                <li><strong>Symmetry Breaking:</strong> All weights same → neurons learn same thing</li>
+                                <li><strong>Slow Convergence:</strong> Poor initialization → takes forever to train</li>
+                            </ul>
+                        </div>
+
+                        <h3>Common Initialization Methods</h3>
+                        
+                        <div class="formula-box">
+                            <h4>1. Random Initialization</h4>
+                            <p><strong>Simple but often problematic:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>W ~ Uniform(-1, 1)</strong> or <strong>W ~ N(0, 1)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Problems:</h5>
+                                <ul>
+                                    <li>Weights too large → activation outputs saturate</li>
+                                    <li>Weights too small → gradients vanish</li>
+                                    <li>No consideration of layer size</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>2. Xavier/Glorot Initialization</h4>
+                            <p><strong>Designed for tanh and sigmoid activations:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>W ~ N(0, σ²)</strong> where <strong>σ² = 1/n_in</strong><br>
+                                or<br>
+                                <strong>W ~ Uniform(-√(6/(n_in + n_out)), √(6/(n_in + n_out)))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Intuition:</h5>
+                                <ul>
+                                    <li><strong>n_in:</strong> Number of inputs to the layer</li>
+                                    <li><strong>n_out:</strong> Number of outputs from the layer</li>
+                                    <li><strong>Goal:</strong> Keep variance of activations constant across layers</li>
+                                    <li><strong>Why it works:</strong> Prevents activations from growing or shrinking too much</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>3. He Initialization (for ReLU)</h4>
+                            <p><strong>Designed specifically for ReLU activation:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>W ~ N(0, σ²)</strong> where <strong>σ² = 2/n_in</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why Different from Xavier?</h5>
+                                <ul>
+                                    <li>ReLU sets half the outputs to zero (only positive values pass through)</li>
+                                    <li>This halves the variance compared to symmetric activations</li>
+                                    <li>He initialization compensates by doubling the variance (2/n_in vs 1/n_in)</li>
+                                    <li><strong>Result:</strong> Maintains variance through ReLU layers</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Implementation</h4>
+                            <pre><code>import numpy as np
+
+def xavier_init(n_in, n_out):
+    """Xavier/Glorot initialization for tanh/sigmoid"""
+    limit = np.sqrt(6.0 / (n_in + n_out))
+    return np.random.uniform(-limit, limit, (n_out, n_in))
+
+def he_init(n_in, n_out):
+    """He initialization for ReLU"""
+    std = np.sqrt(2.0 / n_in)
+    return np.random.randn(n_out, n_in) * std
+
+def initialize_network(layer_sizes, init_method='he'):
+    """
+    Initialize weights for a neural network
+    
+    Parameters:
+    layer_sizes: List of layer sizes, e.g., [784, 128, 64, 10]
+    init_method: 'xavier' or 'he'
+    """
+    weights = []
+    biases = []
+    
+    for i in range(len(layer_sizes) - 1):
+        n_in = layer_sizes[i]
+        n_out = layer_sizes[i + 1]
+        
+        if init_method == 'xavier':
+            W = xavier_init(n_in, n_out)
+        elif init_method == 'he':
+            W = he_init(n_in, n_out)
+        else:
+            W = np.random.randn(n_out, n_in) * 0.01
+        
+        b = np.zeros((n_out, 1))
+        
+        weights.append(W)
+        biases.append(b)
+    
+    return weights, biases
+
+# Example: Initialize a network
+layer_sizes = [784, 256, 128, 10]  # MNIST: 784 inputs → 10 outputs
+weights, biases = initialize_network(layer_sizes, init_method='he')
+
+print(f"Number of layers: {len(weights)}")
+for i, (W, b) in enumerate(zip(weights, biases)):
+    print(f"Layer {i+1}: W shape {W.shape}, b shape {b.shape}")</code></pre>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 Comparison: Different Initializations</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Method</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Best For</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Variance</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Pros</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Cons</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Random</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">None (avoid)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Fixed</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Simple</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Often fails</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Xavier</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Tanh, Sigmoid</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1/n_in</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Maintains variance</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Poor for ReLU</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>He</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">ReLU, Leaky ReLU</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">2/n_in</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Best for ReLU</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Not for sigmoid</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Implementation Section -->
+                    <div id="implementation" class="content-section">
+                        <h2>Complete Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Full Feedforward Network Implementation</h4>
+                            <pre><code>import numpy as np
+
+class FeedforwardNetwork:
+    """Complete Feedforward Neural Network Implementation"""
+    
+    def __init__(self, layer_sizes, activation='relu', init_method='he'):
+        """
+        Initialize network
+        
+        Parameters:
+        layer_sizes: List of neurons per layer, e.g., [784, 256, 128, 10]
+        activation: 'relu', 'sigmoid', or 'tanh'
+        init_method: 'he' or 'xavier'
+        """
+        self.layer_sizes = layer_sizes
+        self.activation = activation
+        self.weights = []
+        self.biases = []
+        
+        # Initialize weights and biases
+        for i in range(len(layer_sizes) - 1):
+            n_in = layer_sizes[i]
+            n_out = layer_sizes[i + 1]
+            
+            # Weight initialization
+            if init_method == 'he':
+                W = np.random.randn(n_out, n_in) * np.sqrt(2.0 / n_in)
+            elif init_method == 'xavier':
+                limit = np.sqrt(6.0 / (n_in + n_out))
+                W = np.random.uniform(-limit, limit, (n_out, n_in))
+            else:
+                W = np.random.randn(n_out, n_in) * 0.01
+            
+            b = np.zeros((n_out, 1))
+            
+            self.weights.append(W)
+            self.biases.append(b)
+    
+    def _activate(self, z):
+        """Apply activation function"""
+        if self.activation == 'relu':
+            return np.maximum(0, z)
+        elif self.activation == 'sigmoid':
+            # Clip to prevent overflow
+            z = np.clip(z, -250, 250)
+            return 1 / (1 + np.exp(-z))
+        elif self.activation == 'tanh':
+            return np.tanh(z)
+        else:
+            return z
+    
+    def forward(self, X):
+        """
+        Forward propagation
+        
+        Parameters:
+        X: Input data (n_features, n_samples)
+        
+        Returns:
+        activations: List of activations for each layer
+        """
+        activations = [X]  # Input layer
+        current_input = X
+        
+        # Store intermediate values for backpropagation
+        self.z_values = []
+        
+        for W, b in zip(self.weights, self.biases):
+            # Compute pre-activation
+            z = np.dot(W, current_input) + b
+            self.z_values.append(z)
+            
+            # Apply activation
+            a = self._activate(z)
+            activations.append(a)
+            
+            # Output becomes input for next layer
+            current_input = a
+        
+        return activations
+    
+    def predict(self, X):
+        """Make predictions"""
+        activations = self.forward(X)
+        return activations[-1]
+
+# Example: Create and test network
+# MNIST-like: 784 inputs (28×28 image) → 256 hidden → 128 hidden → 10 outputs
+network = FeedforwardNetwork(
+    layer_sizes=[784, 256, 128, 10],
+    activation='relu',
+    init_method='he'
+)
+
+# Test with random input (simulating 10 images)
+X_test = np.random.randn(784, 10)
+output = network.predict(X_test)
+
+print(f"Input shape: {X_test.shape}")
+print(f"Output shape: {output.shape}")
+print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
+                            
+                            <div class="code-explanation">
+                                <h5>Key Components:</h5>
+                                <ul>
+                                    <li><strong>__init__:</strong> Sets up network architecture and initializes weights</li>
+                                    <li><strong>forward:</strong> Performs forward propagation through all layers</li>
+                                    <li><strong>_activate:</strong> Applies activation function (vectorized)</li>
+                                    <li><strong>predict:</strong> Wrapper for making predictions</li>
+                                    <li><strong>z_values:</strong> Stores pre-activations (needed for backpropagation)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎯 Key Takeaways</h4>
+                            <ul>
+                                <li><strong>Forward propagation</strong> computes predictions by passing data through layers</li>
+                                <li><strong>Matrix operations</strong> enable efficient batch processing</li>
+                                <li><strong>Weight initialization</strong> is critical for successful training</li>
+                                <li><strong>Layer-by-layer computation</strong> transforms input into output</li>
+                                <li><strong>Activation functions</strong> introduce non-linearity at each layer</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What is the output dimension of a layer with 5 neurons processing input of shape (3, 100)?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) (3, 100)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) (5, 100)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) (5, 3)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) (100, 5)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Why is He initialization preferred over Xavier for ReLU networks?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It's simpler to implement</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) ReLU zeros out half the outputs, so variance needs to be doubled</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It works better with sigmoid</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It prevents overfitting</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: In forward propagation, what happens to the output of layer l?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It's discarded</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) It becomes the input to layer l+1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It's fed back to layer l-1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's stored for backpropagation only</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Section navigation
+        document.querySelectorAll('.section-nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.dataset.section;
+                
+                // Update active button
+                document.querySelectorAll('.section-nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide sections
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                
+                // Update progress
+                const sections = ['overview', 'layers', 'forward', 'matrix', 'initialization', 'implementation', 'quiz'];
+                const progress = ((sections.indexOf(section) + 1) / sections.length) * 100;
+                document.querySelector('.section-progress-fill').style.width = progress + '%';
+            });
+        });
+
+        // Quiz functionality
+        function checkAnswer(element, isCorrect) {
+            // Remove previous feedback
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                
+                // Show correct answer
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+

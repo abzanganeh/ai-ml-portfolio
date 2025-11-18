@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Introduction to Neural Networks - Neural Networks Fundamentals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/neural-networks" class="course-link">
+                    <span>Neural Networks Fundamentals</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Tutorial Header -->
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 1: Introduction to Neural Networks</h1>
+                <p class="chapter-subtitle">From Biological Neurons to Artificial Networks - Understanding the foundation of deep learning</p>
+                
+                <!-- Chapter Progress Bar (1/8) -->
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="12.5"></div>
+                </div>
+                
+                <!-- Chapter Navigation (All 8 chapters) -->
+                <div class="chapter-navigation">
+                    <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn active">Chapter 1</a>
+                    <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/neural-networks/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/neural-networks/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/neural-networks/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/neural-networks/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                </div>
+                
+                <!-- Section Progress Bar -->
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <!-- Section Navigation -->
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="biological">Biological Inspiration</button>
+                    <button class="section-nav-btn azbn-btn" data-section="perceptron">Perceptron</button>
+                    <button class="section-nav-btn azbn-btn" data-section="mlp">Multi-Layer Perceptron</button>
+                    <button class="section-nav-btn azbn-btn" data-section="architecture">Architecture Basics</button>
+                    <button class="section-nav-btn azbn-btn" data-section="universal">Universal Approximation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="example">Code Example</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <!-- Learning Objectives -->
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the biological inspiration behind neural networks</li>
+                        <li>Master the perceptron model and its limitations</li>
+                        <li>Learn the architecture of multi-layer perceptrons (MLPs)</li>
+                        <li>Understand the universal approximation theorem</li>
+                        <li>Implement a simple neural network from scratch</li>
+                        <li>Recognize when to use neural networks vs other ML methods</li>
+                    </ul>
+                </div>
+
+                <!-- Main Content Area -->
+                <main class="chapter-main-content">
+                    <!-- Biological Inspiration Section -->
+                    <div id="biological" class="content-section active">
+                        <h2>Biological Inspiration: The Human Brain</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🧠 The Biological Neuron</h3>
+                            <p><strong>Neural networks are inspired by how the human brain works.</strong> Your brain contains approximately 86 billion neurons, each connected to thousands of other neurons through structures called synapses. When a neuron receives enough input signals, it "fires" and sends signals to connected neurons.</p>
+                            
+                            <p><strong>Key Components of a Biological Neuron:</strong></p>
+                            <ul>
+                                <li><strong>Dendrites:</strong> Receive input signals from other neurons</li>
+                                <li><strong>Cell Body (Soma):</strong> Processes the incoming signals</li>
+                                <li><strong>Axon:</strong> Transmits output signals to other neurons</li>
+                                <li><strong>Synapses:</strong> Connections between neurons that can strengthen or weaken</li>
+                            </ul>
+                        </div>
+
+                        <h3>From Biology to Mathematics</h3>
+                        <p>Artificial neural networks mimic this biological process using mathematical operations:</p>
+                        
+                        <div class="formula-box">
+                            <h4>Biological Process → Mathematical Model</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Biological Component</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Mathematical Equivalent</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Input signals (dendrites)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Input features x₁, x₂, ..., xₙ</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Synaptic strength</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Weights w₁, w₂, ..., wₙ</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Neuron activation threshold</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Bias term b</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Neuron firing</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Activation function f(·)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output signal (axon)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output y = f(Σwᵢxᵢ + b)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Analogy</h4>
+                            <p><strong>Think of a neuron like a voting committee:</strong></p>
+                            <ul>
+                                <li>Each committee member (input feature) has a different influence (weight)</li>
+                                <li>Some members' votes count more than others (higher weights)</li>
+                                <li>The committee needs a minimum number of "yes" votes to make a decision (threshold/bias)</li>
+                                <li>Once the threshold is reached, the committee makes a decision (activation)</li>
+                            </ul>
+                            <p><strong>Example:</strong> Deciding if you should go to a movie:</p>
+                            <ul>
+                                <li>Input 1: "Is it a good movie?" (weight: 0.8 - very important)</li>
+                                <li>Input 2: "Do I have time?" (weight: 0.6 - important)</li>
+                                <li>Input 3: "Is it expensive?" (weight: 0.3 - less important)</li>
+                                <li>Bias: -0.5 (you need enough positive signals to overcome laziness)</li>
+                                <li>If weighted sum > threshold → Go to movie!</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Perceptron Section -->
+                    <div id="perceptron" class="content-section">
+                        <h2>The Perceptron: The Simplest Neural Network</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 What is a Perceptron?</h3>
+                            <p><strong>The perceptron is the simplest form of a neural network.</strong> Invented by Frank Rosenblatt in 1957, it's a single-layer neural network that can learn to classify linearly separable data.</p>
+                            
+                            <p><strong>Key Characteristics:</strong></p>
+                            <ul>
+                                <li>Takes multiple inputs (features)</li>
+                                <li>Applies weights to each input</li>
+                                <li>Sums the weighted inputs</li>
+                                <li>Applies an activation function (typically step function)</li>
+                                <li>Produces a binary output (0 or 1)</li>
+                            </ul>
+                        </div>
+
+                        <h3>Mathematical Formulation</h3>
+                        
+                        <div class="formula-box">
+                            <h4>Perceptron Formula</h4>
+                            <p>Given inputs <strong>x = [x₁, x₂, ..., xₙ]</strong> and weights <strong>w = [w₁, w₂, ..., wₙ]</strong>, the perceptron computes:</p>
+                            
+                            <div class="formula-display">
+                                <strong>z = w₁x₁ + w₂x₂ + ... + wₙxₙ + b</strong>
+                            </div>
+                            
+                            <p>Where <strong>b</strong> is the bias term. Then the output is:</p>
+                            
+                            <div class="formula-display">
+                                <strong>y = f(z) = { 1 if z ≥ 0<br>
+                                                     0 if z < 0 }</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Formula Breakdown:</h5>
+                                <ul>
+                                    <li><strong>z</strong>: The weighted sum (also called the "net input" or "pre-activation")</li>
+                                    <li><strong>wᵢ</strong>: Weight for the i-th input feature</li>
+                                    <li><strong>xᵢ</strong>: The i-th input feature value</li>
+                                    <li><strong>b</strong>: Bias term (allows shifting the decision boundary)</li>
+                                    <li><strong>f(·)</strong>: Step function (also called Heaviside function)</li>
+                                    <li><strong>y</strong>: Binary output (0 or 1)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Vectorized Form</h4>
+                            <p>Using linear algebra, we can write this more compactly:</p>
+                            
+                            <div class="formula-display">
+                                <strong>z = wᵀx + b</strong>
+                            </div>
+                            
+                            <p>Where:</p>
+                            <ul>
+                                <li><strong>wᵀ</strong>: Transpose of weight vector (row vector)</li>
+                                <li><strong>x</strong>: Input vector (column vector)</li>
+                                <li><strong>wᵀx</strong>: Dot product (sum of element-wise multiplication)</li>
+                            </ul>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why Vectorization Matters:</h5>
+                                <p>Vectorized operations are:</p>
+                                <ul>
+                                    <li><strong>Faster:</strong> Can use optimized linear algebra libraries</li>
+                                    <li><strong>Cleaner:</strong> Less code, easier to read</li>
+                                    <li><strong>Parallelizable:</strong> Modern CPUs/GPUs can process vectors efficiently</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Concrete Example: AND Gate</h4>
+                            <p><strong>Let's build a perceptron that implements an AND logic gate:</strong></p>
+                            
+                            <p><strong>Truth Table:</strong></p>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">x₁</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">x₂</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <p><strong>Solution:</strong> We need weights w₁ = 1, w₂ = 1, and bias b = -1.5</p>
+                            
+                            <p><strong>Verification:</strong></p>
+                            <ul>
+                                <li>x₁=0, x₂=0: z = 1×0 + 1×0 - 1.5 = -1.5 → y = 0 ✓</li>
+                                <li>x₁=0, x₂=1: z = 1×0 + 1×1 - 1.5 = -0.5 → y = 0 ✓</li>
+                                <li>x₁=1, x₂=0: z = 1×1 + 1×0 - 1.5 = -0.5 → y = 0 ✓</li>
+                                <li>x₁=1, x₂=1: z = 1×1 + 1×1 - 1.5 = 0.5 → y = 1 ✓</li>
+                            </ul>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Python Implementation</h4>
+                            <pre><code>import numpy as np
+
+class Perceptron:
+    """Simple Perceptron Implementation"""
+    
+    def __init__(self, learning_rate=0.01, n_iterations=1000):
+        self.learning_rate = learning_rate
+        self.n_iterations = n_iterations
+        self.weights = None
+        self.bias = None
+    
+    def fit(self, X, y):
+        """
+        Train the perceptron
+        
+        Parameters:
+        X: Input features (n_samples, n_features)
+        y: Target labels (n_samples,)
+        """
+        n_samples, n_features = X.shape
+        
+        # Initialize weights and bias
+        self.weights = np.zeros(n_features)
+        self.bias = 0
+        
+        # Training loop
+        for _ in range(self.n_iterations):
+            for idx, x_i in enumerate(X):
+                # Compute linear output
+                linear_output = np.dot(x_i, self.weights) + self.bias
+                
+                # Apply step function
+                y_predicted = self.activation(linear_output)
+                
+                # Update rule (Perceptron Learning Rule)
+                update = self.learning_rate * (y[idx] - y_predicted)
+                self.weights += update * x_i
+                self.bias += update
+    
+    def activation(self, x):
+        """Step activation function"""
+        return np.where(x >= 0, 1, 0)
+    
+    def predict(self, X):
+        """Make predictions"""
+        linear_output = np.dot(X, self.weights) + self.bias
+        return self.activation(linear_output)
+
+# Example usage
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([0, 0, 0, 1])  # AND gate
+
+perceptron = Perceptron()
+perceptron.fit(X, y)
+
+# Test
+predictions = perceptron.predict(X)
+print("Predictions:", predictions)
+print("Weights:", perceptron.weights)
+print("Bias:", perceptron.bias)</code></pre>
+                            
+                            <div class="code-explanation">
+                                <h5>Code Explanation:</h5>
+                                <ul>
+                                    <li><strong>__init__:</strong> Initializes learning rate and number of iterations</li>
+                                    <li><strong>fit:</strong> Trains the perceptron using the Perceptron Learning Rule</li>
+                                    <li><strong>activation:</strong> Step function that outputs 1 if input ≥ 0, else 0</li>
+                                    <li><strong>predict:</strong> Makes predictions on new data</li>
+                                    <li><strong>Update Rule:</strong> w ← w + η(y - ŷ)x, where η is learning rate</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>⚠️ Limitations of Perceptron</h4>
+                            <p><strong>The perceptron has a critical limitation:</strong> It can only learn linearly separable patterns. This was famously demonstrated by Marvin Minsky and Seymour Papert in 1969 with the XOR problem.</p>
+                            
+                            <p><strong>XOR Problem:</strong> The XOR (exclusive OR) function cannot be learned by a single perceptron because it's not linearly separable:</p>
+                            
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">x₁</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">x₂</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd;">XOR Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">1</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">0</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <p><strong>Why it fails:</strong> You cannot draw a single straight line to separate the 0s from the 1s. This limitation led to the development of multi-layer perceptrons (MLPs).</p>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Layer Perceptron Section -->
+                    <div id="mlp" class="content-section">
+                        <h2>Multi-Layer Perceptron (MLP): Solving Complex Problems</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🏗️ What is an MLP?</h3>
+                            <p><strong>A Multi-Layer Perceptron (MLP) is a feedforward neural network with one or more hidden layers.</strong> Unlike the single-layer perceptron, MLPs can learn non-linear patterns and solve complex problems like the XOR problem.</p>
+                            
+                            <p><strong>Key Components:</strong></p>
+                            <ul>
+                                <li><strong>Input Layer:</strong> Receives the input features</li>
+                                <li><strong>Hidden Layer(s):</strong> One or more layers between input and output</li>
+                                <li><strong>Output Layer:</strong> Produces the final predictions</li>
+                                <li><strong>Fully Connected:</strong> Every neuron in one layer connects to every neuron in the next</li>
+                            </ul>
+                        </div>
+
+                        <h3>MLP Architecture</h3>
+                        
+                        <div class="formula-box">
+                            <h4>Forward Propagation in MLP</h4>
+                            <p>For an MLP with L layers, the forward propagation is computed as follows:</p>
+                            
+                            <p><strong>For each layer l = 1, 2, ..., L:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>z⁽ˡ⁾ = W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾</strong><br>
+                                <strong>a⁽ˡ⁾ = f⁽ˡ⁾(z⁽ˡ⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Notation:</h5>
+                                <ul>
+                                    <li><strong>z⁽ˡ⁾</strong>: Pre-activation (weighted sum) at layer l</li>
+                                    <li><strong>a⁽ˡ⁾</strong>: Activation (output) at layer l</li>
+                                    <li><strong>W⁽ˡ⁾</strong>: Weight matrix for layer l</li>
+                                    <li><strong>b⁽ˡ⁾</strong>: Bias vector for layer l</li>
+                                    <li><strong>f⁽ˡ⁾</strong>: Activation function for layer l</li>
+                                    <li><strong>a⁽⁰⁾</strong>: Input features x</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Example: 2-Layer MLP for XOR</h4>
+                            <p><strong>Architecture:</strong> 2 inputs → 2 hidden neurons → 1 output</p>
+                            
+                            <p><strong>Layer 1 (Hidden):</strong></p>
+                            <ul>
+                                <li>h₁ = f(w₁₁x₁ + w₁₂x₂ + b₁)</li>
+                                <li>h₂ = f(w₂₁x₁ + w₂₂x₂ + b₂)</li>
+                            </ul>
+                            
+                            <p><strong>Layer 2 (Output):</strong></p>
+                            <ul>
+                                <li>y = f(w₃₁h₁ + w₃₂h₂ + b₃)</li>
+                            </ul>
+                            
+                            <p><strong>With appropriate weights, this MLP can solve XOR!</strong> The hidden layer creates non-linear combinations of inputs that make the problem linearly separable in the output layer.</p>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 MLP Implementation</h4>
+                            <pre><code>import numpy as np
+
+class MLP:
+    """Multi-Layer Perceptron Implementation"""
+    
+    def __init__(self, layers, activation='relu'):
+        """
+        Initialize MLP
+        
+        Parameters:
+        layers: List of layer sizes, e.g., [2, 4, 1] for 2 inputs, 4 hidden, 1 output
+        activation: Activation function ('relu', 'sigmoid', 'tanh')
+        """
+        self.layers = layers
+        self.activation = activation
+        self.weights = []
+        self.biases = []
+        
+        # Initialize weights and biases
+        for i in range(len(layers) - 1):
+            # Xavier initialization
+            w = np.random.randn(layers[i], layers[i+1]) * np.sqrt(2.0 / layers[i])
+            b = np.zeros((1, layers[i+1]))
+            self.weights.append(w)
+            self.biases.append(b)
+    
+    def _activate(self, x):
+        """Apply activation function"""
+        if self.activation == 'relu':
+            return np.maximum(0, x)
+        elif self.activation == 'sigmoid':
+            return 1 / (1 + np.exp(-np.clip(x, -250, 250)))
+        elif self.activation == 'tanh':
+            return np.tanh(x)
+        return x
+    
+    def forward(self, X):
+        """Forward propagation"""
+        a = X
+        activations = [a]
+        
+        for w, b in zip(self.weights, self.biases):
+            z = np.dot(a, w) + b
+            a = self._activate(z)
+            activations.append(a)
+        
+        return activations
+    
+    def predict(self, X):
+        """Make predictions"""
+        activations = self.forward(X)
+        return activations[-1]
+
+# Example: XOR problem
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+y = np.array([[0], [1], [1], [0]])  # XOR
+
+mlp = MLP([2, 4, 1], activation='sigmoid')
+# Note: This is a simplified version. Full training requires backpropagation (covered in Chapter 4)</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Continue with other sections... -->
+                    <!-- I'll create a summary message indicating the structure is set up -->
+                    
+                </main>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+

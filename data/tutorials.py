@@ -126,6 +126,76 @@ TUTORIALS_DATA = [
         'published': True,
         'excerpt': 'Comprehensive guide to coding interview algorithms covering Arrays, Linked Lists, Trees, Graphs, Dynamic Programming, and more with step-by-step code explanations.',
         'tags': 'algorithms,data-structures,coding-interviews,leetcode,problem-solving,arrays,trees,graphs,dynamic-programming'
+    },
+    {
+        'title': 'Neural Networks Fundamentals',
+        'slug': 'neural-networks',
+        'description': 'Master the foundations of neural networks from mathematical principles to practical implementations. 8 comprehensive chapters covering feedforward networks, backpropagation, activation functions, CNNs, RNNs, and LSTMs.',
+        'category': 'Deep Learning',
+        'difficulty': 'intermediate',
+        'duration': '180 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/neural-networks/index.html',
+        'published': True,
+        'excerpt': 'Complete neural networks course with detailed explanations, formulas, and code examples covering feedforward networks, backpropagation, CNNs, RNNs, and LSTMs.',
+        'tags': 'neural-networks,deep-learning,backpropagation,cnn,rnn,lstm,activation-functions,gradient-descent'
+    },
+    {
+        'title': 'Transformer Architecture Deep Dive',
+        'slug': 'transformers',
+        'description': 'Master the Transformer architecture that revolutionized NLP. 10 comprehensive chapters covering attention mechanisms, self-attention, multi-head attention, positional encoding, encoder-decoder architecture, and implementation details.',
+        'category': 'Deep Learning',
+        'difficulty': 'advanced',
+        'duration': '240 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/transformers/index.html',
+        'published': True,
+        'excerpt': 'Deep dive into Transformer architecture with extensive formulas, code examples, and visual explanations covering attention, self-attention, multi-head attention, and complete implementation.',
+        'tags': 'transformers,attention,self-attention,multi-head-attention,encoder-decoder,positional-encoding,bert,gpt'
+    },
+    {
+        'title': 'Large Language Models (LLMs)',
+        'slug': 'llms',
+        'description': 'Master Large Language Models from pre-training to fine-tuning. 8 comprehensive chapters covering BERT, GPT, transfer learning, fine-tuning strategies, prompt engineering, and practical applications.',
+        'category': 'Deep Learning',
+        'difficulty': 'advanced',
+        'duration': '200 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/llms/index.html',
+        'published': True,
+        'excerpt': 'Complete LLM course covering BERT, GPT, pre-training, fine-tuning, LoRA, prompt engineering, and practical applications with detailed explanations and code examples.',
+        'tags': 'llm,bert,gpt,pre-training,fine-tuning,lora,prompt-engineering,transfer-learning'
+    },
+    {
+        'title': 'RAG & Retrieval Systems',
+        'slug': 'rag',
+        'description': 'Master Retrieval-Augmented Generation (RAG) systems from vector databases to production deployment. 7 comprehensive chapters covering embeddings, retrieval strategies, RAG architecture, and building production systems.',
+        'category': 'Deep Learning',
+        'difficulty': 'advanced',
+        'duration': '180 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/rag/index.html',
+        'published': True,
+        'excerpt': 'Complete RAG tutorial covering embeddings, vector databases, retrieval strategies, RAG architecture, and production deployment with detailed explanations and code examples.',
+        'tags': 'rag,retrieval-augmented-generation,vector-databases,embeddings,semantic-search,pinecone,chroma'
+    },
+    {
+        'title': 'Agentic AI & LLM Agents',
+        'slug': 'agentic-ai',
+        'description': 'Master AI Agents and Agentic AI systems. 8 comprehensive chapters covering agent architectures, tool-using agents, ReAct framework, multi-agent systems, agent orchestration, and building production agents.',
+        'category': 'Deep Learning',
+        'difficulty': 'advanced',
+        'duration': '200 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/agentic-ai/index.html',
+        'published': True,
+        'excerpt': 'Complete agentic AI course covering agent architectures, tool-using agents, ReAct, multi-agent systems, orchestration, and production deployment with detailed explanations and code examples.',
+        'tags': 'agents,agentic-ai,react,langchain,multi-agent,tool-using,orchestration,autogpt'
     }
 
     
