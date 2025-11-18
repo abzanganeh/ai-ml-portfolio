@@ -523,15 +523,243 @@ mlp = MLP([2, 4, 1], activation='sigmoid')
                         </div>
                     </div>
 
-                    <!-- Continue with other sections... -->
-                    <!-- I'll create a summary message indicating the structure is set up -->
-                    
+                    <!-- Architecture Basics Section -->
+                    <div id="architecture" class="content-section">
+                        <h2>Neural Network Architecture Basics</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🏗️ Understanding Network Structure</h3>
+                            <p><strong>Neural network architecture refers to the overall design and organization of the network.</strong> This includes the number of layers, number of neurons per layer, how layers are connected, and the types of operations performed.</p>
+                            
+                            <p><strong>Key Architectural Components:</strong></p>
+                            <ul>
+                                <li><strong>Depth:</strong> Number of layers (shallow vs deep networks)</li>
+                                <li><strong>Width:</strong> Number of neurons per layer</li>
+                                <li><strong>Connections:</strong> How neurons connect (fully connected, sparse, etc.)</li>
+                                <li><strong>Activation Functions:</strong> Non-linear transformations at each layer</li>
+                            </ul>
+                        </div>
+
+                        <h3>Layer Types</h3>
+                        
+                        <div class="example-box">
+                            <h4>📊 Common Layer Types</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background-color: #f0f0f0;">
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Layer Type</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Purpose</th>
+                                        <th style="padding: 0.75rem; border: 1px solid #ddd; text-align: left;">Example Use</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Dense/Fully Connected</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Every neuron connects to all neurons in next layer</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Standard MLPs, classification</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Convolutional</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Sparse connections, shared weights</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Image processing, CNNs</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>Recurrent</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Connections form cycles, maintain state</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Sequences, RNNs, LSTMs</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Universal Approximation Section -->
+                    <div id="universal" class="content-section">
+                        <h2>Universal Approximation Theorem</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 The Power of Neural Networks</h3>
+                            <p><strong>The Universal Approximation Theorem is a fundamental result that explains why neural networks are so powerful.</strong> It states that a feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function to arbitrary accuracy, given appropriate activation functions and weights.</p>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Mathematical Statement</h4>
+                            <p><strong>For any continuous function f: [0,1]ⁿ → ℝ and any ε > 0,</strong> there exists a feedforward neural network with:</p>
+                            
+                            <div class="formula-display">
+                                <strong>• One hidden layer</strong><br>
+                                <strong>• Sufficiently many neurons</strong><br>
+                                <strong>• Appropriate activation function (e.g., sigmoid, ReLU)</strong>
+                            </div>
+                            
+                            <p>Such that the network approximates f with error less than ε.</p>
+                            
+                            <div class="formula-explanation">
+                                <h5>What This Means:</h5>
+                                <ul>
+                                    <li><strong>Any function:</strong> No matter how complex, a neural network can learn it</li>
+                                    <li><strong>Arbitrary accuracy:</strong> Can get as close as you want (given enough neurons)</li>
+                                    <li><strong>Single hidden layer:</strong> Even shallow networks are powerful</li>
+                                    <li><strong>Practical limitation:</strong> Theorem doesn't tell us how to find the weights!</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Implication</h4>
+                            <p><strong>This theorem explains why neural networks work so well:</strong></p>
+                            <ul>
+                                <li>They can learn any pattern (given enough capacity)</li>
+                                <li>No need to manually design features - the network learns them</li>
+                                <li>Deep networks (multiple layers) are even more powerful</li>
+                                <li>This is why deep learning has been so successful</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Code Example Section -->
+                    <div id="example" class="content-section">
+                        <h2>Complete Code Example</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Simple Neural Network from Scratch</h4>
+                            <pre><code>import numpy as np
+
+class SimpleNeuralNetwork:
+    """A simple feedforward neural network implementation"""
+    
+    def __init__(self, input_size, hidden_size, output_size):
+        # Initialize weights randomly
+        self.W1 = np.random.randn(input_size, hidden_size) * 0.1
+        self.b1 = np.zeros((1, hidden_size))
+        self.W2 = np.random.randn(hidden_size, output_size) * 0.1
+        self.b2 = np.zeros((1, output_size))
+    
+    def sigmoid(self, x):
+        """Sigmoid activation function"""
+        return 1 / (1 + np.exp(-np.clip(x, -250, 250)))
+    
+    def forward(self, X):
+        """Forward propagation"""
+        # Layer 1
+        self.z1 = np.dot(X, self.W1) + self.b1
+        self.a1 = self.sigmoid(self.z1)
+        
+        # Layer 2 (output)
+        self.z2 = np.dot(self.a1, self.W2) + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        
+        return self.a2
+    
+    def predict(self, X):
+        """Make predictions"""
+        return self.forward(X)
+
+# Example usage
+# Create network: 2 inputs → 3 hidden → 1 output
+network = SimpleNeuralNetwork(input_size=2, hidden_size=3, output_size=1)
+
+# Test input
+X = np.array([[0.5, 0.8]])
+output = network.predict(X)
+
+print(f"Input: {X}")
+print(f"Output: {output}")
+print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
+                            
+                            <div class="code-explanation">
+                                <h5>Code Breakdown:</h5>
+                                <ul>
+                                    <li><strong>__init__:</strong> Initializes weights and biases for 2-layer network</li>
+                                    <li><strong>sigmoid:</strong> Activation function (clips to prevent overflow)</li>
+                                    <li><strong>forward:</strong> Computes output through both layers</li>
+                                    <li><strong>predict:</strong> Wrapper for making predictions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Section -->
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What is the main limitation of a single-layer perceptron?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) It can only learn linearly separable patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's too slow</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It requires too much memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It can't handle numerical data</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What does the Universal Approximation Theorem tell us?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Neural networks always find the best solution</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) A neural network can approximate any continuous function with sufficient neurons</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Neural networks are faster than other methods</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Neural networks don't need training</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is the purpose of activation functions in neural networks?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To make computation faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To introduce non-linearity and enable learning complex patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory usage</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                            </div>
+                        </div>
+                    </div>
                 </main>
             </div>
         </section>
     </main>
+
+    <!-- Footer Navigation -->
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/neural-networks/chapter2" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 2: Feedforward Networks →</a>
+            </div>
+        </div>
+    </footer>
     
     <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <script>
+        // Function to scroll to section navigation
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // Quiz function
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
 
