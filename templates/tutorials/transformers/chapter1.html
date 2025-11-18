@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: The Attention Mechanism - Transformer Architecture Deep Dive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/transformers" class="course-link">
+                    <span>Transformer Architecture Deep Dive</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 1: The Attention Mechanism</h1>
+                <p class="chapter-subtitle">Foundation of Modern NLP - Understanding how attention revolutionized sequence modeling</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="10"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/transformers/chapter1" class="chapter-nav-btn active">Chapter 1</a>
+                    <a href="/tutorials/transformers/chapter2" class="chapter-nav-btn">Chapter 2</a>
+                    <a href="/tutorials/transformers/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/transformers/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/transformers/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/transformers/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/transformers/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/transformers/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                    <a href="/tutorials/transformers/chapter9" class="chapter-nav-btn">Chapter 9</a>
+                    <a href="/tutorials/transformers/chapter10" class="chapter-nav-btn">Chapter 10</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="problem">The Problem</button>
+                    <button class="section-nav-btn azbn-btn" data-section="attention">Attention Concept</button>
+                    <button class="section-nav-btn azbn-btn" data-section="qkv">QKV Framework</button>
+                    <button class="section-nav-btn azbn-btn" data-section="formula">Attention Formula</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand why attention was needed in sequence-to-sequence models</li>
+                        <li>Master the Query, Key, Value (QKV) framework</li>
+                        <li>Learn the mathematical formulation of attention</li>
+                        <li>Understand how attention solves the information bottleneck</li>
+                        <li>Implement attention mechanism from scratch</li>
+                        <li>Recognize the limitations of RNNs/LSTMs that attention addresses</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>What is Attention?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 The Revolutionary Idea</h3>
+                            <p><strong>Attention is a mechanism that allows models to focus on relevant parts of the input when making predictions.</strong> It was introduced to solve a critical limitation in sequence-to-sequence models: the information bottleneck.</p>
+                            
+                            <p><strong>Think of attention like reading comprehension:</strong></p>
+                            <ul>
+                                <li><strong>Without attention:</strong> Like trying to summarize a book after reading it once - you remember only the main points, lose details</li>
+                                <li><strong>With attention:</strong> Like having the book open while writing - you can look back at any part when needed</li>
+                                <li><strong>Key insight:</strong> When generating each word, the model can "attend to" (look at) any part of the input sequence</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Example: Translation</h4>
+                            <p><strong>Translating: "The cat sat on the mat" → "Le chat s'est assis sur le tapis"</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Without Attention (Old RNN Approach):</h5>
+                                <ul>
+                                    <li>Encoder processes entire sentence into one fixed-size vector</li>
+                                    <li>Decoder must generate translation from this single vector</li>
+                                    <li><strong>Problem:</strong> Long sentences get compressed into same-size vector → information loss</li>
+                                    <li>Like trying to fit a 1000-page book summary into one sentence!</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>With Attention (Modern Approach):</h5>
+                                <ul>
+                                    <li>Encoder keeps all hidden states (one per input word)</li>
+                                    <li>When generating "chat", decoder attends to "cat" in input</li>
+                                    <li>When generating "tapis", decoder attends to "mat" in input</li>
+                                    <li><strong>Result:</strong> Each output word can access any input word directly!</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="problem" class="content-section">
+                        <h2>The Problem Attention Solves</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚠️ The Information Bottleneck</h3>
+                            <p><strong>Sequence-to-sequence models (like RNNs) had a fundamental limitation:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>The Bottleneck Problem</h4>
+                                <p><strong>Old architecture (RNN encoder-decoder):</strong></p>
+                                <ul>
+                                    <li><strong>Encoder:</strong> Processes input sequence word by word</li>
+                                    <li><strong>Final hidden state:</strong> Single vector representing entire input</li>
+                                    <li><strong>Decoder:</strong> Must generate output from this single vector</li>
+                                </ul>
+                                
+                                <p><strong>Why this is a problem:</strong></p>
+                                <ul>
+                                    <li>Short sentence: "Hello" → Easy to compress into one vector</li>
+                                    <li>Long sentence: "The quick brown fox jumps over the lazy dog and then runs through the forest..." → Same-size vector!</li>
+                                    <li><strong>Result:</strong> Information loss for long sequences</li>
+                                    <li>Like trying to summarize War and Peace in one sentence</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="attention" class="content-section">
+                        <h2>The Attention Concept</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔍 How Attention Works</h3>
+                            <p><strong>Attention allows the decoder to look at ALL encoder hidden states, not just the final one:</strong></p>
+                            
+                            <div class="formula-box">
+                                <h4>Attention Mechanism</h4>
+                                <p><strong>For each decoder step:</strong></p>
+                                <ol>
+                                    <li>Compute attention scores for all encoder positions</li>
+                                    <li>Convert scores to attention weights (probabilities)</li>
+                                    <li>Create weighted combination of encoder hidden states</li>
+                                    <li>Use this combination (context vector) for decoding</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="qkv" class="content-section">
+                        <h2>Query, Key, Value (QKV) Framework</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔑 The Three Components</h3>
+                            <p><strong>Attention uses three vectors: Query, Key, and Value</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>📚 Library Analogy</h4>
+                                <p><strong>Think of attention like searching a library:</strong></p>
+                                <ul>
+                                    <li><strong>Query (Q):</strong> Your question - "I need information about cats"</li>
+                                    <li><strong>Key (K):</strong> Book titles/index - Each book has a title describing its content</li>
+                                    <li><strong>Value (V):</strong> Book content - The actual information in each book</li>
+                                </ul>
+                                
+                                <p><strong>The process:</strong></p>
+                                <ol>
+                                    <li>Compare your Query to all Keys (book titles)</li>
+                                    <li>Find which Keys match your Query best</li>
+                                    <li>Retrieve the Values (content) from matching books</li>
+                                    <li>Combine the relevant Values to answer your question</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="formula" class="content-section">
+                        <h2>Attention Formula</h2>
+                        
+                        <div class="formula-box">
+                            <h4>Scaled Dot-Product Attention</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Attention(Q, K, V) = softmax(QK^T / √d_k) × V</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Step-by-Step Breakdown:</h5>
+                                <ol>
+                                    <li><strong>QK^T:</strong> Compute similarity between queries and keys (dot product)</li>
+                                    <li><strong>/ √d_k:</strong> Scale by square root of key dimension (prevents large values)</li>
+                                    <li><strong>softmax(...):</strong> Convert scores to probabilities (attention weights)</li>
+                                    <li><strong>× V:</strong> Weighted sum of values based on attention weights</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="implementation" class="content-section">
+                        <h2>Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Attention Implementation</h4>
+                            <pre><code>import numpy as np
+
+def attention(Q, K, V):
+    """
+    Scaled dot-product attention
+    
+    Parameters:
+    Q: Query matrix (seq_len_q, d_k)
+    K: Key matrix (seq_len_k, d_k)
+    V: Value matrix (seq_len_v, d_v)
+    """
+    d_k = K.shape[-1]
+    
+    # Compute attention scores
+    scores = np.dot(Q, K.T) / np.sqrt(d_k)
+    
+    # Apply softmax
+    attention_weights = softmax(scores, axis=-1)
+    
+    # Weighted sum of values
+    output = np.dot(attention_weights, V)
+    
+    return output, attention_weights
+
+def softmax(x, axis=-1):
+    """Softmax function"""
+    exp_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+# Example usage
+Q = np.random.randn(5, 64)  # 5 queries, 64 dimensions
+K = np.random.randn(10, 64)  # 10 keys, 64 dimensions
+V = np.random.randn(10, 64)  # 10 values, 64 dimensions
+
+output, weights = attention(Q, K, V)
+print(f"Output shape: {output.shape}")  # (5, 64)
+print(f"Attention weights shape: {weights.shape}")  # (5, 10)</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What problem does attention solve in sequence-to-sequence models?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The information bottleneck where all input is compressed into one vector</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Slow computation speed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Memory limitations</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Overfitting</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What does the Query (Q) represent in attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) What we're looking for</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The input data</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The output data</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The weights</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/transformers/chapter2" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 2: Self-Attention →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
