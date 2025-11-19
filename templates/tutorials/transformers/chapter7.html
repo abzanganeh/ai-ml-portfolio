@@ -83,14 +83,52 @@
                         <h2>Encoder Architecture</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Understanding the Encoder Stack</strong></p>
-                            <p>This chapter provides comprehensive coverage of encoder architecture, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 What is the Encoder?</h3>
+                            <p><strong>The encoder is a stack of identical layers that process input sequences to create rich, contextualized representations.</strong> Each encoder layer refines the representations, building increasingly abstract and task-relevant features.</p>
+                            
+                            <p><strong>Think of the encoder like a team of editors:</strong></p>
+                            <ul>
+                                <li><strong>Layer 1:</strong> Like a copy editor - fixes basic grammar and spelling</li>
+                                <li><strong>Layer 6:</strong> Like a content editor - understands meaning and context</li>
+                                <li><strong>Layer 12:</strong> Like a senior editor - understands deep relationships and nuances</li>
+                                <li><strong>Result:</strong> Each layer adds more understanding, building up to a complete representation</li>
+                            </ul>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 Encoder Layer Components</h4>
+                            <p><strong>Each encoder layer consists of two main sublayers:</strong></p>
+                            
+                            <div class="example-box">
+                                <h5>1. Multi-Head Self-Attention</h5>
+                                <ul>
+                                    <li>Allows each position to attend to all positions</li>
+                                    <li>Learns relationships between words</li>
+                                    <li>Creates contextualized representations</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>2. Feed-Forward Network</h5>
+                                <ul>
+                                    <li>Processes information at each position</li>
+                                    <li>Adds non-linearity and capacity</li>
+                                    <li>Transforms the attention output</li>
+                                </ul>
+                            </div>
+                            
+                            <p><strong>Both sublayers use:</strong> Residual connections + Layer normalization</p>
                         </div>
 
                         <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding encoder architecture is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                            <h4>📚 Information Flow Through Layers</h4>
+                            <p><strong>How representations evolve:</strong></p>
+                            <ul>
+                                <li><strong>Layer 1:</strong> Detects local patterns (adjacent words, simple syntax)</li>
+                                <li><strong>Layer 3:</strong> Understands phrases and basic semantics</li>
+                                <li><strong>Layer 6:</strong> Captures sentence-level meaning and relationships</li>
+                                <li><strong>Layer 12:</strong> Understands complex semantics, long-range dependencies, task-specific features</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -98,8 +136,53 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>🔑 Complete Encoder Layer Structure</h3>
+                            <p><strong>Each encoder layer follows this structure (pre-norm):</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Step-by-Step Flow</h4>
+                                <ol>
+                                    <li><strong>Input:</strong> x (from previous layer or embeddings)</li>
+                                    <li><strong>Layer Norm:</strong> Normalize x</li>
+                                    <li><strong>Multi-Head Attention:</strong> Apply self-attention</li>
+                                    <li><strong>Residual:</strong> x + attention_output</li>
+                                    <li><strong>Layer Norm:</strong> Normalize again</li>
+                                    <li><strong>FFN:</strong> Apply feed-forward network</li>
+                                    <li><strong>Residual:</strong> previous + ffn_output</li>
+                                    <li><strong>Output:</strong> Refined representation</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Stacking Layers</h3>
+                            <p><strong>Multiple encoder layers are stacked:</strong></p>
+                            <ul>
+                                <li>Output of layer N becomes input to layer N+1</li>
+                                <li>Each layer refines and builds upon previous representations</li>
+                                <li>Like a pipeline: raw input → refined → more refined → final representation</li>
+                            </ul>
+                            
+                            <div class="example-box">
+                                <h4>Common Configurations</h4>
+                                <ul>
+                                    <li><strong>BERT-base:</strong> 12 encoder layers</li>
+                                    <li><strong>BERT-large:</strong> 24 encoder layers</li>
+                                    <li><strong>GPT-2:</strong> 12-48 encoder layers (decoder-only, but similar structure)</li>
+                                    <li><strong>Original Transformer:</strong> 6 encoder layers</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>🔄 Bidirectional Processing</h3>
+                            <p><strong>Encoder processes sequences bidirectionally:</strong></p>
+                            <ul>
+                                <li>Each position can attend to ALL positions (left and right)</li>
+                                <li>Unlike decoders which are causal (only left-to-right)</li>
+                                <li>Enables understanding full context</li>
+                                <li>Perfect for tasks like classification, NER, Q&A</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -107,12 +190,39 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Single Encoder Layer</h4>
+                            
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>EncoderLayer(x) = x + FFN(LayerNorm(x + MultiHeadAttention(LayerNorm(x))))</strong>
                             </div>
+                            
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Breaking Down:</h5>
+                                <ol>
+                                    <li><strong>LayerNorm(x):</strong> Normalize input</li>
+                                    <li><strong>MultiHeadAttention(...):</strong> Self-attention</li>
+                                    <li><strong>x + ...:</strong> Residual connection</li>
+                                    <li><strong>LayerNorm(...):</strong> Normalize again</li>
+                                    <li><strong>FFN(...):</strong> Feed-forward network</li>
+                                    <li><strong>x + ...:</strong> Final residual connection</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Complete Encoder Stack</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Encoder(x) = EncoderLayer_N(...EncoderLayer_2(EncoderLayer_1(x)))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>How Layers Stack:</h5>
+                                <ul>
+                                    <li>Input embeddings → Layer 1 → Layer 2 → ... → Layer N</li>
+                                    <li>Each layer's output becomes next layer's input</li>
+                                    <li>Final output: Rich, contextualized representations</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -121,8 +231,48 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>🔢 Example: Processing "The cat sat on the mat"</h4>
+                            <p><strong>Let's trace through a 3-layer encoder:</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Input (After Embeddings + Positional Encoding)</h5>
+                                <ul>
+                                    <li>Each word: [embedding + position] (512 dimensions)</li>
+                                    <li>"The": [0.1, 0.2, ..., 0.5]</li>
+                                    <li>"cat": [0.3, 0.4, ..., 0.7]</li>
+                                    <li>... (all 6 words)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>After Layer 1 (Local Patterns)</h5>
+                                <ul>
+                                    <li>Attention learns: "sat" attends to "cat" (subject-verb)</li>
+                                    <li>Attention learns: "on" attends to "sat" (preposition-verb)</li>
+                                    <li>FFN processes these local relationships</li>
+                                    <li>Output: Basic syntactic patterns detected</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>After Layer 3 (Phrase Understanding)</h5>
+                                <ul>
+                                    <li>Attention learns: "The cat" as a noun phrase</li>
+                                    <li>Attention learns: "sat on the mat" as a verb phrase</li>
+                                    <li>FFN processes phrase-level semantics</li>
+                                    <li>Output: Phrase structures understood</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>After Layer 6 (Sentence Meaning)</h5>
+                                <ul>
+                                    <li>Attention learns: Complete sentence structure</li>
+                                    <li>Attention learns: Semantic relationships (cat → animal, mat → object)</li>
+                                    <li>FFN processes sentence-level meaning</li>
+                                    <li>Output: Rich semantic representation ready for tasks</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -130,11 +280,93 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Code Implementation</h4>
+                            <h4>💻 Complete Encoder Implementation</h4>
                             <pre><code>import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class EncoderLayer:
+    """Single encoder layer"""
+    
+    def __init__(self, d_model, num_heads, d_ff):
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_ff = d_ff
+        
+        # Multi-head attention (simplified - would need full implementation)
+        # self.attention = MultiHeadAttention(d_model, num_heads)
+        
+        # Feed-forward network
+        # self.ffn = FeedForwardNetwork(d_model, d_ff)
+        
+        # Layer normalizations
+        self.layer_norm1 = LayerNormalization(d_model)
+        self.layer_norm2 = LayerNormalization(d_model)
+    
+    def forward(self, x, attention_fn, ffn_fn):
+        """
+        Forward pass through encoder layer
+        
+        Parameters:
+        x: Input (batch, seq_len, d_model)
+        attention_fn: Function for multi-head attention
+        ffn_fn: Function for feed-forward network
+        """
+        # Sublayer 1: Multi-head self-attention with residual
+        x_norm1 = self.layer_norm1.forward(x)
+        attention_output = attention_fn(x_norm1)
+        x = x + attention_output  # Residual connection
+        
+        # Sublayer 2: FFN with residual
+        x_norm2 = self.layer_norm2.forward(x)
+        ffn_output = ffn_fn(x_norm2)
+        x = x + ffn_output  # Residual connection
+        
+        return x
+
+class Encoder:
+    """Complete encoder stack"""
+    
+    def __init__(self, num_layers, d_model, num_heads, d_ff):
+        """
+        Initialize encoder
+        
+        Parameters:
+        num_layers: Number of encoder layers
+        d_model: Model dimension
+        num_heads: Number of attention heads
+        d_ff: Feed-forward dimension
+        """
+        self.num_layers = num_layers
+        self.layers = [
+            EncoderLayer(d_model, num_heads, d_ff)
+            for _ in range(num_layers)
+        ]
+    
+    def forward(self, x, attention_fn, ffn_fn):
+        """
+        Forward pass through encoder stack
+        
+        Parameters:
+        x: Input embeddings (batch, seq_len, d_model)
+        attention_fn: Function for attention
+        ffn_fn: Function for FFN
+        """
+        # Process through each layer sequentially
+        for layer in self.layers:
+            x = layer.forward(x, attention_fn, ffn_fn)
+        
+        return x
+
+# Example usage
+num_layers, d_model, num_heads, d_ff = 12, 512, 8, 2048
+encoder = Encoder(num_layers, d_model, num_heads, d_ff)
+
+# Input: (batch=2, seq_len=10, d_model=512)
+x = np.random.randn(2, 10, 512)
+
+# Forward pass (would need actual attention_fn and ffn_fn)
+# output = encoder.forward(x, attention_fn, ffn_fn)
+print(f"Encoder with {num_layers} layers created")
+print(f"Input shape: {x.shape}")</code></pre>
                         </div>
                     </div>
 
@@ -142,8 +374,46 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>🌍 Encoder-Only Models</h3>
+                            <p><strong>Encoder architecture is used in many important models:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. BERT (Bidirectional Encoder Representations)</h4>
+                                <ul>
+                                    <li>12-24 encoder layers</li>
+                                    <li>Bidirectional processing (sees full context)</li>
+                                    <li>Used for: Classification, NER, Q&A, sentence similarity</li>
+                                    <li>Revolutionary for understanding tasks</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. RoBERTa (Robust BERT)</h4>
+                                <ul>
+                                    <li>Improved training of BERT</li>
+                                    <li>Same encoder architecture</li>
+                                    <li>Better performance through better training</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. ALBERT (A Lite BERT)</h4>
+                                <ul>
+                                    <li>Parameter sharing across layers</li>
+                                    <li>More efficient than BERT</li>
+                                    <li>Same encoder structure, shared weights</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 What Each Layer Learns</h3>
+                            <p><strong>Research shows layers specialize:</strong></p>
+                            <ul>
+                                <li><strong>Early layers (1-3):</strong> Syntax, POS tags, local patterns</li>
+                                <li><strong>Middle layers (4-8):</strong> Semantics, phrase structure, relationships</li>
+                                <li><strong>Deep layers (9-12):</strong> Task-specific features, complex reasoning</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -152,11 +422,27 @@
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Encoder Architecture</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: How many sublayers does each encoder layer have?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) 1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) 2 (Multi-head attention and FFN)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) 3</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) 4</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the key difference between encoder and decoder?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Encoder is bidirectional, decoder is causal (left-to-right only)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Encoder has more layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Encoder doesn't use attention</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They are the same</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What happens to representations as they go through more encoder layers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) They become more abstract and task-specific</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They become simpler</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They stay the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They become random</div>
                             </div>
                         </div>
                     </div>
