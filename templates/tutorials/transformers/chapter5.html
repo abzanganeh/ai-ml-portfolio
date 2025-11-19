@@ -83,14 +83,52 @@
                         <h2>Feed-Forward Networks</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Processing After Attention</strong></p>
-                            <p>This chapter provides comprehensive coverage of feed-forward networks, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 What is a Feed-Forward Network in Transformers?</h3>
+                            <p><strong>Feed-Forward Networks (FFNs) are two-layer neural networks applied independently to each position after attention.</strong> They process the information gathered by attention, adding non-linearity and capacity to learn complex transformations.</p>
+                            
+                            <p><strong>Think of FFN like a post-processing step:</strong></p>
+                            <ul>
+                                <li><strong>Attention:</strong> Gathers relevant information from other positions (like collecting ingredients)</li>
+                                <li><strong>FFN:</strong> Processes and transforms that information (like cooking the ingredients into a dish)</li>
+                                <li><strong>Key:</strong> Each position processes its information independently, but uses the same transformation</li>
+                            </ul>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 Why FFN After Attention?</h4>
+                            <p><strong>Attention and FFN serve different purposes:</strong></p>
+                            
+                            <div class="example-box">
+                                <h5>Attention's Role</h5>
+                                <ul>
+                                    <li>Mixes information BETWEEN positions</li>
+                                    <li>Decides "what information to gather"</li>
+                                    <li>Like asking: "Which other words are relevant?"</li>
+                                    <li>Result: Each position has a weighted combination of all positions</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>FFN's Role</h5>
+                                <ul>
+                                    <li>Processes information WITHIN each position</li>
+                                    <li>Decides "how to transform the gathered information"</li>
+                                    <li>Like asking: "What should I do with this information?"</li>
+                                    <li>Result: Each position gets a non-linear transformation</li>
+                                </ul>
+                            </div>
+                            
+                            <p><strong>Together:</strong> Attention gathers context, FFN processes it!</p>
                         </div>
 
                         <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding feed-forward networks is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                            <h4>📚 Real-World Analogy: The Research Process</h4>
+                            <p><strong>Imagine writing a research paper:</strong></p>
+                            <ol>
+                                <li><strong>Attention (Gathering):</strong> You read multiple sources, identify relevant information from each</li>
+                                <li><strong>FFN (Processing):</strong> You synthesize, analyze, and transform that information into your own understanding</li>
+                                <li><strong>Result:</strong> You have both the gathered context (attention) and your processed understanding (FFN)</li>
+                            </ol>
                         </div>
                     </div>
 
@@ -98,8 +136,71 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>🔑 FFN Architecture Components</h3>
+                            <p><strong>FFN consists of three main components:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. First Linear Layer (Expansion)</h4>
+                                <ul>
+                                    <li><strong>Input:</strong> d_model dimensions (e.g., 512)</li>
+                                    <li><strong>Output:</strong> d_ff dimensions (e.g., 2048) - typically 4× expansion</li>
+                                    <li><strong>Purpose:</strong> Expands the representation space</li>
+                                    <li><strong>Why expand?</strong> More dimensions = more capacity to learn complex patterns</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. Activation Function (ReLU)</h4>
+                                <ul>
+                                    <li><strong>Function:</strong> ReLU(x) = max(0, x)</li>
+                                    <li><strong>Purpose:</strong> Introduces non-linearity</li>
+                                    <li><strong>Why ReLU?</strong> Simple, fast, helps with gradient flow</li>
+                                    <li><strong>Effect:</strong> Allows the network to learn non-linear transformations</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Second Linear Layer (Projection)</h4>
+                                <ul>
+                                    <li><strong>Input:</strong> d_ff dimensions (e.g., 2048)</li>
+                                    <li><strong>Output:</strong> d_model dimensions (e.g., 512)</li>
+                                    <li><strong>Purpose:</strong> Projects back to original dimension</li>
+                                    <li><strong>Why project back?</strong> Maintains consistent dimensions for residual connection</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 The 4× Expansion Rule</h3>
+                            <p><strong>Why do we expand by 4×?</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Common Configurations</h4>
+                                <ul>
+                                    <li><strong>BERT-base:</strong> d_model=768, d_ff=3072 (4×)</li>
+                                    <li><strong>GPT-3:</strong> d_model=12288, d_ff=49152 (4×)</li>
+                                    <li><strong>Original Transformer:</strong> d_model=512, d_ff=2048 (4×)</li>
+                                </ul>
+                                
+                                <p><strong>Why 4×?</strong></p>
+                                <ul>
+                                    <li>Empirically found to work well</li>
+                                    <li>Balance between capacity and efficiency</li>
+                                    <li>Too small (2×): Limited capacity</li>
+                                    <li>Too large (8×): More parameters, diminishing returns</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>🔄 Position-Wise Processing</h3>
+                            <p><strong>FFN processes each position independently:</strong></p>
+                            <ul>
+                                <li>Same weights applied to all positions</li>
+                                <li>Like using the same "processing function" for every word</li>
+                                <li>Efficient: Can process all positions in parallel</li>
+                                <li>Key difference from attention: No interaction between positions</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -107,12 +208,81 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Feed-Forward Network Formula</h4>
+                            
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>FFN(x) = ReLU(xW₁ + b₁)W₂ + b₂</strong>
                             </div>
+                            
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Breaking Down the Formula:</h5>
+                                <ol>
+                                    <li><strong>xW₁ + b₁:</strong> First linear transformation (expansion)
+                                        <ul>
+                                            <li>x: Input vector (d_model dimensions)</li>
+                                            <li>W₁: Weight matrix (d_model × d_ff)</li>
+                                            <li>b₁: Bias vector (d_ff dimensions)</li>
+                                            <li>Result: Expanded representation (d_ff dimensions)</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>ReLU(...):</strong> Activation function
+                                        <ul>
+                                            <li>Applies ReLU element-wise</li>
+                                            <li>ReLU(x) = max(0, x)</li>
+                                            <li>Introduces non-linearity</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>...W₂ + b₂:</strong> Second linear transformation (projection)
+                                        <ul>
+                                            <li>W₂: Weight matrix (d_ff × d_model)</li>
+                                            <li>b₂: Bias vector (d_model dimensions)</li>
+                                            <li>Result: Projected back to d_model dimensions</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Dimension Flow</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Input: (batch, seq_len, d_model)</strong><br>
+                                <strong>→ Expand: (batch, seq_len, d_ff)</strong><br>
+                                <strong>→ ReLU: (batch, seq_len, d_ff)</strong><br>
+                                <strong>→ Project: (batch, seq_len, d_model)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Example with Numbers:</h5>
+                                <ul>
+                                    <li>Input: (2, 10, 512) - batch=2, seq_len=10, d_model=512</li>
+                                    <li>After W₁: (2, 10, 2048) - expanded to d_ff=2048</li>
+                                    <li>After ReLU: (2, 10, 2048) - same shape, non-linear</li>
+                                    <li>After W₂: (2, 10, 512) - projected back to d_model=512</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Parameter Count</h4>
+                            
+                            <div class="formula-display">
+                                <strong>Parameters = (d_model × d_ff) + d_ff + (d_ff × d_model) + d_model</strong><br>
+                                <strong>= 2 × d_model × d_ff + d_model + d_ff</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Example Calculation:</h5>
+                                <p>For d_model=512, d_ff=2048:</p>
+                                <ul>
+                                    <li>W₁: 512 × 2048 = 1,048,576 parameters</li>
+                                    <li>b₁: 2048 parameters</li>
+                                    <li>W₂: 2048 × 512 = 1,048,576 parameters</li>
+                                    <li>b₂: 512 parameters</li>
+                                    <li><strong>Total: 2,099,712 parameters per FFN</strong></li>
+                                </ul>
+                                <p><strong>Note:</strong> This is typically the largest component in transformer layers!</p>
                             </div>
                         </div>
                     </div>
@@ -121,8 +291,72 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>🔢 Step-by-Step Example: Processing a Word</h4>
+                            <p><strong>Let's trace through how FFN processes the word "cat" in a sentence:</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 1: Input from Attention</h5>
+                                <ul>
+                                    <li>After attention, "cat" has a representation: [0.2, -0.5, 0.8, ..., 0.1] (512 dimensions)</li>
+                                    <li>This representation includes information from other words (via attention)</li>
+                                    <li>Now FFN will process this information</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 2: First Linear Transformation (Expansion)</h5>
+                                <ul>
+                                    <li>Input: [0.2, -0.5, 0.8, ..., 0.1] (512 dims)</li>
+                                    <li>Multiply by W₁ (512 × 2048): Matrix multiplication</li>
+                                    <li>Add bias b₁: [0.1, 0.3, -0.2, ..., 0.5] (2048 dims)</li>
+                                    <li>Result: Expanded representation with more dimensions</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 3: ReLU Activation</h5>
+                                <ul>
+                                    <li>Apply ReLU element-wise: ReLU(x) = max(0, x)</li>
+                                    <li>Positive values stay, negative values become 0</li>
+                                    <li>Example: [0.1, 0.3, -0.2, 0.5] → [0.1, 0.3, 0.0, 0.5]</li>
+                                    <li>This introduces non-linearity</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 4: Second Linear Transformation (Projection)</h5>
+                                <ul>
+                                    <li>Input: [0.1, 0.3, 0.0, ..., 0.5] (2048 dims)</li>
+                                    <li>Multiply by W₂ (2048 × 512): Matrix multiplication</li>
+                                    <li>Add bias b₂: [0.15, -0.3, 0.6, ..., 0.2] (512 dims)</li>
+                                    <li>Result: Processed representation back to original dimension</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 5: Final Output</h5>
+                                <ul>
+                                    <li>The output is a transformed version of the input</li>
+                                    <li>It has learned to process the information gathered by attention</li>
+                                    <li>Ready to be added to the residual connection</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 What Does FFN Learn?</h4>
+                            <p><strong>FFN learns to transform representations:</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Example Transformations:</h5>
+                                <ul>
+                                    <li><strong>Noun → Verb:</strong> "cat" (noun) → "catting" (verb form concept)</li>
+                                    <li><strong>Singular → Plural:</strong> "cat" → "cats" (plural concept)</li>
+                                    <li><strong>Base → Derived:</strong> "happy" → "happiness" (derived form)</li>
+                                    <li><strong>Semantic Relations:</strong> "king" → "royalty" (related concepts)</li>
+                                </ul>
+                                <p><strong>Key:</strong> FFN learns these transformations through training!</p>
+                            </div>
                         </div>
                     </div>
 
@@ -130,11 +364,134 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Code Implementation</h4>
+                            <h4>💻 Feed-Forward Network Implementation</h4>
                             <pre><code>import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class FeedForwardNetwork:
+    """Feed-Forward Network for Transformer"""
+    
+    def __init__(self, d_model, d_ff):
+        """
+        Initialize FFN
+        
+        Parameters:
+        d_model: Model dimension (e.g., 512)
+        d_ff: Feed-forward dimension (e.g., 2048, typically 4× d_model)
+        """
+        self.d_model = d_model
+        self.d_ff = d_ff
+        
+        # Initialize weights with Xavier/Glorot initialization
+        # W1: (d_model, d_ff)
+        limit = np.sqrt(6.0 / (d_model + d_ff))
+        self.W1 = np.random.uniform(-limit, limit, (d_model, d_ff))
+        self.b1 = np.zeros(d_ff)
+        
+        # W2: (d_ff, d_model)
+        limit = np.sqrt(6.0 / (d_ff + d_model))
+        self.W2 = np.random.uniform(-limit, limit, (d_ff, d_model))
+        self.b2 = np.zeros(d_model)
+    
+    def relu(self, x):
+        """ReLU activation function"""
+        return np.maximum(0, x)
+    
+    def forward(self, x):
+        """
+        Forward pass through FFN
+        
+        Parameters:
+        x: Input (batch, seq_len, d_model) or (seq_len, d_model)
+        
+        Returns:
+        Output: (batch, seq_len, d_model) or (seq_len, d_model)
+        """
+        # Handle different input shapes
+        if len(x.shape) == 2:
+            # (seq_len, d_model)
+            batch_size = 1
+            seq_len, d_model = x.shape
+            x = x.reshape(1, seq_len, d_model)
+        else:
+            batch_size, seq_len, d_model = x.shape
+        
+        # Reshape for matrix multiplication: (batch * seq_len, d_model)
+        x_reshaped = x.reshape(-1, d_model)
+        
+        # First linear layer: (batch * seq_len, d_model) × (d_model, d_ff)
+        # = (batch * seq_len, d_ff)
+        z1 = np.dot(x_reshaped, self.W1) + self.b1
+        
+        # ReLU activation
+        a1 = self.relu(z1)
+        
+        # Second linear layer: (batch * seq_len, d_ff) × (d_ff, d_model)
+        # = (batch * seq_len, d_model)
+        z2 = np.dot(a1, self.W2) + self.b2
+        
+        # Reshape back: (batch, seq_len, d_model)
+        output = z2.reshape(batch_size, seq_len, d_model)
+        
+        # Remove batch dimension if input didn't have it
+        if len(x.shape) == 2:
+            output = output.squeeze(0)
+        
+        return output
+
+# Example usage
+d_model, d_ff = 512, 2048
+ffn = FeedForwardNetwork(d_model, d_ff)
+
+# Input: (batch=2, seq_len=10, d_model=512)
+x = np.random.randn(2, 10, 512)
+
+# Forward pass
+output = ffn.forward(x)
+print(f"Input shape: {x.shape}")  # (2, 10, 512)
+print(f"Output shape: {output.shape}")  # (2, 10, 512)
+print(f"Total parameters: {np.prod(ffn.W1.shape) + np.prod(ffn.b1.shape) + np.prod(ffn.W2.shape) + np.prod(ffn.b2.shape)}")
+# Output: 2,099,712 parameters</code></pre>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 FFN in Transformer Layer Context</h4>
+                            <pre><code>import numpy as np
+
+def transformer_ffn_layer(x, W1, b1, W2, b2):
+    """
+    FFN as part of complete transformer layer
+    
+    Parameters:
+    x: Input after attention (batch, seq_len, d_model)
+    W1, b1: First linear layer weights and bias
+    W2, b2: Second linear layer weights and bias
+    """
+    # First linear transformation
+    expanded = np.dot(x, W1) + b1  # (batch, seq_len, d_ff)
+    
+    # ReLU activation
+    activated = np.maximum(0, expanded)  # (batch, seq_len, d_ff)
+    
+    # Second linear transformation
+    output = np.dot(activated, W2) + b2  # (batch, seq_len, d_model)
+    
+    return output
+
+# Complete transformer layer with residual connection
+def transformer_layer(x, attention_output, W1, b1, W2, b2):
+    """
+    Complete transformer layer: Attention + FFN with residuals
+    """
+    # After attention (with residual)
+    x_after_attention = x + attention_output
+    
+    # FFN
+    ffn_output = transformer_ffn_layer(x_after_attention, W1, b1, W2, b2)
+    
+    # Residual connection
+    output = x_after_attention + ffn_output
+    
+    return output</code></pre>
                         </div>
                     </div>
 
@@ -142,8 +499,56 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>🌍 Where FFN is Critical</h3>
+                            <p><strong>FFN is a core component in all transformer-based models:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. Language Models (GPT, BERT)</h4>
+                                <ul>
+                                    <li>Processes contextualized word representations</li>
+                                    <li>Learns semantic transformations</li>
+                                    <li>Critical for understanding and generation</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. Machine Translation</h4>
+                                <ul>
+                                    <li>Transforms source language representations</li>
+                                    <li>Prepares information for target language generation</li>
+                                    <li>Learns cross-lingual patterns</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Text Classification</h4>
+                                <ul>
+                                    <li>Processes document representations</li>
+                                    <li>Learns task-specific transformations</li>
+                                    <li>Prepares features for classification</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>4. Question Answering</h4>
+                                <ul>
+                                    <li>Processes question and context representations</li>
+                                    <li>Learns to extract relevant information</li>
+                                    <li>Prepares for answer generation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 FFN vs Other Components</h3>
+                            <p><strong>Parameter distribution in transformer layers:</strong></p>
+                            <ul>
+                                <li><strong>FFN:</strong> ~70% of parameters (largest component!)</li>
+                                <li><strong>Attention:</strong> ~20% of parameters</li>
+                                <li><strong>Layer Norm:</strong> ~5% of parameters</li>
+                                <li><strong>Embeddings:</strong> ~5% of parameters</li>
+                            </ul>
+                            <p><strong>Why so many parameters?</strong> FFN needs capacity to learn complex transformations!</p>
                         </div>
                     </div>
 
@@ -152,11 +557,27 @@
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Feed-Forward Networks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is the typical expansion factor for FFN hidden dimension?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) 2×</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) 4×</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) 8×</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same as input</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the purpose of the second linear layer in FFN?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To expand dimensions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To project back to original dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add non-linearity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To gather information</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: How does FFN differ from attention in transformers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) FFN processes each position independently, attention mixes between positions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) FFN mixes between positions, attention processes independently</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They are the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) FFN is not used in transformers</div>
                             </div>
                         </div>
                     </div>
