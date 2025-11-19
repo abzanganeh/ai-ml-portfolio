@@ -83,14 +83,51 @@
                         <h2>Decoder Architecture</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Generating Sequences</strong></p>
-                            <p>This chapter provides comprehensive coverage of decoder architecture, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 What is the Decoder?</h3>
+                            <p><strong>The decoder generates output sequences one token at a time, using both the encoder's output and previously generated tokens.</strong> Unlike the encoder which processes the entire input at once, the decoder generates autoregressively (left-to-right).</p>
+                            
+                            <p><strong>Think of the decoder like writing a translation:</strong></p>
+                            <ul>
+                                <li><strong>Encoder:</strong> Reads and understands the entire source sentence</li>
+                                <li><strong>Decoder:</strong> Writes the translation word by word, using both the source understanding and what it has written so far</li>
+                                <li><strong>Key constraint:</strong> Can only see previous words when generating (causal masking)</li>
+                            </ul>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 Decoder vs Encoder</h4>
+                            
+                            <div class="example-box">
+                                <h5>Encoder (Bidirectional)</h5>
+                                <ul>
+                                    <li>Processes entire input at once</li>
+                                    <li>Can attend to all positions (left and right)</li>
+                                    <li>Used for understanding tasks</li>
+                                    <li>Example: BERT, classification models</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Decoder (Causal/Autoregressive)</h5>
+                                <ul>
+                                    <li>Generates one token at a time</li>
+                                    <li>Can only attend to previous positions (causal)</li>
+                                    <li>Used for generation tasks</li>
+                                    <li>Example: GPT, translation, summarization</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding decoder architecture is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                            <h4>📚 Real-World Analogy: Writing a Story</h4>
+                            <p><strong>Imagine writing a story based on a prompt:</strong></p>
+                            <ol>
+                                <li><strong>Encoder:</strong> Reads and understands the prompt completely</li>
+                                <li><strong>Decoder Step 1:</strong> Generates first word using prompt understanding</li>
+                                <li><strong>Decoder Step 2:</strong> Generates second word using prompt + first word</li>
+                                <li><strong>Decoder Step 3:</strong> Generates third word using prompt + first two words</li>
+                                <li><strong>Result:</strong> Complete story generated word by word</li>
+                            </ol>
                         </div>
                     </div>
 
@@ -98,8 +135,68 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>🔑 Decoder Layer Components</h3>
+                            <p><strong>Each decoder layer has THREE sublayers (vs encoder's two):</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. Masked Multi-Head Self-Attention</h4>
+                                <ul>
+                                    <li>Self-attention over decoder's own output</li>
+                                    <li><strong>Causal masking:</strong> Can only attend to previous positions</li>
+                                    <li>Prevents "cheating" by looking at future tokens</li>
+                                    <li>Like reading a book - you can only see pages you've already read</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. Encoder-Decoder Attention</h4>
+                                <ul>
+                                    <li>Attention from decoder to encoder output</li>
+                                    <li>Query from decoder, Key/Value from encoder</li>
+                                    <li>Allows decoder to "look back" at source</li>
+                                    <li>Like a translator looking at the source text while writing</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Feed-Forward Network</h4>
+                                <ul>
+                                    <li>Same as encoder FFN</li>
+                                    <li>Processes information at each position</li>
+                                    <li>Adds non-linearity and capacity</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>🚫 Causal Masking Explained</h3>
+                            <p><strong>Causal masking ensures the decoder can't see future tokens:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Example: Generating "Hello world"</h4>
+                                <p><strong>When generating position 1 ("Hello"):</strong></p>
+                                <ul>
+                                    <li>Can attend to: position 0 (start token)</li>
+                                    <li>Cannot attend to: position 2 ("world") - hasn't been generated yet!</li>
+                                </ul>
+                                
+                                <p><strong>When generating position 2 ("world"):</strong></p>
+                                <ul>
+                                    <li>Can attend to: position 0 (start), position 1 ("Hello")</li>
+                                    <li>Cannot attend to: future positions</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Mask Matrix</h4>
+                                <p><strong>For sequence of length 3:</strong></p>
+                                <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px; font-family: 'JetBrains Mono', monospace;">
+Attention Mask:
+[1  0  0]  ← Position 0 can only see itself
+[1  1  0]  ← Position 1 can see 0 and 1
+[1  1  1]  ← Position 2 can see 0, 1, and 2</pre>
+                                <p>0 = masked (cannot attend), 1 = allowed</p>
+                            </div>
                         </div>
                     </div>
 
@@ -107,12 +204,55 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Causal Masking</h4>
+                            
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>Mask[i, j] = { 1 if j ≤ i<br>
+                                                      0 if j > i }</strong>
                             </div>
+                            
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Meaning:</h5>
+                                <ul>
+                                    <li>Position i can attend to position j only if j ≤ i</li>
+                                    <li>Prevents attending to future positions</li>
+                                    <li>Applied before softmax in attention</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Masked Attention Scores</h4>
+                            
+                            <div class="formula-display">
+                                <strong>scores_masked = scores + mask × (-∞)</strong><br>
+                                <strong>attention = softmax(scores_masked)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>How It Works:</h5>
+                                <ul>
+                                    <li>Add -∞ to masked positions</li>
+                                    <li>After softmax: masked positions → 0 (exp(-∞) = 0)</li>
+                                    <li>Result: Cannot attend to future positions</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Decoder Layer Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>DecoderLayer(x, encoder_output) = x + FFN(LayerNorm(x + EncDecAttention(LayerNorm(x + MaskedSelfAttention(LayerNorm(x))))))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Three Sublayers:</h5>
+                                <ol>
+                                    <li><strong>MaskedSelfAttention:</strong> Causal self-attention</li>
+                                    <li><strong>EncDecAttention:</strong> Attention to encoder output</li>
+                                    <li><strong>FFN:</strong> Feed-forward network</li>
+                                </ol>
                             </div>
                         </div>
                     </div>
@@ -121,8 +261,39 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>🔢 Example: Generating Translation</h4>
+                            <p><strong>Translating "The cat" → "Le chat" (French):</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 1: Encoder Processes Source</h5>
+                                <ul>
+                                    <li>Encoder reads: "The cat"</li>
+                                    <li>Creates rich representations for both words</li>
+                                    <li>Output: Encoder representations ready for decoder</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 2: Decoder Generates First Word</h5>
+                                <ul>
+                                    <li>Input: [START] token</li>
+                                    <li>Masked self-attention: Only sees [START] (causal)</li>
+                                    <li>Encoder-decoder attention: Looks at "The cat" from encoder</li>
+                                    <li>FFN: Processes combined information</li>
+                                    <li>Output: "Le" (first word generated)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 3: Decoder Generates Second Word</h5>
+                                <ul>
+                                    <li>Input: [START] "Le"</li>
+                                    <li>Masked self-attention: Can see [START] and "Le" (but not future)</li>
+                                    <li>Encoder-decoder attention: Still looks at "The cat"</li>
+                                    <li>FFN: Processes information</li>
+                                    <li>Output: "chat" (second word generated)</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -130,11 +301,109 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Code Implementation</h4>
+                            <h4>💻 Causal Masking Implementation</h4>
                             <pre><code>import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+def create_causal_mask(seq_len):
+    """
+    Create causal mask for decoder
+    
+    Parameters:
+    seq_len: Sequence length
+    
+    Returns:
+    Mask matrix (seq_len, seq_len) where 1 = allowed, 0 = masked
+    """
+    mask = np.triu(np.ones((seq_len, seq_len)), k=1)
+    # Invert: 1 = allowed, 0 = masked
+    mask = 1 - mask
+    return mask
+
+def apply_causal_mask(scores, mask):
+    """
+    Apply causal mask to attention scores
+    
+    Parameters:
+    scores: Attention scores (batch, seq_len, seq_len)
+    mask: Causal mask (seq_len, seq_len)
+    
+    Returns:
+    Masked scores
+    """
+    # Set masked positions to -infinity
+    masked_scores = scores + (1 - mask) * (-1e9)
+    return masked_scores
+
+# Example: Causal mask for sequence of length 4
+seq_len = 4
+causal_mask = create_causal_mask(seq_len)
+print("Causal Mask:")
+print(causal_mask)
+# Output:
+# [[1. 0. 0. 0.]
+#  [1. 1. 0. 0.]
+#  [1. 1. 1. 0.]
+#  [1. 1. 1. 1.]]</code></pre>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Decoder Layer Implementation</h4>
+                            <pre><code>import numpy as np
+
+class DecoderLayer:
+    """Single decoder layer"""
+    
+    def __init__(self, d_model, num_heads, d_ff):
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_ff = d_ff
+        
+        # Layer normalizations (3 sublayers = 3 layer norms)
+        self.layer_norm1 = LayerNormalization(d_model)
+        self.layer_norm2 = LayerNormalization(d_model)
+        self.layer_norm3 = LayerNormalization(d_model)
+    
+    def forward(self, x, encoder_output, masked_attention_fn, encdec_attention_fn, ffn_fn):
+        """
+        Forward pass through decoder layer
+        
+        Parameters:
+        x: Decoder input (batch, seq_len, d_model)
+        encoder_output: Encoder output (batch, enc_seq_len, d_model)
+        masked_attention_fn: Function for masked self-attention
+        encdec_attention_fn: Function for encoder-decoder attention
+        ffn_fn: Function for FFN
+        """
+        # Sublayer 1: Masked self-attention
+        x_norm1 = self.layer_norm1.forward(x)
+        masked_attn_output = masked_attention_fn(x_norm1)
+        x = x + masked_attn_output
+        
+        # Sublayer 2: Encoder-decoder attention
+        x_norm2 = self.layer_norm2.forward(x)
+        encdec_attn_output = encdec_attention_fn(x_norm2, encoder_output)
+        x = x + encdec_attn_output
+        
+        # Sublayer 3: FFN
+        x_norm3 = self.layer_norm3.forward(x)
+        ffn_output = ffn_fn(x_norm3)
+        x = x + ffn_output
+        
+        return x
+
+# Example usage
+d_model, num_heads, d_ff = 512, 8, 2048
+decoder_layer = DecoderLayer(d_model, num_heads, d_ff)
+
+# Decoder input: (batch=2, dec_seq_len=5, d_model=512)
+decoder_input = np.random.randn(2, 5, 512)
+
+# Encoder output: (batch=2, enc_seq_len=10, d_model=512)
+encoder_output = np.random.randn(2, 10, 512)
+
+print(f"Decoder layer created")
+print(f"Decoder input shape: {decoder_input.shape}")
+print(f"Encoder output shape: {encoder_output.shape}")</code></pre>
                         </div>
                     </div>
 
@@ -142,8 +411,48 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>🌍 Decoder-Only Models</h3>
+                            <p><strong>Decoder architecture is used in generation models:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. GPT Models (Decoder-Only)</h4>
+                                <ul>
+                                    <li>GPT-1, GPT-2, GPT-3, GPT-4</li>
+                                    <li>Use decoder layers (without encoder-decoder attention)</li>
+                                    <li>Autoregressive text generation</li>
+                                    <li>Revolutionary for language modeling</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. Machine Translation</h4>
+                                <ul>
+                                    <li>Encoder-decoder architecture</li>
+                                    <li>Encoder processes source language</li>
+                                    <li>Decoder generates target language</li>
+                                    <li>State-of-the-art translation systems</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Text Summarization</h4>
+                                <ul>
+                                    <li>Encoder reads long document</li>
+                                    <li>Decoder generates summary</li>
+                                    <li>Autoregressive generation</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Causal Masking Importance</h3>
+                            <p><strong>Why causal masking is critical:</strong></p>
+                            <ul>
+                                <li><strong>Prevents cheating:</strong> Model can't use future information</li>
+                                <li><strong>Realistic generation:</strong> Mimics how humans generate text</li>
+                                <li><strong>Training consistency:</strong> Training and inference match</li>
+                                <li><strong>Without masking:</strong> Model would learn to "cheat" and fail at inference</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -152,11 +461,27 @@
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Decoder Architecture</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: How many sublayers does each decoder layer have?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) 1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) 2</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) 3 (Masked self-attention, encoder-decoder attention, FFN)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) 4</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the purpose of causal masking in the decoder?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To prevent the decoder from seeing future tokens during generation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To reduce computation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To normalize activations</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To add non-linearity</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is encoder-decoder attention used for?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To allow the decoder to attend to encoder output (source information)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To normalize the encoder output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To generate tokens</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To mask future positions</div>
                             </div>
                         </div>
                     </div>
