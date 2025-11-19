@@ -83,14 +83,52 @@
                         <h2>Residual Connections & Layer Normalization</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Stabilizing Deep Networks</strong></p>
-                            <p>This chapter provides comprehensive coverage of residual connections & layer normalization, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 Why These Components Are Critical</h3>
+                            <p><strong>Residual connections and layer normalization are essential for training deep transformer networks.</strong> They solve two critical problems: vanishing gradients and training instability.</p>
+                            
+                            <p><strong>Think of them like safety features in a car:</strong></p>
+                            <ul>
+                                <li><strong>Residual connections:</strong> Like a backup system - ensures information can always flow through, even if a layer doesn't learn well</li>
+                                <li><strong>Layer normalization:</strong> Like cruise control - keeps the network stable and prevents it from going too fast or too slow</li>
+                                <li><strong>Together:</strong> They enable training of very deep networks (50+ layers) that would otherwise be impossible</li>
+                            </ul>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>⚠️ The Problem Without These Components</h4>
+                            
+                            <div class="example-box">
+                                <h5>Problem 1: Vanishing Gradients</h5>
+                                <p><strong>In deep networks without residuals:</strong></p>
+                                <ul>
+                                    <li>Gradients get smaller as they flow backward through layers</li>
+                                    <li>Early layers receive almost no gradient signal</li>
+                                    <li>Result: Early layers don't learn, only later layers learn</li>
+                                    <li>Like a message getting distorted as it passes through many people</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Problem 2: Training Instability</h5>
+                                <p><strong>Without layer normalization:</strong></p>
+                                <ul>
+                                    <li>Activations can become very large or very small</li>
+                                    <li>Gradients can explode or vanish</li>
+                                    <li>Training becomes unstable and may not converge</li>
+                                    <li>Like a car without cruise control - speed fluctuates wildly</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding residual connections & layer normalization is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                            <h4>📚 Historical Context</h4>
+                            <p><strong>These innovations came from different sources:</strong></p>
+                            <ul>
+                                <li><strong>Residual Connections:</strong> Introduced in ResNet (2015) for image recognition</li>
+                                <li><strong>Layer Normalization:</strong> Introduced in 2016, specifically for sequence models</li>
+                                <li><strong>Transformer (2017):</strong> Combined both, enabling deep language models</li>
+                                <li><strong>Result:</strong> Enabled training of models with 100+ layers!</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -98,8 +136,73 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>🔑 Residual Connections (Skip Connections)</h3>
+                            <p><strong>Residual connections add the input directly to the output of a layer:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>How It Works</h4>
+                                <ul>
+                                    <li><strong>Without residual:</strong> output = Layer(input)</li>
+                                    <li><strong>With residual:</strong> output = input + Layer(input)</li>
+                                    <li><strong>Key insight:</strong> The layer learns the "residual" (difference) rather than the full transformation</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Why This Helps</h4>
+                                <ul>
+                                    <li><strong>Identity mapping:</strong> If Layer(input) = 0, output = input (information preserved!)</li>
+                                    <li><strong>Gradient flow:</strong> Gradients can flow directly through the addition</li>
+                                    <li><strong>Easier learning:</strong> Layer can learn small refinements rather than complete transformations</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Layer Normalization</h3>
+                            <p><strong>Layer normalization normalizes activations across features for each sample:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>What It Does</h4>
+                                <ul>
+                                    <li>Normalizes each token's features independently</li>
+                                    <li>Mean = 0, Variance = 1 for each token</li>
+                                    <li>Stabilizes training by keeping activations in a reasonable range</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Layer Norm vs Batch Norm</h4>
+                                <ul>
+                                    <li><strong>Batch Norm:</strong> Normalizes across batch dimension (problematic for sequences of different lengths)</li>
+                                    <li><strong>Layer Norm:</strong> Normalizes across feature dimension (works for any sequence length)</li>
+                                    <li><strong>Why Layer Norm for transformers:</strong> Sequences have variable lengths, batch norm doesn't work well</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>🔄 Pre-Norm vs Post-Norm</h3>
+                            <p><strong>Two common architectures:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Post-Norm (Original Transformer)</h4>
+                                <p><strong>Structure:</strong> Sublayer → LayerNorm → Residual</p>
+                                <ul>
+                                    <li>x → Attention → LayerNorm → x + attention_output</li>
+                                    <li>Used in original Transformer paper</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Pre-Norm (Modern Standard)</h4>
+                                <p><strong>Structure:</strong> LayerNorm → Sublayer → Residual</p>
+                                <ul>
+                                    <li>x → LayerNorm → Attention → x + attention_output</li>
+                                    <li>More stable, easier to train</li>
+                                    <li>Used in modern models (GPT, BERT variants)</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -107,12 +210,68 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Residual Connection Formula</h4>
+                            
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>output = x + Sublayer(x)</strong>
                             </div>
+                            
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Breaking Down:</h5>
+                                <ul>
+                                    <li><strong>x:</strong> Input to the layer</li>
+                                    <li><strong>Sublayer(x):</strong> Output of attention or FFN</li>
+                                    <li><strong>x + Sublayer(x):</strong> Residual connection (element-wise addition)</li>
+                                    <li><strong>Key:</strong> If Sublayer(x) = 0, output = x (identity mapping preserved)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Layer Normalization Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>LayerNorm(x) = γ ⊙ ((x - μ) / √(σ² + ε)) + β</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Step-by-Step:</h5>
+                                <ol>
+                                    <li><strong>μ = mean(x):</strong> Compute mean across features</li>
+                                    <li><strong>σ² = var(x):</strong> Compute variance across features</li>
+                                    <li><strong>(x - μ) / √(σ² + ε):</strong> Normalize (mean=0, std=1)</li>
+                                    <li><strong>γ ⊙ ... + β:</strong> Scale and shift (learnable parameters)</li>
+                                </ol>
+                                
+                                <h5>Notation:</h5>
+                                <ul>
+                                    <li><strong>μ:</strong> Mean vector (computed per token)</li>
+                                    <li><strong>σ²:</strong> Variance vector (computed per token)</li>
+                                    <li><strong>ε:</strong> Small constant (e.g., 1e-5) to prevent division by zero</li>
+                                    <li><strong>γ:</strong> Learnable scale parameter</li>
+                                    <li><strong>β:</strong> Learnable shift parameter</li>
+                                    <li><strong>⊙:</strong> Element-wise multiplication</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Complete Transformer Sublayer (Pre-Norm)</h4>
+                            
+                            <div class="formula-display">
+                                <strong>output = x + Sublayer(LayerNorm(x))</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>For Attention Sublayer:</h5>
+                                <ul>
+                                    <li>x → LayerNorm(x) → MultiHeadAttention(...) → x + attention_output</li>
+                                </ul>
+                                
+                                <h5>For FFN Sublayer:</h5>
+                                <ul>
+                                    <li>x → LayerNorm(x) → FFN(...) → x + ffn_output</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -121,8 +280,66 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>🔢 Example: Residual Connection in Action</h4>
+                            <p><strong>Let's see how residual connections preserve information:</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Scenario: Deep Network (10 layers)</h5>
+                                <p><strong>Without Residual:</strong></p>
+                                <ul>
+                                    <li>Input: x = [1.0, 2.0, 3.0]</li>
+                                    <li>After Layer 1: [0.9, 1.8, 2.7] (slight change)</li>
+                                    <li>After Layer 2: [0.8, 1.6, 2.4] (more change)</li>
+                                    <li>... (information degrades through layers)</li>
+                                    <li>After Layer 10: [0.1, 0.2, 0.3] (most information lost!)</li>
+                                </ul>
+                                
+                                <p><strong>With Residual:</strong></p>
+                                <ul>
+                                    <li>Input: x = [1.0, 2.0, 3.0]</li>
+                                    <li>After Layer 1: x + Layer1(x) = [1.0, 2.0, 3.0] + [-0.1, -0.2, -0.3] = [0.9, 1.8, 2.7]</li>
+                                    <li>After Layer 2: previous + Layer2(...) = [0.9, 1.8, 2.7] + [-0.1, -0.2, -0.3] = [0.8, 1.6, 2.4]</li>
+                                    <li>... (but original x is always accessible through the residual path!)</li>
+                                    <li>Even if layers learn nothing, output ≈ input (information preserved)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📊 Example: Layer Normalization</h4>
+                            <p><strong>Normalizing a token's features:</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Input Token Features</h5>
+                                <p><strong>Before normalization:</strong> x = [10.0, -5.0, 2.0, 8.0, -3.0]</p>
+                                
+                                <p><strong>Step 1: Compute mean</strong></p>
+                                <ul>
+                                    <li>μ = (10.0 + (-5.0) + 2.0 + 8.0 + (-3.0)) / 5 = 2.4</li>
+                                </ul>
+                                
+                                <p><strong>Step 2: Compute variance</strong></p>
+                                <ul>
+                                    <li>σ² = ((10.0-2.4)² + (-5.0-2.4)² + (2.0-2.4)² + (8.0-2.4)² + (-3.0-2.4)²) / 5</li>
+                                    <li>σ² = (57.76 + 54.76 + 0.16 + 31.36 + 29.16) / 5 = 34.64</li>
+                                    <li>σ = √34.64 ≈ 5.89</li>
+                                </ul>
+                                
+                                <p><strong>Step 3: Normalize</strong></p>
+                                <ul>
+                                    <li>normalized = (x - μ) / σ</li>
+                                    <li>normalized = [(10.0-2.4)/5.89, (-5.0-2.4)/5.89, (2.0-2.4)/5.89, (8.0-2.4)/5.89, (-3.0-2.4)/5.89]</li>
+                                    <li>normalized ≈ [1.29, -1.26, -0.07, 0.95, -0.92]</li>
+                                    <li>Mean ≈ 0, Std ≈ 1 ✓</li>
+                                </ul>
+                                
+                                <p><strong>Step 4: Scale and shift (if learned)</strong></p>
+                                <ul>
+                                    <li>If γ = [1.0, 1.0, 1.0, 1.0, 1.0] and β = [0.0, 0.0, 0.0, 0.0, 0.0]</li>
+                                    <li>Output = normalized (no change)</li>
+                                    <li>But γ and β are learned, so they can adjust the distribution</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -130,11 +347,130 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Code Implementation</h4>
+                            <h4>💻 Layer Normalization Implementation</h4>
                             <pre><code>import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class LayerNormalization:
+    """Layer Normalization for Transformers"""
+    
+    def __init__(self, d_model, eps=1e-5):
+        """
+        Initialize Layer Normalization
+        
+        Parameters:
+        d_model: Model dimension
+        eps: Small constant for numerical stability
+        """
+        self.d_model = d_model
+        self.eps = eps
+        
+        # Learnable parameters
+        self.gamma = np.ones(d_model)  # Scale parameter
+        self.beta = np.zeros(d_model)  # Shift parameter
+    
+    def forward(self, x):
+        """
+        Forward pass through layer normalization
+        
+        Parameters:
+        x: Input (batch, seq_len, d_model) or (seq_len, d_model)
+        
+        Returns:
+        Normalized output (same shape as input)
+        """
+        # Handle different input shapes
+        if len(x.shape) == 2:
+            x = x.reshape(1, *x.shape)
+            squeeze_output = True
+        else:
+            squeeze_output = False
+        
+        batch_size, seq_len, d_model = x.shape
+        
+        # Compute mean and variance across features (last dimension)
+        # Shape: (batch, seq_len, 1)
+        mean = np.mean(x, axis=-1, keepdims=True)
+        variance = np.var(x, axis=-1, keepdims=True)
+        
+        # Normalize
+        x_normalized = (x - mean) / np.sqrt(variance + self.eps)
+        
+        # Scale and shift
+        output = self.gamma * x_normalized + self.beta
+        
+        if squeeze_output:
+            output = output.squeeze(0)
+        
+        return output
+
+# Example usage
+d_model = 512
+layer_norm = LayerNormalization(d_model)
+
+# Input: (batch=2, seq_len=10, d_model=512)
+x = np.random.randn(2, 10, 512) * 5  # Large values
+
+# Normalize
+output = layer_norm.forward(x)
+print(f"Input mean: {np.mean(x):.2f}, std: {np.std(x):.2f}")
+print(f"Output mean: {np.mean(output):.2f}, std: {np.std(output):.2f}")
+# Output should have mean ≈ 0, std ≈ 1</code></pre>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Residual Connection Implementation</h4>
+                            <pre><code>import numpy as np
+
+def residual_connection(x, sublayer_output):
+    """
+    Apply residual connection
+    
+    Parameters:
+    x: Input (batch, seq_len, d_model)
+    sublayer_output: Output from attention or FFN (batch, seq_len, d_model)
+    
+    Returns:
+    x + sublayer_output (element-wise addition)
+    """
+    return x + sublayer_output
+
+# Complete transformer sublayer with pre-norm
+def transformer_sublayer(x, sublayer_fn, layer_norm):
+    """
+    Transformer sublayer with pre-norm and residual
+    
+    Parameters:
+    x: Input (batch, seq_len, d_model)
+    sublayer_fn: Function for attention or FFN
+    layer_norm: LayerNormalization instance
+    
+    Returns:
+    Output with residual connection
+    """
+    # Pre-norm: normalize before sublayer
+    x_norm = layer_norm.forward(x)
+    
+    # Apply sublayer (attention or FFN)
+    sublayer_output = sublayer_fn(x_norm)
+    
+    # Residual connection
+    output = residual_connection(x, sublayer_output)
+    
+    return output
+
+# Example: Complete attention sublayer
+def attention_sublayer(x, attention_fn, layer_norm):
+    """Attention sublayer with pre-norm and residual"""
+    x_norm = layer_norm.forward(x)
+    attention_out = attention_fn(x_norm)
+    return x + attention_out
+
+# Example: Complete FFN sublayer
+def ffn_sublayer(x, ffn_fn, layer_norm):
+    """FFN sublayer with pre-norm and residual"""
+    x_norm = layer_norm.forward(x)
+    ffn_out = ffn_fn(x_norm)
+    return x + ffn_out</code></pre>
                         </div>
                     </div>
 
@@ -142,8 +478,46 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>🌍 Critical for All Deep Transformers</h3>
+                            <p><strong>Residual connections and layer normalization are used in virtually every transformer model:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. BERT (Bidirectional Encoder)</h4>
+                                <ul>
+                                    <li>12-24 layers, all use residuals and layer norm</li>
+                                    <li>Enables training deep bidirectional encoders</li>
+                                    <li>Without these, BERT couldn't train effectively</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. GPT Models</h4>
+                                <ul>
+                                    <li>GPT-3: 96 layers! Impossible without residuals</li>
+                                    <li>Layer norm stabilizes training across all layers</li>
+                                    <li>Enables autoregressive generation at scale</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Vision Transformers (ViT)</h4>
+                                <ul>
+                                    <li>Apply transformers to images</li>
+                                    <li>Residuals and layer norm critical for deep vision models</li>
+                                    <li>Enable state-of-the-art image classification</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Impact on Training</h3>
+                            <p><strong>These components enable:</strong></p>
+                            <ul>
+                                <li><strong>Deeper networks:</strong> 100+ layers vs 10-20 without residuals</li>
+                                <li><strong>Faster convergence:</strong> Layer norm stabilizes gradients</li>
+                                <li><strong>Better performance:</strong> Deeper = more capacity = better results</li>
+                                <li><strong>Stable training:</strong> Prevents gradient explosion/vanishing</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -152,11 +526,27 @@
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Residual Connections & Layer Normalization</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is the main purpose of residual connections?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To reduce parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To enable gradient flow and preserve information through deep networks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add non-linearity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To normalize activations</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What does layer normalization normalize across?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Batch dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Feature dimension (for each token independently)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Sequence dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) All dimensions</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: In pre-norm architecture, where is layer normalization applied?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Before the sublayer (attention or FFN)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) After the sublayer</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Both before and after</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not used in pre-norm</div>
                             </div>
                         </div>
                     </div>
