@@ -196,6 +196,99 @@
                                     </li>
                                 </ul>
                             </div>
+                        </div>
+
+                        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 2rem 0;">
+                            <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">🔄 LSTM Gate Flow Visualization</h4>
+                            
+                            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <!-- Input and Previous State -->
+                                <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                                    <div style="text-align: center; flex: 1; min-width: 150px;">
+                                        <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #1e40af; margin: 0; font-size: 0.9rem;">Input x_t</p>
+                                            <p style="font-size: 0.85rem; color: #1e40af; margin: 0.3rem 0 0 0;">Current word</p>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: center; flex: 1; min-width: 150px;">
+                                        <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #166534; margin: 0; font-size: 0.9rem;">h_{t-1}</p>
+                                            <p style="font-size: 0.85rem; color: #166534; margin: 0.3rem 0 0 0;">Previous hidden</p>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: center; flex: 1; min-width: 150px;">
+                                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #92400e; margin: 0; font-size: 0.9rem;">C_{t-1}</p>
+                                            <p style="font-size: 0.85rem; color: #92400e; margin: 0.3rem 0 0 0;">Previous cell state</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <!-- Three Gates -->
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                                    <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #991b1b; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Forget Gate</p>
+                                        <p style="font-size: 0.8rem; color: #991b1b; margin: 0;">f_t = σ(...)</p>
+                                        <p style="font-size: 0.75rem; color: #991b1b; margin: 0.3rem 0 0 0;">What to forget?</p>
+                                    </div>
+                                    <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #1e40af; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Input Gate</p>
+                                        <p style="font-size: 0.8rem; color: #1e40af; margin: 0;">i_t = σ(...)</p>
+                                        <p style="font-size: 0.75rem; color: #1e40af; margin: 0.3rem 0 0 0;">What to remember?</p>
+                                    </div>
+                                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #92400e; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Output Gate</p>
+                                        <p style="font-size: 0.8rem; color: #92400e; margin: 0;">o_t = σ(...)</p>
+                                        <p style="font-size: 0.75rem; color: #92400e; margin: 0.3rem 0 0 0;">What to output?</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <!-- Cell State Update -->
+                                <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                    <p style="font-weight: 700; color: #166534; margin: 0 0 1rem 0; text-align: center;">Cell State Update</p>
+                                    <div style="background: white; padding: 1rem; border-radius: 6px; text-align: center;">
+                                        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #166534; margin: 0;">
+                                            C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t
+                                        </p>
+                                        <p style="font-size: 0.8rem; color: #166534; margin: 0.5rem 0 0 0;">
+                                            (Forget old) + (Add new)
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <!-- Output -->
+                                <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                    <div style="text-align: center; flex: 1; min-width: 150px;">
+                                        <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #166534; margin: 0; font-size: 0.9rem;">h_t</p>
+                                            <p style="font-size: 0.85rem; color: #166534; margin: 0.3rem 0 0 0;">New hidden state</p>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: center; flex: 1; min-width: 150px;">
+                                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #92400e; margin: 0; font-size: 0.9rem;">C_t</p>
+                                            <p style="font-size: 0.85rem; color: #92400e; margin: 0.3rem 0 0 0;">New cell state</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem; margin-top: 1.5rem; border-radius: 4px;">
+                                    <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>💡 Key:</strong> The three gates control information flow. Forget gate removes old info, Input gate adds new info, Output gate decides what to use. The cell state (C_t) flows through time without degradation!</p>
+                                </div>
+                            </div>
+                        </div>
                             
                             <div class="explanation-box">
                                 <h5>The Complete Process</h5>
