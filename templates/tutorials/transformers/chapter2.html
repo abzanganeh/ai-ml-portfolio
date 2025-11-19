@@ -173,42 +173,87 @@
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Detailed Example: "The cat sat"</h4>
+                            <h4>🔢 Detailed Example: "The cat sat" with Visual Attention Flow</h4>
                             <p><strong>Input sequence (3 words):</strong></p>
                             
-                            <div class="explanation-box">
-                                <h5>Step 1: Create Q, K, V</h5>
-                                <ul>
-                                    <li>X = [embedding("The"), embedding("cat"), embedding("sat")]</li>
-                                    <li>Q = X × W_Q (3 queries, one per word)</li>
-                                    <li>K = X × W_K (3 keys, one per word)</li>
-                                    <li>V = X × W_V (3 values, one per word)</li>
-                                </ul>
+                            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">🔄 Self-Attention Flow Diagram</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                                    <p style="font-weight: 600; color: #0c4a6e; margin-bottom: 1rem; text-align: center;">Step 1: Create Q, K, V from Input</p>
+                                    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem;">
+                                                <p style="font-weight: 700; color: #1e40af; margin: 0; font-size: 0.9rem;">Input X</p>
+                                            </div>
+                                            <p style="font-size: 0.85rem; color: #1e40af; margin: 0;">["The", "cat", "sat"]</p>
+                                        </div>
+                                        <div style="font-size: 1.5rem; color: #0ea5e9;">→</div>
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem;">
+                                                <p style="font-weight: 700; color: #92400e; margin: 0; font-size: 0.9rem;">Q, K, V</p>
+                                            </div>
+                                            <p style="font-size: 0.85rem; color: #92400e; margin: 0;">3 queries, 3 keys, 3 values</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
+                                    <p style="font-weight: 600; color: #0c4a6e; margin-bottom: 1rem; text-align: center;">Step 2: Attention Flow for "cat" (position 1)</p>
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
+                                        <div style="text-align: center; background: #f3f4f6; padding: 1rem; border-radius: 8px;">
+                                            <p style="font-weight: 600; margin: 0 0 0.5rem 0; color: #374151;">"The"</p>
+                                            <div style="background: #fee2e2; height: 15px; border-radius: 4px; margin: 0 auto; width: 20%;"></div>
+                                            <p style="font-size: 0.75rem; color: #991b1b; margin: 0.3rem 0 0 0;">Score: 0.1</p>
+                                        </div>
+                                        <div style="text-align: center; background: #dcfce7; padding: 1rem; border-radius: 8px; border: 2px solid #22c55e;">
+                                            <p style="font-weight: 700; margin: 0 0 0.5rem 0; color: #166534;">"cat"</p>
+                                            <div style="background: #22c55e; height: 60px; border-radius: 4px; margin: 0 auto; width: 80%;"></div>
+                                            <p style="font-size: 0.75rem; color: #166534; margin: 0.3rem 0 0 0; font-weight: 700;">Score: 0.9</p>
+                                        </div>
+                                        <div style="text-align: center; background: #f3f4f6; padding: 1rem; border-radius: 8px;">
+                                            <p style="font-weight: 600; margin: 0 0 0.5rem 0; color: #374151;">"sat"</p>
+                                            <div style="background: #fee2e2; height: 25px; border-radius: 4px; margin: 0 auto; width: 30%;"></div>
+                                            <p style="font-size: 0.75rem; color: #991b1b; margin: 0.3rem 0 0 0;">Score: 0.3</p>
+                                        </div>
+                                    </div>
+                                    <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 0.8rem; border-radius: 4px;">
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>Query("cat")</strong> compares to all Keys → High similarity with Key("cat") → Strong attention!</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <p style="font-weight: 600; color: #0c4a6e; margin-bottom: 1rem; text-align: center;">Step 3 & 4: Softmax → Weighted Sum</p>
+                                    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                                            <p style="font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem;">0.15 × V("The")</p>
+                                            <div style="background: #fee2e2; height: 15px; border-radius: 4px; margin: 0 auto; width: 20%;"></div>
+                                        </div>
+                                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                                            <p style="font-size: 0.85rem; color: #166534; margin-bottom: 0.5rem; font-weight: 600;">0.70 × V("cat")</p>
+                                            <div style="background: #22c55e; height: 50px; border-radius: 4px; margin: 0 auto; width: 70%; border: 2px solid #16a34a;"></div>
+                                        </div>
+                                        <div style="text-align: center; flex: 1; min-width: 100px;">
+                                            <p style="font-size: 0.85rem; color: #374151; margin-bottom: 0.5rem;">0.15 × V("sat")</p>
+                                            <div style="background: #fee2e2; height: 15px; border-radius: 4px; margin: 0 auto; width: 20%;"></div>
+                                        </div>
+                                        <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">=</div>
+                                        <div style="text-align: center; flex: 1; min-width: 120px; background: #dcfce7; padding: 1rem; border-radius: 8px; border: 2px solid #22c55e;">
+                                            <p style="font-weight: 700; color: #166534; margin: 0;">Output("cat")</p>
+                                            <p style="font-size: 0.85rem; color: #166534; margin: 0.3rem 0 0 0;">Contextualized!</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
-                            <div class="explanation-box">
-                                <h5>Step 2: Compute Attention Scores</h5>
-                                <ul>
-                                    <li>For "cat" (position 1):</li>
-                                    <li>Query("cat") compares to Key("The"), Key("cat"), Key("sat")</li>
-                                    <li>Scores: [0.1, 0.9, 0.3] (high score with itself, moderate with "sat")</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="explanation-box">
-                                <h5>Step 3: Apply Softmax</h5>
-                                <ul>
-                                    <li>Attention weights: [0.15, 0.70, 0.15]</li>
-                                    <li>"cat" attends most to itself, some to neighbors</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="explanation-box">
-                                <h5>Step 4: Weighted Sum</h5>
-                                <ul>
-                                    <li>Output("cat") = 0.15×V("The") + 0.70×V("cat") + 0.15×V("sat")</li>
-                                    <li>New representation combines information from all positions</li>
-                                </ul>
+                            <div class="explanation-box" style="margin-top: 1.5rem;">
+                                <h5>Step-by-Step Breakdown:</h5>
+                                <ol>
+                                    <li><strong>Create Q, K, V:</strong> X = [embedding("The"), embedding("cat"), embedding("sat")] → Q, K, V (3 queries, 3 keys, 3 values)</li>
+                                    <li><strong>Compute Attention Scores:</strong> For "cat" (position 1), Query("cat") compares to all Keys → Scores: [0.1, 0.9, 0.3]</li>
+                                    <li><strong>Apply Softmax:</strong> Attention weights: [0.15, 0.70, 0.15] - "cat" attends most to itself, some to neighbors</li>
+                                    <li><strong>Weighted Sum:</strong> Output("cat") = 0.15×V("The") + 0.70×V("cat") + 0.15×V("sat") - New representation combines information from all positions</li>
+                                </ol>
                             </div>
                         </div>
                     </div>
@@ -221,17 +266,68 @@
                             <p><strong>Attention weights show which positions are most relevant for understanding each position.</strong></p>
                             
                             <div class="example-box">
-                                <h4>Example: Pronoun Resolution</h4>
+                                <h4>Example: Pronoun Resolution with Visual Attention Map</h4>
                                 <p><strong>Sentence:</strong> "The cat sat on the mat because it was tired."</p>
                                 
-                                <p><strong>Attention weights for "it":</strong></p>
-                                <ul>
-                                    <li>High weight (0.7) → "cat" (the referent)</li>
-                                    <li>Medium weight (0.2) → "tired" (related concept)</li>
-                                    <li>Low weights → other words</li>
-                                </ul>
-                                
-                                <p><strong>Interpretation:</strong> The model learns that "it" should attend strongly to "cat" to resolve the pronoun!</p>
+                                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                    <h4 style="color: #14532d; margin-bottom: 1rem; text-align: center;">🎯 Attention Weight Visualization</h4>
+                                    
+                                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                        <p style="font-weight: 600; color: #14532d; margin-bottom: 1rem; text-align: center;">Attention weights for word "it" (position 6):</p>
+                                        
+                                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">The</p>
+                                                <div style="background: #fee2e2; height: 20px; border-radius: 4px; margin-top: 0.3rem; width: 20%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.05</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">cat</p>
+                                                <div style="background: #dcfce7; height: 60px; border-radius: 4px; margin-top: 0.3rem; width: 70%; margin: 0.3rem auto 0 auto; border: 2px solid #22c55e;"></div>
+                                                <p style="font-size: 0.75rem; color: #166534; margin: 0.2rem 0 0 0; font-weight: 700;">0.70</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">sat</p>
+                                                <div style="background: #fee2e2; height: 15px; border-radius: 4px; margin-top: 0.3rem; width: 15%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.03</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">on</p>
+                                                <div style="background: #fee2e2; height: 10px; border-radius: 4px; margin-top: 0.3rem; width: 10%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.02</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">the</p>
+                                                <div style="background: #fee2e2; height: 10px; border-radius: 4px; margin-top: 0.3rem; width: 10%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.02</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">mat</p>
+                                                <div style="background: #fee2e2; height: 10px; border-radius: 4px; margin-top: 0.3rem; width: 10%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.02</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #dbeafe; border: 2px solid #3b82f6; border-radius: 6px;">
+                                                <p style="font-weight: 700; margin: 0; font-size: 0.9rem; color: #1e40af;">it</p>
+                                                <div style="background: #3b82f6; height: 30px; border-radius: 4px; margin-top: 0.3rem; width: 100%;"></div>
+                                                <p style="font-size: 0.75rem; color: #1e40af; margin: 0.2rem 0 0 0; font-weight: 600;">(self)</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">was</p>
+                                                <div style="background: #fee2e2; height: 15px; border-radius: 4px; margin-top: 0.3rem; width: 15%; margin: 0.3rem auto 0 auto;"></div>
+                                                <p style="font-size: 0.75rem; color: #991b1b; margin: 0.2rem 0 0 0;">0.03</p>
+                                            </div>
+                                            <div style="flex: 1; min-width: 60px; text-align: center; padding: 0.5rem; background: #f3f4f6; border-radius: 6px;">
+                                                <p style="font-weight: 600; margin: 0; font-size: 0.9rem;">tired</p>
+                                                <div style="background: #fef3c7; height: 25px; border-radius: 4px; margin-top: 0.3rem; width: 25%; margin: 0.3rem auto 0 auto; border: 1px solid #f59e0b;"></div>
+                                                <p style="font-size: 0.75rem; color: #92400e; margin: 0.2rem 0 0 0; font-weight: 600;">0.20</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+                                            <p style="margin: 0; color: #0c4a6e;"><strong>💡 Interpretation:</strong> "it" attends most strongly to "cat" (0.70) - the model correctly identifies the referent! It also attends to "tired" (0.20) as a related concept. The bar heights represent attention weights.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

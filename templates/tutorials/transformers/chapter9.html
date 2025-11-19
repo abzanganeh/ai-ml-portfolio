@@ -83,14 +83,100 @@
                         <h2>Complete Transformer Architecture</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Putting It All Together</strong></p>
-                            <p>This chapter provides comprehensive coverage of complete transformer architecture, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 The Complete Picture</h3>
+                            <p><strong>The Transformer combines all components we've learned: embeddings, positional encoding, multi-head attention, FFN, residuals, and layer normalization into a powerful architecture.</strong></p>
+                            
+                            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 2rem 0;">
+                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">🏗️ Complete Transformer Architecture Diagram</h4>
+                                
+                                <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <!-- Input Layer -->
+                                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                                        <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 200px;">
+                                            <p style="font-weight: 700; color: #1e40af; margin: 0;">Input Tokens</p>
+                                            <p style="font-size: 0.9rem; color: #1e40af; margin: 0.3rem 0 0 0;">["The", "cat", "sat"]</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                    </div>
+                                    
+                                    <!-- Embeddings -->
+                                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 200px;">
+                                            <p style="font-weight: 700; color: #92400e; margin: 0;">Token Embeddings</p>
+                                            <p style="font-size: 0.85rem; color: #92400e; margin: 0.3rem 0 0 0;">+ Positional Encoding</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                    </div>
+                                    
+                                    <!-- Encoder Stack -->
+                                    <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                        <p style="font-weight: 700; color: #166534; margin: 0 0 1rem 0; text-align: center;">Encoder Stack (N layers)</p>
+                                        
+                                        <div style="background: white; border-radius: 6px; padding: 1rem; margin-bottom: 0.5rem;">
+                                            <p style="font-weight: 600; color: #14532d; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Encoder Layer 1:</p>
+                                            <div style="display: flex; justify-content: space-around; gap: 0.5rem; flex-wrap: wrap;">
+                                                <div style="flex: 1; min-width: 120px; background: #f0f9ff; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                                    <p style="font-size: 0.8rem; color: #0c4a6e; margin: 0; font-weight: 600;">Multi-Head<br>Attention</p>
+                                                </div>
+                                                <div style="flex: 1; min-width: 120px; background: #fef3c7; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                                    <p style="font-size: 0.8rem; color: #92400e; margin: 0; font-weight: 600;">Feed-Forward<br>Network</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="text-align: center; margin: 0.5rem 0;">
+                                            <p style="font-size: 0.8rem; color: #166534; margin: 0;">... (N-2 more layers) ...</p>
+                                        </div>
+                                        
+                                        <div style="background: white; border-radius: 6px; padding: 1rem;">
+                                            <p style="font-weight: 600; color: #14532d; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Encoder Layer N:</p>
+                                            <div style="display: flex; justify-content: space-around; gap: 0.5rem; flex-wrap: wrap;">
+                                                <div style="flex: 1; min-width: 120px; background: #f0f9ff; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                                    <p style="font-size: 0.8rem; color: #0c4a6e; margin: 0; font-weight: 600;">Multi-Head<br>Attention</p>
+                                                </div>
+                                                <div style="flex: 1; min-width: 120px; background: #fef3c7; padding: 0.5rem; border-radius: 4px; text-align: center;">
+                                                    <p style="font-size: 0.8rem; color: #92400e; margin: 0; font-weight: 600;">Feed-Forward<br>Network</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                    </div>
+                                    
+                                    <!-- Output -->
+                                    <div style="text-align: center;">
+                                        <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 200px;">
+                                            <p style="font-weight: 700; color: #166534; margin: 0;">Output Representations</p>
+                                            <p style="font-size: 0.9rem; color: #166534; margin: 0.3rem 0 0 0;">Rich, contextualized</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem; margin-top: 1.5rem; border-radius: 4px;">
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>💡 Key Components:</strong> Each encoder layer has Multi-Head Attention + FFN, both with residual connections and layer normalization. The stack processes input through N layers, building increasingly rich representations!</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding complete transformer architecture is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                        <div class="explanation-box">
+                            <h4>🔄 Information Flow Through Transformer</h4>
+                            <p><strong>Complete data flow:</strong></p>
+                            <ol>
+                                <li><strong>Input:</strong> Tokenized text → ["The", "cat", "sat"]</li>
+                                <li><strong>Embeddings:</strong> Each token → dense vector (512 dimensions)</li>
+                                <li><strong>Positional Encoding:</strong> Add position information</li>
+                                <li><strong>Encoder Layer 1:</strong> Multi-head attention + FFN → Refined representations</li>
+                                <li><strong>Encoder Layer 2-N:</strong> Further refinement through each layer</li>
+                                <li><strong>Output:</strong> Rich, contextualized representations ready for tasks</li>
+                            </ol>
                         </div>
                     </div>
 
