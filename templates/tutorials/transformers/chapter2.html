@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Self-Attention Mechanism - Transformer Architecture Deep Dive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/transformers" class="course-link">
+                    <span>Transformer Architecture Deep Dive</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 2: Self-Attention Mechanism</h1>
+                <p class="chapter-subtitle">Attention is All You Need - How self-attention enables parallel processing</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="20"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/transformers/chapter1" class="chapter-nav-btn">Chapter 1</a>
+                    <a href="/tutorials/transformers/chapter2" class="chapter-nav-btn active">Chapter 2</a>
+                    <a href="/tutorials/transformers/chapter3" class="chapter-nav-btn">Chapter 3</a>
+                    <a href="/tutorials/transformers/chapter4" class="chapter-nav-btn">Chapter 4</a>
+                    <a href="/tutorials/transformers/chapter5" class="chapter-nav-btn">Chapter 5</a>
+                    <a href="/tutorials/transformers/chapter6" class="chapter-nav-btn">Chapter 6</a>
+                    <a href="/tutorials/transformers/chapter7" class="chapter-nav-btn">Chapter 7</a>
+                    <a href="/tutorials/transformers/chapter8" class="chapter-nav-btn">Chapter 8</a>
+                    <a href="/tutorials/transformers/chapter9" class="chapter-nav-btn">Chapter 9</a>
+                    <a href="/tutorials/transformers/chapter10" class="chapter-nav-btn">Chapter 10</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="difference">Self vs Regular</button>
+                    <button class="section-nav-btn azbn-btn" data-section="computation">Computation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="weights">Attention Weights</button>
+                    <button class="section-nav-btn azbn-btn" data-section="parallel">Parallel Processing</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand the difference between attention and self-attention</li>
+                        <li>Master how self-attention computes relationships within a sequence</li>
+                        <li>Learn the scaled dot-product attention formula in detail</li>
+                        <li>Understand how attention weights reveal relationships</li>
+                        <li>Recognize why self-attention enables parallel processing</li>
+                        <li>Implement self-attention from scratch</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>What is Self-Attention?</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔄 Attention Within a Sequence</h3>
+                            <p><strong>Self-attention is attention applied to the same sequence - each position attends to all positions in the same sequence, including itself.</strong></p>
+                            
+                            <p><strong>Key difference from regular attention:</strong></p>
+                            <ul>
+                                <li><strong>Regular Attention:</strong> Query from one sequence, Keys/Values from another sequence (encoder-decoder)</li>
+                                <li><strong>Self-Attention:</strong> Query, Key, and Value all come from the same sequence</li>
+                            </ul>
+                            
+                            <p><strong>Think of self-attention like a group discussion:</strong></p>
+                            <ul>
+                                <li>Each person (word) can look at and consider what everyone else (all words) is saying</li>
+                                <li>Each person forms their understanding based on the full context</li>
+                                <li>This happens simultaneously for everyone - parallel processing!</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Example: Understanding "it" in Context</h4>
+                            <p><strong>Sentence:</strong> "The cat sat on the mat because it was tired."</p>
+                            
+                            <div class="explanation-box">
+                                <h5>Self-Attention Process:</h5>
+                                <ul>
+                                    <li>When processing "it", self-attention looks at ALL words in the sentence</li>
+                                    <li>It computes: "How relevant is each word for understanding 'it'?"</li>
+                                    <li>High attention weight to "cat" → "it" refers to "cat"</li>
+                                    <li>Lower attention weights to other words</li>
+                                    <li><strong>Result:</strong> "it" gets a representation that includes information about "cat"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="difference" class="content-section">
+                        <h2>Self-Attention vs Regular Attention</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔍 The Key Distinction</h3>
+                            
+                            <div class="example-box">
+                                <h4>Regular Attention (Encoder-Decoder)</h4>
+                                <ul>
+                                    <li><strong>Source:</strong> Encoder hidden states (e.g., French sentence)</li>
+                                    <li><strong>Target:</strong> Decoder hidden state (e.g., English word being generated)</li>
+                                    <li><strong>Query:</strong> From decoder (what am I looking for?)</li>
+                                    <li><strong>Keys/Values:</strong> From encoder (what information is available?)</li>
+                                    <li><strong>Use case:</strong> Translation, summarization</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Self-Attention (Within Sequence)</h4>
+                                <ul>
+                                    <li><strong>Source:</strong> Same sequence (e.g., English sentence)</li>
+                                    <li><strong>Target:</strong> Same sequence positions</li>
+                                    <li><strong>Query, Key, Value:</strong> All from the same sequence</li>
+                                    <li><strong>Use case:</strong> Understanding relationships within text, encoding context</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="computation" class="content-section">
+                        <h2>How Self-Attention Computes</h2>
+                        
+                        <div class="formula-box">
+                            <h4>Self-Attention Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>SelfAttention(X) = Attention(Q, K, V)</strong><br>
+                                <strong>where Q = XW_Q, K = XW_K, V = XW_V</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Step-by-Step Process:</h5>
+                                <ol>
+                                    <li><strong>Input:</strong> Sequence X (n × d_model)</li>
+                                    <li><strong>Linear Projections:</strong> Create Q, K, V from X using learned weight matrices</li>
+                                    <li><strong>Attention Scores:</strong> Compute QK^T (similarity between all positions)</li>
+                                    <li><strong>Scale:</strong> Divide by √d_k to prevent large values</li>
+                                    <li><strong>Softmax:</strong> Convert to probabilities (attention weights)</li>
+                                    <li><strong>Weighted Sum:</strong> Multiply attention weights by V</li>
+                                    <li><strong>Output:</strong> New representation for each position</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Detailed Example: "The cat sat"</h4>
+                            <p><strong>Input sequence (3 words):</strong></p>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 1: Create Q, K, V</h5>
+                                <ul>
+                                    <li>X = [embedding("The"), embedding("cat"), embedding("sat")]</li>
+                                    <li>Q = X × W_Q (3 queries, one per word)</li>
+                                    <li>K = X × W_K (3 keys, one per word)</li>
+                                    <li>V = X × W_V (3 values, one per word)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 2: Compute Attention Scores</h5>
+                                <ul>
+                                    <li>For "cat" (position 1):</li>
+                                    <li>Query("cat") compares to Key("The"), Key("cat"), Key("sat")</li>
+                                    <li>Scores: [0.1, 0.9, 0.3] (high score with itself, moderate with "sat")</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 3: Apply Softmax</h5>
+                                <ul>
+                                    <li>Attention weights: [0.15, 0.70, 0.15]</li>
+                                    <li>"cat" attends most to itself, some to neighbors</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="explanation-box">
+                                <h5>Step 4: Weighted Sum</h5>
+                                <ul>
+                                    <li>Output("cat") = 0.15×V("The") + 0.70×V("cat") + 0.15×V("sat")</li>
+                                    <li>New representation combines information from all positions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="weights" class="content-section">
+                        <h2>Understanding Attention Weights</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>📊 What Attention Weights Reveal</h3>
+                            <p><strong>Attention weights show which positions are most relevant for understanding each position.</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Example: Pronoun Resolution</h4>
+                                <p><strong>Sentence:</strong> "The cat sat on the mat because it was tired."</p>
+                                
+                                <p><strong>Attention weights for "it":</strong></p>
+                                <ul>
+                                    <li>High weight (0.7) → "cat" (the referent)</li>
+                                    <li>Medium weight (0.2) → "tired" (related concept)</li>
+                                    <li>Low weights → other words</li>
+                                </ul>
+                                
+                                <p><strong>Interpretation:</strong> The model learns that "it" should attend strongly to "cat" to resolve the pronoun!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="parallel" class="content-section">
+                        <h2>Parallel Processing Advantage</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⚡ Why Self-Attention is Fast</h3>
+                            <p><strong>Self-attention can process all positions simultaneously, unlike RNNs which must process sequentially.</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>RNN vs Self-Attention</h4>
+                                <p><strong>RNN (Sequential):</strong></p>
+                                <ul>
+                                    <li>Process word 1 → wait → process word 2 → wait → process word 3</li>
+                                    <li>Time complexity: O(n) sequential steps</li>
+                                    <li>Cannot parallelize across sequence</li>
+                                </ul>
+                                
+                                <p><strong>Self-Attention (Parallel):</strong></p>
+                                <ul>
+                                    <li>Process all words simultaneously</li>
+                                    <li>Time complexity: O(1) parallel steps (though O(n²) operations)</li>
+                                    <li>Can use GPU parallelism effectively</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="implementation" class="content-section">
+                        <h2>Self-Attention Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Complete Self-Attention Implementation</h4>
+                            <pre><code>import numpy as np
+
+def self_attention(X, W_Q, W_K, W_V, d_k):
+    """
+    Self-attention mechanism
+    
+    Parameters:
+    X: Input sequence (n, d_model)
+    W_Q: Query weight matrix (d_model, d_k)
+    W_K: Key weight matrix (d_model, d_k)
+    W_V: Value weight matrix (d_model, d_v)
+    d_k: Dimension of keys/queries
+    """
+    n = X.shape[0]
+    
+    # Step 1: Create Q, K, V from input
+    Q = np.dot(X, W_Q)  # (n, d_k)
+    K = np.dot(X, W_K)  # (n, d_k)
+    V = np.dot(X, W_V)  # (n, d_v)
+    
+    # Step 2: Compute attention scores
+    scores = np.dot(Q, K.T)  # (n, n)
+    
+    # Step 3: Scale
+    scores = scores / np.sqrt(d_k)
+    
+    # Step 4: Apply softmax
+    attention_weights = softmax(scores, axis=-1)  # (n, n)
+    
+    # Step 5: Weighted sum of values
+    output = np.dot(attention_weights, V)  # (n, d_v)
+    
+    return output, attention_weights
+
+def softmax(x, axis=-1):
+    """Softmax function"""
+    exp_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+# Example usage
+n, d_model, d_k, d_v = 10, 512, 64, 64
+X = np.random.randn(n, d_model)
+W_Q = np.random.randn(d_model, d_k) * 0.1
+W_K = np.random.randn(d_model, d_k) * 0.1
+W_V = np.random.randn(d_model, d_v) * 0.1
+
+output, weights = self_attention(X, W_Q, W_K, W_V, d_k)
+print(f"Output shape: {output.shape}")  # (10, 64)
+print(f"Attention weights shape: {weights.shape}")  # (10, 10)</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What is the key difference between self-attention and regular attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Self-attention uses Q, K, V from the same sequence</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Self-attention is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Self-attention uses fewer parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Self-attention doesn't use softmax</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Why can self-attention process all positions in parallel?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Each position can attend to all positions independently</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It uses less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It doesn't need gradients</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It uses smaller matrices</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/transformers/chapter1" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 1</a>
+                <a href="/tutorials/transformers/chapter3" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 3: Multi-Head Attention →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

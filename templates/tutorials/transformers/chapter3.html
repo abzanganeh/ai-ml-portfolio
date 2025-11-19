@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Multi-Head Attention - Transformer Architecture Deep Dive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+</head>
+<body>
+    <header class="azbn-header">
+        <nav class="azbn-nav">
+            <div class="azbn-container">
+                <a href="/tutorials/transformers" class="course-link">
+                    <span>Transformer Architecture Deep Dive</span>
+                </a>
+                <div class="azbn-links">
+                    <a href="/">Home</a>
+                    <a href="/#about">About</a>
+                    <a href="/tutorials/">Tutorials</a>
+                    <a href="/#projects">Projects</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="tutorial-header">
+            <div class="azbn-container">
+                <h1 class="chapter-title">Chapter 3: Multi-Head Attention</h1>
+                <p class="chapter-subtitle">Learning Multiple Relationships</p>
+                
+                <div class="chapter-progress">
+                    <div class="chapter-progress-fill" data-progress="30"></div>
+                </div>
+                
+                <div class="chapter-navigation">
+                    <a href="/tutorials/transformers/chapter1" class="chapter-nav-btn ">Chapter 1</a>
+                    <a href="/tutorials/transformers/chapter2" class="chapter-nav-btn ">Chapter 2</a>
+                    <a href="/tutorials/transformers/chapter3" class="chapter-nav-btn active">Chapter 3</a>
+                    <a href="/tutorials/transformers/chapter4" class="chapter-nav-btn ">Chapter 4</a>
+                    <a href="/tutorials/transformers/chapter5" class="chapter-nav-btn ">Chapter 5</a>
+                    <a href="/tutorials/transformers/chapter6" class="chapter-nav-btn ">Chapter 6</a>
+                    <a href="/tutorials/transformers/chapter7" class="chapter-nav-btn ">Chapter 7</a>
+                    <a href="/tutorials/transformers/chapter8" class="chapter-nav-btn ">Chapter 8</a>
+                    <a href="/tutorials/transformers/chapter9" class="chapter-nav-btn ">Chapter 9</a>
+                    <a href="/tutorials/transformers/chapter10" class="chapter-nav-btn ">Chapter 10</a>
+                </div>
+                
+                <div class="section-progress">
+                    <div class="section-progress-fill" data-progress="14.3"></div>
+                </div>
+                
+                <div class="section-nav">
+                    <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                    <button class="section-nav-btn azbn-btn" data-section="concepts">Key Concepts</button>
+                    <button class="section-nav-btn azbn-btn" data-section="formulas">Formulas</button>
+                    <button class="section-nav-btn azbn-btn" data-section="examples">Examples</button>
+                    <button class="section-nav-btn azbn-btn" data-section="implementation">Implementation</button>
+                    <button class="section-nav-btn azbn-btn" data-section="applications">Applications</button>
+                    <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="azbn-section">
+            <div class="azbn-container">
+                <div class="learning-objectives-box">
+                    <h2>Learning Objectives</h2>
+                    <ul>
+                        <li>Understand multi-head attention fundamentals</li>
+                        <li>Master the mathematical foundations</li>
+                        <li>Learn practical implementation</li>
+                        <li>Apply knowledge through examples</li>
+                        <li>Recognize real-world applications</li>
+                    </ul>
+                </div>
+
+                <main class="chapter-main-content">
+                    <div id="overview" class="content-section active">
+                        <h2>Multi-Head Attention</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🎯 Why Multiple Heads?</h3>
+                            <p><strong>Multi-head attention allows the model to attend to information from different representation subspaces simultaneously.</strong> Instead of one attention mechanism, we use multiple parallel attention "heads", each learning different types of relationships.</p>
+                            
+                            <p><strong>Think of multi-head attention like having multiple experts:</strong></p>
+                            <ul>
+                                <li><strong>Single-head attention:</strong> Like one person trying to understand everything - they might miss some relationships</li>
+                                <li><strong>Multi-head attention:</strong> Like a team of specialists - one focuses on syntax, another on semantics, another on long-range dependencies</li>
+                                <li><strong>Result:</strong> Each head learns different patterns, then we combine their insights</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>📚 Real-World Analogy: The Research Team</h4>
+                            <p><strong>Imagine analyzing a complex document:</strong></p>
+                            <ul>
+                                <li><strong>Head 1 (Syntax Expert):</strong> Focuses on grammatical relationships - "What is the subject? What is the verb?"</li>
+                                <li><strong>Head 2 (Semantic Expert):</strong> Focuses on meaning - "What concepts are related? What is the topic?"</li>
+                                <li><strong>Head 3 (Reference Expert):</strong> Focuses on references - "What does 'it' refer to? What does 'this' mean?"</li>
+                                <li><strong>Head 4 (Temporal Expert):</strong> Focuses on time relationships - "What happened first? What's the sequence?"</li>
+                            </ul>
+                            <p><strong>Multi-head attention:</strong> All experts work in parallel, then we combine their findings for a complete understanding!</p>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 How Multi-Head Attention Works</h4>
+                            <p><strong>The process:</strong></p>
+                            <ol>
+                                <li><strong>Split:</strong> Divide the embedding dimension into multiple heads</li>
+                                <li><strong>Parallel Attention:</strong> Each head computes attention independently</li>
+                                <li><strong>Specialization:</strong> Each head learns different relationships</li>
+                                <li><strong>Concatenate:</strong> Combine all head outputs</li>
+                                <li><strong>Project:</strong> Linear transformation to final dimension</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div id="concepts" class="content-section">
+                        <h2>Key Concepts</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🔑 Head Specialization</h3>
+                            <p><strong>Different attention heads learn to focus on different aspects of the input:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Example: Sentence Analysis</h4>
+                                <p><strong>Sentence:</strong> "The cat, which was very fluffy, sat on the mat."</p>
+                                
+                                <ul>
+                                    <li><strong>Head 1 (Subject-Verb):</strong> High attention from "sat" to "cat" (subject-verb relationship)</li>
+                                    <li><strong>Head 2 (Modifier):</strong> High attention from "fluffy" to "cat" (adjective-noun relationship)</li>
+                                    <li><strong>Head 3 (Relative Clause):</strong> High attention from "which" to "cat" (relative pronoun reference)</li>
+                                    <li><strong>Head 4 (Preposition):</strong> High attention from "on" to "mat" (preposition-object relationship)</li>
+                                </ul>
+                                
+                                <p><strong>Key insight:</strong> Each head specializes in a different linguistic relationship!</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Dimension Splitting</h3>
+                            <p><strong>How dimensions are divided:</strong></p>
+                            <ul>
+                                <li>If embedding dimension = 512 and num_heads = 8</li>
+                                <li>Each head gets: 512 / 8 = 64 dimensions</li>
+                                <li>Each head operates in its own 64-dimensional subspace</li>
+                                <li>This allows parallel computation and specialization</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="formulas" class="content-section">
+                        <h2>Mathematical Formulations</h2>
+                        
+                        <div class="formula-box">
+                            <h4>Multi-Head Attention Formula</h4>
+                            
+                            <div class="formula-display">
+                                <strong>MultiHead(Q, K, V) = Concat(head₁, ..., headₕ)W^O</strong><br><br>
+                                <strong>where headᵢ = Attention(QW^Qᵢ, KW^Kᵢ, VW^Vᵢ)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Notation:</h5>
+                                <ul>
+                                    <li><strong>h:</strong> Number of attention heads</li>
+                                    <li><strong>QW^Qᵢ:</strong> Query projection for head i</li>
+                                    <li><strong>KW^Kᵢ:</strong> Key projection for head i</li>
+                                    <li><strong>VW^Vᵢ:</strong> Value projection for head i</li>
+                                    <li><strong>Concat:</strong> Concatenate all head outputs</li>
+                                    <li><strong>W^O:</strong> Output projection matrix</li>
+                                </ul>
+                                
+                                <h5>Dimension Breakdown:</h5>
+                                <ul>
+                                    <li>Input: (batch, seq_len, d_model)</li>
+                                    <li>Each head: (batch, seq_len, d_model/h)</li>
+                                    <li>After concat: (batch, seq_len, d_model)</li>
+                                    <li>After W^O: (batch, seq_len, d_model)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="examples" class="content-section">
+                        <h2>Detailed Examples</h2>
+                        
+                        <div class="example-box">
+                            <h4>🔢 Step-by-Step Examples</h4>
+                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                        </div>
+                    </div>
+
+                    <div id="implementation" class="content-section">
+                        <h2>Implementation</h2>
+                        
+                        <div class="code-box">
+                            <h4>💻 Multi-Head Attention Implementation</h4>
+                            <pre><code>import numpy as np
+
+def multi_head_attention(X, W_Q, W_K, W_V, W_O, num_heads):
+    """
+    Multi-head attention implementation
+    
+    Parameters:
+    X: Input (batch, seq_len, d_model)
+    W_Q: Query weight matrices for each head (num_heads, d_model, d_k)
+    W_K: Key weight matrices for each head (num_heads, d_model, d_k)
+    W_V: Value weight matrices for each head (num_heads, d_model, d_v)
+    W_O: Output projection (d_model, d_model)
+    num_heads: Number of attention heads
+    """
+    batch_size, seq_len, d_model = X.shape
+    d_k = d_model // num_heads
+    
+    # List to store outputs from each head
+    head_outputs = []
+    
+    # Process each head
+    for h in range(num_heads):
+        # Project to Q, K, V for this head
+        Q_h = np.dot(X, W_Q[h])  # (batch, seq_len, d_k)
+        K_h = np.dot(X, W_K[h])  # (batch, seq_len, d_k)
+        V_h = np.dot(X, W_V[h])  # (batch, seq_len, d_v)
+        
+        # Compute attention for this head
+        scores = np.dot(Q_h, K_h.transpose(0, 2, 1))  # (batch, seq_len, seq_len)
+        scores = scores / np.sqrt(d_k)
+        
+        # Softmax
+        attention_weights = softmax(scores, axis=-1)
+        
+        # Weighted sum
+        head_output = np.dot(attention_weights, V_h)  # (batch, seq_len, d_v)
+        head_outputs.append(head_output)
+    
+    # Concatenate all heads
+    multi_head_output = np.concatenate(head_outputs, axis=-1)  # (batch, seq_len, d_model)
+    
+    # Final output projection
+    output = np.dot(multi_head_output, W_O)  # (batch, seq_len, d_model)
+    
+    return output
+
+def softmax(x, axis=-1):
+    """Softmax function"""
+    exp_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
+    return exp_x / np.sum(exp_x, axis=axis, keepdims=True)
+
+# Example usage
+batch_size, seq_len, d_model, num_heads = 2, 10, 512, 8
+X = np.random.randn(batch_size, seq_len, d_model)
+d_k = d_model // num_heads
+
+# Initialize weight matrices for each head
+W_Q = np.random.randn(num_heads, d_model, d_k) * 0.1
+W_K = np.random.randn(num_heads, d_model, d_k) * 0.1
+W_V = np.random.randn(num_heads, d_model, d_k) * 0.1
+W_O = np.random.randn(d_model, d_model) * 0.1
+
+output = multi_head_attention(X, W_Q, W_K, W_V, W_O, num_heads)
+print(f"Output shape: {output.shape}")  # (2, 10, 512)</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="applications" class="content-section">
+                        <h2>Real-World Applications</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>🌍 Where This Is Used</h3>
+                            <p>Real-world applications and use cases will be detailed here.</p>
+                        </div>
+                    </div>
+
+                    <div id="quiz" class="content-section">
+                        <h2>Test Your Understanding</h2>
+                        
+                        <div class="quiz-container">
+                            <div class="quiz-question">
+                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Multi-Head Attention</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/transformers/chapter2" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 2</a>
+                <a href="/tutorials/transformers/chapter4" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 4 →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
