@@ -81,14 +81,91 @@
                         <h2>Tool-Using Agents</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 Introduction</h3>
-                            <p><strong>Agents That Can Use Tools</strong></p>
-                            <p>This chapter provides comprehensive coverage of tool-using agents, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>🎯 What are Tool-Using Agents?</h3>
+                            <p><strong>Tool-using agents can interact with external systems through function calls, APIs, and tools.</strong> This capability transforms agents from simple text generators into powerful autonomous systems that can affect the real world.</p>
+                            
+                            <p><strong>Think of tool-using agents like a Swiss Army knife:</strong></p>
+                            <ul>
+                                <li><strong>Traditional LLM:</strong> Like a single tool - can only generate text</li>
+                                <li><strong>Tool-Using Agent:</strong> Like a multi-tool - can use different tools for different tasks</li>
+                                <li><strong>Key advantage:</strong> Can access real-time data, perform calculations, interact with systems</li>
+                            </ul>
                         </div>
 
-                        <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding tool-using agents is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 2rem 0;">
+                            <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">🔧 Tool-Using Agent Architecture</h4>
+                            
+                            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                <div style="text-align: center; margin-bottom: 1.5rem;">
+                                    <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 200px;">
+                                        <p style="font-weight: 700; color: #1e40af; margin: 0;">User Request</p>
+                                        <p style="font-size: 0.9rem; color: #1e40af; margin: 0.3rem 0 0 0;">"Get weather in NYC"</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                    <p style="font-weight: 700; color: #166534; margin: 0 0 1rem 0; text-align: center;">🧠 LLM Reasoning</p>
+                                    <div style="background: white; padding: 1rem; border-radius: 6px; text-align: center;">
+                                        <p style="font-size: 0.9rem; color: #166534; margin: 0;">Analyzes request → Decides: "Need weather tool"</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                                    <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #991b1b; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Tool 1</p>
+                                        <p style="font-size: 0.8rem; color: #991b1b; margin: 0;">Weather API</p>
+                                    </div>
+                                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #92400e; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Tool 2</p>
+                                        <p style="font-size: 0.8rem; color: #92400e; margin: 0;">Calculator</p>
+                                    </div>
+                                    <div style="background: #e0e7ff; border: 2px solid #6366f1; border-radius: 8px; padding: 1rem; text-align: center;">
+                                        <p style="font-weight: 700; color: #4338ca; margin: 0 0 0.5rem 0; font-size: 0.9rem;">Tool 3</p>
+                                        <p style="font-size: 0.8rem; color: #4338ca; margin: 0;">Web Search</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                                    <p style="font-weight: 700; color: #991b1b; margin: 0 0 1rem 0; text-align: center;">⚡ Tool Execution</p>
+                                    <div style="background: white; padding: 1rem; border-radius: 6px; text-align: center;">
+                                        <p style="font-size: 0.9rem; color: #991b1b; margin: 0;">Calls: get_weather("New York") → Returns: "72°F, sunny"</p>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin: 1rem 0;">
+                                    <div style="font-size: 1.5rem; color: #0ea5e9; font-weight: bold;">↓</div>
+                                </div>
+                                
+                                <div style="text-align: center;">
+                                    <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem; display: inline-block; min-width: 200px;">
+                                        <p style="font-weight: 700; color: #166534; margin: 0;">Response</p>
+                                        <p style="font-size: 0.9rem; color: #166534; margin: 0.3rem 0 0 0;">"Weather in NYC: 72°F, sunny"</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 Why Tools Matter</h4>
+                            <p><strong>Tools extend agent capabilities beyond text generation:</strong></p>
+                            <ul>
+                                <li><strong>Real-time data:</strong> Access current information (weather, stock prices, news)</li>
+                                <li><strong>Computations:</strong> Perform calculations, data analysis</li>
+                                <li><strong>System integration:</strong> Interact with databases, APIs, software systems</li>
+                                <li><strong>Actions:</strong> Send emails, create files, update records</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -96,8 +173,183 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>🔑 Function Calling Mechanism</h3>
+                            <p><strong>Function calling allows LLMs to request tool execution:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>How Function Calling Works</h4>
+                                <ol>
+                                    <li><strong>Tool Definition:</strong> Define tools with name, description, and parameters</li>
+                                    <li><strong>LLM Decision:</strong> LLM analyzes request and decides which tool to use</li>
+                                    <li><strong>Function Call:</strong> LLM generates function call with parameters</li>
+                                    <li><strong>Tool Execution:</strong> System executes the function</li>
+                                    <li><strong>Result Integration:</strong> Tool result is fed back to LLM</li>
+                                    <li><strong>Response Generation:</strong> LLM generates final response using tool result</li>
+                                </ol>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #991b1b; margin-bottom: 1.5rem; text-align: center;">🔧 Function Calling Flow Diagram</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #1e40af; margin: 0; font-size: 0.9rem;">1. Tool Def</p>
+                                                <p style="font-size: 0.8rem; color: #1e40af; margin: 0.3rem 0 0 0;">Define tools</p>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 1.5rem; color: #ef4444;">→</div>
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #dcfce7; border: 2px solid #22c55e; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #166534; margin: 0; font-size: 0.9rem;">2. LLM Select</p>
+                                                <p style="font-size: 0.8rem; color: #166534; margin: 0.3rem 0 0 0;">Choose tool</p>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 1.5rem; color: #ef4444;">→</div>
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #991b1b; margin: 0; font-size: 0.9rem;">3. Execute</p>
+                                                <p style="font-size: 0.8rem; color: #991b1b; margin: 0.3rem 0 0 0;">Run function</p>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 1.5rem; color: #ef4444;">→</div>
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #92400e; margin: 0; font-size: 0.9rem;">4. Response</p>
+                                                <p style="font-size: 0.8rem; color: #92400e; margin: 0.3rem 0 0 0;">Generate answer</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📋 Tool Definition Schema</h3>
+                            <p><strong>Tools must be properly defined for LLMs to understand and use them:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Tool Schema Components</h4>
+                                <ul>
+                                    <li><strong>name:</strong> Unique identifier for the tool</li>
+                                    <li><strong>description:</strong> What the tool does (critical for LLM selection!)</li>
+                                    <li><strong>parameters:</strong> Input parameters with types and descriptions</li>
+                                    <li><strong>returns:</strong> What the tool returns</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="code-box">
+                                <h4>Example Tool Definition</h4>
+                                <pre><code>{
+    "name": "get_weather",
+    "description": "Get current weather for a specific city",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {
+                "type": "string",
+                "description": "The city name, e.g., 'New York'"
+            },
+            "units": {
+                "type": "string",
+                "enum": ["celsius", "fahrenheit"],
+                "description": "Temperature units"
+            }
+        },
+        "required": ["city"]
+    },
+    "returns": {
+        "type": "object",
+        "properties": {
+            "temperature": {"type": "number"},
+            "condition": {"type": "string"},
+            "humidity": {"type": "number"}
+        }
+    }
+}</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>🎯 Tool Selection Process</h3>
+                            <p><strong>The LLM selects tools based on task requirements:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Selection Criteria</h4>
+                                <ul>
+                                    <li><strong>Task match:</strong> Does tool description match the task?</li>
+                                    <li><strong>Parameter availability:</strong> Can we provide required parameters?</li>
+                                    <li><strong>Relevance:</strong> Is this the best tool for the job?</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">🎯 Tool Selection Decision Tree</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <div style="text-align: center; margin-bottom: 1rem;">
+                                        <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem; display: inline-block;">
+                                            <p style="font-weight: 700; color: #1e40af; margin: 0;">User Request</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <div style="font-size: 1.5rem; color: #22c55e; font-weight: bold;">↓</div>
+                                    </div>
+                                    
+                                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;">
+                                        <p style="font-weight: 700; color: #92400e; margin: 0 0 1rem 0; text-align: center;">LLM Analyzes Request</p>
+                                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                                            <div style="background: white; padding: 0.8rem; border-radius: 6px; text-align: center;">
+                                                <p style="font-size: 0.8rem; color: #92400e; margin: 0;">Weather?</p>
+                                            </div>
+                                            <div style="background: white; padding: 0.8rem; border-radius: 6px; text-align: center;">
+                                                <p style="font-size: 0.8rem; color: #92400e; margin: 0;">Calculate?</p>
+                                            </div>
+                                            <div style="background: white; padding: 0.8rem; border-radius: 6px; text-align: center;">
+                                                <p style="font-size: 0.8rem; color: #92400e; margin: 0;">Search?</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <div style="font-size: 1.5rem; color: #22c55e; font-weight: bold;">↓</div>
+                                    </div>
+                                    
+                                    <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1.5rem;">
+                                        <p style="font-weight: 700; color: #991b1b; margin: 0 0 1rem 0; text-align: center;">Selected Tool</p>
+                                        <div style="background: white; padding: 1rem; border-radius: 6px; text-align: center;">
+                                            <p style="font-size: 0.9rem; color: #991b1b; margin: 0;">get_weather(city="New York")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>⚙️ Error Handling in Tool Usage</h3>
+                            <p><strong>Agents must handle tool execution errors gracefully:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Common Error Scenarios</h4>
+                                <ul>
+                                    <li><strong>Tool not found:</strong> Requested tool doesn't exist</li>
+                                    <li><strong>Invalid parameters:</strong> Wrong parameter types or missing required params</li>
+                                    <li><strong>Tool failure:</strong> Tool execution fails (API error, network issue)</li>
+                                    <li><strong>Timeout:</strong> Tool takes too long to execute</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Error Handling Strategies</h4>
+                                <ul>
+                                    <li><strong>Retry:</strong> Retry failed operations (with backoff)</li>
+                                    <li><strong>Fallback:</strong> Use alternative tool or approach</li>
+                                    <li><strong>Clarification:</strong> Ask user for more information</li>
+                                    <li><strong>Graceful degradation:</strong> Provide partial answer if possible</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -105,12 +357,53 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Tool Selection Probability</h4>
+                            
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>P(tool = t | request, available_tools) = softmax(similarity(request, tool.description))</strong>
                             </div>
+                            
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>LLM selects tool based on similarity:</h5>
+                                <ul>
+                                    <li><strong>request:</strong> User's request</li>
+                                    <li><strong>tool.description:</strong> Tool description</li>
+                                    <li><strong>similarity(...):</strong> Semantic similarity score</li>
+                                    <li><strong>softmax:</strong> Converts scores to probabilities</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Tool Execution Function</h4>
+                            
+                            <div class="formula-display">
+                                <strong>result = Execute(tool, parameters) = { success: tool(params), error: None }</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Tool execution returns:</h5>
+                                <ul>
+                                    <li><strong>success:</strong> Tool result if execution succeeds</li>
+                                    <li><strong>error:</strong> Error message if execution fails</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>Tool Result Integration</h4>
+                            
+                            <div class="formula-display">
+                                <strong>response = LLM(request, tool_result, context)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>LLM generates response using:</h5>
+                                <ul>
+                                    <li><strong>request:</strong> Original user request</li>
+                                    <li><strong>tool_result:</strong> Result from tool execution</li>
+                                    <li><strong>context:</strong> Conversation context and memory</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -119,8 +412,96 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>🔢 Example 1: Weather Agent - Complete Tool Usage</h4>
+                            <p><strong>Task: "What's the weather in New York and Paris?"</strong></p>
+                            
+                            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">📊 Multi-Tool Execution Flow</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <table style="width: 100%; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="background: #f3f4f6;">
+                                                <th style="padding: 0.8rem; text-align: left; border: 1px solid #d1d5db; color: #374151; font-weight: 600;">Step</th>
+                                                <th style="padding: 0.8rem; text-align: left; border: 1px solid #d1d5db; color: #374151; font-weight: 600;">Action</th>
+                                                <th style="padding: 0.8rem; text-align: left; border: 1px solid #d1d5db; color: #374151; font-weight: 600;">Tool Call</th>
+                                                <th style="padding: 0.8rem; text-align: left; border: 1px solid #d1d5db; color: #374151; font-weight: 600;">Result</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; font-weight: 600; color: #1e40af;">1</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">LLM analyzes request</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">-</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #166534;">Decides: Need 2 weather calls</td>
+                                            </tr>
+                                            <tr style="background: #f9fafb;">
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; font-weight: 600; color: #1e40af;">2</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">Call weather tool</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #991b1b; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">get_weather("New York")</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #166534;">72°F, sunny</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; font-weight: 600; color: #1e40af;">3</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">Call weather tool</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #991b1b; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">get_weather("Paris")</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #166534;">65°F, cloudy</td>
+                                            </tr>
+                                            <tr style="background: #f9fafb;">
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; font-weight: 600; color: #1e40af;">4</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">LLM generates response</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #374151;">-</td>
+                                                <td style="padding: 0.8rem; border: 1px solid #d1d5db; color: #166534;">"NYC: 72°F sunny, Paris: 65°F cloudy"</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="example-box">
+                            <h4>🔢 Example 2: Calculator Agent - Tool Chaining</h4>
+                            <p><strong>Task: "Calculate (15 + 27) × 3 and convert to binary"</strong></p>
+                            
+                            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">🔗 Tool Chaining Example</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #991b1b; margin: 0; font-size: 0.9rem;">Step 1</p>
+                                                <p style="font-size: 0.85rem; color: #991b1b; margin: 0.3rem 0 0 0;">calculate("15+27")</p>
+                                                <p style="font-size: 0.8rem; color: #166534; margin: 0.3rem 0 0 0; font-weight: 600;">→ 42</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="font-size: 2rem; color: #22c55e; font-weight: bold;">→</div>
+                                        
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #991b1b; margin: 0; font-size: 0.9rem;">Step 2</p>
+                                                <p style="font-size: 0.85rem; color: #991b1b; margin: 0.3rem 0 0 0;">calculate("42*3")</p>
+                                                <p style="font-size: 0.8rem; color: #166534; margin: 0.3rem 0 0 0; font-weight: 600;">→ 126</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div style="font-size: 2rem; color: #22c55e; font-weight: bold;">→</div>
+                                        
+                                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                                            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem;">
+                                                <p style="font-weight: 700; color: #991b1b; margin: 0; font-size: 0.9rem;">Step 3</p>
+                                                <p style="font-size: 0.85rem; color: #991b1b; margin: 0.3rem 0 0 0;">convert_to_binary(126)</p>
+                                                <p style="font-size: 0.8rem; color: #166534; margin: 0.3rem 0 0 0; font-weight: 600;">→ "1111110"</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem; border-radius: 4px;">
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>💡 Key:</strong> Agent chains multiple tools, using output of one tool as input to the next!</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -128,11 +509,303 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Code Implementation</h4>
-                            <pre><code>import numpy as np
+                            <h4>💻 Complete Tool-Using Agent Implementation</h4>
+                            <pre><code>from typing import Dict, List, Any, Callable
+import json
+from enum import Enum
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class ToolExecutionStatus(Enum):
+    SUCCESS = "success"
+    ERROR = "error"
+    TIMEOUT = "timeout"
+
+class ToolUsingAgent:
+    """Agent that can use tools to interact with external systems"""
+    
+    def __init__(self, llm):
+        self.llm = llm
+        self.tools: Dict[str, Dict] = {}
+        self.tool_execution_history = []
+    
+    def register_tool(self, name: str, description: str, function: Callable, 
+                     parameters: Dict, returns: Dict = None):
+        """
+        Register a tool for the agent to use
+        
+        Parameters:
+        name: Tool name
+        description: What the tool does (critical for LLM selection!)
+        function: Python function to execute
+        parameters: Parameter schema
+        returns: Return type schema
+        """
+        self.tools[name] = {
+            'name': name,
+            'description': description,
+            'function': function,
+            'parameters': parameters,
+            'returns': returns
+        }
+    
+    def get_tool_descriptions(self) -> str:
+        """Get formatted tool descriptions for LLM"""
+        descriptions = []
+        for tool in self.tools.values():
+            desc = f"- {tool['name']}: {tool['description']}"
+            if tool['parameters']:
+                params = ', '.join(tool['parameters'].keys())
+                desc += f" (parameters: {params})"
+            descriptions.append(desc)
+        return '\n'.join(descriptions)
+    
+    def select_tool(self, user_request: str) -> Dict:
+        """
+        Use LLM to select appropriate tool
+        
+        Returns:
+        Dict with tool name and parameters
+        """
+        tool_descriptions = self.get_tool_descriptions()
+        
+        prompt = f"""
+        User request: {user_request}
+        
+        Available tools:
+        {tool_descriptions}
+        
+        Select the most appropriate tool and parameters.
+        Return JSON: {{"tool": "tool_name", "parameters": {{"param": "value"}}}}
+        """
+        
+        response = self.llm.generate(prompt)
+        decision = json.loads(response)
+        return decision
+    
+    def execute_tool(self, tool_name: str, parameters: Dict) -> Dict:
+        """
+        Execute a tool
+        
+        Returns:
+        Dict with status and result/error
+        """
+        if tool_name not in self.tools:
+            return {
+                'status': ToolExecutionStatus.ERROR,
+                'error': f'Tool {tool_name} not found',
+                'result': None
+            }
+        
+        tool = self.tools[tool_name]
+        func = tool['function']
+        
+        try:
+            # Execute tool
+            result = func(**parameters)
+            
+            execution_record = {
+                'tool': tool_name,
+                'parameters': parameters,
+                'status': ToolExecutionStatus.SUCCESS,
+                'result': result,
+                'timestamp': datetime.now().isoformat()
+            }
+            self.tool_execution_history.append(execution_record)
+            
+            return {
+                'status': ToolExecutionStatus.SUCCESS,
+                'result': result,
+                'error': None
+            }
+        
+        except Exception as e:
+            execution_record = {
+                'tool': tool_name,
+                'parameters': parameters,
+                'status': ToolExecutionStatus.ERROR,
+                'error': str(e),
+                'timestamp': datetime.now().isoformat()
+            }
+            self.tool_execution_history.append(execution_record)
+            
+            return {
+                'status': ToolExecutionStatus.ERROR,
+                'result': None,
+                'error': str(e)
+            }
+    
+    def process_with_tools(self, user_request: str, max_iterations: int = 5) -> str:
+        """
+        Process user request using tools
+        
+        Parameters:
+        user_request: User's request
+        max_iterations: Maximum tool calls allowed
+        
+        Returns:
+        Final response
+        """
+        context = []
+        
+        for iteration in range(max_iterations):
+            # Step 1: Select tool
+            decision = self.select_tool(user_request)
+            tool_name = decision.get('tool')
+            parameters = decision.get('parameters', {})
+            
+            if not tool_name or tool_name == 'respond':
+                # LLM decided to respond directly
+                prompt = f"""
+                User request: {user_request}
+                Context: {json.dumps(context, indent=2)}
+                
+                Generate a response.
+                """
+                response = self.llm.generate(prompt)
+                return response
+            
+            # Step 2: Execute tool
+            execution_result = self.execute_tool(tool_name, parameters)
+            context.append({
+                'tool': tool_name,
+                'result': execution_result
+            })
+            
+            # Step 3: Check if we have enough information
+            if execution_result['status'] == ToolExecutionStatus.SUCCESS:
+                # Generate response using tool result
+                prompt = f"""
+                User request: {user_request}
+                Tool result: {json.dumps(execution_result['result'], indent=2)}
+                
+                Generate a response using the tool result.
+                """
+                response = self.llm.generate(prompt)
+                return response
+            else:
+                # Tool failed, try again or ask for clarification
+                user_request = f"Tool {tool_name} failed: {execution_result['error']}. Please try a different approach."
+                continue
+        
+        return "Agent reached maximum iterations without completing the task."
+
+# Example tools
+def get_weather(city: str) -> Dict:
+    """Get weather for a city"""
+    # In real implementation, call weather API
+    return {"temperature": 72, "condition": "sunny", "city": city}
+
+def calculate(expression: str) -> float:
+    """Calculate mathematical expression"""
+    try:
+        return eval(expression)
+    except:
+        raise ValueError(f"Invalid expression: {expression}")
+
+# Example usage
+# agent = ToolUsingAgent(llm=my_llm)
+
+# Register tools
+# agent.register_tool(
+#     name='get_weather',
+#     description='Get current weather for a city',
+#     function=get_weather,
+#     parameters={'city': 'string'}
+# )
+
+# agent.register_tool(
+#     name='calculate',
+#     description='Calculate a mathematical expression',
+#     function=calculate,
+#     parameters={'expression': 'string'}
+# )
+
+# Process request
+# response = agent.process_with_tools("What's the weather in New York?")
+# print(response)</code></pre>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>💻 Error Handling in Tool Execution</h4>
+                            <pre><code>class RobustToolExecutor:
+    """Tool executor with error handling and retry logic"""
+    
+    def __init__(self, max_retries: int = 3, retry_delay: float = 1.0):
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+    
+    def execute_with_retry(self, tool_func: Callable, parameters: Dict) -> Dict:
+        """
+        Execute tool with retry logic
+        
+        Parameters:
+        tool_func: Tool function to execute
+        parameters: Parameters for the function
+        
+        Returns:
+        Execution result with status
+        """
+        last_error = None
+        
+        for attempt in range(self.max_retries):
+            try:
+                result = tool_func(**parameters)
+                return {
+                    'success': True,
+                    'result': result,
+                    'attempts': attempt + 1
+                }
+            except Exception as e:
+                last_error = e
+                if attempt < self.max_retries - 1:
+                    time.sleep(self.retry_delay * (attempt + 1))  # Exponential backoff
+                    continue
+        
+        # All retries failed
+        return {
+            'success': False,
+            'error': str(last_error),
+            'attempts': self.max_retries
+        }
+    
+    def execute_with_fallback(self, primary_tool: Callable, fallback_tool: Callable,
+                              parameters: Dict) -> Dict:
+        """
+        Execute tool with fallback
+        
+        Parameters:
+        primary_tool: Primary tool to try
+        fallback_tool: Fallback tool if primary fails
+        parameters: Parameters for tools
+        
+        Returns:
+        Execution result
+        """
+        # Try primary tool
+        result = self.execute_with_retry(primary_tool, parameters)
+        
+        if result['success']:
+            return result
+        
+        # Primary failed, try fallback
+        print(f"Primary tool failed, trying fallback...")
+        fallback_result = self.execute_with_retry(fallback_tool, parameters)
+        
+        if fallback_result['success']:
+            fallback_result['used_fallback'] = True
+            return fallback_result
+        
+        # Both failed
+        return {
+            'success': False,
+            'error': f"Both primary and fallback tools failed",
+            'primary_error': result.get('error'),
+            'fallback_error': fallback_result.get('error')
+        }
+
+# Example usage
+# executor = RobustToolExecutor(max_retries=3)
+# result = executor.execute_with_retry(get_weather, {'city': 'New York'})
+# print(result)</code></pre>
                         </div>
                     </div>
 
@@ -140,8 +813,91 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>🌍 Tool-Using Agents in Production</h3>
+                            <p><strong>Tool-using agents power many real-world applications:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>1. Customer Support Agents</h4>
+                                <ul>
+                                    <li><strong>Tools:</strong> Order database, CRM system, knowledge base</li>
+                                    <li><strong>Use cases:</strong> Check order status, process returns, answer questions</li>
+                                    <li><strong>Example:</strong> "Check my order #12345" → Agent calls order_lookup tool</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>2. Research Agents</h4>
+                                <ul>
+                                    <li><strong>Tools:</strong> Web search, academic databases, PDF readers</li>
+                                    <li><strong>Use cases:</strong> Research topics, gather information, cite sources</li>
+                                    <li><strong>Example:</strong> "Research quantum computing" → Agent uses search and read tools</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>3. Data Analysis Agents</h4>
+                                <ul>
+                                    <li><strong>Tools:</strong> Database connectors, statistical libraries, visualization tools</li>
+                                    <li><strong>Use cases:</strong> Query data, analyze trends, create charts</li>
+                                    <li><strong>Example:</strong> "Analyze sales data" → Agent queries DB, runs analysis, creates visualizations</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>4. Code Generation Agents</h4>
+                                <ul>
+                                    <li><strong>Tools:</strong> Code editor, compiler, test runner, git</li>
+                                    <li><strong>Use cases:</strong> Write code, run tests, commit changes</li>
+                                    <li><strong>Example:</strong> "Create a REST API" → Agent writes code, tests it, commits to git</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h3>📊 Tool Categories</h3>
+                            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">📊 Common Tool Categories</h4>
+                                
+                                <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                                        <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #991b1b; margin: 0 0 0.5rem 0;">🌐 Information Tools</p>
+                                            <ul style="color: #991b1b; margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                                                <li>Web search</li>
+                                                <li>Database queries</li>
+                                                <li>API calls</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #92400e; margin: 0 0 0.5rem 0;">🔢 Computation Tools</p>
+                                            <ul style="color: #92400e; margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                                                <li>Calculator</li>
+                                                <li>Data analysis</li>
+                                                <li>Statistical functions</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #1e40af; margin: 0 0 0.5rem 0;">💼 Business Tools</p>
+                                            <ul style="color: #1e40af; margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                                                <li>CRM systems</li>
+                                                <li>Email systems</li>
+                                                <li>Calendar APIs</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div style="background: #e0e7ff; border: 2px solid #6366f1; border-radius: 8px; padding: 1rem;">
+                                            <p style="font-weight: 700; color: #4338ca; margin: 0 0 0.5rem 0;">💻 Development Tools</p>
+                                            <ul style="color: #4338ca; margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                                                <li>Code editors</li>
+                                                <li>Version control</li>
+                                                <li>Build systems</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -150,11 +906,27 @@
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Tool-Using Agents</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is the key advantage of tool-using agents over traditional LLMs?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) They can interact with external systems, access real-time data, and perform actions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They use less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They have more parameters</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What information is critical for LLM tool selection?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Tool description - LLM uses it to match tools to tasks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Tool name only</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Tool code</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Tool file location</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What should an agent do when a tool execution fails?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Retry with backoff, try fallback tool, or ask for clarification</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Give up immediately</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Ignore the error</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use a random tool</div>
                             </div>
                         </div>
                     </div>
