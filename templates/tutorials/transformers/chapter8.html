@@ -207,8 +207,7 @@ Attention Mask:
                             <h4>Causal Masking</h4>
                             
                             <div class="formula-display">
-                                <strong>Mask[i, j] = { 1 if j ≤ i<br>
-                                                      0 if j > i }</strong>
+                                \[\text{Mask}[i, j] = \begin{cases} 1 & \text{if } j \leq i \\ 0 & \text{if } j > i \end{cases}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -225,7 +224,7 @@ Attention Mask:
                             <h4>Masked Attention Scores</h4>
                             
                             <div class="formula-display">
-                                <strong>scores_masked = scores + mask × (-∞)</strong><br>
+                                \[\text{scores}_{\text{masked}} = \text{scores} + \text{mask} \times (-\infty)\]
                                 <strong>attention = softmax(scores_masked)</strong>
                             </div>
                             
@@ -533,6 +532,21 @@ print(f"Encoder output shape: {encoder_output.shape}")</code></pre>
                 }
             }
         }
+            
+        // Initialize KaTeX rendering
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "\[", right: "\]", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\(", right: "\)", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
     </script>
 </body>
 </html>

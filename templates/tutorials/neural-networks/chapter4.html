@@ -134,8 +134,8 @@
                             <h4>Chain Rule for Single Variable</h4>
                             
                             <div class="formula-display">
-                                <strong>If y = f(g(x)), then:</strong><br>
-                                <strong>dy/dx = (df/dg) × (dg/dx)</strong>
+                                <p><strong>If \(y = f(g(x))\), then:</strong></p>
+                                \[\frac{dy}{dx} = \frac{df}{dg} \times \frac{dg}{dx}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -167,8 +167,8 @@
                             <p><strong>For neural networks, we need the multivariable chain rule:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>If z = f(x, y) where x = g(t) and y = h(t), then:</strong><br>
-                                <strong>dz/dt = (∂f/∂x)(dx/dt) + (∂f/∂y)(dy/dt)</strong>
+                                <p><strong>If \(z = f(x, y)\) where \(x = g(t)\) and \(y = h(t)\), then:</strong></p>
+                                \[\frac{dz}{dt} = \frac{\partial f}{\partial x} \frac{dx}{dt} + \frac{\partial f}{\partial y} \frac{dy}{dt}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -233,7 +233,7 @@ print(f"dy/dx = {dy_dx}")
                             <h4>1. Mean Squared Error (MSE) - For Regression</h4>
                             
                             <div class="formula-display">
-                                <strong>L = (1/n) Σ(y_pred - y_true)²</strong>
+                                \[L = \frac{1}{n} \sum_{i=1}^{n} (y_{\text{pred}} - y_{\text{true}})^2\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -251,11 +251,11 @@ print(f"dy/dx = {dy_dx}")
                             <h4>2. Cross-Entropy Loss - For Classification</h4>
                             
                             <div class="formula-display">
-                                <strong>Binary Cross-Entropy:</strong><br>
-                                <strong>L = -(1/n) Σ[y_true × log(y_pred) + (1-y_true) × log(1-y_pred)]</strong><br><br>
+                                <p><strong>Binary Cross-Entropy:</strong></p>
+                                \[L = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_{\text{true}} \log(y_{\text{pred}}) + (1-y_{\text{true}}) \log(1-y_{\text{pred}}) \right]\]
                                 
-                                <strong>Multi-class Cross-Entropy:</strong><br>
-                                <strong>L = -(1/n) Σ Σ y_true × log(y_pred)</strong>
+                                <p style="margin-top: 1rem;"><strong>Multi-class Cross-Entropy:</strong></p>
+                                \[L = -\frac{1}{n} \sum_{i=1}^{n} \sum_{c=1}^{C} y_{\text{true},c} \log(y_{\text{pred},c})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -342,7 +342,7 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                             <p><strong>Start with the loss gradient at the output:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂a⁽ᴸ⁾</strong> = derivative of loss with respect to output
+                                \[\frac{\partial L}{\partial a^{(L)}} = \text{derivative of loss with respect to output}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -359,7 +359,7 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                             <p><strong>Apply chain rule through activation function:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂z⁽ᴸ⁾ = (∂L/∂a⁽ᴸ⁾) × f'(z⁽ᴸ⁾)</strong>
+                                \[\frac{\partial L}{\partial z^{(L)}} = \frac{\partial L}{\partial a^{(L)}} \times f'(z^{(L)})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -376,8 +376,8 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                             <p><strong>Compute gradients for parameters:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂W⁽ᴸ⁾ = (∂L/∂z⁽ᴸ⁾) × a⁽ᴸ⁻¹⁾ᵀ</strong><br>
-                                <strong>∂L/∂b⁽ᴸ⁾ = Σ(∂L/∂z⁽ᴸ⁾)</strong>
+                                \[\frac{\partial L}{\partial W^{(L)}} = \frac{\partial L}{\partial z^{(L)}} \times (a^{(L-1)})^T\]
+                                \[\frac{\partial L}{\partial b^{(L)}} = \sum \frac{\partial L}{\partial z^{(L)}}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -394,7 +394,7 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                             <p><strong>Compute error for previous layer:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂a⁽ᴸ⁻¹⁾ = W⁽ᴸ⁾ᵀ × (∂L/∂z⁽ᴸ⁾)</strong>
+                                \[\frac{\partial L}{\partial a^{(L-1)}} = (W^{(L)})^T \times \frac{\partial L}{\partial z^{(L)}}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -443,23 +443,23 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                             
                             <p><strong>Output Layer (L):</strong></p>
                             <div class="formula-display">
-                                <strong>δ⁽ᴸ⁾ = ∂L/∂a⁽ᴸ⁾ ⊙ f'⁽ᴸ⁾(z⁽ᴸ⁾)</strong>
+                                \[\delta^{(L)} = \frac{\partial L}{\partial a^{(L)}} \odot f'^{(L)}(z^{(L)})\]
                             </div>
                             <p>Where ⊙ is element-wise multiplication</p>
                             
                             <p><strong>Hidden Layers (l = L-1, L-2, ..., 1):</strong></p>
                             <div class="formula-display">
-                                <strong>δ⁽ˡ⁾ = (W⁽ˡ⁺¹⁾ᵀ × δ⁽ˡ⁺¹⁾) ⊙ f'⁽ˡ⁾(z⁽ˡ⁾)</strong>
+                                \[\delta^{(l)} = ((W^{(l+1)})^T \times \delta^{(l+1)}) \odot f'^{(l)}(z^{(l)})\]
                             </div>
                             
                             <p><strong>Weight Gradients:</strong></p>
                             <div class="formula-display">
-                                <strong>∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ × a⁽ˡ⁻¹⁾ᵀ</strong>
+                                \[\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)} \times (a^{(l-1)})^T\]
                             </div>
                             
                             <p><strong>Bias Gradients:</strong></p>
                             <div class="formula-display">
-                                <strong>∂L/∂b⁽ˡ⁾ = δ⁽ˡ⁾</strong> (sum over batch dimension)
+                                \[\frac{\partial L}{\partial b^{(l)}} = \delta^{(l)} \quad \text{(sum over batch dimension)}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -598,8 +598,8 @@ for epoch in range(100):
                             <h4>Gradient Descent Update Rule</h4>
                             
                             <div class="formula-display">
-                                <strong>W ← W - η × (∂L/∂W)</strong><br>
-                                <strong>b ← b - η × (∂L/∂b)</strong>
+                                \[W \leftarrow W - \eta \times \frac{\partial L}{\partial W}\]
+                                \[b \leftarrow b - \eta \times \frac{\partial L}{\partial b}\]
                             </div>
                             
                             <p>Where <strong>η</strong> (eta) is the learning rate</p>
@@ -886,11 +886,26 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
     
     <script>
         function scrollToSectionNav() {
-            const sectionNav = document.querySelector(.section-nav);
+            const sectionNav = document.querySelector('.section-nav');
             if (sectionNav) {
                 sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+        
+        // Initialize KaTeX rendering
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "\\[", right: "\\]", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\\(", right: "\\)", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
     </script>
 </body>
 </html>

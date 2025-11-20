@@ -186,10 +186,10 @@
                             <p>We use superscripts to denote layers:</p>
                             
                             <div class="formula-display">
-                                <strong>a⁽⁰⁾</strong> = Input layer (raw features)<br>
-                                <strong>a⁽¹⁾</strong> = First hidden layer output<br>
-                                <strong>a⁽²⁾</strong> = Second hidden layer output<br>
-                                <strong>a⁽ᴸ⁾</strong> = Output layer (L = number of layers)
+                                \[a^{(0)} = \text{Input layer (raw features)}\]<br>
+                                \[a^{(1)} = \text{First hidden layer output}\]<br>
+                                \[a^{(2)} = \text{Second hidden layer output}\]<br>
+                                \[a^{(L)} = \text{Output layer (L = number of layers)}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -250,11 +250,11 @@
                             <p>For each layer <strong>l = 1, 2, ..., L</strong>:</p>
                             
                             <div class="formula-display">
-                                <strong>Step 1: Compute Pre-activation (Weighted Sum)</strong><br>
-                                <strong>z⁽ˡ⁾ = W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾</strong><br><br>
+                                <p><strong>Step 1: Compute Pre-activation (Weighted Sum)</strong></p>
+                                \[z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)}\]
                                 
-                                <strong>Step 2: Apply Activation Function</strong><br>
-                                <strong>a⁽ˡ⁾ = f(z⁽ˡ⁾)</strong>
+                                <p style="margin-top: 1rem;"><strong>Step 2: Apply Activation Function</strong></p>
+                                \[a^{(l)} = f(z^{(l)})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -346,11 +346,11 @@ W⁽¹⁾ = [0.1  0.3]
                             <p>Understanding matrix dimensions is crucial:</p>
                             
                             <div class="formula-display">
-                                <strong>For layer l:</strong><br>
-                                <strong>W⁽ˡ⁾</strong>: (n⁽ˡ⁾ × n⁽ˡ⁻¹⁾) matrix<br>
-                                <strong>a⁽ˡ⁻¹⁾</strong>: (n⁽ˡ⁻¹⁾ × m) matrix (m = batch size)<br>
-                                <strong>b⁽ˡ⁾</strong>: (n⁽ˡ⁾ × 1) vector<br>
-                                <strong>z⁽ˡ⁾</strong>: (n⁽ˡ⁾ × m) matrix<br>
+                                <p><strong>For layer \(l\):</strong></p>
+                                \[W^{(l)}: (n^{(l)} \times n^{(l-1)}) \text{ matrix}\]
+                                \[a^{(l-1)}: (n^{(l-1)} \times m) \text{ matrix (m = batch size)}\]
+                                \[b^{(l)}: (n^{(l)} \times 1) \text{ vector}\]
+                                \[z^{(l)}: (n^{(l)} \times m) \text{ matrix}\]
                                 <strong>a⁽ˡ⁾</strong>: (n⁽ˡ⁾ × m) matrix
                             </div>
                             
@@ -496,7 +496,7 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                             <p><strong>Simple but often problematic:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>W ~ Uniform(-1, 1)</strong> or <strong>W ~ N(0, 1)</strong>
+                                \[W \sim \text{Uniform}(-1, 1) \quad \text{or} \quad W \sim \mathcal{N}(0, 1)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -514,9 +514,9 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                             <p><strong>Designed for tanh and sigmoid activations:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>W ~ N(0, σ²)</strong> where <strong>σ² = 1/n_in</strong><br>
-                                or<br>
-                                <strong>W ~ Uniform(-√(6/(n_in + n_out)), √(6/(n_in + n_out)))</strong>
+                                \[W \sim \mathcal{N}(0, \sigma^2) \quad \text{where } \sigma^2 = \frac{1}{n_{\text{in}}}\]
+                                <p style="margin-top: 0.5rem;">or</p>
+                                \[W \sim \text{Uniform}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -535,7 +535,7 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                             <p><strong>Designed specifically for ReLU activation:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>W ~ N(0, σ²)</strong> where <strong>σ² = 2/n_in</strong>
+                                \[W \sim \mathcal{N}(0, \sigma^2) \quad \text{where } \sigma^2 = \frac{2}{n_{\text{in}}}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -876,6 +876,21 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                 sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+            
+        // Initialize KaTeX rendering
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "\[", right: "\]", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\(", right: "\)", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
     </script>
 </body>
 </html>
