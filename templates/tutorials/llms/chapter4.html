@@ -106,8 +106,53 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>GPT Architecture Overview</h3>
+                            <p><strong>GPT (Generative Pre-trained Transformer) is decoder-only:</strong></p>
+                            <ul>
+                                <li>Uses only decoder layers from transformer architecture</li>
+                                <li>Autoregressive: generates text one token at a time</li>
+                                <li>Causal masking: can only attend to previous tokens</li>
+                                <li>Pre-trained on next token prediction</li>
+                            </ul>
+                            
+                            <p><strong>Key difference from BERT:</strong></p>
+                            <ul>
+                                <li>BERT: Bidirectional, understands context from both directions</li>
+                                <li>GPT: Unidirectional, generates left-to-right</li>
+                                <li>BERT: Better for understanding tasks</li>
+                                <li>GPT: Better for generation tasks</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Scaling in GPT Models</h3>
+                            <p><strong>GPT models have scaled dramatically:</strong></p>
+                            <ul>
+                                <li>GPT-1 (2018): 117M parameters</li>
+                                <li>GPT-2 (2019): 1.5B parameters</li>
+                                <li>GPT-3 (2020): 175B parameters</li>
+                                <li>GPT-4 (2023): Estimated 1T+ parameters</li>
+                            </ul>
+                            
+                            <p><strong>With scale comes:</strong></p>
+                            <ul>
+                                <li>Better language understanding</li>
+                                <li>Emergent capabilities (reasoning, few-shot learning)</li>
+                                <li>More coherent and contextually appropriate generation</li>
+                                <li>Ability to follow complex instructions</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Generation Process</h3>
+                            <p><strong>How GPT generates text:</strong></p>
+                            <ul>
+                                <li>Start with prompt/context</li>
+                                <li>Process through transformer layers</li>
+                                <li>Output probability distribution over vocabulary</li>
+                                <li>Sample next token (greedy or with temperature)</li>
+                                <li>Append to sequence, repeat until stop condition</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,12 +160,38 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Autoregressive Generation</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[P(x_{t+1} | x_1, \ldots, x_t) = \text{softmax}(W \cdot h_t)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(x_1, \ldots, x_t\): Previous tokens</li>
+                                    <li>\(h_t\): Hidden state at position t (from transformer)</li>
+                                    <li>\(W\): Output projection matrix</li>
+                                    <li>Output: Probability distribution over vocabulary</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Complete Sequence Probability</h4>
+                            <div class="formula-display">
+                                \[P(x_1, \ldots, x_n) = \prod_{t=1}^{n} P(x_t | x_1, \ldots, x_{t-1})\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>The probability of a complete sequence is the product of conditional probabilities. Each token's probability depends on all previous tokens.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Causal Attention Mask</h4>
+                            <div class="formula-display">
+                                \[\text{Mask}[i, j] = \begin{cases} 1 & \text{if } j \leq i \\ 0 & \text{if } j > i \end{cases}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Position i can only attend to positions j where j ≤ i. This ensures the model cannot see future tokens during training or generation.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +200,49 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: GPT Generation Process</h4>
+                            <p><strong>Prompt:</strong> "The capital of France is"</p>
+                            
+                            <p><strong>Step 1: Tokenization</strong></p>
+                            <ul>
+                                <li>Input → ["The", "capital", "of", "France", "is"]</li>
+                                <li>Each token converted to embedding</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Forward Pass</strong></p>
+                            <ul>
+                                <li>Process through 12-96 transformer layers (depending on model)</li>
+                                <li>Each layer refines the representation</li>
+                                <li>Final hidden state for "is" position</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Prediction</strong></p>
+                            <ul>
+                                <li>Output projection → vocabulary probabilities</li>
+                                <li>P("Paris") = 0.85, P("London") = 0.05, ...</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Sampling</strong></p>
+                            <ul>
+                                <li>Sample "Paris"</li>
+                                <li>New sequence: "The capital of France is Paris"</li>
+                                <li>Continue generating if needed</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Causal Masking</h4>
+                            <p><strong>Sequence:</strong> "The cat sat"</p>
+                            
+                            <p><strong>Attention patterns:</strong></p>
+                            <ul>
+                                <li>"The" can only attend to itself</li>
+                                <li>"cat" can attend to "The" and itself</li>
+                                <li>"sat" can attend to "The", "cat", and itself</li>
+                                <li>Cannot see future tokens</li>
+                            </ul>
+                            
+                            <p><strong>This matches inference:</strong> During generation, model only sees previous tokens, so training with causal masking ensures consistency.</p>
                         </div>
                     </div>
 
@@ -138,11 +250,81 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>GPT Text Generation</h4>
+                            <pre><code class="language-python">from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import torch
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Load model
+model = GPT2LMHeadModel.from_pretrained("gpt2")
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+tokenizer.pad_token = tokenizer.eos_token
+
+def generate_text(prompt, max_length=50, temperature=0.7):
+    """
+    Generate text using GPT model
+    """
+    # Tokenize input
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
+    # Generate
+    with torch.no_grad():
+        outputs = model.generate(
+            inputs.input_ids,
+            max_length=max_length,
+            temperature=temperature,
+            do_sample=True,
+            top_k=50,
+            top_p=0.95,
+            pad_token_id=tokenizer.eos_token_id
+        )
+    
+    # Decode
+    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return generated_text
+
+# Example
+prompt = "The capital of France is"
+result = generate_text(prompt)
+print(result)  # "The capital of France is Paris"</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Implementing Causal Mask</h4>
+                            <pre><code class="language-python">import torch
+import torch.nn.functional as F
+
+def create_causal_mask(seq_len):
+    """
+    Create causal attention mask
+    """
+    mask = torch.tril(torch.ones(seq_len, seq_len))
+    return mask
+
+def masked_attention(Q, K, V, mask):
+    """
+    Apply causal masking to attention
+    """
+    # Compute attention scores
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / (Q.size(-1) ** 0.5)
+    
+    # Apply mask (set masked positions to -inf)
+    mask = mask.unsqueeze(0).unsqueeze(0)  # Add batch and head dimensions
+    scores = scores.masked_fill(mask == 0, float('-inf'))
+    
+    # Softmax
+    attention_weights = F.softmax(scores, dim=-1)
+    
+    # Apply to values
+    output = torch.matmul(attention_weights, V)
+    return output
+
+# Example
+seq_len = 5
+Q = torch.randn(1, 1, seq_len, 64)  # (batch, heads, seq, dim)
+K = torch.randn(1, 1, seq_len, 64)
+V = torch.randn(1, 1, seq_len, 64)
+mask = create_causal_mask(seq_len)
+output = masked_attention(Q, K, V, mask)</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +332,49 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>GPT Applications</h3>
+                            <p><strong>Text Generation:</strong></p>
+                            <ul>
+                                <li>Chatbots and conversational AI (ChatGPT)</li>
+                                <li>Content creation (articles, stories, marketing)</li>
+                                <li>Creative writing assistance</li>
+                                <li>Email and document drafting</li>
+                            </ul>
+                            
+                            <p><strong>Code Generation:</strong></p>
+                            <ul>
+                                <li>GitHub Copilot (code completion)</li>
+                                <li>Code generation from natural language</li>
+                                <li>Code explanation and documentation</li>
+                                <li>Bug fixing and refactoring suggestions</li>
+                            </ul>
+                            
+                            <p><strong>Specialized Tasks:</strong></p>
+                            <ul>
+                                <li>Text summarization</li>
+                                <li>Translation</li>
+                                <li>Question answering</li>
+                                <li>Data extraction and formatting</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>GPT vs BERT Use Cases</h3>
+                            <p><strong>Use GPT when:</strong></p>
+                            <ul>
+                                <li>You need to generate new text</li>
+                                <li>Task requires creativity or continuation</li>
+                                <li>You want conversational responses</li>
+                                <li>Task benefits from autoregressive generation</li>
+                            </ul>
+                            
+                            <p><strong>Use BERT when:</strong></p>
+                            <ul>
+                                <li>You need to understand/classify existing text</li>
+                                <li>Task requires bidirectional context</li>
+                                <li>You're extracting information, not generating</li>
+                                <li>Task is classification or understanding</li>
+                            </ul>
                         </div>
                     </div>
 
