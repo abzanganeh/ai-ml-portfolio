@@ -558,6 +558,78 @@ def ffn_sublayer(x, ffn_fn, layer_norm):
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Both before and after</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not used in pre-norm</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is the formula for layer normalization?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(LayerNorm(x) = \gamma \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta\) where μ and σ are mean and std across features, γ and β are learnable parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(LayerNorm(x) = x\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(LayerNorm(x) = x - \mu\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(LayerNorm(x) = \mu\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: Why are residual connections important in transformers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Residual connections allow gradients to flow directly through layers, preventing vanishing gradients, enabling training of very deep networks, and allowing layers to learn residual mappings</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They reduce parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They make it faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're not important</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the difference between pre-norm and post-norm in transformers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-norm applies layer norm before sublayers (more stable, common in modern transformers), post-norm applies after sublayers (original Transformer). Pre-norm generally trains better for deep networks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Post-norm is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Pre-norm is never used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: How does layer normalization differ from batch normalization?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Layer norm normalizes across features for each sample independently, while batch norm normalizes across batch dimension. Layer norm works better for sequences and variable batch sizes</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're identical</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Batch norm is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Layer norm normalizes batches</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What happens if you remove residual connections from transformers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients vanish in deep networks, training becomes unstable, and the model struggles to learn effectively, especially with many layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Nothing changes</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It improves</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It becomes faster</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: How would you implement residual connection and layer norm?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) For pre-norm: x_norm = LayerNorm(x), output = x + Sublayer(x_norm). For post-norm: output = LayerNorm(x + Sublayer(x)). Compute mean and std, normalize, scale and shift with learnable parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just add x</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Just normalize</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: Why is epsilon added in layer normalization formula?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Epsilon (small constant like 1e-5) prevents division by zero when variance is very small, ensuring numerical stability during computation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase variance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To decrease variance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: How do residual connections help with gradient flow?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Residual connections create direct paths for gradients to flow backward, allowing gradients to bypass layers and reach earlier layers without being multiplied many times, preventing vanishing gradients</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They block gradients</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They don't affect gradients</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They only help forward pass</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What is the complete transformer block structure with residual and norm?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-norm: x = x + Attention(LayerNorm(x)), x = x + FFN(LayerNorm(x)). Post-norm: x = LayerNorm(x + Attention(x)), x = LayerNorm(x + FFN(x)). Both use residual connections</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No residual connections</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No layer norm</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sequential without connections</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -581,7 +653,7 @@ def ffn_sublayer(x, ffn_fn, layer_norm):
         <!-- KaTeX for math rendering -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
             const sectionNav = document.querySelector('.section-nav');

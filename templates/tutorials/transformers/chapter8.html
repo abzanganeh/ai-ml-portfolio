@@ -492,6 +492,78 @@ print(f"Encoder output shape: {encoder_output.shape}")</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) To generate tokens</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) To mask future positions</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: How does the decoder generate output autoregressively?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Decoder generates tokens one at a time, using previously generated tokens as input, with causal masking ensuring it only sees past tokens, continuing until end token or max length</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All tokens at once</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random tokens</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only first token</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is the difference between decoder self-attention and cross-attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Self-attention attends to decoder's own previous tokens (with causal mask), while cross-attention lets decoder queries attend to encoder outputs, allowing decoder to focus on relevant input parts</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Self-attention uses encoder</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cross-attention is self-attention</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: Why is causal masking necessary in decoder?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Causal masking prevents the model from cheating during training by seeing future tokens, ensuring it learns to generate based only on past context, which matches inference behavior</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's not necessary</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To make it faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To reduce memory</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What are the main components of a decoder layer?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Masked multi-head self-attention, cross-attention (encoder-decoder attention), feed-forward network, residual connections, and layer normalization</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only self-attention</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only cross-attention</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random components</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: How does decoder-only architecture differ from encoder-decoder?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Decoder-only (like GPT) uses only decoder layers with causal masking, suitable for generation tasks. Encoder-decoder uses both encoder and decoder, better for tasks requiring understanding input and generating output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Decoder-only has encoder</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: How would you implement causal masking?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Create a lower triangular mask matrix (1s for allowed positions, -inf for masked), add to attention scores before softmax. This ensures positions can only attend to themselves and previous positions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just mask all</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No masking needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random masking</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What is teacher forcing in decoder training?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) During training, decoder receives ground truth previous tokens as input instead of its own predictions, making training faster and more stable, though this creates train-test mismatch</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It uses predictions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It's not used</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only in inference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: How does the decoder use encoder information via cross-attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Decoder queries attend to encoder keys and values, computing attention weights that determine which encoder positions are most relevant for generating each decoder token, creating a weighted combination of encoder outputs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It copies encoder directly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It ignores encoder</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It averages encoder</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What tasks are decoder-only models best suited for?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Generation tasks like text completion, story generation, code generation, where you generate text from scratch or continue given context, without needing to understand structured input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only classification</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only translation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) All tasks equally</div>
+                            </div>
                         </div>
                     </div>
                 </main>
