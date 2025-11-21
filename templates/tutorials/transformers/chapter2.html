@@ -206,8 +206,8 @@
                                             <p style="font-size: 0.85rem; color: #92400e; margin: 0;">3 queries, 3 keys, 3 values</p>
                                         </div>
                                     </div>
-                                </div>
-                                
+                            </div>
+                            
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 1.5rem;">
                                     <p style="font-weight: 600; color: #0c4a6e; margin-bottom: 1rem; text-align: center;">Step 2: Attention Flow for "cat" (position 1)</p>
                                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
@@ -230,8 +230,8 @@
                                     <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 0.8rem; border-radius: 4px;">
                                         <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>Query("cat")</strong> compares to all Keys → High similarity with Key("cat") → Strong attention!</p>
                                     </div>
-                                </div>
-                                
+                            </div>
+                            
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <p style="font-weight: 600; color: #0c4a6e; margin-bottom: 1rem; text-align: center;">Step 3 & 4: Softmax → Weighted Sum</p>
                                     <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -444,6 +444,86 @@ print(f"Attention weights shape: {weights.shape}")  # (10, 10)</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) It doesn't need gradients</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) It uses smaller matrices</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: How does self-attention create contextualized word embeddings?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Each word's representation becomes a weighted combination of all words in the sequence, where weights are determined by how relevant each word is to understanding the current word's meaning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It just copies the input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It averages all words</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It uses only the first word</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is the formula for self-attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(SelfAttention(X) = softmax(\frac{XW_Q (XW_K)^T}{\sqrt{d_k}}) XW_V\) where X is input, W_Q, W_K, W_V are learned weight matrices</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(SelfAttention = X\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(SelfAttention = W \times X\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(SelfAttention = X + W\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: Why does the word "bank" get different representations in different contexts with self-attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Self-attention allows "bank" to attend to different surrounding words (financial terms vs river terms), creating context-specific representations that capture the word's meaning in that particular sentence</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It always has the same representation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It randomly changes</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It depends on position only</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: How do you compute Q, K, V matrices in self-attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Multiply input embeddings X by learned weight matrices: Q = XW_Q, K = XW_K, V = XW_V, where all three come from the same input sequence</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Q, K, V are the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They come from different sequences</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're random</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What does the attention weight matrix show?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A square matrix where each row shows how much each position attends to all other positions, revealing which words are most relevant for understanding each word</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only word frequencies</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only positions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random values</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: How is self-attention different from word embeddings like Word2Vec?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Word2Vec gives each word a fixed embedding regardless of context, while self-attention produces context-dependent embeddings that change based on surrounding words</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Word2Vec is context-dependent</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Self-attention is fixed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What is the computational cost of self-attention for a sequence of length n?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) O(n²) because we compute attention scores between every pair of positions, creating an n×n attention matrix</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) O(n)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) O(1)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) O(log n)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: How would you visualize attention weights to understand what a model learned?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Create a heatmap where rows are query positions, columns are key positions, and color intensity shows attention weight. Darker colors indicate stronger attention, revealing which words the model considers most relevant</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just look at numbers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Plot only the maximum</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Can't visualize</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: Why is self-attention parallelizable while RNNs are sequential?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Self-attention computes all attention scores simultaneously using matrix operations, while RNNs must process tokens one at a time since each step depends on the previous hidden state</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) RNNs are also parallel</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Self-attention is sequential</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: How would you implement self-attention from scratch in code?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Initialize weight matrices W_Q, W_K, W_V. Compute Q=XW_Q, K=XW_K, V=XW_V. Compute scores=QK^T, scale by sqrt(d_k), apply softmax, multiply by V. Return weighted sum as output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just return input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only Q</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -467,7 +547,7 @@ print(f"Attention weights shape: {weights.shape}")  # (10, 10)</code></pre>
         <!-- KaTeX for math rendering -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
             const sectionNav = document.querySelector('.section-nav');
