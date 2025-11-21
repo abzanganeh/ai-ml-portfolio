@@ -204,7 +204,7 @@
                                             <li>Makes it available (hidden state)</li>
                                         </ul>
                                     </li>
-                                </ul>
+                            </ul>
                             </div>
                         </div>
 
@@ -603,6 +603,78 @@ print(f"Processed {len(outputs)} time steps")</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Cell state is input, hidden state is output</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) There is no difference</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: How does the forget gate work in an LSTM?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The forget gate decides what information to discard from the cell state by outputting values between 0 and 1, where 0 means completely forget and 1 means keep everything</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It forgets everything</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It remembers everything</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It only works on inputs</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is the purpose of the cell state in LSTM?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The cell state acts as a highway for information to flow through the sequence with minimal modification, allowing gradients to flow better and enabling long-term memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It stores only current input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It's the same as hidden state</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not important</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: How does LSTM solve the vanishing gradient problem better than basic RNNs?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The cell state provides a direct path for gradients to flow through time with minimal multiplication, and the gates allow selective information flow, preventing gradients from vanishing as they propagate backward</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It doesn't solve it</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By using more layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) By using fewer parameters</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What is the difference between LSTM and GRU?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LSTM has separate forget and input gates with a cell state, while GRU combines forget and input gates into a single update gate and merges cell state with hidden state, making GRU simpler and faster but sometimes less powerful</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're identical</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) GRU is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) LSTM has no gates</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: How do you compute the LSTM output at each time step?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The output gate filters the cell state using a sigmoid, then the filtered cell state is passed through tanh to produce the hidden state, which becomes the output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use cell state directly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random value</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: When would you choose LSTM over a basic RNN?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) When you need to learn long-term dependencies in sequences, when basic RNNs struggle with vanishing gradients, or when task requires remembering information over many time steps</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use basic RNN</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only for short sequences</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're interchangeable</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What is the computational cost of LSTM compared to basic RNN?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LSTM is more expensive due to multiple gates and the cell state, requiring more parameters and computations per time step, but often worth it for better performance on long sequences</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) LSTM is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) LSTM uses fewer parameters</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: How does the input gate decide what new information to store?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The input gate uses a sigmoid to decide which values to update, then a tanh creates candidate values, and these are combined to update the cell state selectively</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It stores everything</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It stores nothing</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random selection</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: How would you implement an LSTM cell from scratch?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Implement forget gate (sigmoid of weighted sum), input gate (sigmoid), candidate values (tanh), update cell state (forget old, add new), output gate (sigmoid), compute hidden state (output gate times tanh of cell state). Each gate has its own weight matrices</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just copy RNN code</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only one gate</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No implementation needed</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -626,7 +698,7 @@ print(f"Processed {len(outputs)} time steps")</code></pre>
         <!-- KaTeX for math rendering -->
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
             const sectionNav = document.querySelector('.section-nav');
