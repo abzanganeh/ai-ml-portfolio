@@ -106,8 +106,53 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Pre-training Objectives</h3>
+                            <p><strong>Autoregressive Language Modeling (GPT-style):</strong></p>
+                            <ul>
+                                <li>Predict next token given previous tokens</li>
+                                <li>Unidirectional (left-to-right)</li>
+                                <li>Enables text generation</li>
+                                <li>Training: "The cat sat" → predict "on"</li>
+                            </ul>
+                            
+                            <p><strong>Masked Language Modeling (BERT-style):</strong></p>
+                            <ul>
+                                <li>Predict masked tokens using bidirectional context</li>
+                                <li>Bidirectional understanding</li>
+                                <li>Better for understanding tasks</li>
+                                <li>Training: "The [MASK] sat" → predict "cat"</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Data Requirements</h3>
+                            <p><strong>Scale matters:</strong></p>
+                            <ul>
+                                <li>GPT-3: Trained on ~500B tokens</li>
+                                <li>LLaMA: Trained on ~1.4T tokens</li>
+                                <li>More data generally leads to better performance</li>
+                                <li>Quality is as important as quantity</li>
+                            </ul>
+                            
+                            <p><strong>Data sources:</strong></p>
+                            <ul>
+                                <li>Web text (Common Crawl)</li>
+                                <li>Books and literature</li>
+                                <li>Wikipedia and encyclopedias</li>
+                                <li>Code repositories</li>
+                                <li>Scientific papers</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Training Challenges</h3>
+                            <p><strong>Computational requirements:</strong></p>
+                            <ul>
+                                <li>GPT-3: Months on thousands of GPUs</li>
+                                <li>Memory: Models require 100s of GB</li>
+                                <li>Cost: Millions of dollars in compute</li>
+                                <li>Infrastructure: Distributed training across data centers</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,12 +160,42 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Autoregressive Language Modeling</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[P(x_1, x_2, \ldots, x_n) = \prod_{i=1}^{n} P(x_i | x_1, \ldots, x_{i-1}, \theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(x_i\): Token at position i</li>
+                                    <li>\(\theta\): Model parameters</li>
+                                    <li>Model predicts probability of each token given previous context</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Masked Language Modeling</h4>
+                            <div class="formula-display">
+                                \[L = -\sum_{i \in M} \log P(x_i | x_{\backslash M}, \theta)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(M\): Set of masked token positions</li>
+                                    <li>\(x_{\backslash M}\): All tokens except masked ones</li>
+                                    <li>Model predicts masked tokens using bidirectional context</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Next Sentence Prediction (BERT)</h4>
+                            <div class="formula-display">
+                                \[P(\text{IsNext} | \text{Sentence}_A, \text{Sentence}_B)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Binary classification task: predict if Sentence_B follows Sentence_A. Helps model understand sentence relationships.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +204,34 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Autoregressive Pre-training</h4>
+                            <p><strong>Training sequence:</strong> "The cat sat on the mat"</p>
+                            
+                            <p><strong>Training examples created:</strong></p>
+                            <ul>
+                                <li>Context: "The" → Target: "cat"</li>
+                                <li>Context: "The cat" → Target: "sat"</li>
+                                <li>Context: "The cat sat" → Target: "on"</li>
+                                <li>Context: "The cat sat on" → Target: "the"</li>
+                                <li>Context: "The cat sat on the" → Target: "mat"</li>
+                            </ul>
+                            
+                            <p><strong>Model learns:</strong> Given any context, predict the most likely next token. This builds understanding of language patterns, grammar, and semantics.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Masked Language Modeling</h4>
+                            <p><strong>Original:</strong> "The cat sat on the mat"</p>
+                            
+                            <p><strong>Masked version:</strong> "The [MASK] sat on the mat"</p>
+                            
+                            <p><strong>Model task:</strong> Predict what [MASK] should be</p>
+                            
+                            <p><strong>Model sees:</strong> All tokens except the masked one (bidirectional context)</p>
+                            
+                            <p><strong>Prediction:</strong> P("cat") = 0.9, P("dog") = 0.05, P("bird") = 0.03, ...</p>
+                            
+                            <p><strong>Learning:</strong> Model learns to use context from both directions to understand word meaning and relationships.</p>
                         </div>
                     </div>
 
@@ -138,11 +239,78 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Pre-training Data Preparation</h4>
+                            <pre><code class="language-python">import torch
+from torch.utils.data import Dataset
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class LanguageModelingDataset(Dataset):
+    """Dataset for autoregressive language modeling"""
+    
+    def __init__(self, texts, tokenizer, max_length=512):
+        self.texts = texts
+        self.tokenizer = tokenizer
+        self.max_length = max_length
+    
+    def __len__(self):
+        return len(self.texts)
+    
+    def __getitem__(self, idx):
+        text = self.texts[idx]
+        
+        # Tokenize
+        tokens = self.tokenizer.encode(text, max_length=self.max_length, 
+                                      truncation=True, padding='max_length')
+        
+        # Create input and target (shifted by 1)
+        input_ids = torch.tensor(tokens[:-1])
+        labels = torch.tensor(tokens[1:])
+        
+        return input_ids, labels
+
+# Example usage
+texts = [
+    "The cat sat on the mat.",
+    "Machine learning is fascinating.",
+    "Transformers revolutionized NLP."
+]
+
+# tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+# dataset = LanguageModelingDataset(texts, tokenizer)
+# dataloader = DataLoader(dataset, batch_size=4, shuffle=True)</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Masked Language Modeling Data Preparation</h4>
+                            <pre><code class="language-python">import random
+import torch
+
+def create_masked_lm_example(tokens, tokenizer, mask_prob=0.15):
+    """
+    Create masked language modeling example
+    """
+    labels = tokens.copy()
+    masked_indices = []
+    
+    for i in range(len(tokens)):
+        if tokens[i] in [tokenizer.cls_token_id, tokenizer.sep_token_id]:
+            continue
+        
+        prob = random.random()
+        if prob < mask_prob:
+            masked_indices.append(i)
+            # 80% of the time, replace with [MASK]
+            if prob < mask_prob * 0.8:
+                tokens[i] = tokenizer.mask_token_id
+            # 10% of the time, replace with random token
+            elif prob < mask_prob * 0.9:
+                tokens[i] = random.randint(0, tokenizer.vocab_size - 1)
+            # 10% of the time, keep original (but still predict it)
+    
+    return torch.tensor(tokens), torch.tensor(labels), masked_indices
+
+# Example
+# tokens = tokenizer.encode("The cat sat on the mat")
+# input_ids, labels, masked = create_masked_lm_example(tokens, tokenizer)</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +318,36 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Pre-training Enables Transfer Learning</h3>
+                            <p><strong>Pre-trained models serve as foundation for:</strong></p>
+                            <ul>
+                                <li><strong>Fine-tuning:</strong> Adapt to specific tasks (classification, QA, NER)</li>
+                                <li><strong>Few-shot learning:</strong> Perform tasks with minimal examples</li>
+                                <li><strong>Zero-shot learning:</strong> Perform tasks without training examples</li>
+                                <li><strong>Domain adaptation:</strong> Transfer to new domains with less data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Pre-training Strategies in Practice</h3>
+                            <p><strong>Different objectives for different goals:</strong></p>
+                            <ul>
+                                <li><strong>Autoregressive (GPT):</strong> Best for generation tasks</li>
+                                <li><strong>Masked (BERT):</strong> Best for understanding tasks</li>
+                                <li><strong>Hybrid approaches:</strong> Combine multiple objectives</li>
+                                <li><strong>Instruction tuning:</strong> Fine-tune on instruction-following data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Scaling Laws</h3>
+                            <p><strong>Research shows predictable relationships:</strong></p>
+                            <ul>
+                                <li>Performance improves with model size (parameters)</li>
+                                <li>Performance improves with training data size</li>
+                                <li>Performance improves with compute budget</li>
+                                <li>Optimal ratios exist between these factors</li>
+                            </ul>
                         </div>
                     </div>
 
