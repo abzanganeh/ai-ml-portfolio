@@ -147,8 +147,47 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Why Positional Encoding is Necessary</h3>
+                            <p><strong>Transformers have no inherent sense of word order:</strong></p>
+                            <p>Unlike RNNs or CNNs, transformers process all tokens in parallel. Without positional encoding, the model cannot distinguish between "cat sat on mat" and "mat sat on cat" - both would be identical to the model!</p>
+                            
+                            <p><strong>Positional encoding adds order information:</strong></p>
+                            <ul>
+                                <li>Each position gets a unique encoding vector</li>
+                                <li>This encoding is added to the token embedding</li>
+                                <li>The model learns to use this information to understand sequence order</li>
+                                <li>Enables understanding of word order, syntax, and temporal relationships</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Sinusoidal vs Learned Positional Encoding</h3>
+                            <p><strong>Original Transformer used sinusoidal (fixed) encoding:</strong></p>
+                            <ul>
+                                <li>Mathematical functions (sin/cos) generate encodings</li>
+                                <li>Deterministic - same position always gets same encoding</li>
+                                <li>Can extrapolate to longer sequences than seen during training</li>
+                                <li>No additional parameters to learn</li>
+                            </ul>
+                            
+                            <p><strong>Modern models often use learned positional embeddings:</strong></p>
+                            <ul>
+                                <li>Learnable parameters that are optimized during training</li>
+                                <li>More flexible - can learn optimal position representations</li>
+                                <li>Limited to maximum sequence length seen during training</li>
+                                <li>Requires additional parameters</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>How Positional Encoding Works</h3>
+                            <p><strong>The encoding is added (not concatenated) to token embeddings:</strong></p>
+                            <ul>
+                                <li>Token embedding: [0.2, -0.5, 0.8, ...] (512 dimensions)</li>
+                                <li>Position encoding: [0.1, 0.3, -0.2, ...] (512 dimensions)</li>
+                                <li>Final embedding: [0.3, -0.2, 0.6, ...] (element-wise addition)</li>
+                                <li>This preserves the embedding space while adding position info</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -205,8 +244,51 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Positional Encoding for "The cat sat"</h4>
+                            <p><strong>Input sequence:</strong> ["The", "cat", "sat"] (3 tokens)</p>
+                            <p><strong>Embedding dimension:</strong> 512</p>
+                            
+                            <p><strong>Step 1: Token Embeddings</strong></p>
+                            <ul>
+                                <li>"The" → [0.1, -0.3, 0.5, ..., 0.2] (512-dim vector)</li>
+                                <li>"cat" → [0.4, 0.1, -0.2, ..., 0.3] (512-dim vector)</li>
+                                <li>"sat" → [-0.1, 0.5, 0.3, ..., -0.1] (512-dim vector)</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Positional Encodings</strong></p>
+                            <ul>
+                                <li>Position 0: PE(0) = [sin(0), cos(0), sin(0.0001), cos(0.0001), ...]</li>
+                                <li>Position 1: PE(1) = [sin(0.001), cos(0.001), sin(0.0002), cos(0.0002), ...]</li>
+                                <li>Position 2: PE(2) = [sin(0.002), cos(0.002), sin(0.0004), cos(0.0004), ...]</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Add Encodings</strong></p>
+                            <ul>
+                                <li>"The" at pos 0: TokenEmbed("The") + PE(0)</li>
+                                <li>"cat" at pos 1: TokenEmbed("cat") + PE(1)</li>
+                                <li>"sat" at pos 2: TokenEmbed("sat") + PE(2)</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Each token now has position information embedded in its representation, allowing the model to understand word order.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Why Addition (Not Concatenation)?</h4>
+                            <p><strong>If we concatenated:</strong></p>
+                            <ul>
+                                <li>Token embedding: 512 dimensions</li>
+                                <li>Position encoding: 512 dimensions</li>
+                                <li>Result: 1024 dimensions (doubles size!)</li>
+                            </ul>
+                            
+                            <p><strong>With addition:</strong></p>
+                            <ul>
+                                <li>Token embedding: 512 dimensions</li>
+                                <li>Position encoding: 512 dimensions</li>
+                                <li>Result: 512 dimensions (same size, information combined)</li>
+                            </ul>
+                            
+                            <p><strong>Why it works:</strong> The model learns to separate token and position information during training. The addition creates a combined representation that preserves both types of information.</p>
                         </div>
                     </div>
 
@@ -315,8 +397,42 @@ print(f"Output shape: {output.shape}")  # (2, 10, 768)</code></pre>
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Positional Encoding in Modern Models</h3>
+                            <p><strong>All transformer-based models use positional encoding:</strong></p>
+                            <ul>
+                                <li><strong>BERT:</strong> Uses learned positional embeddings (max 512 tokens)</li>
+                                <li><strong>GPT:</strong> Uses learned positional embeddings (varies by model size)</li>
+                                <li><strong>Original Transformer:</strong> Used sinusoidal encoding (can handle any length)</li>
+                                <li><strong>T5:</strong> Uses learned positional embeddings</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Handling Variable Sequence Lengths</h3>
+                            <p><strong>Positional encoding enables:</strong></p>
+                            <ul>
+                                <li>Processing sequences of different lengths</li>
+                                <li>Understanding relative positions (near vs far)</li>
+                                <li>Capturing temporal order in time-series data</li>
+                                <li>Maintaining word order in translation tasks</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Limitations and Solutions</h3>
+                            <p><strong>Learned positional embeddings:</strong></p>
+                            <ul>
+                                <li>Limited to maximum sequence length seen during training</li>
+                                <li>Cannot extrapolate to longer sequences</li>
+                                <li>Solution: Use relative positional encoding or extend embeddings</li>
+                            </ul>
+                            
+                            <p><strong>Sinusoidal encoding:</strong></p>
+                            <ul>
+                                <li>Can handle any sequence length</li>
+                                <li>But may not be optimal for specific tasks</li>
+                                <li>Solution: Often replaced with learned embeddings for better performance</li>
+                            </ul>
                         </div>
                     </div>
 
