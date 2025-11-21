@@ -106,8 +106,36 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Fine-tuning Strategies</h3>
+                            <p><strong>Full fine-tuning:</strong> Update all model parameters. Most powerful but requires most memory and compute.</p>
+                            
+                            <p><strong>Partial fine-tuning:</strong> Freeze early layers, only train later layers. Reduces memory requirements while maintaining most performance.</p>
+                            
+                            <p><strong>Parameter-efficient fine-tuning:</strong> Only train small subset of parameters (LoRA, adapters, prompt tuning). Very efficient, can run on single GPU.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Instruction Tuning</h3>
+                            <p><strong>What it is:</strong> Fine-tuning on diverse tasks formatted as instructions. Teaches model to follow instructions and generalize to new tasks.</p>
+                            
+                            <p><strong>Example format:</strong></p>
+                            <ul>
+                                <li>Input: "Translate to French: Hello"</li>
+                                <li>Output: "Bonjour"</li>
+                            </ul>
+                            
+                            <p><strong>Benefits:</strong> Model becomes better at following prompts, can handle diverse tasks, shows improved few-shot performance.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Multi-task Fine-tuning</h3>
+                            <p><strong>Training on multiple tasks simultaneously:</strong></p>
+                            <ul>
+                                <li>Combines data from different tasks</li>
+                                <li>Model learns to handle diverse scenarios</li>
+                                <li>Better generalization than single-task fine-tuning</li>
+                                <li>Requires careful task balancing</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,12 +143,51 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Fine-tuning Objective</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[L_{\text{ft}} = -\frac{1}{N} \sum_{i=1}^{N} \log P(y_i | x_i, \theta_0 + \Delta\theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\theta_0\): Pre-trained parameters (frozen or partially frozen)</li>
+                                    <li>\(\Delta\theta\): Parameter updates (small compared to \(\theta_0\))</li>
+                                    <li>\(x_i, y_i\): Task-specific input-output pairs</li>
+                                    <li>Much smaller dataset than pre-training</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>LoRA Decomposition</h4>
+                            <div class="formula-display">
+                                \[W' = W_0 + \Delta W = W_0 + BA\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(W_0\): Original weight matrix (frozen, d×d)</li>
+                                    <li>\(B\): Trainable matrix (d×r, rank r)</li>
+                                    <li>\(A\): Trainable matrix (r×d)</li>
+                                    <li>Only \(2dr\) parameters trained instead of \(d^2\)</li>
+                                    <li>Typical: r = 4-16, much smaller than d</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Multi-task Loss</h4>
+                            <div class="formula-display">
+                                \[L = \sum_{t=1}^{T} \alpha_t L_t\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(T\): Number of tasks</li>
+                                    <li>\(L_t\): Loss for task t</li>
+                                    <li>\(\alpha_t\): Task weight (balances importance)</li>
+                                    <li>Allows training on multiple tasks simultaneously</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -129,8 +196,37 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Full vs LoRA Fine-tuning</h4>
+                            <p><strong>Task:</strong> Fine-tune GPT-2 for sentiment analysis</p>
+                            
+                            <p><strong>Full fine-tuning:</strong></p>
+                            <ul>
+                                <li>Trainable parameters: 124M (all GPT-2 parameters)</li>
+                                <li>Memory: ~2GB per batch</li>
+                                <li>Training time: ~2 hours on GPU</li>
+                                <li>Performance: Best possible</li>
+                            </ul>
+                            
+                            <p><strong>LoRA fine-tuning (r=8):</strong></p>
+                            <ul>
+                                <li>Trainable parameters: ~1M (LoRA matrices only)</li>
+                                <li>Memory: ~500MB per batch</li>
+                                <li>Training time: ~30 minutes on GPU</li>
+                                <li>Performance: ~95% of full fine-tuning</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Instruction Tuning</h4>
+                            <p><strong>Training examples:</strong></p>
+                            <ul>
+                                <li>"Translate to French: Hello" → "Bonjour"</li>
+                                <li>"Summarize: [long text]" → "[summary]"</li>
+                                <li>"Classify sentiment: Great movie!" → "Positive"</li>
+                                <li>"Answer: What is AI?" → "AI is..."</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Model learns to follow instructions and can generalize to new instruction-formatted tasks.</p>
                         </div>
                     </div>
 
@@ -138,11 +234,55 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Partial Fine-tuning (Freeze Early Layers)</h4>
+                            <pre><code class="language-python">from transformers import GPT2ForSequenceClassification, GPT2Tokenizer
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Load model
+model = GPT2ForSequenceClassification.from_pretrained("gpt2", num_labels=2)
+
+# Freeze early layers (first 6 out of 12)
+for i in range(6):
+    for param in model.transformer.h[i].parameters():
+        param.requires_grad = False
+
+# Later layers remain trainable
+# Only train: layers 6-11 + classification head
+
+# Count trainable parameters
+trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+total = sum(p.numel() for p in model.parameters())
+print(f"Trainable: {trainable}, Total: {total}, Ratio: {trainable/total:.2%}")</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Instruction Tuning Setup</h4>
+                            <pre><code class="language-python"># Instruction tuning data format
+instruction_data = [
+    {
+        "instruction": "Translate to French",
+        "input": "Hello",
+        "output": "Bonjour"
+    },
+    {
+        "instruction": "Summarize",
+        "input": "Long article text...",
+        "output": "Summary text..."
+    },
+    {
+        "instruction": "Classify sentiment",
+        "input": "Great movie!",
+        "output": "Positive"
+    }
+]
+
+def format_instruction(example):
+    """Format instruction for training"""
+    prompt = f"{example['instruction']}: {example['input']}"
+    target = example['output']
+    return prompt, target
+
+# Use with standard language modeling loss
+# Model learns to generate target given instruction+input</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +290,33 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Fine-tuning Applications</h3>
+                            <p><strong>Domain-specific models:</strong></p>
+                            <ul>
+                                <li>Medical LLMs: Fine-tuned on medical literature</li>
+                                <li>Legal LLMs: Fine-tuned on legal documents</li>
+                                <li>Code models: Fine-tuned on code repositories</li>
+                                <li>Customer service: Fine-tuned on support tickets</li>
+                            </ul>
+                            
+                            <p><strong>Task-specific models:</strong></p>
+                            <ul>
+                                <li>Sentiment analysis for product reviews</li>
+                                <li>Named entity recognition for information extraction</li>
+                                <li>Question answering for knowledge bases</li>
+                                <li>Text classification for content moderation</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Instruction-tuned Models</h3>
+                            <p><strong>Models like ChatGPT, Claude use instruction tuning:</strong></p>
+                            <ul>
+                                <li>Better at following user instructions</li>
+                                <li>More helpful and aligned with human intent</li>
+                                <li>Can handle diverse tasks without task-specific fine-tuning</li>
+                                <li>Show improved safety and reduced harmful outputs</li>
+                            </ul>
                         </div>
                     </div>
 
