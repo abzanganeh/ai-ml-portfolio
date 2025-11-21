@@ -7,6 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/agentic-ai/agentic-ai.css') }}">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWAT2dVgYnHwpIK/NS" crossorigin="anonymous">
+    <!-- Prism.js for code syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+
 </head>
 <body>
     <header class="azbn-header">
@@ -81,7 +91,7 @@
                         <h2>Tool-Using Agents</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 What are Tool-Using Agents?</h3>
+                            <h3>What are Tool-Using Agents?</h3>
                             <p><strong>Tool-using agents can interact with external systems through function calls, APIs, and tools.</strong> This capability transforms agents from simple text generators into powerful autonomous systems that can affect the real world.</p>
                             
                             <p><strong>Think of tool-using agents like a Swiss Army knife:</strong></p>
@@ -158,7 +168,7 @@
                         </div>
 
                         <div class="explanation-box">
-                            <h4>🔄 Why Tools Matter</h4>
+                            <h4>Why Tools Matter</h4>
                             <p><strong>Tools extend agent capabilities beyond text generation:</strong></p>
                             <ul>
                                 <li><strong>Real-time data:</strong> Access current information (weather, stock prices, news)</li>
@@ -226,7 +236,7 @@
                         </div>
 
                         <div class="explanation-box">
-                            <h3>📋 Tool Definition Schema</h3>
+                            <h3>Tool Definition Schema</h3>
                             <p><strong>Tools must be properly defined for LLMs to understand and use them:</strong></p>
                             
                             <div class="example-box">
@@ -241,7 +251,7 @@
                             
                             <div class="code-box">
                                 <h4>Example Tool Definition</h4>
-                                <pre><code>{
+                                <pre><code class="language-python">{
     "name": "get_weather",
     "description": "Get current weather for a specific city",
     "parameters": {
@@ -272,7 +282,7 @@
                         </div>
 
                         <div class="explanation-box">
-                            <h3>🎯 Tool Selection Process</h3>
+                            <h3>Tool Selection Process</h3>
                             <p><strong>The LLM selects tools based on task requirements:</strong></p>
                             
                             <div class="example-box">
@@ -285,7 +295,7 @@
                             </div>
                             
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">🎯 Tool Selection Decision Tree</h4>
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">Tool Selection Decision Tree</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <div style="text-align: center; margin-bottom: 1rem;">
@@ -360,7 +370,7 @@
                             <h4>Tool Selection Probability</h4>
                             
                             <div class="formula-display">
-                                <strong>P(tool = t | request, available_tools) = softmax(similarity(request, tool.description))</strong>
+                                \[P(\text{tool} = t \mid \text{request}, \text{available\_tools}) = \text{softmax}(\text{similarity}(\text{request}, \text{tool.description}))\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -378,7 +388,7 @@
                             <h4>Tool Execution Function</h4>
                             
                             <div class="formula-display">
-                                <strong>result = Execute(tool, parameters) = { success: tool(params), error: None }</strong>
+                                \[\text{result} = \text{Execute}(\text{tool}, \text{parameters}) = \begin{cases} \text{success}: \text{tool}(\text{params}) \\ \text{error}: \text{None} \end{cases}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -394,7 +404,7 @@
                             <h4>Tool Result Integration</h4>
                             
                             <div class="formula-display">
-                                <strong>response = LLM(request, tool_result, context)</strong>
+                                \[\text{response} = \text{LLM}(\text{request}, \text{tool\_result}, \text{context})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -412,11 +422,11 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Example 1: Weather Agent - Complete Tool Usage</h4>
+                            <h4>Example 1: Weather Agent - Complete Tool Usage</h4>
                             <p><strong>Task: "What's the weather in New York and Paris?"</strong></p>
                             
                             <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">📊 Multi-Tool Execution Flow</h4>
+                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">Multi-Tool Execution Flow</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <table style="width: 100%; border-collapse: collapse;">
@@ -460,7 +470,7 @@
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Example 2: Calculator Agent - Tool Chaining</h4>
+                            <h4>Example 2: Calculator Agent - Tool Chaining</h4>
                             <p><strong>Task: "Calculate (15 + 27) × 3 and convert to binary"</strong></p>
                             
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
@@ -498,7 +508,7 @@
                                     </div>
                                     
                                     <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1rem; border-radius: 4px;">
-                                        <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>💡 Key:</strong> Agent chains multiple tools, using output of one tool as input to the next!</p>
+                                        <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;"><strong>Key:</strong> Agent chains multiple tools, using output of one tool as input to the next!</p>
                                     </div>
                                 </div>
                             </div>
@@ -509,8 +519,8 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Complete Tool-Using Agent Implementation</h4>
-                            <pre><code>from typing import Dict, List, Any, Callable
+                            <h4>Complete Tool-Using Agent Implementation</h4>
+                            <pre><code class="language-python">from typing import Dict, List, Any, Callable
 import json
 from enum import Enum
 
@@ -725,8 +735,8 @@ def calculate(expression: str) -> float:
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 Error Handling in Tool Execution</h4>
-                            <pre><code>class RobustToolExecutor:
+                            <h4>Error Handling in Tool Execution</h4>
+                            <pre><code class="language-python">class RobustToolExecutor:
     """Tool executor with error handling and retry logic"""
     
     def __init__(self, max_retries: int = 3, retry_delay: float = 1.0):
@@ -854,9 +864,9 @@ def calculate(expression: str) -> float:
                         </div>
 
                         <div class="explanation-box">
-                            <h3>📊 Tool Categories</h3>
+                            <h3>Tool Categories</h3>
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">📊 Common Tool Categories</h4>
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">Common Tool Categories</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
@@ -888,7 +898,7 @@ def calculate(expression: str) -> float:
                                         </div>
                                         
                                         <div style="background: #e0e7ff; border: 2px solid #6366f1; border-radius: 8px; padding: 1rem;">
-                                            <p style="font-weight: 700; color: #4338ca; margin: 0 0 0.5rem 0;">💻 Development Tools</p>
+                                            <p style="font-weight: 700; color: #4338ca; margin: 0 0 0.5rem 0;">Development Tools</p>
                                             <ul style="color: #4338ca; margin: 0; padding-left: 1.5rem; font-size: 0.9rem;">
                                                 <li>Code editors</li>
                                                 <li>Version control</li>
@@ -928,6 +938,78 @@ def calculate(expression: str) -> float:
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Ignore the error</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use a random tool</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: Interview question: "How would you design a tool interface that allows an agent to select from 100+ tools efficiently?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use semantic search/embedding similarity to filter relevant tools, then LLM selects from top-k candidates, with tool descriptions and parameter schemas</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Try all tools sequentially</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Randomly select tools</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use only the first 10 tools</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: In the formula P(tool = t | request, available_tools) = softmax(similarity(...)), what does softmax do?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Finds the maximum similarity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Converts similarity scores into a probability distribution over tools</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Sorts tools by similarity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Filters out low similarity tools</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is function calling in the context of tool-using agents?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A mechanism where LLMs can request to call external functions/tools with specific parameters, typically using structured output (JSON)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Calling Python functions directly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Function overloading</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Recursive function calls</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: Interview question: "How do you handle tool parameter validation and type checking?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Define parameter schemas (JSON Schema), validate types and constraints before execution, provide clear error messages, and use LLM to correct invalid parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Don't validate, just execute</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only check parameter count</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Validate after execution</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What is the difference between synchronous and asynchronous tool execution?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Synchronous blocks until completion, asynchronous allows agent to continue processing while tool executes in background</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Synchronous is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Asynchronous is simpler</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) There is no difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: Interview question: "How would you implement tool result caching to improve agent performance?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Cache tool results with key based on tool name + parameter hash, implement TTL, invalidate on data updates, use for idempotent operations</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Cache everything forever</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Never cache</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cache only tool names</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What information should be included in a tool description for optimal LLM selection?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Clear description of what the tool does, when to use it, required parameters with types and constraints, example use cases</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just the tool name</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only the code</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Tool file path</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: In the tool execution function result = Execute(tool, parameters), what should happen if parameters are invalid?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Return error status with descriptive message, allow LLM to correct and retry</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Execute anyway</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use default parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Skip the tool</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Interview question: "How do you handle rate limiting when agents make multiple tool calls?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Implement exponential backoff, respect rate limit headers, queue requests, prioritize critical tools, batch when possible</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Ignore rate limits</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Stop after first rate limit</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Make all calls simultaneously</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -948,7 +1030,10 @@ def calculate(expression: str) -> float:
         </div>
     </footer>
     
-    <script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
+        <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
             const sectionNav = document.querySelector('.section-nav');
@@ -991,6 +1076,11 @@ def calculate(expression: str) -> float:
                     ],
                     throwOnError: false
                 });
+            }
+            
+            // Initialize Prism.js syntax highlighting
+            if (typeof Prism !== \'undefined\') {
+                Prism.highlightAll();
             }
         });
     </script>

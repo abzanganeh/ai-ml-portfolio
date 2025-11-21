@@ -7,6 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/agentic-ai/agentic-ai.css') }}">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWAT2dVgYnHwpIK/NS" crossorigin="anonymous">
+    <!-- Prism.js for code syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+
 </head>
 <body>
     <header class="azbn-header">
@@ -81,7 +91,7 @@
                         <h2>ReAct Framework</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 What is ReAct?</h3>
+                            <h3>What is ReAct?</h3>
                             <p><strong>ReAct (Reasoning + Acting) is a framework that combines reasoning and acting in language, allowing agents to think step-by-step and take actions based on their reasoning.</strong></p>
                             
                             <p><strong>ReAct solves a critical problem:</strong></p>
@@ -93,7 +103,7 @@
                         </div>
 
                         <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 2rem 0;">
-                            <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">🔄 ReAct Loop Visualization</h4>
+                            <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">ReAct Loop Visualization</h4>
                             
                             <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                 <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
@@ -135,7 +145,7 @@
                         </div>
 
                         <div class="explanation-box">
-                            <h4>🔄 The ReAct Loop</h4>
+                            <h4>The ReAct Loop</h4>
                             <p><strong>ReAct follows a simple but powerful pattern:</strong></p>
                             <ol>
                                 <li><strong>Thought:</strong> Agent reasons about what to do next</li>
@@ -208,10 +218,10 @@
                         </div>
 
                         <div class="explanation-box">
-                            <h3>🔄 ReAct vs Other Approaches</h3>
+                            <h3>ReAct vs Other Approaches</h3>
                             
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">📊 ReAct vs Other Frameworks</h4>
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">ReAct vs Other Frameworks</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <table style="width: 100%; border-collapse: collapse;">
@@ -260,7 +270,7 @@
                             
                             <div class="code-box">
                                 <h4>ReAct Prompt Structure</h4>
-                                <pre><code>Question: What's the weather in New York?
+                                <pre><code class="language-python">Question: What's the weather in New York?
 
 Thought: I need to find the weather in New York. I should use the get_weather tool.
 Action: get_weather(city="New York")
@@ -282,7 +292,7 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             <h4>ReAct State Transition</h4>
                             
                             <div class="formula-display">
-                                <strong>(thought_t, action_t, observation_t) → (thought_{t+1}, action_{t+1}, observation_{t+1})</strong>
+                                \[(\text{thought}_t, \text{action}_t, \text{observation}_t) \rightarrow (\text{thought}_{t+1}, \text{action}_{t+1}, \text{observation}_{t+1})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -300,7 +310,7 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             <h4>ReAct Decision Function</h4>
                             
                             <div class="formula-display">
-                                <strong>action_t = LLM(question, thought_t, history_{&lt;t}, available_tools)</strong>
+                                \[\text{action}_t = \text{LLM}(\text{question}, \text{thought}_t, \text{history}_{<t}, \text{available\_tools})\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -318,7 +328,7 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             <h4>ReAct Termination Condition</h4>
                             
                             <div class="formula-display">
-                                <strong>Terminate if: action_t = "Final Answer" OR max_steps reached</strong>
+                                \[\text{Terminate if: } \text{action}_t = \text{"Final Answer"} \text{ OR } \text{max\_steps} \text{ reached}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -335,11 +345,11 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>🔢 Example 1: ReAct for Weather Query - Complete Trace</h4>
+                            <h4>Example 1: ReAct for Weather Query - Complete Trace</h4>
                             <p><strong>Task: "What's the weather in New York and should I bring an umbrella?"</strong></p>
                             
                             <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">📊 Complete ReAct Execution Trace</h4>
+                                <h4 style="color: #0c4a6e; margin-bottom: 1.5rem; text-align: center;">Complete ReAct Execution Trace</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <div style="margin-bottom: 1.5rem;">
@@ -378,11 +388,11 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Example 2: ReAct for Multi-Step Research</h4>
+                            <h4>Example 2: ReAct for Multi-Step Research</h4>
                             <p><strong>Task: "Research quantum computing breakthroughs in 2024"</strong></p>
                             
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">📊 Multi-Step ReAct Trace</h4>
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">Multi-Step ReAct Trace</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <table style="width: 100%; border-collapse: collapse;">
@@ -424,8 +434,8 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 ReAct Agent Implementation</h4>
-                            <pre><code>from typing import Dict, List, Any, Optional
+                            <h4>ReAct Agent Implementation</h4>
+                            <pre><code class="language-python">from typing import Dict, List, Any, Optional
 import re
 import json
 
@@ -636,8 +646,8 @@ tools = {
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 ReAct Prompt Template</h4>
-                            <pre><code>REACT_PROMPT_TEMPLATE = """Question: {question}
+                            <h4>ReAct Prompt Template</h4>
+                            <pre><code class="language-python">REACT_PROMPT_TEMPLATE = """Question: {question}
 
 You can use the following tools:
 {tools}
@@ -706,9 +716,9 @@ def create_react_prompt(question: str, tools: List[Dict]) -> str:
                         </div>
 
                         <div class="explanation-box">
-                            <h3>📊 ReAct Performance Benefits</h3>
+                            <h3>ReAct Performance Benefits</h3>
                             <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 2px solid #22c55e; border-radius: 12px; padding: 2rem; margin: 1.5rem 0;">
-                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">📊 ReAct vs Act-Only Performance</h4>
+                                <h4 style="color: #14532d; margin-bottom: 1.5rem; text-align: center;">ReAct vs Act-Only Performance</h4>
                                 
                                 <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                                     <table style="width: 100%; border-collapse: collapse;">
@@ -774,6 +784,78 @@ def create_react_prompt(question: str, tools: List[Dict]) -> str:
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Agent ignores errors</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Agent uses random tools</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: Interview question: "Explain the ReAct framework and why explicit reasoning helps."</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) ReAct = Reasoning + Acting. Agent explicitly writes thoughts before actions, allowing it to reason about observations, handle errors, and make transparent decisions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) ReAct is just action without reasoning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) ReAct only uses reasoning, no actions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) ReAct is a programming language</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: In the ReAct state transition formula, what does the arrow (→) represent?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The transition from current state to next state, where observation informs the next thought</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A mathematical operation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) A comparison</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A variable assignment</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the termination condition for a ReAct loop?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) When agent outputs "Final Answer" or max_steps limit is reached</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) When first action is taken</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) When an error occurs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) After exactly 5 steps</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: Interview question: "How would you implement a ReAct agent that can handle multi-step reasoning?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Implement Thought-Action-Observation loop with state tracking, maintain history of all steps, use LLM to generate thoughts and actions, execute tools and observe results, continue until Final Answer or max_steps</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just call LLM once</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only one tool</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Skip reasoning</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What makes ReAct different from traditional prompt engineering?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) ReAct explicitly structures reasoning and actions in a loop, allowing iterative refinement and error recovery, while traditional prompts are single-shot</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) ReAct is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) ReAct doesn't use LLMs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) There's no difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: In the formula action_t = LLM(question, thought_t, history_{<t}, available_tools), what does history_{<t} represent?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) All previous thoughts, actions, and observations from steps before time t</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only the last action</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Future steps</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Tool definitions</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: Interview question: "How do you prevent a ReAct agent from getting stuck in infinite loops?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Set max_steps limit, detect repeated states/actions, implement timeout, track goal progress, add loop detection in thought generation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) There's no way to prevent it</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only allow one step</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Disable reasoning</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is the advantage of making reasoning explicit in ReAct?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Transparency, debugging, error recovery, and better decision-making through iterative refinement</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It uses less tokens</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's simpler</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Interview question: "How would you optimize token usage in a ReAct agent?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Summarize history instead of full context, use concise thought prompts, limit observation length, implement context window management, cache common reasoning patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Don't use history</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Skip thoughts</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use shorter tool names</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -794,7 +876,10 @@ def create_react_prompt(question: str, tools: List[Dict]) -> str:
         </div>
     </footer>
     
-    <script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
+        <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
             const sectionNav = document.querySelector('.section-nav');
@@ -837,6 +922,11 @@ def create_react_prompt(question: str, tools: List[Dict]) -> str:
                     ],
                     throwOnError: false
                 });
+            }
+            
+            // Initialize Prism.js syntax highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
             }
         });
     </script>
