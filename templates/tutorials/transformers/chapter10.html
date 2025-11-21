@@ -108,8 +108,38 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Transformer Variants</h3>
+                            <p><strong>Many architectures extend the original transformer:</strong></p>
+                            <ul>
+                                <li><strong>BERT:</strong> Bidirectional encoder for understanding tasks</li>
+                                <li><strong>GPT:</strong> Autoregressive decoder for generation</li>
+                                <li><strong>T5:</strong> Encoder-decoder for text-to-text tasks</li>
+                                <li><strong>RoBERTa:</strong> Optimized BERT training</li>
+                                <li><strong>ALBERT:</strong> Parameter-sharing for efficiency</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Optimization Techniques</h3>
+                            <p><strong>Key optimizations improve efficiency:</strong></p>
+                            <ul>
+                                <li><strong>Sparse Attention:</strong> Reduce computation by attending to fewer positions</li>
+                                <li><strong>Linear Attention:</strong> Approximate attention with linear complexity</li>
+                                <li><strong>Quantization:</strong> Use lower precision to reduce memory</li>
+                                <li><strong>Pruning:</strong> Remove less important weights</li>
+                                <li><strong>Knowledge Distillation:</strong> Train smaller models from larger ones</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Scaling Strategies</h3>
+                            <p><strong>Methods to scale transformers:</strong></p>
+                            <ul>
+                                <li><strong>Model Parallelism:</strong> Distribute model across devices</li>
+                                <li><strong>Pipeline Parallelism:</strong> Split layers across GPUs</li>
+                                <li><strong>Mixed Precision:</strong> Use float16 for speed, float32 for stability</li>
+                                <li><strong>Gradient Checkpointing:</strong> Trade compute for memory</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -117,12 +147,50 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Efficient Attention Variants</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                <strong>Sparse Attention:</strong> Only compute attention for selected positions<br>
+                                <strong>Linear Attention:</strong> \(O(n)\) complexity instead of \(O(n^2)\)<br>
+                                <strong>Flash Attention:</strong> Memory-efficient attention computation
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <p>Various optimizations reduce the quadratic complexity of standard attention, making transformers more efficient for long sequences.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Model Parallelism</h4>
+                            <div class="formula-display">
+                                <strong>Pipeline Parallelism:</strong> Split layers across devices<br>
+                                <strong>Tensor Parallelism:</strong> Split matrix operations<br>
+                                <strong>Data Parallelism:</strong> Replicate model, split data
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Parallelization strategies enable training and inference of very large models across multiple GPUs/TPUs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Quantization</h4>
+                            <div class="formula-display">
+                                <strong>Quantized Weight:</strong> \(W_q = \text{round}(W \times s)\)<br>
+                                <strong>Dequantization:</strong> \(W \approx W_q / s\)<br>
+                                Where \(s\) is the quantization scale factor
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Quantization reduces model size and memory by using lower precision (e.g., int8 instead of float32) while maintaining reasonable accuracy.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Knowledge Distillation</h4>
+                            <div class="formula-display">
+                                <strong>Distillation Loss:</strong> \(L = \alpha L_{task} + (1-\alpha) L_{distill}\)<br>
+                                <strong>\(L_{distill} = \text{KL}(P_{student} || P_{teacher})\)</strong><br>
+                                Where \(P\) are probability distributions from teacher and student models
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Knowledge distillation trains smaller student models to mimic larger teacher models, transferring knowledge while reducing size.</p>
                             </div>
                         </div>
                     </div>
@@ -131,8 +199,32 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Sparse Attention Pattern</h4>
+                            <p><strong>Instead of full attention (all-to-all), sparse attention might use:</strong></p>
+                            <ul>
+                                <li>Local attention: Each token attends to nearby tokens (window of size w)</li>
+                                <li>Strided attention: Attend to every k-th token</li>
+                                <li>Global attention: Some tokens attend to all positions</li>
+                            </ul>
+                            <p>This reduces computation from O(n²) to O(n×w) for local attention.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Model Variants Comparison</h4>
+                            <p><strong>BERT vs GPT vs T5:</strong></p>
+                            <ul>
+                                <li><strong>BERT:</strong> "The cat sat" → [CLS] token for classification</li>
+                                <li><strong>GPT:</strong> "The cat sat" → predicts "on" (next token)</li>
+                                <li><strong>T5:</strong> "translate: The cat sat" → "Le chat s'est assis"</li>
+                            </ul>
+                            <p>Each architecture is optimized for different task types.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Quantization Impact</h4>
+                            <p><strong>Original model:</strong> 1 billion parameters × 4 bytes (float32) = 4GB</p>
+                            <p><strong>Quantized (int8):</strong> 1 billion parameters × 1 byte = 1GB</p>
+                            <p>4× reduction in memory with minimal accuracy loss when done carefully.</p>
                         </div>
                     </div>
 
@@ -140,11 +232,67 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
+                            <h4>Sparse Attention Implementation</h4>
+                            <pre><code class="language-python">import torch
+import torch.nn as nn
+
+def sparse_attention(Q, K, V, window_size=3):
+    """
+    Sparse attention with local window
+    
+    Args:
+        Q, K, V: Query, Key, Value tensors (batch, seq_len, d_model)
+        window_size: Number of nearby tokens to attend to
+    """
+    seq_len = Q.size(1)
+    scores = torch.matmul(Q, K.transpose(-2, -1))
+    
+    # Create sparse mask (only attend to nearby tokens)
+    mask = torch.zeros(seq_len, seq_len)
+    for i in range(seq_len):
+        start = max(0, i - window_size // 2)
+        end = min(seq_len, i + window_size // 2 + 1)
+        mask[i, start:end] = 1
+    
+    # Apply mask
+    scores = scores.masked_fill(mask == 0, float('-inf'))
+    scores = scores / (Q.size(-1) ** 0.5)
+    attn_weights = torch.softmax(scores, dim=-1)
+    
+    output = torch.matmul(attn_weights, V)
+    return output</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Quantization Example</h4>
                             <pre><code class="language-python">import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+def quantize_weights(weights, bits=8):
+    """
+    Quantize weights to int8
+    """
+    # Calculate scale factor
+    max_val = np.abs(weights).max()
+    scale = (2 ** (bits - 1) - 1) / max_val
+    
+    # Quantize
+    quantized = np.round(weights * scale).astype(np.int8)
+    
+    return quantized, scale
+
+def dequantize_weights(quantized, scale):
+    """
+    Dequantize back to float
+    """
+    return quantized.astype(np.float32) / scale
+
+# Example
+weights = np.random.randn(100, 100).astype(np.float32)
+quantized, scale = quantize_weights(weights)
+reconstructed = dequantize_weights(quantized, scale)
+print(f"Original size: {weights.nbytes} bytes")
+print(f"Quantized size: {quantized.nbytes} bytes")
+print(f"Compression: {weights.nbytes / quantized.nbytes:.1f}x")</code></pre>
                         </div>
                     </div>
 
@@ -152,8 +300,47 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>BERT Applications</h3>
+                            <p><strong>Understanding tasks:</strong></p>
+                            <ul>
+                                <li>Sentiment analysis in customer reviews</li>
+                                <li>Named entity recognition in documents</li>
+                                <li>Question answering systems</li>
+                                <li>Text classification and tagging</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>GPT Applications</h3>
+                            <p><strong>Generation tasks:</strong></p>
+                            <ul>
+                                <li>Chatbots and conversational AI</li>
+                                <li>Code generation and completion</li>
+                                <li>Content creation and writing assistance</li>
+                                <li>Text summarization</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>T5 Applications</h3>
+                            <p><strong>Text-to-text tasks:</strong></p>
+                            <ul>
+                                <li>Machine translation</li>
+                                <li>Text summarization</li>
+                                <li>Question answering</li>
+                                <li>Text classification (formatted as generation)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Optimization Benefits</h3>
+                            <p><strong>Efficiency improvements enable:</strong></p>
+                            <ul>
+                                <li>Faster inference for real-time applications</li>
+                                <li>Deployment on edge devices</li>
+                                <li>Reduced computational costs</li>
+                                <li>Handling longer sequences</li>
+                            </ul>
                         </div>
                     </div>
 
