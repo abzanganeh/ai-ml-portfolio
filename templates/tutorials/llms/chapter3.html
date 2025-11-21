@@ -106,8 +106,36 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Fine-tuning Strategies</h3>
+                            <p><strong>Full fine-tuning:</strong> Update all model parameters. Most powerful but requires most resources.</p>
+                            
+                            <p><strong>Partial fine-tuning:</strong> Freeze early layers, only train later layers. Reduces memory and compute.</p>
+                            
+                            <p><strong>Parameter-efficient methods:</strong> Only train small subset of parameters (LoRA, adapters). Very efficient but may have slight performance trade-off.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Learning Rate Considerations</h3>
+                            <p><strong>Why lower learning rates:</strong></p>
+                            <ul>
+                                <li>Pre-trained weights are already good</li>
+                                <li>High learning rates can destroy pre-trained knowledge</li>
+                                <li>Typical: 1e-5 to 1e-3 (vs 1e-3 to 1e-2 for training from scratch)</li>
+                                <li>Often use learning rate schedule with warmup</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Catastrophic Forgetting</h3>
+                            <p><strong>The problem:</strong> Fine-tuning on new task can cause model to forget what it learned during pre-training.</p>
+                            
+                            <p><strong>Solutions:</strong></p>
+                            <ul>
+                                <li>Lower learning rates</li>
+                                <li>Freeze early layers</li>
+                                <li>Use regularization</li>
+                                <li>Continual learning techniques</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,12 +143,48 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Fine-tuning Loss</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[L_{\text{fine-tune}} = -\frac{1}{N} \sum_{i=1}^{N} \log P(y_i | x_i, \theta_{\text{pre-trained}} + \Delta\theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\theta_{\text{pre-trained}}\): Pre-trained model parameters</li>
+                                    <li>\(\Delta\theta\): Parameter updates during fine-tuning</li>
+                                    <li>\(y_i, x_i\): Task-specific labeled examples</li>
+                                    <li>Updates are typically small (\(\Delta\theta\) is small)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>LoRA (Low-Rank Adaptation)</h4>
+                            <div class="formula-display">
+                                \[W' = W + \Delta W = W + BA\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(W\): Original weight matrix (frozen)</li>
+                                    <li>\(B\): Low-rank matrix (trainable, rank r)</li>
+                                    <li>\(A\): Low-rank matrix (trainable, rank r)</li>
+                                    <li>Only \(B\) and \(A\) are trained, not \(W\)</li>
+                                    <li>Reduces trainable parameters significantly</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Learning Rate Schedule</h4>
+                            <div class="formula-display">
+                                \[\text{lr}(t) = \begin{cases} 
+                                \text{lr}_{\text{max}} \times \frac{t}{T_{\text{warmup}}} & \text{if } t < T_{\text{warmup}} \\
+                                \text{lr}_{\text{max}} \times \left(1 - \frac{t - T_{\text{warmup}}}{T_{\text{total}} - T_{\text{warmup}}}\right) & \text{if } t \geq T_{\text{warmup}}
+                                \end{cases}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Warmup phase gradually increases learning rate, then linear decay. Prevents large gradient updates early in fine-tuning.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +193,46 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Fine-tuning for Sentiment Analysis</h4>
+                            <p><strong>Pre-trained model:</strong> GPT-2 (general language understanding)</p>
+                            
+                            <p><strong>Task:</strong> Classify movie reviews as positive or negative</p>
+                            
+                            <p><strong>Step 1: Prepare data</strong></p>
+                            <ul>
+                                <li>Training examples: ("This movie was amazing!", "positive")</li>
+                                <li>Format: Review text → sentiment label</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Add classification head</strong></p>
+                            <ul>
+                                <li>Add linear layer on top of pre-trained model</li>
+                                <li>Output: 2 classes (positive, negative)</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Fine-tune</strong></p>
+                            <ul>
+                                <li>Learning rate: 2e-5 (much lower than pre-training)</li>
+                                <li>Freeze early layers, train later layers + classification head</li>
+                                <li>Train for 3-5 epochs</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Model adapts general language knowledge to sentiment classification task.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: LoRA Fine-tuning</h4>
+                            <p><strong>Original weight matrix:</strong> W (768×768) = 589,824 parameters</p>
+                            
+                            <p><strong>LoRA approach:</strong></p>
+                            <ul>
+                                <li>W (frozen): 589,824 parameters</li>
+                                <li>B (768×8): 6,144 parameters (trainable)</li>
+                                <li>A (8×768): 6,144 parameters (trainable)</li>
+                                <li>Total trainable: 12,288 (2% of original!)</li>
+                            </ul>
+                            
+                            <p><strong>Benefits:</strong> Much less memory, faster training, can fine-tune on single GPU.</p>
                         </div>
                     </div>
 
@@ -138,11 +240,71 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Fine-tuning with HuggingFace</h4>
+                            <pre><code class="language-python">from transformers import GPT2ForSequenceClassification, GPT2Tokenizer, Trainer, TrainingArguments
+from datasets import Dataset
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Load pre-trained model
+model = GPT2ForSequenceClassification.from_pretrained("gpt2", num_labels=2)
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+tokenizer.pad_token = tokenizer.eos_token
+
+# Prepare data
+def tokenize_function(examples):
+    return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+
+# Example data
+data = {
+    "text": ["This movie was amazing!", "Terrible acting.", "It was okay."],
+    "label": [1, 0, 0]  # 1=positive, 0=negative
+}
+dataset = Dataset.from_dict(data)
+tokenized_dataset = dataset.map(tokenize_function, batched=True)
+
+# Training arguments
+training_args = TrainingArguments(
+    output_dir="./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    learning_rate=2e-5,  # Low learning rate for fine-tuning
+    warmup_steps=100,
+    logging_dir="./logs",
+)
+
+# Train
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=tokenized_dataset,
+)
+trainer.train()</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>LoRA Fine-tuning with PEFT</h4>
+                            <pre><code class="language-python">from transformers import AutoModelForCausalLM
+from peft import LoraConfig, get_peft_model, TaskType
+
+# Load model
+model = AutoModelForCausalLM.from_pretrained("gpt2")
+
+# Configure LoRA
+lora_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,  # Rank (low-rank dimension)
+    lora_alpha=16,
+    lora_dropout=0.1,
+    target_modules=["c_attn", "c_proj"]  # Which layers to apply LoRA to
+)
+
+# Apply LoRA
+model = get_peft_model(model, lora_config)
+
+# Now only LoRA parameters are trainable
+print(f"Trainable parameters: {model.num_parameters(only_trainable=True)}")
+print(f"Total parameters: {model.num_parameters()}")
+
+# Fine-tune as usual (but with much fewer parameters)</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +312,41 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Fine-tuning Use Cases</h3>
+                            <p><strong>Domain-specific applications:</strong></p>
+                            <ul>
+                                <li><strong>Medical:</strong> Fine-tune on medical literature for clinical applications</li>
+                                <li><strong>Legal:</strong> Fine-tune on legal documents for contract analysis</li>
+                                <li><strong>Code:</strong> Fine-tune on code repositories for programming assistance</li>
+                                <li><strong>Customer service:</strong> Fine-tune on support tickets for automated responses</li>
+                            </ul>
+                            
+                            <p><strong>Task-specific fine-tuning:</strong></p>
+                            <ul>
+                                <li>Sentiment analysis for product reviews</li>
+                                <li>Named entity recognition for information extraction</li>
+                                <li>Question answering for knowledge bases</li>
+                                <li>Text classification for content moderation</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>When to Use Fine-tuning vs Prompting</h3>
+                            <p><strong>Use fine-tuning when:</strong></p>
+                            <ul>
+                                <li>You have task-specific labeled data</li>
+                                <li>You need high performance on specific domain</li>
+                                <li>Prompting doesn't achieve desired accuracy</li>
+                                <li>You can afford training time and resources</li>
+                            </ul>
+                            
+                            <p><strong>Use prompting when:</strong></p>
+                            <ul>
+                                <li>You have limited or no labeled data</li>
+                                <li>You need quick iteration</li>
+                                <li>Task is simple enough for few-shot learning</li>
+                                <li>You want to avoid training overhead</li>
+                            </ul>
                         </div>
                     </div>
 
