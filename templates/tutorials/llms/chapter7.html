@@ -106,8 +106,39 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Prompt Engineering Fundamentals</h3>
+                            <p><strong>What is prompt engineering:</strong> Crafting input text to guide LLM behavior and improve performance without modifying model weights.</p>
+                            
+                            <p><strong>Key principles:</strong></p>
+                            <ul>
+                                <li><strong>Clarity:</strong> Be specific and unambiguous</li>
+                                <li><strong>Context:</strong> Provide relevant background</li>
+                                <li><strong>Examples:</strong> Show desired format (few-shot)</li>
+                                <li><strong>Structure:</strong> Use clear formatting and organization</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Prompting Strategies</h3>
+                            <p><strong>Zero-shot:</strong> Just describe the task. Model uses its pre-trained knowledge.</p>
+                            
+                            <p><strong>Few-shot:</strong> Provide examples in the prompt. Model learns the pattern from examples.</p>
+                            
+                            <p><strong>Chain-of-thought:</strong> Ask model to show reasoning steps. Improves complex reasoning tasks.</p>
+                            
+                            <p><strong>Role-playing:</strong> "Act as a..." helps model adopt specific perspective or expertise.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Prompt Components</h3>
+                            <p><strong>Effective prompts include:</strong></p>
+                            <ul>
+                                <li><strong>Task description:</strong> What you want the model to do</li>
+                                <li><strong>Context:</strong> Relevant background information</li>
+                                <li><strong>Examples:</strong> Demonstrations of desired behavior</li>
+                                <li><strong>Constraints:</strong> Limitations or requirements</li>
+                                <li><strong>Output format:</strong> How you want the response structured</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -115,12 +146,44 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Prompt-based Prediction</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[P(y | \text{prompt}, x) = P(y | [\text{task\_desc}, \text{examples}, x])\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(y\): Desired output</li>
+                                    <li>\(\text{prompt}\): Crafted input including task description and examples</li>
+                                    <li>\(x\): Actual input to process</li>
+                                    <li>Model conditions on entire prompt context</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Few-shot Learning</h4>
+                            <div class="formula-display">
+                                \[P(y | x, \{(x_i, y_i)\}_{i=1}^{k}) = P(y | [x_1, y_1, \ldots, x_k, y_k, x])\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\{(x_i, y_i)\}\): k examples in prompt</li>
+                                    <li>Model learns pattern from examples</li>
+                                    <li>Applies pattern to new input x</li>
+                                    <li>k typically 1-5 examples</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Chain-of-Thought Prompting</h4>
+                            <div class="formula-display">
+                                \[P(\text{answer} | \text{question}) = P(\text{reasoning} | \text{question}) \times P(\text{answer} | \text{reasoning})\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>By explicitly modeling reasoning steps, the model breaks down complex problems into simpler sub-problems, improving accuracy on reasoning tasks.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +192,43 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Zero-shot vs Few-shot</h4>
+                            <p><strong>Zero-shot prompt:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+Classify the sentiment of this review: "This movie was amazing!"
+Sentiment:</pre>
+                            
+                            <p><strong>Few-shot prompt:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+Review: "Great product!"
+Sentiment: Positive
+
+Review: "Terrible quality."
+Sentiment: Negative
+
+Review: "This movie was amazing!"
+Sentiment:</pre>
+                            
+                            <p><strong>Result:</strong> Few-shot typically performs better as model learns the pattern from examples.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Chain-of-Thought</h4>
+                            <p><strong>Without CoT:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+Q: A store has 15 apples. They sell 6. How many left?
+A:</pre>
+                            
+                            <p><strong>With CoT:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+Q: A store has 15 apples. They sell 6. How many left?
+A: Let me think step by step.
+The store starts with 15 apples.
+They sell 6 apples.
+So remaining = 15 - 6 = 9 apples.
+Therefore, 9 apples are left.</pre>
+                            
+                            <p><strong>Result:</strong> CoT improves accuracy on math and reasoning problems.</p>
                         </div>
                     </div>
 
@@ -138,11 +236,68 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Few-shot Prompting Function</h4>
+                            <pre><code class="language-python">def few_shot_classify(text, examples, model, tokenizer):
+    """
+    Classify text using few-shot prompting
+    """
+    # Build prompt with examples
+    prompt = ""
+    for example_text, example_label in examples:
+        prompt += f"Text: {example_text}\nLabel: {example_label}\n\n"
+    
+    # Add input text
+    prompt += f"Text: {text}\nLabel:"
+    
+    # Generate
+    inputs = tokenizer(prompt, return_tensors="pt")
+    outputs = model.generate(
+        inputs.input_ids,
+        max_length=inputs.input_ids.shape[1] + 10,
+        temperature=0.3,
+        do_sample=True
+    )
+    
+    result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    label = result.split("Label:")[-1].strip()
+    return label
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Example usage
+examples = [
+    ("Great product!", "Positive"),
+    ("Terrible quality.", "Negative")
+]
+text = "This movie was amazing!"
+label = few_shot_classify(text, examples, model, tokenizer)
+print(label)  # "Positive"</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Chain-of-Thought Prompting</h4>
+                            <pre><code class="language-python">def chain_of_thought_reasoning(question, model, tokenizer):
+    """
+    Use chain-of-thought prompting for reasoning
+    """
+    prompt = f"""Q: {question}
+A: Let me think step by step.
+"""
+    
+    inputs = tokenizer(prompt, return_tensors="pt")
+    outputs = model.generate(
+        inputs.input_ids,
+        max_length=inputs.input_ids.shape[1] + 200,
+        temperature=0.7,
+        do_sample=True
+    )
+    
+    result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    reasoning = result.split("A:")[-1].strip()
+    return reasoning
+
+# Example
+question = "A store has 15 apples. They sell 6. How many left?"
+reasoning = chain_of_thought_reasoning(question, model, tokenizer)
+print(reasoning)</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +305,47 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Prompt Engineering in Practice</h3>
+                            <p><strong>Chatbot development:</strong></p>
+                            <ul>
+                                <li>Craft system prompts to define chatbot personality</li>
+                                <li>Use few-shot examples to show desired conversation style</li>
+                                <li>Iterate on prompts to improve responses</li>
+                            </ul>
+                            
+                            <p><strong>Content generation:</strong></p>
+                            <ul>
+                                <li>Use role-playing prompts: "Act as a marketing expert..."</li>
+                                <li>Provide examples of desired writing style</li>
+                                <li>Specify output format and constraints</li>
+                            </ul>
+                            
+                            <p><strong>Task automation:</strong></p>
+                            <ul>
+                                <li>Format conversion tasks</li>
+                                <li>Data extraction from unstructured text</li>
+                                <li>Code generation with specific requirements</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Prompt Engineering Best Practices</h3>
+                            <p><strong>Do:</strong></p>
+                            <ul>
+                                <li>Be specific and clear</li>
+                                <li>Provide context and examples</li>
+                                <li>Specify output format</li>
+                                <li>Test and iterate</li>
+                                <li>Use chain-of-thought for complex reasoning</li>
+                            </ul>
+                            
+                            <p><strong>Don't:</strong></p>
+                            <ul>
+                                <li>Be vague or ambiguous</li>
+                                <li>Assume model knows context</li>
+                                <li>Use overly complex prompts</li>
+                                <li>Ignore prompt injection risks</li>
+                            </ul>
                         </div>
                     </div>
 
