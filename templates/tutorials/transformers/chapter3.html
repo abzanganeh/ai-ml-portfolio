@@ -291,11 +291,99 @@ print(f"Output shape: {output.shape}")  # (2, 10, 512)</code></pre>
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Multi-Head Attention</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is multi-head attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Running multiple attention mechanisms in parallel with different learned projections</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Using multiple layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Processing multiple sequences</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Using larger matrices</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Why use multiple attention heads instead of one?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Different heads can learn to focus on different types of relationships (syntax, semantics, long-range dependencies), allowing the model to capture diverse patterns simultaneously</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It uses less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No reason</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: How do you combine outputs from multiple attention heads?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Concatenate all head outputs, then apply a linear projection to get the final output with the desired dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Average them</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only the first head</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Multiply them</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is the formula for multi-head attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(MultiHead(Q, K, V) = Concat(head_1, ..., head_h)W_O\) where each head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(MultiHead = Q + K + V\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(MultiHead = Q \times K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(MultiHead = Attention\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: How do you split dimensions for multiple heads?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) If embedding dimension is d_model and you have h heads, each head gets d_model/h dimensions. For example, 768 dimensions with 12 heads gives 64 dimensions per head</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Each head gets full dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random split</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only first head gets dimensions</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What types of relationships can different attention heads learn?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Some heads focus on syntactic relationships (subject-verb), others on semantic (word meaning), positional (distance), or task-specific patterns, creating a rich representation</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All heads learn the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only positional</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only semantic</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: How does the number of heads affect model capacity?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) More heads increase capacity by allowing the model to learn diverse attention patterns, but too many heads can lead to redundancy. Typical values are 8-16 heads</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) More heads always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Fewer heads always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Number doesn't matter</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What is the computational cost of multi-head attention compared to single-head?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Similar cost because dimensions are split across heads. With h heads, each head processes d/h dimensions, so total computation is roughly the same as single head with full dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) h times more expensive</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) h times less expensive</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: How would you visualize what different attention heads learn?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Create separate attention heatmaps for each head, showing which positions each head focuses on. Compare patterns across heads to see if they specialize in different relationships</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only visualize one head</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Average all heads</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Can't visualize</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What happens if you use too many attention heads?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Heads may become redundant, learning similar patterns, wasting parameters, and potentially hurting performance. There's a sweet spot based on model size and task</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always improves performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No effect</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Makes it faster</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: How do you implement multi-head attention from scratch?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Split Q, K, V into h heads (reshape to add head dimension), compute attention for each head independently, concatenate all head outputs, apply output projection matrix W_O to combine heads</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use single head</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Stack heads sequentially</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Why is multi-head attention a key innovation in transformers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) It allows the model to attend to information from different representation subspaces simultaneously, capturing multiple types of relationships in parallel, which is crucial for understanding complex language patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's just faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It uses less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No special reason</div>
                             </div>
                         </div>
                     </div>
