@@ -7,6 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWAT2dVgYnHwpIK/NS" crossorigin="anonymous">
+    <!-- Prism.js for code syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+
 </head>
 <body>
     <header class="azbn-header">
@@ -90,7 +100,7 @@
                         <h2>What is a Feedforward Network?</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔄 Information Flow: One Direction Only</h3>
+                            <h3>Information Flow: One Direction Only</h3>
                             <p><strong>A feedforward neural network is called "feedforward" because information flows in only one direction:</strong> from input → hidden layers → output. There are no loops or cycles - data moves forward through the network like water flowing down a river.</p>
                             
                             <p><strong>Key Characteristics:</strong></p>
@@ -204,7 +214,7 @@
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Concrete Example: 3-Layer Network</h4>
+                            <h4>Concrete Example: 3-Layer Network</h4>
                             <p><strong>Architecture:</strong> 4 inputs → 5 hidden neurons → 3 outputs</p>
                             
                             <p><strong>Layer Sizes:</strong></p>
@@ -230,7 +240,7 @@
                         <h2>Forward Propagation: Step by Step</h2>
                         
                         <div class="explanation-box">
-                            <h3>⚡ What is Forward Propagation?</h3>
+                            <h3>What is Forward Propagation?</h3>
                             <p><strong>Forward propagation is the process of passing input data through the network to compute the output.</strong> It's called "forward" because we move from input to output, computing each layer's activations in sequence.</p>
                             
                             <p><strong>The Process:</strong></p>
@@ -271,7 +281,7 @@
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Step-by-Step Example</h4>
+                            <h4>Step-by-Step Example</h4>
                             <p><strong>Simple 2-Layer Network:</strong> 2 inputs → 3 hidden → 1 output</p>
                             
                             <p><strong>Input:</strong> x = [0.5, 0.8]</p>
@@ -313,7 +323,7 @@ W⁽¹⁾ = [0.1  0.3]
                         </div>
 
                         <div class="explanation-box">
-                            <h4>🎯 Why Forward Propagation Matters</h4>
+                            <h4>Why Forward Propagation Matters</h4>
                             <p><strong>Forward propagation is the foundation of neural network computation:</strong></p>
                             <ul>
                                 <li><strong>Prediction:</strong> Used every time you make a prediction (inference)</li>
@@ -329,7 +339,7 @@ W⁽¹⁾ = [0.1  0.3]
                         <h2>Matrix Operations in Neural Networks</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔢 Why Matrices?</h3>
+                            <h3>Why Matrices?</h3>
                             <p><strong>Neural networks use matrix operations because they're incredibly efficient!</strong> Instead of computing each neuron one by one, we can process entire layers simultaneously using matrix multiplication.</p>
                             
                             <p><strong>Benefits of Matrix Operations:</strong></p>
@@ -366,7 +376,7 @@ W⁽¹⁾ = [0.1  0.3]
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Matrix Multiplication Example</h4>
+                            <h4>Matrix Multiplication Example</h4>
                             <p><strong>Single Example (m=1):</strong></p>
                             
                             <p><strong>Input:</strong> a⁽⁰⁾ = [2, 3]ᵀ (2×1 vector)</p>
@@ -406,8 +416,8 @@ z⁽¹⁾ = [0.1  0.2] [2]   [0.1]
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 Matrix Operations in NumPy</h4>
-                            <pre><code>import numpy as np
+                            <h4>Matrix Operations in NumPy</h4>
+                            <pre><code class="language-python">import numpy as np
 
 # Example: Forward propagation with matrices
 def forward_propagation(X, weights, biases, activation='relu'):
@@ -550,8 +560,8 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 Implementation</h4>
-                            <pre><code>import numpy as np
+                            <h4>Implementation</h4>
+                            <pre><code class="language-python">import numpy as np
 
 def xavier_init(n_in, n_out):
     """Xavier/Glorot initialization for tanh/sigmoid"""
@@ -602,7 +612,7 @@ for i, (W, b) in enumerate(zip(weights, biases)):
                         </div>
 
                         <div class="example-box">
-                            <h4>📊 Comparison: Different Initializations</h4>
+                            <h4>Comparison: Different Initializations</h4>
                             <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
                                 <thead>
                                     <tr style="background-color: #f0f0f0;">
@@ -645,8 +655,8 @@ for i, (W, b) in enumerate(zip(weights, biases)):
                         <h2>Complete Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Full Feedforward Network Implementation</h4>
-                            <pre><code>import numpy as np
+                            <h4>Full Feedforward Network Implementation</h4>
+                            <pre><code class="language-python">import numpy as np
 
 class FeedforwardNetwork:
     """Complete Feedforward Neural Network Implementation"""
@@ -761,7 +771,7 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                         </div>
 
                         <div class="explanation-box">
-                            <h4>🎯 Key Takeaways</h4>
+                            <h4>Key Takeaways</h4>
                             <ul>
                                 <li><strong>Forward propagation</strong> computes predictions by passing data through layers</li>
                                 <li><strong>Matrix operations</strong> enable efficient batch processing</li>
@@ -855,7 +865,10 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
             }
         }
     </script>
-    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+        <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <!-- Footer Navigation -->
     <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
         <div class="azbn-container" style="text-align: center;">
@@ -889,6 +902,11 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                     ],
                     throwOnError: false
                 });
+            }
+            
+            // Initialize Prism.js syntax highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
             }
         });
     </script>

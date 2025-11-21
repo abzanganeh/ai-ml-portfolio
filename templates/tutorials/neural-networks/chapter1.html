@@ -7,6 +7,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWAT2dVgYnHwpIK/NS" crossorigin="anonymous">
+    <!-- Prism.js for code syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+
 </head>
 <body>
     <header class="azbn-header">
@@ -164,7 +174,7 @@
                         <h2>The Perceptron: The Simplest Neural Network</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 What is a Perceptron?</h3>
+                            <h3>What is a Perceptron?</h3>
                             <p><strong>The perceptron is the simplest form of a neural network.</strong> Invented by Frank Rosenblatt in 1957, it's a single-layer neural network that can learn to classify linearly separable data.</p>
                             
                             <p><strong>Key Characteristics:</strong></p>
@@ -233,7 +243,7 @@
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Concrete Example: AND Gate</h4>
+                            <h4>Concrete Example: AND Gate</h4>
                             <p><strong>Let's build a perceptron that implements an AND logic gate:</strong></p>
                             
                             <p><strong>Truth Table:</strong></p>
@@ -281,8 +291,8 @@
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 Python Implementation</h4>
-                            <pre><code>import numpy as np
+                            <h4>Python Implementation</h4>
+                            <pre><code class="language-python">import numpy as np
 
 class Perceptron:
     """Simple Perceptron Implementation"""
@@ -441,7 +451,7 @@ print("Bias:", perceptron.bias)</code></pre>
                         </div>
 
                         <div class="example-box">
-                            <h4>🔢 Example: 2-Layer MLP for XOR</h4>
+                            <h4>Example: 2-Layer MLP for XOR</h4>
                             <p><strong>Architecture:</strong> 2 inputs → 2 hidden neurons → 1 output</p>
                             
                             <p><strong>Layer 1 (Hidden):</strong></p>
@@ -459,8 +469,8 @@ print("Bias:", perceptron.bias)</code></pre>
                         </div>
 
                         <div class="code-box">
-                            <h4>💻 MLP Implementation</h4>
-                            <pre><code>import numpy as np
+                            <h4>MLP Implementation</h4>
+                            <pre><code class="language-python">import numpy as np
 
 class MLP:
     """Multi-Layer Perceptron Implementation"""
@@ -542,7 +552,7 @@ mlp = MLP([2, 4, 1], activation='sigmoid')
                         <h3>Layer Types</h3>
                         
                         <div class="example-box">
-                            <h4>📊 Common Layer Types</h4>
+                            <h4>Common Layer Types</h4>
                             <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
                                 <thead>
                                     <tr style="background-color: #f0f0f0;">
@@ -577,7 +587,7 @@ mlp = MLP([2, 4, 1], activation='sigmoid')
                         <h2>Universal Approximation Theorem</h2>
                         
                         <div class="explanation-box">
-                            <h3>🎯 The Power of Neural Networks</h3>
+                            <h3>The Power of Neural Networks</h3>
                             <p><strong>The Universal Approximation Theorem is a fundamental result that explains why neural networks are so powerful.</strong> It states that a feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function to arbitrary accuracy, given appropriate activation functions and weights.</p>
                         </div>
 
@@ -621,8 +631,8 @@ mlp = MLP([2, 4, 1], activation='sigmoid')
                         <h2>Complete Code Example</h2>
                         
                         <div class="code-box">
-                            <h4>💻 Simple Neural Network from Scratch</h4>
-                            <pre><code>import numpy as np
+                            <h4>Simple Neural Network from Scratch</h4>
+                            <pre><code class="language-python">import numpy as np
 
 class SimpleNeuralNetwork:
     """A simple feedforward neural network implementation"""
@@ -706,6 +716,78 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory usage</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: Interview question: "Explain the difference between a perceptron and a multi-layer perceptron (MLP)."</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A perceptron is a single-layer network that can only learn linearly separable patterns, while an MLP has multiple layers with activation functions that can learn non-linear, complex patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are the same thing</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Perceptron is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) MLP uses less memory</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is the mathematical representation of a neuron's output?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(y = f(\sum_{i=1}^{n} w_i x_i + b)\) where f is the activation function, w_i are weights, x_i are inputs, and b is bias</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(y = \sum w_i x_i\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(y = w \times x\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(y = x + b\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: Interview question: "How would you initialize weights in a neural network and why?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use small random values (e.g., Xavier/Glorot or He initialization) to break symmetry, prevent vanishing/exploding gradients, and ensure different neurons learn different features</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Initialize all weights to zero</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Initialize all weights to one</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use large random values</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What does the Universal Approximation Theorem guarantee?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function on compact subsets of R^n, given appropriate activation functions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Neural networks always converge to the global optimum</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Neural networks are always better than other methods</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Neural networks don't need training</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: Interview question: "What happens if you don't use an activation function in a neural network?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The network becomes a linear model, regardless of depth, because the composition of linear transformations is still linear, losing the ability to learn non-linear patterns</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The network becomes faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The network uses less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The network becomes more accurate</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What is the role of bias in a neural network?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Bias allows the activation function to shift, enabling the network to fit data that doesn't pass through the origin and learn more flexible decision boundaries</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Bias makes computation faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Bias prevents overfitting</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Bias is optional and not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: Interview question: "How would you choose the number of neurons in a hidden layer?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Start with a rule of thumb (e.g., between input and output size, or 2/3 of input size), then use validation set to tune, balancing model capacity (too few = underfitting, too many = overfitting)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use the same as input size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use as many as possible</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use exactly 10 neurons</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is forward propagation in a neural network?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The process of passing input data through the network layers, computing weighted sums and applying activation functions, to produce an output prediction</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The process of updating weights</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The process of calculating loss</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The process of initializing weights</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Interview question: "What are the key components of a neural network and how do they work together?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Input layer receives data, hidden layers transform data through weighted connections and activation functions, output layer produces predictions. Weights store learned patterns, biases shift activations, activation functions introduce non-linearity. Forward pass computes predictions, backpropagation updates weights based on error</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just weights and inputs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only activation functions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Just the output layer</div>
+                            </div>
                         </div>
                     </div>
                 </main>
@@ -726,7 +808,10 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
         </div>
     </footer>
     
-    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+        <!-- KaTeX for math rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlG8jLC0KXLSyHiQtD6lqG3t3a3H4RbQT6GhhDYFyK4aQo5hk6g/AVC/gw" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         // Function to scroll to section navigation
         function scrollToSectionNav() {
@@ -771,6 +856,11 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                     ],
                     throwOnError: false
                 });
+            }
+            
+            // Initialize Prism.js syntax highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
             }
         });
     </script>
