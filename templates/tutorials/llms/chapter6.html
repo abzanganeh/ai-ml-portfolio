@@ -106,8 +106,46 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Why Parameter-Efficient Fine-tuning?</h3>
+                            <p><strong>Problem with full fine-tuning:</strong></p>
+                            <ul>
+                                <li>Large models (billions of parameters) require massive memory</li>
+                                <li>Training all parameters is expensive</li>
+                                <li>Storing multiple fine-tuned models requires huge storage</li>
+                                <li>Not feasible for many users or edge devices</li>
+                            </ul>
+                            
+                            <p><strong>Solution: Parameter-efficient methods</strong></p>
+                            <ul>
+                                <li>Only train small subset of parameters</li>
+                                <li>Dramatically reduce memory and compute</li>
+                                <li>Can fine-tune on single GPU</li>
+                                <li>Store only small adapter weights</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>LoRA (Low-Rank Adaptation)</h3>
+                            <p><strong>Key insight:</strong> Weight updates during fine-tuning have low intrinsic rank. We can approximate updates with low-rank matrices.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Original weights W are frozen</li>
+                                <li>Add trainable low-rank matrices B and A</li>
+                                <li>W' = W + BA (where BA is low-rank)</li>
+                                <li>Only train B and A (much fewer parameters)</li>
+                            </ul>
+                            
+                            <p><strong>Benefits:</strong> 10-100x reduction in trainable parameters, minimal performance loss.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Other Parameter-Efficient Methods</h3>
+                            <p><strong>Adapter layers:</strong> Insert small trainable layers between transformer layers. Only adapters are trained.</p>
+                            
+                            <p><strong>Prompt tuning:</strong> Learn soft prompts (continuous embeddings) instead of model weights.</p>
+                            
+                            <p><strong>Prefix tuning:</strong> Similar to prompt tuning but applied to all layers.</p>
                         </div>
                     </div>
 
@@ -115,12 +153,46 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>LoRA Weight Update</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[W' = W_0 + \Delta W = W_0 + BA\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(W_0 \in \mathbb{R}^{d \times d}\): Original weight matrix (frozen)</li>
+                                    <li>\(B \in \mathbb{R}^{d \times r}\): Trainable matrix (rank r)</li>
+                                    <li>\(A \in \mathbb{R}^{r \times d}\): Trainable matrix</li>
+                                    <li>\(r \ll d\): Rank is much smaller than dimension</li>
+                                    <li>Parameters: \(2dr\) instead of \(d^2\)</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <ul>
+                                    <li>d = 768, r = 8</li>
+                                    <li>Full: 768² = 589,824 parameters</li>
+                                    <li>LoRA: 2×768×8 = 12,288 parameters (2% of original!)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Forward Pass with LoRA</h4>
+                            <div class="formula-display">
+                                \[h = W'x = (W_0 + BA)x = W_0x + B(Ax)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>During forward pass, compute both terms. \(W_0x\) can be computed once and cached. Only \(B(Ax)\) needs recomputation during training.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Rank Selection</h4>
+                            <div class="formula-display">
+                                \[\text{Compression ratio} = \frac{2dr}{d^2} = \frac{2r}{d}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>For r=8 and d=768, compression ratio is ~2%. Lower rank = more compression but potentially lower performance. Typical ranks: 4-16.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +201,49 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: LoRA Parameter Reduction</h4>
+                            <p><strong>GPT-2 base model:</strong> 124M parameters</p>
+                            
+                            <p><strong>Full fine-tuning:</strong></p>
+                            <ul>
+                                <li>Trainable: 124M parameters</li>
+                                <li>Memory: ~2GB per batch</li>
+                                <li>Storage: 500MB per fine-tuned model</li>
+                            </ul>
+                            
+                            <p><strong>LoRA fine-tuning (r=8):</strong></p>
+                            <ul>
+                                <li>Trainable: ~1M parameters (LoRA matrices)</li>
+                                <li>Memory: ~500MB per batch</li>
+                                <li>Storage: 4MB per fine-tuned model (125x smaller!)</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Can store 125 LoRA models in space of 1 full model, train on single GPU.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: LoRA Application</h4>
+                            <p><strong>Scenario:</strong> Fine-tune GPT-2 for code generation</p>
+                            
+                            <p><strong>Step 1: Identify target layers</strong></p>
+                            <ul>
+                                <li>Apply LoRA to attention layers (c_attn, c_proj)</li>
+                                <li>These layers capture most task-specific patterns</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Initialize LoRA matrices</strong></p>
+                            <ul>
+                                <li>B initialized to zeros (so W' = W initially)</li>
+                                <li>A initialized with small random values</li>
+                                <li>Ensures training starts from pre-trained weights</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Train only LoRA parameters</strong></p>
+                            <ul>
+                                <li>Freeze all original weights</li>
+                                <li>Only update B and A matrices</li>
+                                <li>Much faster and memory-efficient</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -138,11 +251,79 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>LoRA with PEFT Library</h4>
+                            <pre><code class="language-python">from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import LoraConfig, get_peft_model, TaskType
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Load model
+model = AutoModelForCausalLM.from_pretrained("gpt2")
+tokenizer = AutoTokenizer.from_pretrained("gpt2")
+
+# Configure LoRA
+lora_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,  # Rank (low-rank dimension)
+    lora_alpha=16,  # Scaling factor
+    lora_dropout=0.1,  # Dropout for LoRA layers
+    target_modules=["c_attn", "c_proj"],  # Which layers to apply LoRA to
+    bias="none"  # Don't train bias
+)
+
+# Apply LoRA
+model = get_peft_model(model, lora_config)
+
+# Print parameter counts
+trainable = model.num_parameters(only_trainable=True)
+total = model.num_parameters()
+print(f"Trainable: {trainable:,}")
+print(f"Total: {total:,}")
+print(f"Trainable %: {100 * trainable / total:.2f}%")
+
+# Now fine-tune as usual (but only LoRA params update)
+# model.train()
+# ... training loop ...</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Manual LoRA Implementation</h4>
+                            <pre><code class="language-python">import torch
+import torch.nn as nn
+
+class LoRALayer(nn.Module):
+    """LoRA layer implementation"""
+    
+    def __init__(self, original_layer, rank=8, alpha=16):
+        super().__init__()
+        self.original_layer = original_layer  # Frozen
+        self.rank = rank
+        self.alpha = alpha
+        
+        # Get dimensions
+        if isinstance(original_layer, nn.Linear):
+            in_features = original_layer.in_features
+            out_features = original_layer.out_features
+        else:
+            raise ValueError("Original layer must be nn.Linear")
+        
+        # LoRA matrices
+        self.lora_A = nn.Parameter(torch.randn(rank, in_features) * 0.02)
+        self.lora_B = nn.Parameter(torch.zeros(out_features, rank))
+        self.scaling = alpha / rank
+    
+    def forward(self, x):
+        # Original output
+        original_output = self.original_layer(x)
+        
+        # LoRA output
+        lora_output = self.lora_B @ (self.lora_A @ x.T).T
+        lora_output = lora_output * self.scaling
+        
+        return original_output + lora_output
+
+# Example usage
+# original = nn.Linear(768, 768)
+# lora_layer = LoRALayer(original, rank=8)
+# output = lora_layer(input_tensor)</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +331,45 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>LoRA Use Cases</h3>
+                            <p><strong>Personalized models:</strong></p>
+                            <ul>
+                                <li>Fine-tune large models for individual users</li>
+                                <li>Store only small LoRA weights per user</li>
+                                <li>Enable personalization without massive storage</li>
+                            </ul>
+                            
+                            <p><strong>Multi-task deployment:</strong></p>
+                            <ul>
+                                <li>One base model, multiple LoRA adapters</li>
+                                <li>Switch between tasks by loading different LoRA weights</li>
+                                <li>Much more efficient than multiple full models</li>
+                            </ul>
+                            
+                            <p><strong>Edge deployment:</strong></p>
+                            <ul>
+                                <li>Fine-tune on edge devices with limited memory</li>
+                                <li>LoRA enables fine-tuning on consumer GPUs</li>
+                                <li>Makes large models accessible to more users</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>When to Use LoRA</h3>
+                            <p><strong>Use LoRA when:</strong></p>
+                            <ul>
+                                <li>Memory/compute is limited</li>
+                                <li>You need to fine-tune many variants</li>
+                                <li>Storage is a concern</li>
+                                <li>Performance trade-off is acceptable</li>
+                            </ul>
+                            
+                            <p><strong>Use full fine-tuning when:</strong></p>
+                            <ul>
+                                <li>You need maximum performance</li>
+                                <li>Resources are abundant</li>
+                                <li>Only fine-tuning one or few models</li>
+                            </ul>
                         </div>
                     </div>
 
