@@ -194,8 +194,34 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Complete Transformer Architecture</h3>
+                            <p><strong>The full transformer combines all components:</strong></p>
+                            <ul>
+                                <li><strong>Input Processing:</strong> Tokenization → Embeddings → Positional Encoding</li>
+                                <li><strong>Encoder Stack:</strong> Multiple encoder layers (self-attention + FFN)</li>
+                                <li><strong>Decoder Stack:</strong> Multiple decoder layers (masked self-attention + cross-attention + FFN)</li>
+                                <li><strong>Output Generation:</strong> Linear projection → Softmax → Token prediction</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Information Flow Through Layers</h3>
+                            <p><strong>Early layers:</strong> Capture local patterns, syntax, word-level relationships</p>
+                            <p><strong>Middle layers:</strong> Build phrase-level understanding, semantic relationships</p>
+                            <p><strong>Deep layers:</strong> Develop high-level abstractions, task-specific features</p>
+                            <p>Each layer refines and abstracts the representation from the previous layer.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Training Challenges</h3>
+                            <p><strong>Key challenges in training transformers:</strong></p>
+                            <ul>
+                                <li><strong>Memory:</strong> Large models require significant GPU memory</li>
+                                <li><strong>Compute:</strong> Training takes weeks to months on many GPUs</li>
+                                <li><strong>Data:</strong> Need massive, high-quality datasets</li>
+                                <li><strong>Hyperparameters:</strong> Learning rate, warmup, batch size all critical</li>
+                                <li><strong>Stability:</strong> Deep networks prone to gradient issues</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -203,12 +229,65 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Complete Transformer Forward Pass</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{Transformer}(X) = \text{Decoder}(\text{Encoder}(X_{\text{enc}}), X_{\text{dec}})\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Encoder Stack:</h5>
+                                <ul>
+                                    <li>\(X_{\text{enc}} = \text{Embed}(X_{\text{enc}}) + PE\)</li>
+                                    <li>\(H = \text{EncoderLayer}_N(\ldots\text{EncoderLayer}_1(X_{\text{enc}}))\)</li>
+                                </ul>
+                                
+                                <h5>Decoder Stack:</h5>
+                                <ul>
+                                    <li>\(X_{\text{dec}} = \text{Embed}(X_{\text{dec}}) + PE\)</li>
+                                    <li>\(O = \text{DecoderLayer}_N(\ldots\text{DecoderLayer}_1(X_{\text{dec}}, H))\)</li>
+                                </ul>
+                                
+                                <h5>Output:</h5>
+                                <ul>
+                                    <li>\(\text{Output} = \text{Softmax}(O \cdot W_{\text{out}})\)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Training Loss</h4>
+                            <div class="formula-display">
+                                \[L = -\sum_{i=1}^{N} \log P(y_i | x_i, \theta)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(N\): Number of training examples</li>
+                                    <li>\(y_i\): Target token at position i</li>
+                                    <li>\(x_i\): Input context up to position i</li>
+                                    <li>\(\theta\): Model parameters</li>
+                                    <li>\(P(y_i | x_i, \theta)\): Model's predicted probability</li>
+                                </ul>
+                                
+                                <p>This is the standard cross-entropy loss for language modeling.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Learning Rate Schedule</h4>
+                            <div class="formula-display">
+                                \[\text{lr}(t) = \begin{cases} 
+                                \text{lr}_{\text{max}} \times \frac{t}{T_{\text{warmup}}} & \text{if } t < T_{\text{warmup}} \\
+                                \text{lr}_{\text{max}} & \text{if } T_{\text{warmup}} \leq t < T_{\text{decay}} \\
+                                \text{lr}_{\text{max}} \times \frac{T_{\text{total}} - t}{T_{\text{total}} - T_{\text{decay}}} & \text{if } t \geq T_{\text{decay}}
+                                \end{cases}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Phases:</h5>
+                                <ul>
+                                    <li><strong>Warmup:</strong> Gradually increase from 0 to max learning rate</li>
+                                    <li><strong>Constant:</strong> Maintain max learning rate</li>
+                                    <li><strong>Decay:</strong> Gradually decrease learning rate</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -217,8 +296,49 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Complete Transformer Processing</h4>
+                            <p><strong>Task:</strong> Translate "Hello world" to French</p>
+                            
+                            <p><strong>Step 1: Input Processing</strong></p>
+                            <ul>
+                                <li>Encoder input: "Hello world" → Token IDs → Embeddings → + Positional Encoding</li>
+                                <li>Decoder input: [START] → Token ID → Embedding → + Positional Encoding</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Encoder Processing</strong></p>
+                            <ul>
+                                <li>Layer 1: Self-attention captures relationships between "Hello" and "world"</li>
+                                <li>Layer 2-6: Further refinement of representations</li>
+                                <li>Output: Rich contextualized representation of input</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Decoder Processing</strong></p>
+                            <ul>
+                                <li>Masked self-attention: [START] attends to itself</li>
+                                <li>Cross-attention: [START] attends to encoder output</li>
+                                <li>FFN: Processes the combined information</li>
+                                <li>Output: Probability distribution over French vocabulary</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Generation</strong></p>
+                            <ul>
+                                <li>Sample "Bonjour" (highest probability)</li>
+                                <li>Add to decoder input: [START, "Bonjour"]</li>
+                                <li>Repeat until [END] token or max length</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Training Setup</h4>
+                            <p><strong>Typical configuration for large transformer:</strong></p>
+                            <ul>
+                                <li><strong>Model size:</strong> 12 layers, 768 dimensions, 12 heads</li>
+                                <li><strong>Batch size:</strong> 256 (with gradient accumulation)</li>
+                                <li><strong>Learning rate:</strong> 1e-4 with warmup to 1e-3</li>
+                                <li><strong>Optimizer:</strong> AdamW with weight decay 0.01</li>
+                                <li><strong>Training time:</strong> 1-2 weeks on 8 GPUs</li>
+                                <li><strong>Data:</strong> Millions of sentence pairs</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -226,11 +346,59 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Complete Transformer Training Loop</h4>
+                            <pre><code class="language-python">import torch
+import torch.nn as nn
+from torch.optim import AdamW
+from torch.optim.lr_scheduler import LambdaLR
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+def train_transformer(model, train_loader, num_epochs, warmup_steps, total_steps):
+    """
+    Training loop for transformer model
+    """
+    optimizer = AdamW(model.parameters(), lr=1e-4, weight_decay=0.01)
+    
+    # Learning rate schedule with warmup
+    def lr_lambda(step):
+        if step < warmup_steps:
+            return step / warmup_steps  # Warmup
+        else:
+            return (total_steps - step) / (total_steps - warmup_steps)  # Decay
+    
+    scheduler = LambdaLR(optimizer, lr_lambda)
+    criterion = nn.CrossEntropyLoss(ignore_index=-1)
+    
+    model.train()
+    for epoch in range(num_epochs):
+        total_loss = 0
+        for batch_idx, (src, tgt) in enumerate(train_loader):
+            # Forward pass
+            output = model(src, tgt[:, :-1])  # Exclude last token
+            target = tgt[:, 1:]  # Shift by one for next token prediction
+            
+            # Compute loss
+            loss = criterion(output.reshape(-1, output.size(-1)), target.reshape(-1))
+            
+            # Backward pass
+            optimizer.zero_grad()
+            loss.backward()
+            
+            # Gradient clipping
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
+            optimizer.step()
+            scheduler.step()
+            
+            total_loss += loss.item()
+            
+            if batch_idx % 100 == 0:
+                print(f'Epoch {epoch}, Batch {batch_idx}, Loss: {loss.item():.4f}')
+        
+        print(f'Epoch {epoch} average loss: {total_loss / len(train_loader):.4f}')
+
+# Example usage
+# model = TransformerModel(vocab_size=50000, d_model=512, nhead=8, num_layers=6)
+# train_transformer(model, train_loader, num_epochs=10, warmup_steps=4000, total_steps=100000)</code></pre>
                         </div>
                     </div>
 
@@ -238,8 +406,37 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Complete Transformer Applications</h3>
+                            <p><strong>Encoder-decoder transformers are used for:</strong></p>
+                            <ul>
+                                <li><strong>Machine Translation:</strong> Google Translate, DeepL use transformer architectures</li>
+                                <li><strong>Text Summarization:</strong> Generating concise summaries from long documents</li>
+                                <li><strong>Question Answering:</strong> Systems that answer questions based on context</li>
+                                <li><strong>Dialogue Systems:</strong> Conversational AI that maintains context</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Training Infrastructure</h3>
+                            <p><strong>Large-scale training requires:</strong></p>
+                            <ul>
+                                <li><strong>Distributed Training:</strong> Multiple GPUs/TPUs working together</li>
+                                <li><strong>Data Pipeline:</strong> Efficient data loading and preprocessing</li>
+                                <li><strong>Monitoring:</strong> Track loss, learning rate, gradient norms</li>
+                                <li><strong>Checkpointing:</strong> Save model state regularly</li>
+                                <li><strong>Mixed Precision:</strong> Use float16 for speed</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Production Deployment</h3>
+                            <p><strong>Deploying trained transformers:</strong></p>
+                            <ul>
+                                <li><strong>Model Optimization:</strong> Quantization, pruning for efficiency</li>
+                                <li><strong>Inference Optimization:</strong> Batch processing, caching</li>
+                                <li><strong>Scalability:</strong> Handle multiple concurrent requests</li>
+                                <li><strong>Monitoring:</strong> Track latency, throughput, accuracy</li>
+                            </ul>
                         </div>
                     </div>
 
