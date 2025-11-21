@@ -138,8 +138,33 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Scale and Emergence</h3>
+                            <p><strong>The scaling hypothesis:</strong> As models get larger (more parameters), trained on more data, with more compute, they show predictable improvements and emergent capabilities not present in smaller models.</p>
+                            
+                            <p><strong>Emergent abilities include:</strong></p>
+                            <ul>
+                                <li>Few-shot learning (performing tasks with just a few examples)</li>
+                                <li>Chain-of-thought reasoning (step-by-step problem solving)</li>
+                                <li>Instruction following (understanding and following complex instructions)</li>
+                                <li>Code generation and understanding</li>
+                                <li>Mathematical problem solving</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Pre-training vs Fine-tuning</h3>
+                            <p><strong>Pre-training:</strong> Learning general language patterns from massive unlabeled text. This is expensive (weeks/months, many GPUs) but done once.</p>
+                            
+                            <p><strong>Fine-tuning:</strong> Adapting the pre-trained model to specific tasks using labeled data. Much faster and cheaper, can be done for many tasks.</p>
+                            
+                            <p><strong>Prompt engineering:</strong> Using carefully crafted prompts to guide model behavior without any training. Fastest approach but less powerful than fine-tuning.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Architecture Types</h3>
+                            <p><strong>Encoder-only (BERT):</strong> Bidirectional understanding, best for classification, QA, NER</p>
+                            <p><strong>Decoder-only (GPT):</strong> Autoregressive generation, best for text generation, completion</p>
+                            <p><strong>Encoder-decoder (T5):</strong> Both understanding and generation, best for translation, summarization</p>
                         </div>
                     </div>
 
@@ -147,12 +172,43 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Language Modeling Objective</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[P(x_1, x_2, \ldots, x_n) = \prod_{i=1}^{n} P(x_i | x_1, \ldots, x_{i-1})\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(x_i\): Token at position i</li>
+                                    <li>\(P(x_i | x_1, \ldots, x_{i-1})\): Probability of token \(x_i\) given previous tokens</li>
+                                    <li>Model learns to predict next token given context</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Training Loss (Cross-Entropy)</h4>
+                            <div class="formula-display">
+                                \[L = -\frac{1}{N} \sum_{i=1}^{N} \log P(y_i | x_{<i}, \theta)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(N\): Number of training examples</li>
+                                    <li>\(y_i\): Target token</li>
+                                    <li>\(x_{<i}\): Context (previous tokens)</li>
+                                    <li>\(\theta\): Model parameters</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Perplexity</h4>
+                            <div class="formula-display">
+                                \[\text{Perplexity} = \exp\left(-\frac{1}{N} \sum_{i=1}^{N} \log P(x_i | x_{<i})\right)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Perplexity measures how well the model predicts a sequence. Lower perplexity means better prediction. It's the exponentiated average negative log-likelihood.</p>
                             </div>
                         </div>
                     </div>
@@ -161,8 +217,50 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: How LLMs Generate Text</h4>
+                            <p><strong>Input prompt:</strong> "The capital of France is"</p>
+                            
+                            <p><strong>Step 1: Tokenization</strong></p>
+                            <ul>
+                                <li>Input → ["The", "capital", "of", "France", "is"]</li>
+                                <li>Each token converted to embedding vector</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Forward Pass</strong></p>
+                            <ul>
+                                <li>Model processes sequence through transformer layers</li>
+                                <li>Creates contextualized representation for "is"</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Prediction</strong></p>
+                            <ul>
+                                <li>Model outputs probability distribution over vocabulary</li>
+                                <li>P("Paris") = 0.85, P("London") = 0.05, P("Berlin") = 0.03, ...</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Sampling</strong></p>
+                            <ul>
+                                <li>Sample "Paris" (highest probability)</li>
+                                <li>Output: "The capital of France is Paris"</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Few-Shot Learning</h4>
+                            <p><strong>Task:</strong> Classify sentiment without training</p>
+                            
+                            <p><strong>Prompt with examples:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 1rem; border-radius: 5px;">
+Review: "This movie was amazing!"
+Sentiment: Positive
+
+Review: "Terrible acting and plot."
+Sentiment: Negative
+
+Review: "It was okay, nothing special."
+Sentiment: Neutral</pre>
+                            
+                            <p><strong>Model learns the pattern</strong> from examples and can classify new reviews without fine-tuning!</p>
                         </div>
                     </div>
 
@@ -170,11 +268,73 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Using Pre-trained LLM with HuggingFace</h4>
+                            <pre><code class="language-python">from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import torch
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Load pre-trained model and tokenizer
+model_name = "gpt2"
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
+
+# Set pad token
+tokenizer.pad_token = tokenizer.eos_token
+
+# Input text
+text = "The capital of France is"
+
+# Tokenize
+inputs = tokenizer(text, return_tensors="pt")
+
+# Generate
+with torch.no_grad():
+    outputs = model.generate(
+        inputs.input_ids,
+        max_length=20,
+        num_return_sequences=1,
+        temperature=0.7,
+        do_sample=True
+    )
+
+# Decode
+generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+print(generated_text)
+# Output: "The capital of France is Paris"</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Few-Shot Prompting Example</h4>
+                            <pre><code class="language-python">def few_shot_classification(review, model, tokenizer):
+    """
+    Classify sentiment using few-shot prompting
+    """
+    prompt = f"""Review: "This movie was amazing!"
+Sentiment: Positive
+
+Review: "Terrible acting and plot."
+Sentiment: Negative
+
+Review: "{review}"
+Sentiment:"""
+    
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
+    with torch.no_grad():
+        outputs = model.generate(
+            inputs.input_ids,
+            max_length=inputs.input_ids.shape[1] + 10,
+            temperature=0.3,
+            do_sample=True
+        )
+    
+    result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    sentiment = result.split("Sentiment:")[-1].strip()
+    return sentiment
+
+# Example usage
+review = "It was okay, nothing special."
+sentiment = few_shot_classification(review, model, tokenizer)
+print(f"Sentiment: {sentiment}")  # Output: "Neutral"</code></pre>
                         </div>
                     </div>
 
@@ -182,8 +342,42 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Major LLM Applications</h3>
+                            <p><strong>Text Generation:</strong></p>
+                            <ul>
+                                <li>Chatbots and conversational AI (ChatGPT, Claude)</li>
+                                <li>Content creation (articles, stories, marketing copy)</li>
+                                <li>Code generation (GitHub Copilot, Codex)</li>
+                                <li>Creative writing assistance</li>
+                            </ul>
+                            
+                            <p><strong>Understanding Tasks:</strong></p>
+                            <ul>
+                                <li>Question answering systems</li>
+                                <li>Text classification and sentiment analysis</li>
+                                <li>Named entity recognition</li>
+                                <li>Document summarization</li>
+                            </ul>
+                            
+                            <p><strong>Specialized Applications:</strong></p>
+                            <ul>
+                                <li>Translation services</li>
+                                <li>Educational tutoring systems</li>
+                                <li>Customer service automation</li>
+                                <li>Research assistance and information retrieval</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Impact on Industry</h3>
+                            <p><strong>LLMs are transforming:</strong></p>
+                            <ul>
+                                <li><strong>Software Development:</strong> Code completion, debugging, documentation</li>
+                                <li><strong>Content Creation:</strong> Writing, editing, translation</li>
+                                <li><strong>Education:</strong> Personalized tutoring, content generation</li>
+                                <li><strong>Healthcare:</strong> Medical documentation, research assistance</li>
+                                <li><strong>Business:</strong> Customer service, data analysis, report generation</li>
+                            </ul>
                         </div>
                     </div>
 
