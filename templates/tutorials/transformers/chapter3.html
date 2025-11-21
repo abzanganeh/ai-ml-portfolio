@@ -200,8 +200,58 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Multi-Head Attention on "The cat sat on the mat"</h4>
+                            <p><strong>Input:</strong> Sequence of 6 tokens with embedding dimension 512, using 8 heads</p>
+                            
+                            <p><strong>Step 1: Create Q, K, V for each head</strong></p>
+                            <ul>
+                                <li>Head 1: Q₁, K₁, V₁ (each 64-dim, from 512/8)</li>
+                                <li>Head 2: Q₂, K₂, V₂ (64-dim)</li>
+                                <li>... Head 8: Q₈, K₈, V₈ (64-dim)</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Compute attention for each head independently</strong></p>
+                            <ul>
+                                <li>Head 1 might focus on subject-verb: "sat" → "cat"</li>
+                                <li>Head 2 might focus on preposition: "on" → "mat"</li>
+                                <li>Head 3 might focus on articles: "the" → "cat", "the" → "mat"</li>
+                                <li>Each head produces its own attention output (6×64)</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Concatenate all heads</strong></p>
+                            <ul>
+                                <li>Concat[head₁, head₂, ..., head₈] → (6×512)</li>
+                                <li>All 8 heads' outputs combined</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Apply output projection</strong></p>
+                            <ul>
+                                <li>Multiply by W^O (512×512) → Final output (6×512)</li>
+                                <li>This combines information from all heads</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Each token now has a representation that incorporates information from all tokens, with different heads capturing different relationships.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Why Multiple Heads Help</h4>
+                            <p><strong>Single-head attention limitation:</strong></p>
+                            <p>With one head, the model must learn all relationships in one attention pattern. This is like asking one person to be an expert in grammar, syntax, semantics, and discourse all at once.</p>
+                            
+                            <p><strong>Multi-head advantage:</strong></p>
+                            <p>With 8 heads, each head can specialize:</p>
+                            <ul>
+                                <li>Head 1: Subject-verb relationships</li>
+                                <li>Head 2: Adjective-noun relationships</li>
+                                <li>Head 3: Preposition-object relationships</li>
+                                <li>Head 4: Pronoun-antecedent relationships</li>
+                                <li>Head 5: Long-range dependencies</li>
+                                <li>Head 6: Negation scope</li>
+                                <li>Head 7: Temporal relationships</li>
+                                <li>Head 8: Causal relationships</li>
+                            </ul>
+                            
+                            <p>This specialization allows the model to capture more nuanced relationships than a single head could.</p>
                         </div>
                     </div>
 
@@ -281,8 +331,37 @@ print(f"Output shape: {output.shape}")  # (2, 10, 512)</code></pre>
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Multi-Head Attention in Modern NLP</h3>
+                            <p><strong>Multi-head attention is the core mechanism in:</strong></p>
+                            <ul>
+                                <li><strong>BERT:</strong> Uses 12 heads to understand bidirectional context, with different heads capturing different linguistic patterns</li>
+                                <li><strong>GPT:</strong> Uses 12-96 heads depending on model size, with heads specializing in different aspects of language generation</li>
+                                <li><strong>Translation models:</strong> Encoder heads focus on source language relationships, decoder heads on target language and cross-lingual alignment</li>
+                                <li><strong>Question answering:</strong> Different heads attend to question tokens, context tokens, and relationships between them</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Why Multi-Head is Essential</h3>
+                            <p><strong>Single-head attention cannot capture the complexity of language:</strong></p>
+                            <ul>
+                                <li>Language has multiple simultaneous relationships (syntax, semantics, discourse)</li>
+                                <li>Different relationships require different attention patterns</li>
+                                <li>Multi-head allows parallel processing of different relationship types</li>
+                                <li>Empirically, models with more heads perform better (up to a point)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Head Specialization in Practice</h3>
+                            <p><strong>Research shows heads naturally specialize:</strong></p>
+                            <ul>
+                                <li>Some heads focus on local patterns (adjacent words)</li>
+                                <li>Others focus on long-range dependencies (distant relationships)</li>
+                                <li>Some heads capture syntactic structure</li>
+                                <li>Others capture semantic relationships</li>
+                                <li>This specialization emerges during training, not by design</li>
+                            </ul>
                         </div>
                     </div>
 
