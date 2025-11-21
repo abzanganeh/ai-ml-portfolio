@@ -160,8 +160,58 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>What is RAG?</h3>
+                            <p><strong>Retrieval-Augmented Generation (RAG) combines:</strong></p>
+                            <ul>
+                                <li><strong>Retrieval:</strong> Find relevant information from knowledge base</li>
+                                <li><strong>Augmentation:</strong> Add retrieved information to LLM context</li>
+                                <li><strong>Generation:</strong> LLM generates answer using retrieved context</li>
+                            </ul>
+                            
+                            <p><strong>Why RAG?</strong></p>
+                            <ul>
+                                <li>LLMs have knowledge cutoff (trained on data up to certain date)</li>
+                                <li>LLMs can hallucinate (make up information)</li>
+                                <li>RAG provides up-to-date, accurate information</li>
+                                <li>Enables domain-specific knowledge without fine-tuning</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>RAG Architecture</h3>
+                            <p><strong>Components:</strong></p>
+                            <ul>
+                                <li><strong>Knowledge Base:</strong> Collection of documents (vector database)</li>
+                                <li><strong>Retriever:</strong> Finds relevant documents for query</li>
+                                <li><strong>LLM:</strong> Generates answer using retrieved context</li>
+                            </ul>
+                            
+                            <p><strong>Process:</strong></p>
+                            <ol>
+                                <li>User asks question</li>
+                                <li>Retriever searches knowledge base</li>
+                                <li>Top-k relevant documents retrieved</li>
+                                <li>Documents added to LLM prompt as context</li>
+                                <li>LLM generates answer based on context</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>RAG vs Fine-tuning</h3>
+                            <p><strong>RAG advantages:</strong></p>
+                            <ul>
+                                <li>No training required</li>
+                                <li>Easy to update knowledge (just add documents)</li>
+                                <li>Can cite sources</li>
+                                <li>Works with any LLM</li>
+                            </ul>
+                            
+                            <p><strong>Fine-tuning advantages:</strong></p>
+                            <ul>
+                                <li>Better for learning specific patterns</li>
+                                <li>No retrieval latency</li>
+                                <li>More consistent behavior</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -169,12 +219,45 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>RAG Generation Process</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[P(y | q) = P(y | q, \text{Retrieve}(q, D))\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(y\): Generated answer</li>
+                                    <li>\(q\): User query</li>
+                                    <li>\(D\): Knowledge base (document collection)</li>
+                                    <li>\(\text{Retrieve}(q, D)\): Retrieved relevant documents</li>
+                                    <li>LLM conditions on both query and retrieved context</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Retrieval Score (Cosine Similarity)</h4>
+                            <div class="formula-display">
+                                \[\text{score}(q, d) = \frac{q \cdot d}{\|q\| \|d\|} = \cos(\theta)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(q\): Query embedding vector</li>
+                                    <li>\(d\): Document embedding vector</li>
+                                    <li>\(\theta\): Angle between vectors</li>
+                                    <li>Higher score = more relevant document</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Top-k Retrieval</h4>
+                            <div class="formula-display">
+                                \[D_{\text{retrieved}} = \text{argmax}_k \{\text{score}(q, d) : d \in D\}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Select top k documents with highest similarity scores. Typical k values: 3-10 documents.</p>
                             </div>
                         </div>
                     </div>
@@ -183,8 +266,49 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: RAG Question Answering</h4>
+                            <p><strong>User query:</strong> "What is the capital of France?"</p>
+                            
+                            <p><strong>Step 1: Query Embedding</strong></p>
+                            <ul>
+                                <li>Convert query to embedding vector: [0.2, -0.5, 0.8, ...]</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Retrieval</strong></p>
+                            <ul>
+                                <li>Search knowledge base for similar embeddings</li>
+                                <li>Find document: "France is a country in Europe. Its capital is Paris."</li>
+                                <li>Similarity score: 0.92</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Context Augmentation</strong></p>
+                            <ul>
+                                <li>Build prompt: "Context: France is a country in Europe. Its capital is Paris. Question: What is the capital of France?"</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Generation</strong></p>
+                            <ul>
+                                <li>LLM generates: "The capital of France is Paris."</li>
+                                <li>Answer is grounded in retrieved context</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Without RAG vs With RAG</h4>
+                            <p><strong>Query:</strong> "What happened in the company Q4 2024 earnings?"</p>
+                            
+                            <p><strong>Without RAG:</strong></p>
+                            <ul>
+                                <li>LLM only knows training data (cutoff date)</li>
+                                <li>May hallucinate or say "I don't have information about that"</li>
+                            </ul>
+                            
+                            <p><strong>With RAG:</strong></p>
+                            <ul>
+                                <li>Retrieves Q4 2024 earnings report from knowledge base</li>
+                                <li>LLM generates answer based on actual report</li>
+                                <li>Accurate, up-to-date information</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -192,11 +316,60 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Simple RAG Implementation</h4>
+                            <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+import numpy as np
+from transformers import pipeline
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class SimpleRAG:
+    """Basic RAG implementation"""
+    
+    def __init__(self):
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        self.llm = pipeline("text-generation", model="gpt2")
+        self.documents = []
+        self.embeddings = None
+    
+    def add_documents(self, docs):
+        """Add documents to knowledge base"""
+        self.documents = docs
+        self.embeddings = self.embedder.encode(docs)
+    
+    def retrieve(self, query, top_k=3):
+        """Retrieve top-k relevant documents"""
+        query_embedding = self.embedder.encode([query])
+        
+        # Compute cosine similarity
+        scores = np.dot(self.embeddings, query_embedding.T).flatten()
+        
+        # Get top-k indices
+        top_indices = np.argsort(scores)[-top_k:][::-1]
+        
+        return [self.documents[i] for i in top_indices]
+    
+    def generate(self, query, top_k=3):
+        """Generate answer using RAG"""
+        # Retrieve relevant documents
+        context_docs = self.retrieve(query, top_k)
+        
+        # Build prompt
+        context = "\n".join(context_docs)
+        prompt = f"Context: {context}\n\nQuestion: {query}\n\nAnswer:"
+        
+        # Generate
+        result = self.llm(prompt, max_length=200, num_return_sequences=1)
+        return result[0]['generated_text']
+
+# Example usage
+rag = SimpleRAG()
+rag.add_documents([
+    "France is a country in Europe. Its capital is Paris.",
+    "Germany is a country in Europe. Its capital is Berlin.",
+    "Italy is a country in Europe. Its capital is Rome."
+])
+
+answer = rag.generate("What is the capital of France?")
+print(answer)</code></pre>
                         </div>
                     </div>
 
@@ -204,8 +377,39 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>RAG Use Cases</h3>
+                            <p><strong>Customer Support:</strong></p>
+                            <ul>
+                                <li>Chatbots with access to product documentation</li>
+                                <li>FAQ systems with up-to-date information</li>
+                                <li>Support ticket resolution</li>
+                            </ul>
+                            
+                            <p><strong>Enterprise Knowledge Bases:</strong></p>
+                            <ul>
+                                <li>Internal documentation search</li>
+                                <li>Company policy Q&A</li>
+                                <li>Technical documentation assistance</li>
+                            </ul>
+                            
+                            <p><strong>Research and Analysis:</strong></p>
+                            <ul>
+                                <li>Academic paper Q&A</li>
+                                <li>Legal document analysis</li>
+                                <li>Medical information systems</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>RAG Advantages</h3>
+                            <p><strong>Key benefits:</strong></p>
+                            <ul>
+                                <li>Up-to-date information (no retraining needed)</li>
+                                <li>Source attribution (can cite documents)</li>
+                                <li>Reduced hallucination (grounded in real data)</li>
+                                <li>Domain-specific knowledge without fine-tuning</li>
+                                <li>Easy to update (just add new documents)</li>
+                            </ul>
                         </div>
                     </div>
 
