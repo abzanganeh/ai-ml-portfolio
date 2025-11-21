@@ -291,6 +291,86 @@ print(f"Attention weights shape: {weights.shape}")  # (5, 10)</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) The output data</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) The weights</div>
                             </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: Explain the attention mechanism in your own words.</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Attention lets a model focus on relevant parts of the input when producing each output. It computes how much each input position should influence the current output by comparing queries with keys and using those scores to weight the values</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It processes all inputs equally</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It only looks at the first input</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It ignores inputs</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is the mathematical formula for attention scores?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V\) where d_k is the dimension of keys</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(Attention = Q + K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(Attention = Q \times K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(Attention = V\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: Why do we divide by sqrt(d_k) in the attention formula?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To prevent the dot products from growing too large, which would push softmax into regions with extremely small gradients, making training unstable</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To make computation faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the difference between Key (K) and Value (V) in attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Keys are used to compute attention scores (how relevant each position is), while values contain the actual information that gets weighted and summed to produce the output</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Keys are outputs, values are inputs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: How does attention solve the information bottleneck in sequence-to-sequence models?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Instead of compressing all input into a single fixed-size vector, attention allows the decoder to directly access all encoder states, dynamically focusing on relevant parts for each output step</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) By using larger vectors</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By processing faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) By using less memory</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What happens after computing attention scores?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Scores are passed through softmax to get attention weights (probabilities), then these weights are used to compute a weighted sum of the values</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Scores are used directly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Scores are discarded</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only maximum score is used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: Why is attention better than fixed-size encoding for long sequences?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Fixed encoding loses information as sequence length increases, while attention maintains access to all positions and can focus on the most relevant parts regardless of sequence length</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It uses less memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: How would you implement attention from scratch?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Create Q, K, V matrices from input, compute scores as Q times K transpose, scale by sqrt(d_k), apply softmax, multiply by V to get weighted sum. Each step uses matrix operations</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just add Q and K</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only V</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is the computational complexity of attention?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) O(n²) where n is sequence length, because we compute attention scores between every pair of positions (each query attends to all keys)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) O(n)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) O(1)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) O(log n)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: How does attention differ from RNN-based sequence modeling?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) RNNs process sequentially and struggle with long dependencies, while attention processes all positions in parallel and can directly model relationships between any positions regardless of distance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) RNNs are always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Attention is sequential</div>
+                            </div>
                         </div>
                     </div>
                 </main>
