@@ -105,8 +105,58 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Retrieval Strategies</h3>
+                            <p><strong>Dense retrieval (semantic search):</strong></p>
+                            <ul>
+                                <li>Uses embeddings for semantic similarity</li>
+                                <li>Finds documents with similar meaning</li>
+                                <li>Handles synonyms and paraphrasing</li>
+                                <li>Most common in RAG systems</li>
+                            </ul>
+                            
+                            <p><strong>Sparse retrieval (keyword search):</strong></p>
+                            <ul>
+                                <li>Uses keyword matching (BM25, TF-IDF)</li>
+                                <li>Faster but less semantic understanding</li>
+                                <li>Good for exact term matching</li>
+                                <li>Often combined with dense retrieval (hybrid)</li>
+                            </ul>
+                            
+                            <p><strong>Hybrid retrieval:</strong></p>
+                            <ul>
+                                <li>Combines dense and sparse retrieval</li>
+                                <li>Reranks results from both methods</li>
+                                <li>Best of both worlds</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Retrieval Parameters</h3>
+                            <p><strong>Top-k selection:</strong></p>
+                            <ul>
+                                <li>Number of documents to retrieve (typically 3-10)</li>
+                                <li>More documents = more context but higher cost</li>
+                                <li>Fewer documents = faster but may miss relevant info</li>
+                            </ul>
+                            
+                            <p><strong>Similarity threshold:</strong></p>
+                            <ul>
+                                <li>Minimum similarity score to include document</li>
+                                <li>Filters out irrelevant documents</li>
+                                <li>Prevents low-quality context</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Reranking</h3>
+                            <p><strong>Why rerank:</strong> Initial retrieval may not perfectly match query intent. Reranking improves relevance.</p>
+                            
+                            <p><strong>Methods:</strong></p>
+                            <ul>
+                                <li>Cross-encoder models (more accurate but slower)</li>
+                                <li>LLM-based reranking</li>
+                                <li>Learning-to-rank algorithms</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -114,12 +164,45 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>BM25 (Sparse Retrieval)</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{BM25}(q, d) = \sum_{t \in q} \text{IDF}(t) \times \frac{f(t,d) \times (k_1 + 1)}{f(t,d) + k_1 \times (1 - b + b \times \frac{|d|}{\text{avgdl}})}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(q\): Query</li>
+                                    <li>\(d\): Document</li>
+                                    <li>\(f(t,d)\): Term frequency in document</li>
+                                    <li>\(\text{IDF}(t)\): Inverse document frequency</li>
+                                    <li>\(k_1, b\): Tuning parameters</li>
+                                    <li>\(|d|, \text{avgdl}\): Document length and average length</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Hybrid Score</h4>
+                            <div class="formula-display">
+                                \[\text{score}(q, d) = \alpha \times \text{BM25}(q, d) + (1 - \alpha) \times \text{cosine}(E(q), E(d))\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\alpha\): Weight between sparse and dense (typically 0.3-0.7)</li>
+                                    <li>Combines keyword matching with semantic similarity</li>
+                                    <li>Often outperforms either method alone</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Reranking Score</h4>
+                            <div class="formula-display">
+                                \[\text{rerank\_score}(q, d) = \text{CrossEncoder}([q; d])\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Cross-encoder processes query and document together, providing more accurate relevance score than bi-encoder (embedding-based) methods.</p>
                             </div>
                         </div>
                     </div>
@@ -128,8 +211,42 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Dense vs Sparse Retrieval</h4>
+                            <p><strong>Query:</strong> "How do I reset my password?"</p>
+                            
+                            <p><strong>Dense retrieval (semantic):</strong></p>
+                            <ul>
+                                <li>Finds: "Password recovery steps", "Reset account access", "Forgot password guide"</li>
+                                <li>Understands synonyms: "reset" = "recovery" = "forgot"</li>
+                            </ul>
+                            
+                            <p><strong>Sparse retrieval (keyword):</strong></p>
+                            <ul>
+                                <li>Finds: Documents containing "reset" AND "password"</li>
+                                <li>Misses: "Password recovery" (no "reset" keyword)</li>
+                            </ul>
+                            
+                            <p><strong>Hybrid:</strong> Combines both, gets best results</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Reranking</h4>
+                            <p><strong>Initial retrieval (top-10):</strong></p>
+                            <ul>
+                                <li>Doc 1: "Password reset" (score: 0.85)</li>
+                                <li>Doc 2: "Account settings" (score: 0.82)</li>
+                                <li>Doc 3: "Password recovery" (score: 0.80)</li>
+                                <li>...</li>
+                            </ul>
+                            
+                            <p><strong>After reranking:</strong></p>
+                            <ul>
+                                <li>Doc 3: "Password recovery" (score: 0.92) ← More relevant!</li>
+                                <li>Doc 1: "Password reset" (score: 0.88)</li>
+                                <li>Doc 2: "Account settings" (score: 0.65) ← Less relevant</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Better ordering improves final answer quality</p>
                         </div>
                     </div>
 
@@ -137,11 +254,81 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Hybrid Retrieval</h4>
+                            <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+from rank_bm25 import BM25Okapi
+import numpy as np
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class HybridRetriever:
+    """Hybrid dense + sparse retrieval"""
+    
+    def __init__(self, documents, alpha=0.5):
+        self.documents = documents
+        self.alpha = alpha  # Weight for BM25 vs dense
+        
+        # Dense retriever
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        self.embeddings = self.embedder.encode(documents)
+        
+        # Sparse retriever (BM25)
+        tokenized_docs = [doc.split() for doc in documents]
+        self.bm25 = BM25Okapi(tokenized_docs)
+    
+    def retrieve(self, query, top_k=5):
+        """Retrieve using hybrid approach"""
+        # Dense retrieval
+        query_embedding = self.embedder.encode([query])
+        dense_scores = np.dot(self.embeddings, query_embedding.T).flatten()
+        dense_scores = (dense_scores - dense_scores.min()) / (dense_scores.max() - dense_scores.min() + 1e-8)
+        
+        # Sparse retrieval
+        tokenized_query = query.split()
+        sparse_scores = self.bm25.get_scores(tokenized_query)
+        sparse_scores = (sparse_scores - sparse_scores.min()) / (sparse_scores.max() - sparse_scores.min() + 1e-8)
+        
+        # Combine
+        hybrid_scores = self.alpha * sparse_scores + (1 - self.alpha) * dense_scores
+        
+        # Get top-k
+        top_indices = np.argsort(hybrid_scores)[-top_k:][::-1]
+        return [self.documents[i] for i in top_indices]
+
+# Example
+docs = ["Password reset instructions", "Account settings guide", "Password recovery steps"]
+retriever = HybridRetriever(docs)
+results = retriever.retrieve("How do I reset my password?")
+print(results)</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Reranking with Cross-Encoder</h4>
+                            <pre><code class="language-python">from sentence_transformers import CrossEncoder
+
+class Reranker:
+    """Rerank retrieved documents"""
+    
+    def __init__(self):
+        self.model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+    
+    def rerank(self, query, documents, top_k=3):
+        """Rerank documents for query"""
+        # Create query-document pairs
+        pairs = [[query, doc] for doc in documents]
+        
+        # Get scores
+        scores = self.model.predict(pairs)
+        
+        # Sort by score
+        ranked_indices = np.argsort(scores)[::-1]
+        
+        # Return top-k
+        return [documents[i] for i in ranked_indices[:top_k]]
+
+# Example
+reranker = Reranker()
+docs = ["Password reset", "Account settings", "Password recovery"]
+reranked = reranker.rerank("How do I reset my password?", docs)
+print(reranked)</code></pre>
                         </div>
                     </div>
 
@@ -149,8 +336,38 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Retrieval Strategy Selection</h3>
+                            <p><strong>Use dense retrieval when:</strong></p>
+                            <ul>
+                                <li>Semantic understanding is important</li>
+                                <li>Users may phrase queries differently</li>
+                                <li>Domain-specific terminology</li>
+                            </ul>
+                            
+                            <p><strong>Use sparse retrieval when:</strong></p>
+                            <ul>
+                                <li>Exact keyword matching is important</li>
+                                <li>Speed is critical</li>
+                                <li>Technical documentation with specific terms</li>
+                            </ul>
+                            
+                            <p><strong>Use hybrid when:</strong></p>
+                            <ul>
+                                <li>You want best of both worlds</li>
+                                <li>High accuracy is required</li>
+                                <li>Can afford extra computation</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Reranking Benefits</h3>
+                            <p><strong>When to use reranking:</strong></p>
+                            <ul>
+                                <li>Initial retrieval returns many candidates</li>
+                                <li>Need high precision in top results</li>
+                                <li>Can afford additional latency</li>
+                                <li>Quality is more important than speed</li>
+                            </ul>
                         </div>
                     </div>
 
