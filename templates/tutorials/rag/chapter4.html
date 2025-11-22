@@ -105,8 +105,47 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Why Chunking is Important</h3>
+                            <p><strong>Problem:</strong> Documents are often too long for LLM context windows or embedding models.</p>
+                            
+                            <p><strong>Solution:</strong> Split documents into smaller chunks that:</p>
+                            <ul>
+                                <li>Fit within context limits</li>
+                                <li>Are semantically meaningful</li>
+                                <li>Can be retrieved independently</li>
+                                <li>Maintain context when possible</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Chunking Strategies</h3>
+                            <p><strong>Fixed-size chunking:</strong></p>
+                            <ul>
+                                <li>Split by character/token count</li>
+                                <li>Simple but may break sentences</li>
+                                <li>Fast and predictable</li>
+                            </ul>
+                            
+                            <p><strong>Sentence-based chunking:</strong></p>
+                            <ul>
+                                <li>Split at sentence boundaries</li>
+                                <li>Preserves sentence integrity</li>
+                                <li>Better semantic coherence</li>
+                            </ul>
+                            
+                            <p><strong>Semantic chunking:</strong></p>
+                            <ul>
+                                <li>Group related sentences together</li>
+                                <li>Uses embeddings to find boundaries</li>
+                                <li>Most semantically coherent</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Chunk Overlap</h3>
+                            <p><strong>Why overlap:</strong> Prevents losing context at chunk boundaries. Important information at boundaries can be preserved.</p>
+                            
+                            <p><strong>Typical overlap:</strong> 10-20% of chunk size. Too much overlap wastes storage, too little loses context.</p>
                         </div>
                     </div>
 
@@ -114,12 +153,38 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Chunk Size Calculation</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{chunks} = \left\lceil \frac{\text{document\_length}}{\text{chunk\_size} - \text{overlap}} \right\rceil\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\text{document\_length}\): Total length of document (characters or tokens)</li>
+                                    <li>\(\text{chunk\_size}\): Desired chunk size</li>
+                                    <li>\(\text{overlap}\): Overlap between chunks</li>
+                                    <li>Effective chunk size: chunk_size - overlap</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Overlap Percentage</h4>
+                            <div class="formula-display">
+                                \[\text{overlap\_percentage} = \frac{\text{overlap}}{\text{chunk\_size}} \times 100\%\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Typical overlap: 10-20%. Ensures context is preserved at chunk boundaries.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Storage Efficiency</h4>
+                            <div class="formula-display">
+                                \[\text{storage\_ratio} = \frac{\text{total\_chunks} \times \text{chunk\_size}}{\text{document\_length}}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>With overlap, storage_ratio > 1. Higher overlap = more storage but better context preservation.</p>
                             </div>
                         </div>
                     </div>
@@ -128,8 +193,33 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Fixed-Size Chunking</h4>
+                            <p><strong>Document:</strong> "Python is a programming language. It is widely used for data science. Machine learning uses Python extensively."</p>
+                            
+                            <p><strong>Chunk size:</strong> 50 characters, overlap: 10 characters</p>
+                            
+                            <p><strong>Chunks:</strong></p>
+                            <ul>
+                                <li>Chunk 1: "Python is a programming language. It is widely used for data"</li>
+                                <li>Chunk 2: "for data science. Machine learning uses Python extensively."</li>
+                            </ul>
+                            
+                            <p><strong>Note:</strong> Overlap ensures "for data" appears in both chunks, preserving context.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Sentence-Based Chunking</h4>
+                            <p><strong>Document:</strong> "Python is a programming language. It is widely used. Machine learning uses Python."</p>
+                            
+                            <p><strong>Chunk size:</strong> 2 sentences</p>
+                            
+                            <p><strong>Chunks:</strong></p>
+                            <ul>
+                                <li>Chunk 1: "Python is a programming language. It is widely used."</li>
+                                <li>Chunk 2: "It is widely used. Machine learning uses Python."</li>
+                            </ul>
+                            
+                            <p><strong>Advantage:</strong> Preserves sentence integrity, better semantic coherence.</p>
                         </div>
                     </div>
 
@@ -138,10 +228,38 @@
                         
                         <div class="code-box">
                             <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <pre><code class="language-python">from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+# Fixed-size chunking
+text_splitter = CharacterTextSplitter(
+    separator="\n",
+    chunk_size=1000,
+    chunk_overlap=200,
+    length_function=len
+)
+
+text = "Your long document text here..."
+chunks = text_splitter.split_text(text)
+
+# Recursive chunking (tries multiple separators)
+recursive_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=200,
+    length_function=len,
+    separators=["\n\n", "\n", " ", ""]
+)
+
+chunks = recursive_splitter.split_text(text)
+
+# Sentence-based chunking
+from langchain.text_splitter import SentenceTransformersTokenTextSplitter
+
+splitter = SentenceTransformersTokenTextSplitter(
+    chunk_overlap=50,
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
+
+chunks = splitter.split_text(text)</code></pre>
                         </div>
                     </div>
 
@@ -149,8 +267,19 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Chunking in RAG Systems</h3>
+                            <p><strong>Document processing:</strong> Split large documents into manageable chunks for embedding and retrieval</p>
+                            <p><strong>Context management:</strong> Ensure chunks fit within LLM context windows</p>
+                            <p><strong>Retrieval optimization:</strong> Smaller, focused chunks improve retrieval precision</p>
+                            <p><strong>Storage efficiency:</strong> Balance between chunk size and storage costs</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Best Practices</h3>
+                            <p><strong>Chunk size:</strong> 200-1000 tokens (depends on embedding model and LLM context)</p>
+                            <p><strong>Overlap:</strong> 10-20% of chunk size</p>
+                            <p><strong>Strategy:</strong> Use semantic chunking when possible, fallback to sentence-based, then fixed-size</p>
+                            <p><strong>Testing:</strong> Evaluate retrieval quality with different chunk sizes</p>
                         </div>
                     </div>
 
