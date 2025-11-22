@@ -106,8 +106,42 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Agent Evaluation Metrics</h3>
+                            <p><strong>Task success rate:</strong> Percentage of tasks completed successfully</p>
+                            
+                            <p><strong>Response quality:</strong></p>
+                            <ul>
+                                <li>Accuracy: Correctness of agent outputs</li>
+                                <li>Relevance: How well output addresses task</li>
+                                <li>Completeness: Whether all requirements met</li>
+                            </ul>
+                            
+                            <p><strong>Efficiency metrics:</strong></p>
+                            <ul>
+                                <li>Latency: Time to complete task</li>
+                                <li>Token usage: Cost per task</li>
+                                <li>Tool calls: Number of tool invocations</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Monitoring Agent Behavior</h3>
+                            <p><strong>What to monitor:</strong></p>
+                            <ul>
+                                <li>Decision patterns: What actions agent chooses</li>
+                                <li>Tool usage: Which tools are used most</li>
+                                <li>Error rates: Frequency and types of errors</li>
+                                <li>Loop detection: Infinite loops or repetitive behavior</li>
+                                <li>Cost tracking: API calls and token usage</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Evaluation Strategies</h3>
+                            <p><strong>Automated evaluation:</strong> Use LLMs or rule-based systems to score agent outputs</p>
+                            <p><strong>Human evaluation:</strong> Human reviewers assess quality (gold standard but expensive)</p>
+                            <p><strong>Hybrid evaluation:</strong> Combine automated and human evaluation</p>
+                            <p><strong>A/B testing:</strong> Compare different agent configurations</p>
                         </div>
                     </div>
 
@@ -115,12 +149,42 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Task Success Rate</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{Success Rate} = \frac{\text{Successful Tasks}}{\text{Total Tasks}} \times 100\%\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <p>Measures overall agent reliability. Higher is better.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Average Task Latency</h4>
+                            <div class="formula-display">
+                                \[\text{Avg Latency} = \frac{1}{N} \sum_{i=1}^{N} T_i\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(N\): Number of tasks</li>
+                                    <li>\(T_i\): Time to complete task i</li>
+                                    <li>Lower latency is better</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Cost per Task</h4>
+                            <div class="formula-display">
+                                \[\text{Cost} = \sum_{i=1}^{M} (\text{tokens}_i \times \text{price\_per\_token}_i)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(M\): Number of API calls</li>
+                                    <li>\(\text{tokens}_i\): Tokens used in call i</li>
+                                    <li>Track total cost for optimization</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -129,8 +193,42 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Evaluating Agent Performance</h4>
+                            <p><strong>Test set:</strong> 100 tasks</p>
+                            
+                            <p><strong>Results:</strong></p>
+                            <ul>
+                                <li>Successful: 85 tasks</li>
+                                <li>Failed: 10 tasks</li>
+                                <li>Timeout: 5 tasks</li>
+                            </ul>
+                            
+                            <p><strong>Metrics:</strong></p>
+                            <ul>
+                                <li>Success rate: 85%</li>
+                                <li>Average latency: 3.2 seconds</li>
+                                <li>Average cost: $0.05 per task</li>
+                            </ul>
+                            
+                            <p><strong>Analysis:</strong> Agent performs well but has room for improvement in failure handling.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Monitoring Agent Behavior</h4>
+                            <p><strong>Observed patterns:</strong></p>
+                            <ul>
+                                <li>Agent uses search tool 60% of the time</li>
+                                <li>Average 3 tool calls per task</li>
+                                <li>Most common error: Tool timeout (40% of failures)</li>
+                                <li>No infinite loops detected</li>
+                            </ul>
+                            
+                            <p><strong>Action items:</strong></p>
+                            <ul>
+                                <li>Optimize search tool (reduce timeout rate)</li>
+                                <li>Cache frequent searches</li>
+                                <li>Add retry logic for timeouts</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -138,11 +236,82 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Agent Evaluation System</h4>
+                            <pre><code class="language-python">import time
+from typing import List, Dict
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class AgentEvaluator:
+    """Evaluate agent performance"""
+    
+    def __init__(self):
+        self.metrics = {
+            'total_tasks': 0,
+            'successful_tasks': 0,
+            'failed_tasks': 0,
+            'total_latency': 0,
+            'total_cost': 0
+        }
+    
+    def evaluate_task(self, task, agent, expected_output=None):
+        """Evaluate single task"""
+        start_time = time.time()
+        
+        try:
+            result = agent.execute(task)
+            latency = time.time() - start_time
+            cost = self.estimate_cost(agent.last_api_calls)
+            
+            # Check success
+            success = self.check_success(result, expected_output)
+            
+            # Update metrics
+            self.metrics['total_tasks'] += 1
+            if success:
+                self.metrics['successful_tasks'] += 1
+            else:
+                self.metrics['failed_tasks'] += 1
+            self.metrics['total_latency'] += latency
+            self.metrics['total_cost'] += cost
+            
+            return {
+                'success': success,
+                'latency': latency,
+                'cost': cost,
+                'result': result
+            }
+        except Exception as e:
+            self.metrics['failed_tasks'] += 1
+            return {'success': False, 'error': str(e)}
+    
+    def get_metrics(self):
+        """Get aggregated metrics"""
+        total = self.metrics['total_tasks']
+        if total == 0:
+            return {}
+        
+        return {
+            'success_rate': self.metrics['successful_tasks'] / total,
+            'avg_latency': self.metrics['total_latency'] / total,
+            'avg_cost': self.metrics['total_cost'] / total,
+            'total_tasks': total
+        }
+    
+    def check_success(self, result, expected):
+        """Check if result matches expected output"""
+        if expected is None:
+            return result is not None
+        return result == expected
+    
+    def estimate_cost(self, api_calls):
+        """Estimate cost from API calls"""
+        # Simplified: assume $0.002 per 1K tokens
+        total_tokens = sum(call.get('tokens', 0) for call in api_calls)
+        return (total_tokens / 1000) * 0.002
+
+# Example usage
+evaluator = AgentEvaluator()
+# evaluator.evaluate_task("Task 1", agent, expected_output="...")
+# metrics = evaluator.get_metrics()</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +319,28 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Evaluation and Monitoring in Production</h3>
+                            <p><strong>Continuous monitoring:</strong></p>
+                            <ul>
+                                <li>Track agent performance in real-time</li>
+                                <li>Alert on quality degradation</li>
+                                <li>Detect anomalies in behavior</li>
+                                <li>Monitor costs and usage</li>
+                            </ul>
+                            
+                            <p><strong>A/B testing:</strong></p>
+                            <ul>
+                                <li>Compare different agent configurations</li>
+                                <li>Test new prompts or tools</li>
+                                <li>Measure impact of changes</li>
+                            </ul>
+                            
+                            <p><strong>Quality assurance:</strong></p>
+                            <ul>
+                                <li>Validate agent outputs before deployment</li>
+                                <li>Regression testing for agent updates</li>
+                                <li>Compliance and safety checks</li>
+                            </ul>
                         </div>
                     </div>
 

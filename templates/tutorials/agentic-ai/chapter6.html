@@ -106,8 +106,32 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Agent Orchestration</h3>
+                            <p><strong>What is orchestration:</strong> Coordinating multiple agents to work together efficiently toward a common goal.</p>
+                            
+                            <p><strong>Orchestration patterns:</strong></p>
+                            <ul>
+                                <li><strong>Sequential:</strong> Agents work one after another (pipeline)</li>
+                                <li><strong>Parallel:</strong> Agents work simultaneously on different tasks</li>
+                                <li><strong>Hierarchical:</strong> Manager agents coordinate worker agents</li>
+                                <li><strong>Dynamic:</strong> Agent selection based on task requirements</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Orchestration Components</h3>
+                            <p><strong>Task decomposition:</strong> Break complex task into subtasks</p>
+                            <p><strong>Agent selection:</strong> Choose appropriate agent for each subtask</p>
+                            <p><strong>Workflow management:</strong> Define execution order and dependencies</p>
+                            <p><strong>State management:</strong> Track progress and intermediate results</p>
+                            <p><strong>Error handling:</strong> Handle failures and retries</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Orchestration vs Multi-Agent</h3>
+                            <p><strong>Orchestration:</strong> Focus on coordination and workflow management</p>
+                            <p><strong>Multi-agent:</strong> Focus on agent communication and collaboration</p>
+                            <p>Orchestration is often used within multi-agent systems to manage complex workflows.</p>
                         </div>
                     </div>
 
@@ -115,12 +139,38 @@
                         <h2>Mathematical Formulations</h2>
                         
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>Task Decomposition</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{Task} = \{T_1, T_2, \ldots, T_n\} \text{ where } T_i \text{ are subtasks}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <p>Complex task is decomposed into n subtasks. Each subtask can be assigned to appropriate agent.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Agent Selection</h4>
+                            <div class="formula-display">
+                                \[\text{Agent}(T_i) = \arg\max_{A_j} \text{score}(A_j, T_i)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(T_i\): Subtask</li>
+                                    <li>\(A_j\): Available agents</li>
+                                    <li>\(\text{score}\): Agent capability score for task</li>
+                                    <li>Select agent with highest score for task</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Workflow Execution Time</h4>
+                            <div class="formula-display">
+                                \[T_{\text{total}} = \max(\text{sequential path}) + \sum(\text{parallel overhead})\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Total execution time is determined by longest sequential path plus overhead from parallel coordination.</p>
                             </div>
                         </div>
                     </div>
@@ -129,8 +179,37 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Sequential Orchestration</h4>
+                            <p><strong>Task:</strong> Generate and review a report</p>
+                            
+                            <p><strong>Step 1:</strong> Orchestrator decomposes task</p>
+                            <ul>
+                                <li>Subtask 1: Research topic (Researcher agent)</li>
+                                <li>Subtask 2: Write report (Writer agent)</li>
+                                <li>Subtask 3: Review report (Reviewer agent)</li>
+                            </ul>
+                            
+                            <p><strong>Step 2:</strong> Execute sequentially</p>
+                            <ul>
+                                <li>Researcher → outputs research findings</li>
+                                <li>Writer (receives findings) → outputs draft</li>
+                                <li>Reviewer (receives draft) → outputs final report</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Parallel Orchestration</h4>
+                            <p><strong>Task:</strong> Analyze multiple data sources</p>
+                            
+                            <p><strong>Orchestration:</strong></p>
+                            <ul>
+                                <li>Agent 1: Analyze dataset A (parallel)</li>
+                                <li>Agent 2: Analyze dataset B (parallel)</li>
+                                <li>Agent 3: Analyze dataset C (parallel)</li>
+                                <li>Synthesizer: Combine all results (after parallel tasks complete)</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> Faster execution than sequential processing.</p>
                         </div>
                     </div>
 
@@ -138,11 +217,58 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Orchestrator with LangGraph</h4>
+                            <pre><code class="language-python">from langgraph.graph import StateGraph, END
+from typing import TypedDict
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class OrchestrationState(TypedDict):
+    task: str
+    subtasks: list
+    results: dict
+    current_step: int
+
+def decompose_task(state):
+    """Break task into subtasks"""
+    task = state["task"]
+    subtasks = [
+        f"Research: {task}",
+        f"Write: {task}",
+        f"Review: {task}"
+    ]
+    return {"subtasks": subtasks, "current_step": 0}
+
+def execute_subtask(state):
+    """Execute current subtask"""
+    step = state["current_step"]
+    subtask = state["subtasks"][step]
+    
+    # Simulate agent execution
+    result = f"Result for {subtask}"
+    results = state.get("results", {})
+    results[step] = result
+    
+    return {
+        "results": results,
+        "current_step": step + 1
+    }
+
+def should_continue(state):
+    """Check if more subtasks remain"""
+    if state["current_step"] < len(state["subtasks"]):
+        return "execute"
+    return END
+
+# Build workflow
+workflow = StateGraph(OrchestrationState)
+workflow.add_node("decompose", decompose_task)
+workflow.add_node("execute", execute_subtask)
+
+workflow.set_entry_point("decompose")
+workflow.add_edge("decompose", "execute")
+workflow.add_conditional_edges("execute", should_continue)
+
+app = workflow.compile()
+result = app.invoke({"task": "Write report on AI"})</code></pre>
                         </div>
                     </div>
 
@@ -150,8 +276,28 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>🌍 Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Orchestration Use Cases</h3>
+                            <p><strong>Complex workflows:</strong></p>
+                            <ul>
+                                <li>Multi-step data processing pipelines</li>
+                                <li>End-to-end content creation workflows</li>
+                                <li>Software development automation</li>
+                                <li>Business process automation</li>
+                            </ul>
+                            
+                            <p><strong>Dynamic task routing:</strong></p>
+                            <ul>
+                                <li>Route tasks to best available agent</li>
+                                <li>Load balancing across agents</li>
+                                <li>Adaptive workflow based on results</li>
+                            </ul>
+                            
+                            <p><strong>Error recovery:</strong></p>
+                            <ul>
+                                <li>Retry failed tasks with different agents</li>
+                                <li>Fallback mechanisms</li>
+                                <li>Graceful degradation</li>
+                            </ul>
                         </div>
                     </div>
 

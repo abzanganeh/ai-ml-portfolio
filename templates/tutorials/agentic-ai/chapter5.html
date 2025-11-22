@@ -106,8 +106,42 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Multi-Agent System Architecture</h3>
+                            <p><strong>What is a multi-agent system:</strong> Multiple specialized agents working together to solve complex tasks that no single agent could handle alone.</p>
+                            
+                            <p><strong>Key components:</strong></p>
+                            <ul>
+                                <li><strong>Specialized agents:</strong> Each agent has specific expertise (researcher, writer, coder, reviewer)</li>
+                                <li><strong>Communication protocol:</strong> How agents share information and coordinate</li>
+                                <li><strong>Task allocation:</strong> Deciding which agent handles which task</li>
+                                <li><strong>Shared memory:</strong> Common knowledge base accessible to all agents</li>
+                                <li><strong>Orchestrator:</strong> Coordinates agent activities (optional, can be decentralized)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Coordination Strategies</h3>
+                            <p><strong>Centralized coordination:</strong></p>
+                            <ul>
+                                <li>Orchestrator agent manages all other agents</li>
+                                <li>Centralized decision-making</li>
+                                <li>Easier to control but single point of failure</li>
+                            </ul>
+                            
+                            <p><strong>Decentralized coordination:</strong></p>
+                            <ul>
+                                <li>Agents communicate directly with each other</li>
+                                <li>Distributed decision-making</li>
+                                <li>More resilient but harder to coordinate</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Communication Patterns</h3>
+                            <p><strong>Message passing:</strong> Agents send structured messages to each other</p>
+                            <p><strong>Shared workspace:</strong> Agents read/write to common memory</p>
+                            <p><strong>Event-driven:</strong> Agents react to events from other agents</p>
+                            <p><strong>Broadcast:</strong> One agent broadcasts to all others</p>
                         </div>
                     </div>
 
@@ -130,8 +164,41 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Research Paper Writing System</h4>
+                            <p><strong>Task:</strong> Write a research paper on "Machine Learning in Healthcare"</p>
+                            
+                            <p><strong>Agent 1 (Researcher):</strong></p>
+                            <ul>
+                                <li>Searches academic databases</li>
+                                <li>Finds relevant papers and extracts key findings</li>
+                                <li>Outputs: Summary of research findings</li>
+                            </ul>
+                            
+                            <p><strong>Agent 2 (Writer):</strong></p>
+                            <ul>
+                                <li>Receives research summary from Agent 1</li>
+                                <li>Drafts paper sections (introduction, methods, results)</li>
+                                <li>Outputs: Draft paper</li>
+                            </ul>
+                            
+                            <p><strong>Agent 3 (Reviewer):</strong></p>
+                            <ul>
+                                <li>Reviews draft from Agent 2</li>
+                                <li>Provides feedback and corrections</li>
+                                <li>Outputs: Reviewed paper</li>
+                            </ul>
+                            
+                            <p><strong>Orchestrator:</strong> Coordinates flow: Researcher → Writer → Reviewer → Final paper</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Conflict Resolution</h4>
+                            <p><strong>Scenario:</strong> Two agents want to modify the same document section</p>
+                            
+                            <p><strong>Solution 1 - Priority:</strong> Agent with higher priority wins</p>
+                            <p><strong>Solution 2 - Bidding:</strong> Agents bid on task, highest bidder wins</p>
+                            <p><strong>Solution 3 - Consensus:</strong> Agents negotiate and agree on changes</p>
+                            <p><strong>Solution 4 - Coordinator:</strong> Orchestrator decides based on rules</p>
                         </div>
                     </div>
 
@@ -139,11 +206,83 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>Multi-Agent System with LangGraph</h4>
+                            <pre><code class="language-python">from langgraph.graph import StateGraph, END
+from typing import TypedDict, List
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+class AgentState(TypedDict):
+    task: str
+    results: List[str]
+    current_agent: str
+
+class ResearcherAgent:
+    def process(self, state):
+        # Research logic
+        research_results = f"Research findings for: {state['task']}"
+        return {"results": state["results"]"] + [research_results]}
+
+class WriterAgent:
+    def process(self, state):
+        # Writing logic
+        draft = f"Draft based on: {state['results']}"
+        return {"results": state["results"] + [draft]}
+
+class ReviewerAgent:
+    def process(self, state):
+        # Review logic
+        reviewed = f"Reviewed: {state['results'][-1]}"
+        return {"results": state["results"] + [reviewed]}
+
+# Create agents
+researcher = ResearcherAgent()
+writer = WriterAgent()
+reviewer = ReviewerAgent()
+
+# Build graph
+workflow = StateGraph(AgentState)
+workflow.add_node("researcher", researcher.process)
+workflow.add_node("writer", writer.process)
+workflow.add_node("reviewer", reviewer.process)
+
+# Define flow
+workflow.set_entry_point("researcher")
+workflow.add_edge("researcher", "writer")
+workflow.add_edge("writer", "reviewer")
+workflow.add_edge("reviewer", END)
+
+# Compile and run
+app = workflow.compile()
+result = app.invoke({"task": "Write paper on ML", "results": []})</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Simple Multi-Agent Communication</h4>
+                            <pre><code class="language-python">class Message:
+    def __init__(self, sender, receiver, content):
+        self.sender = sender
+        self.receiver = receiver
+        self.content = content
+
+class Agent:
+    def __init__(self, name, role):
+        self.name = name
+        self.role = role
+        self.messages = []
+    
+    def send_message(self, receiver, content):
+        message = Message(self.name, receiver.name, content)
+        receiver.receive_message(message)
+    
+    def receive_message(self, message):
+        self.messages.append(message)
+        print(f"{self.name} received from {message.sender}: {message.content}")
+
+# Example
+researcher = Agent("Researcher", "research")
+writer = Agent("Writer", "writing")
+
+researcher.send_message(writer, "Here are the research findings: ...")
+writer.send_message(researcher, "I need more details on section 2")</code></pre>
                         </div>
                     </div>
 
@@ -151,8 +290,42 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Multi-Agent System Use Cases</h3>
+                            <p><strong>Software development:</strong></p>
+                            <ul>
+                                <li>Code generation agent + testing agent + documentation agent</li>
+                                <li>Agents collaborate to build complete software projects</li>
+                            </ul>
+                            
+                            <p><strong>Content creation:</strong></p>
+                            <ul>
+                                <li>Research agent + writer agent + editor agent</li>
+                                <li>Produce high-quality articles, reports, documentation</li>
+                            </ul>
+                            
+                            <p><strong>Customer service:</strong></p>
+                            <ul>
+                                <li>Query understanding agent + knowledge retrieval agent + response generation agent</li>
+                                <li>Handle complex customer inquiries</li>
+                            </ul>
+                            
+                            <p><strong>Data analysis:</strong></p>
+                            <ul>
+                                <li>Data collection agent + analysis agent + visualization agent + report agent</li>
+                                <li>End-to-end data pipeline automation</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Benefits of Multi-Agent Systems</h3>
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>Specialization: Each agent excels at its domain</li>
+                                <li>Scalability: Can add more agents for more capabilities</li>
+                                <li>Modularity: Easy to modify or replace individual agents</li>
+                                <li>Parallel processing: Agents can work simultaneously</li>
+                                <li>Robustness: System continues if one agent fails</li>
+                            </ul>
                         </div>
                     </div>
 
