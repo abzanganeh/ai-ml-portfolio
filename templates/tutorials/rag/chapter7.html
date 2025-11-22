@@ -105,8 +105,41 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>🔑 Fundamental Ideas</h3>
-                            <p>Detailed explanation of key concepts will be provided here with analogies, step-by-step breakdowns, and visual explanations.</p>
+                            <h3>Production RAG Considerations</h3>
+                            <p><strong>Scalability:</strong></p>
+                            <ul>
+                                <li>Handle millions of documents</li>
+                                <li>Fast retrieval (sub-second latency)</li>
+                                <li>Efficient embedding storage</li>
+                                <li>Horizontal scaling for high traffic</li>
+                            </ul>
+                            
+                            <p><strong>Monitoring and evaluation:</strong></p>
+                            <ul>
+                                <li>Track retrieval quality (precision, recall)</li>
+                                <li>Monitor answer quality (faithfulness, relevance)</li>
+                                <li>Log queries and responses</li>
+                                <li>Alert on quality degradation</li>
+                            </ul>
+                            
+                            <p><strong>Error handling:</strong></p>
+                            <ul>
+                                <li>Handle retrieval failures gracefully</li>
+                                <li>Fallback when no relevant docs found</li>
+                                <li>Validate retrieved context quality</li>
+                                <li>Retry mechanisms for transient failures</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Performance Optimization</h3>
+                            <p><strong>Caching:</strong> Cache embeddings and retrieval results for common queries.</p>
+                            
+                            <p><strong>Batch processing:</strong> Process multiple queries together for efficiency.</p>
+                            
+                            <p><strong>Async operations:</strong> Parallelize retrieval and generation when possible.</p>
+                            
+                            <p><strong>Model selection:</strong> Balance quality vs latency (smaller models for faster responses).</p>
                         </div>
                     </div>
 
@@ -116,7 +149,46 @@
                         <div class="formula-box">
                             <h4>Key Formulas</h4>
                             <div class="formula-display">
-                                <strong>Formulas will be detailed here</strong>
+                                \[\text{Retrieval\_Precision@k} = \frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{k}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\text{relevant docs}\): Documents actually relevant to query</li>
+                                    <li>\(\text{retrieved top-k}\): Top-k documents retrieved</li>
+                                    <li>Measures fraction of retrieved docs that are relevant</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Retrieval Recall</h4>
+                            <div class="formula-display">
+                                \[\text{Retrieval\_Recall@k} = \frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{|\{\text{relevant docs}\}|}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Measures fraction of relevant documents that were retrieved. Higher recall = fewer missed relevant docs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Answer Faithfulness</h4>
+                            <div class="formula-display">
+                                \[\text{Faithfulness} = \frac{|\{\text{claims in answer}\} \cap \{\text{claims in context}\}|}{|\{\text{claims in answer}\}|}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Fraction of answer claims that are supported by context. Measures grounding quality.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>Answer Relevance</h4>
+                            <div class="formula-display">
+                                \[\text{Relevance} = \text{similarity}(E(\text{query}), E(\text{answer}))\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>Semantic similarity between query and answer. Higher similarity = more relevant answer.</p>
+                            </div>
                             </div>
                             <div class="formula-explanation">
                                 <p>Step-by-step formula breakdowns with explanations.</p>
@@ -129,7 +201,26 @@
                         
                         <div class="example-box">
                             <h4>Step-by-Step Examples</h4>
-                            <p>Comprehensive examples with detailed explanations will be provided here.</p>
+                            <h4>Example: Evaluating Retrieval</h4>
+                            <p><strong>Query:</strong> "What is Python?"</p>
+                            
+                            <p><strong>Relevant documents:</strong> ["Python is a programming language", "Python tutorial"]</p>
+                            
+                            <p><strong>Retrieved top-3:</strong> ["Python is a programming language", "Java tutorial", "Python tutorial"]</p>
+                            
+                            <p><strong>Precision@3:</strong> 2/3 = 0.67 (2 relevant out of 3 retrieved)</p>
+                            <p><strong>Recall@3:</strong> 2/2 = 1.0 (all relevant docs retrieved)</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example: Evaluating Generation</h4>
+                            <p><strong>Query:</strong> "What is the capital of France?"</p>
+                            <p><strong>Context:</strong> "France is a country. Its capital is Paris."</p>
+                            <p><strong>Generated answer:</strong> "The capital of France is Paris."</p>
+                            
+                            <p><strong>Faithfulness:</strong> 1.0 (answer fully supported by context)</p>
+                            <p><strong>Relevance:</strong> 0.95 (high semantic similarity to query)</p>
+                            <p><strong>Completeness:</strong> 1.0 (answer is complete)</p>
                         </div>
                     </div>
 
@@ -137,11 +228,102 @@
                         <h2>Implementation</h2>
                         
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>RAG Evaluation Metrics</h4>
+                            <pre><code class="language-python">def evaluate_retrieval(relevant_docs, retrieved_docs, k=10):
+    """
+    Evaluate retrieval quality
+    """
+    # Precision@k
+    relevant_retrieved = len(set(relevant_docs) & set(retrieved_docs[:k]))
+    precision = relevant_retrieved / k
+    
+    # Recall@k
+    recall = relevant_retrieved / len(relevant_docs) if relevant_docs else 0
+    
+    # F1 score
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    
+    return {
+        'precision@k': precision,
+        'recall@k': recall,
+        'f1@k': f1
+    }
 
-# Comprehensive implementation code will be provided here
-# With detailed comments and explanations</code></pre>
+def evaluate_answer_faithfulness(answer, context):
+    """
+    Check if answer claims are supported by context
+    """
+    # Extract claims from answer (simplified)
+    answer_claims = extract_claims(answer)
+    context_claims = extract_claims(context)
+    
+    # Check how many answer claims are in context
+    supported = len(set(answer_claims) & set(context_claims))
+    faithfulness = supported / len(answer_claims) if answer_claims else 0
+    
+    return faithfulness
+
+# Example usage
+relevant = ['doc1', 'doc2', 'doc3']
+retrieved = ['doc1', 'doc4', 'doc2', 'doc5']
+metrics = evaluate_retrieval(relevant, retrieved, k=3)
+print(metrics)</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>Production RAG with Error Handling</h4>
+                            <pre><code class="language-python">class ProductionRAG:
+    """Production-ready RAG with error handling"""
+    
+    def __init__(self, embedder, vector_db, llm):
+        self.embedder = embedder
+        self.vector_db = vector_db
+        self.llm = llm
+        self.cache = {}
+    
+    def query(self, question, top_k=5, use_cache=True):
+        """Query with error handling and caching"""
+        try:
+            # Check cache
+            if use_cache and question in self.cache:
+                return self.cache[question]
+            
+            # Retrieve
+            contexts = self.retrieve(question, top_k)
+            
+            if not contexts:
+                return "I couldn't find relevant information to answer your question."
+            
+            # Generate
+            answer = self.generate(question, contexts)
+            
+            # Cache result
+            if use_cache:
+                self.cache[question] = answer
+            
+            return answer
+            
+        except Exception as e:
+            # Log error
+            print(f"Error in RAG query: {e}")
+            return "I encountered an error processing your question. Please try again."
+    
+    def retrieve(self, question, top_k):
+        """Retrieve with fallback"""
+        try:
+            query_embedding = self.embedder.encode([question])
+            results = self.vector_db.search(query_embedding, top_k=top_k)
+            return [r['text'] for r in results if r['score'] > 0.7]  # Threshold
+        except:
+            return []
+    
+    def generate(self, question, contexts):
+        """Generate with context validation"""
+        if not contexts:
+            return "No relevant context found."
+        
+        prompt = f"Context: {' '.join(contexts)}\n\nQuestion: {question}\nAnswer:"
+        return self.llm.generate(prompt)</code></pre>
                         </div>
                     </div>
 
@@ -149,8 +331,35 @@
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
-                            <p>Real-world applications and use cases will be detailed here.</p>
+                            <h3>Production RAG Systems</h3>
+                            <p><strong>Enterprise knowledge bases:</strong></p>
+                            <ul>
+                                <li>Internal documentation search (Confluence, Notion)</li>
+                                <li>Company policy Q&A systems</li>
+                                <li>Technical support knowledge bases</li>
+                            </ul>
+                            
+                            <p><strong>Customer-facing applications:</strong></p>
+                            <ul>
+                                <li>E-commerce product Q&A</li>
+                                <li>FAQ chatbots</li>
+                                <li>Help center assistants</li>
+                            </ul>
+                            
+                            <p><strong>Research and analysis:</strong></p>
+                            <ul>
+                                <li>Legal document analysis systems</li>
+                                <li>Medical literature Q&A</li>
+                                <li>Academic paper search and summarization</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Best Practices</h3>
+                            <p><strong>Deployment:</strong> Use managed vector databases, implement caching, monitor performance</p>
+                            <p><strong>Quality:</strong> Regular evaluation, A/B testing, continuous improvement</p>
+                            <p><strong>Reliability:</strong> Error handling, fallbacks, retries, graceful degradation</p>
+                            <p><strong>Security:</strong> Access control, data privacy, input validation</p>
                         </div>
                     </div>
 
