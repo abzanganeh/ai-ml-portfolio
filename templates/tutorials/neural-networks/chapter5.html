@@ -1060,18 +1060,37 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
             }
         }
             
-        // Initialize KaTeX rendering
-        document.addEventListener("DOMContentLoaded", function() {
-            if (typeof renderMathInElement !== 'undefined') {
+// Initialize KaTeX rendering - ensure KaTeX is loaded first
+        function initKaTeX() {
+            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
                     delimiters: [
                         {left: "$$", right: "$$", display: true},
-                        {left: "\[", right: "\]", display: true},
+                        {left: "\\[", right: "\\]", display: true},
                         {left: "$", right: "$", display: false},
-                        {left: "\(", right: "\)", display: false}
+                        {left: "\\(", right: "\\)", display: false}
                     ],
                     throwOnError: false
                 });
+            } else {
+                // Retry if KaTeX not loaded yet
+                setTimeout(initKaTeX, 100);
+                return;
+            }
+            
+            // Initialize Prism.js syntax highlighting
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
+        }
+        
+        // Wait for DOM and KaTeX to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener("DOMContentLoaded", initKaTeX);
+        } else {
+            // DOM already loaded, wait for KaTeX
+            initKaTeX();
+        }
             }
             
             // Initialize Prism.js syntax highlighting
