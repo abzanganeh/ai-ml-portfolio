@@ -785,23 +785,38 @@ if __name__ == "__main__":
 <script src="{{ url_for('static', filename='js/tutorials/rag/shared-tutorial.js') }}"></script>
     <script>
         function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+            // Store original text for all options before modifying
+            const questionContainer = element.closest('.quiz-question');
+            const allOptions = questionContainer.querySelectorAll('.quiz-option');
+            
+            // Restore original text and remove classes from all options
+            allOptions.forEach(opt => {
+                if (!opt.dataset.originalText) {
+                    opt.dataset.originalText = opt.textContent.trim();
+                }
+                opt.textContent = opt.dataset.originalText;
                 opt.classList.remove('correct', 'incorrect');
+                opt.style.pointerEvents = 'none'; // Disable further clicks
             });
+            
             if (isCorrect) {
+                // Correct answer selected
                 element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
+                element.textContent = element.dataset.originalText + ' ✓ Correct!';
             } else {
+                // Wrong answer selected
                 element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                element.textContent = element.dataset.originalText + ' ✗ Incorrect';
+                
+                // Find and highlight the correct answer
+                const correctOption = Array.from(allOptions).find(opt => {
+                    const onclick = opt.getAttribute('onclick') || '';
+                    return onclick.includes('checkAnswer(this, true)');
+                });
+                
+                if (correctOption) {
                     correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
+                    correctOption.textContent = correctOption.dataset.originalText + ' ✓ Correct Answer';
                 }
             }
         }
