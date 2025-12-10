@@ -206,14 +206,21 @@
                                 \[P(y | q) = P(y | q, \text{Retrieve}(q, D))\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Means:</h5>
+                                <p>This formula represents the core principle of RAG: the probability of generating answer \(y\) given query \(q\) is equal to the probability of generating \(y\) given both the query \(q\) and the retrieved documents from the knowledge base.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(y\): Generated answer</li>
-                                    <li>\(q\): User query</li>
-                                    <li>\(D\): Knowledge base (document collection)</li>
-                                    <li>\(\text{Retrieve}(q, D)\): Retrieved relevant documents</li>
-                                    <li>LLM conditions on both query and retrieved context</li>
+                                    <li><strong>\(P(y | q)\)</strong>: Traditional LLM approach - probability of answer \(y\) given only the query \(q\). This relies solely on the model's training data.</li>
+                                    <li><strong>\(P(y | q, \text{Retrieve}(q, D))\)</strong>: RAG approach - probability of answer \(y\) given both the query \(q\) AND the retrieved context from knowledge base \(D\).</li>
+                                    <li><strong>\(\text{Retrieve}(q, D)\)</strong>: Function that searches knowledge base \(D\) and returns the most relevant documents for query \(q\).</li>
                                 </ul>
+                                
+                                <h5>Key Insight:</h5>
+                                <p>The formula shows that RAG <strong>augments</strong> the generation process by conditioning on retrieved documents. Instead of generating from memory alone, the LLM generates based on both the query and the retrieved factual context, leading to more accurate and up-to-date responses.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>If a user asks "What happened in Q4 2024?", the traditional model might say "I don't have information about that" (because its training data cuts off earlier). But with RAG, \(\text{Retrieve}(q, D)\) finds the Q4 2024 report in the knowledge base, and the model generates an answer based on that actual document.</p>
                             </div>
                         </div>
                         
@@ -223,13 +230,30 @@
                                 \[\text{score}(q, d) = \frac{q \cdot d}{\|q\| \|d\|} = \cos(\theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Measures:</h5>
+                                <p>Cosine similarity measures how similar two vectors are in direction, regardless of their magnitude. It's the cosine of the angle \(\theta\) between the query embedding vector \(q\) and document embedding vector \(d\).</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(q\): Query embedding vector</li>
-                                    <li>\(d\): Document embedding vector</li>
-                                    <li>\(\theta\): Angle between vectors</li>
-                                    <li>Higher score = more relevant document</li>
+                                    <li><strong>\(q \cdot d\)</strong>: Dot product of query and document vectors. Measures how much the vectors point in the same direction.</li>
+                                    <li><strong>\(\|q\|\)</strong>: Magnitude (length) of query vector = \(\sqrt{q_1^2 + q_2^2 + \ldots + q_n^2}\)</li>
+                                    <li><strong>\(\|d\|\)</strong>: Magnitude (length) of document vector</li>
+                                    <li><strong>\(\frac{q \cdot d}{\|q\| \|d\|}\)</strong>: Normalizes the dot product by dividing by the product of magnitudes, giving us the cosine of the angle.</li>
+                                    <li><strong>\(\cos(\theta)\)</strong>: The cosine of the angle between vectors. When vectors point in the same direction, \(\theta = 0°\) and \(\cos(0°) = 1\) (maximum similarity).</li>
                                 </ul>
+                                
+                                <h5>Why Cosine Similarity?</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> Values range from -1 to 1, but for normalized embeddings (common in RAG), values are typically between 0 and 1.</li>
+                                    <li><strong>Scale-invariant:</strong> Only cares about direction, not magnitude. A document about "machine learning" will have high similarity to a query about "ML" even if one is longer.</li>
+                                    <li><strong>Semantic meaning:</strong> Embeddings capture semantic meaning, so similar meanings = similar directions = high cosine similarity.</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "What is artificial intelligence?"<br>
+                                Document 1: "AI is the simulation of human intelligence by machines" → High similarity (0.92)<br>
+                                Document 2: "The weather today is sunny" → Low similarity (0.15)<br>
+                                The retrieval system ranks Document 1 higher because its embedding vector points in a similar direction to the query embedding.</p>
                             </div>
                         </div>
                         
@@ -239,7 +263,35 @@
                                 \[D_{\text{retrieved}} = \text{argmax}_k \{\text{score}(q, d) : d \in D\}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Select top k documents with highest similarity scores. Typical k values: 3-10 documents.</p>
+                                <h5>What This Formula Does:</h5>
+                                <p>This formula selects the top \(k\) documents from knowledge base \(D\) that have the highest similarity scores with query \(q\). The \(\text{argmax}_k\) function finds the \(k\) documents that maximize the score function.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(D\)</strong>: The entire knowledge base (all documents available for retrieval)</li>
+                                    <li><strong>\(d \in D\)</strong>: Each document \(d\) in the knowledge base \(D\)</li>
+                                    <li><strong>\(\text{score}(q, d)\)</strong>: Similarity score between query \(q\) and document \(d\) (typically cosine similarity)</li>
+                                    <li><strong>\(\text{argmax}_k\)</strong>: Returns the \(k\) documents with the highest scores (not just the maximum, but the top \(k\))</li>
+                                    <li><strong>\(D_{\text{retrieved}}\)</strong>: The final set of \(k\) documents selected for context</li>
+                                </ul>
+                                
+                                <h5>Why Top-k Instead of Just the Best?</h5>
+                                <ul>
+                                    <li><strong>Context completeness:</strong> A single document might not contain all relevant information. Multiple documents provide richer context.</li>
+                                    <li><strong>Redundancy:</strong> Multiple sources can confirm information, reducing hallucination risk.</li>
+                                    <li><strong>Coverage:</strong> Different documents might cover different aspects of the query.</li>
+                                </ul>
+                                
+                                <h5>Choosing k:</h5>
+                                <ul>
+                                    <li><strong>Small k (3-5):</strong> Faster, lower cost, but might miss relevant information. Good for simple queries.</li>
+                                    <li><strong>Medium k (5-10):</strong> Balanced approach, most common in production RAG systems.</li>
+                                    <li><strong>Large k (10+):</strong> More comprehensive but increases latency, cost, and may include irrelevant documents that confuse the LLM.</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "How does RAG work?"<br>
+                                Knowledge base has 1000 documents. The system calculates similarity scores for all 1000, then selects the top 5 documents with scores: [0.95, 0.92, 0.89, 0.87, 0.85]. These 5 documents are passed to the LLM as context for generating the answer.</p>
                             </div>
                         </div>
                     </div>

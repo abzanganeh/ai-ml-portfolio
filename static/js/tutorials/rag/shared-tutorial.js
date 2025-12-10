@@ -23,7 +23,7 @@ function initializeSections() {
 
 // Initialize tutorial functionality
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Neural Networks Tutorial: Initializing...');
+    console.log('RAG Tutorial: Initializing...');
     
     // Initialize sections from page content
     initializeSections();
@@ -34,8 +34,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize progress bars
     initializeProgressBars();
     
-    console.log('Neural Networks Tutorial: Initialization complete');
+    // Initialize KaTeX rendering for the entire page
+    initializeKaTeX();
+    
+    console.log('RAG Tutorial: Initialization complete');
 });
+
+// Initialize KaTeX rendering
+function initializeKaTeX() {
+    function initKaTeX() {
+        if (typeof renderMathInElement !== 'undefined') {
+            // Render math in all active sections
+            const activeSection = document.querySelector('.content-section.active');
+            if (activeSection) {
+                renderKaTeXInElement(activeSection);
+            }
+            // Also render in the entire body for any math outside sections
+            renderKaTeXInElement(document.body);
+        } else {
+            // Retry if KaTeX not loaded yet
+            setTimeout(initKaTeX, 100);
+        }
+    }
+    
+    // Wait for KaTeX to be loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener("DOMContentLoaded", initKaTeX);
+    } else {
+        initKaTeX();
+    }
+}
 
 // Section Navigation Functions
 function initializeSectionNavigation() {
@@ -70,6 +98,9 @@ function showSection(sectionName, clickedElement) {
     if (targetSection) {
         targetSection.classList.add('active');
         console.log('✅ Section shown:', sectionName);
+        
+        // Re-render KaTeX math in the newly shown section
+        renderKaTeXInElement(targetSection);
     } else {
         console.error('❌ Section not found:', sectionName);
     }
@@ -87,6 +118,21 @@ function showSection(sectionName, clickedElement) {
         top: 0,
         behavior: 'smooth'
     });
+}
+
+// Render KaTeX math in a specific element
+function renderKaTeXInElement(element) {
+    if (typeof renderMathInElement !== 'undefined' && element) {
+        renderMathInElement(element, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "\\[", right: "\\]", display: true},
+                {left: "$", right: "$", display: false},
+                {left: "\\(", right: "\\)", display: false}
+            ],
+            throwOnError: false
+        });
+    }
 }
 
 function updateSectionProgress(sectionName) {
