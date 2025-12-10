@@ -157,89 +157,119 @@
                         
                         <div class="explanation-box">
                             <h4>📊 RAG Data Flow Diagram</h4>
-                            <p>The following diagram shows how data flows through a RAG system and which libraries/components are used at each step:</p>
+                            <p>The following diagram shows how data flows through a RAG system, including document indexing and query processing:</p>
                             
                             <div class="rag-flow-diagram">
-                                <div class="flow-step">
-                                    <div class="flow-box user-query">
-                                        <div class="flow-icon">👤</div>
-                                        <div class="flow-title">User Query</div>
-                                        <div class="flow-content">"What is the capital of France?"</div>
+                                <!-- Document Indexing Phase (Left Side) -->
+                                <div class="flow-phase">
+                                    <div class="phase-title">📚 Document Indexing Phase (One-time Setup)</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box documents">
+                                            <div class="flow-icon">📄</div>
+                                            <div class="flow-title">Raw Documents</div>
+                                            <div class="flow-content">"France is a country...", "Germany is...", etc.</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box embedding">
+                                            <div class="flow-icon">🔢</div>
+                                            <div class="flow-title">Document Embedding</div>
+                                            <div class="flow-library">SentenceTransformer</div>
+                                            <div class="flow-content">Convert each document to vector: [0.1, -0.3, 0.7, ...]</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box storage">
+                                            <div class="flow-icon">💾</div>
+                                            <div class="flow-title">Store in Vector Database</div>
+                                            <div class="flow-library">Pinecone / Weaviate / FAISS</div>
+                                            <div class="flow-content">Store document embeddings for fast retrieval</div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box embedding">
-                                        <div class="flow-icon">🔢</div>
-                                        <div class="flow-title">Query Embedding</div>
-                                        <div class="flow-library">SentenceTransformer</div>
-                                        <div class="flow-content">Convert query to vector: [0.2, -0.5, 0.8, ...]</div>
+                                <!-- Query Processing Phase (Right Side) -->
+                                <div class="flow-phase">
+                                    <div class="phase-title">🔍 Query Processing Phase (Per Query)</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box user-query">
+                                            <div class="flow-icon">👤</div>
+                                            <div class="flow-title">User Query</div>
+                                            <div class="flow-content">"What is the capital of France?"</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box retrieval">
-                                        <div class="flow-icon">🔍</div>
-                                        <div class="flow-title">Similarity Search</div>
-                                        <div class="flow-library">NumPy / Vector DB</div>
-                                        <div class="flow-content">Compute cosine similarity with all document embeddings</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box embedding">
+                                            <div class="flow-icon">🔢</div>
+                                            <div class="flow-title">Query Embedding</div>
+                                            <div class="flow-library">SentenceTransformer</div>
+                                            <div class="flow-content">Convert query to vector: [0.2, -0.5, 0.8, ...]</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box documents">
-                                        <div class="flow-icon">📄</div>
-                                        <div class="flow-title">Top-k Documents</div>
-                                        <div class="flow-library">NumPy argsort</div>
-                                        <div class="flow-content">Retrieve top 3-5 most relevant documents</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box similarity">
+                                            <div class="flow-icon">📐</div>
+                                            <div class="flow-title">Cosine Similarity</div>
+                                            <div class="flow-library">NumPy</div>
+                                            <div class="flow-content">cos(θ) = (q·d) / (||q|| × ||d||)<br>Compare query vector with all document vectors</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box context">
-                                        <div class="flow-icon">📝</div>
-                                        <div class="flow-title">Context Assembly</div>
-                                        <div class="flow-library">Python String</div>
-                                        <div class="flow-content">Build prompt: Context + Question</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box retrieval">
+                                            <div class="flow-icon">🔍</div>
+                                            <div class="flow-title">Top-k Retrieval</div>
+                                            <div class="flow-library">NumPy argsort / Vector DB</div>
+                                            <div class="flow-content">Select top 3-5 documents with highest similarity scores</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box generation">
-                                        <div class="flow-icon">🤖</div>
-                                        <div class="flow-title">LLM Generation</div>
-                                        <div class="flow-library">OpenAI API / Transformers</div>
-                                        <div class="flow-content">Generate answer based on context</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box context">
+                                            <div class="flow-icon">📝</div>
+                                            <div class="flow-title">Context Assembly</div>
+                                            <div class="flow-library">Python String</div>
+                                            <div class="flow-content">Build prompt: Context + Question</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-arrow">↓</div>
-                                
-                                <div class="flow-step">
-                                    <div class="flow-box answer">
-                                        <div class="flow-icon">✅</div>
-                                        <div class="flow-title">Final Answer</div>
-                                        <div class="flow-content">"The capital of France is Paris."</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box generation">
+                                            <div class="flow-icon">🤖</div>
+                                            <div class="flow-title">LLM Generation</div>
+                                            <div class="flow-library">OpenAI API / Transformers</div>
+                                            <div class="flow-content">Generate answer based on context</div>
+                                        </div>
                                     </div>
-                                </div>
-                                
-                                <div class="flow-sidebar">
-                                    <div class="flow-sidebar-title">Knowledge Base</div>
-                                    <div class="flow-sidebar-content">
-                                        <div class="sidebar-item">📚 Document 1: "France is..."</div>
-                                        <div class="sidebar-item">📚 Document 2: "Germany is..."</div>
-                                        <div class="sidebar-item">📚 Document 3: "Italy is..."</div>
-                                        <div class="sidebar-item">📚 ... (stored as embeddings)</div>
+                                    
+                                    <div class="flow-arrow">↓</div>
+                                    
+                                    <div class="flow-step">
+                                        <div class="flow-box answer">
+                                            <div class="flow-icon">✅</div>
+                                            <div class="flow-title">Final Answer</div>
+                                            <div class="flow-content">"The capital of France is Paris."</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -247,12 +277,21 @@
                             <div class="flow-legend">
                                 <h5>Key Libraries & Components:</h5>
                                 <ul>
-                                    <li><strong>SentenceTransformer:</strong> Converts text (queries and documents) into dense vector embeddings</li>
-                                    <li><strong>NumPy:</strong> Computes cosine similarity and performs vector operations for retrieval</li>
-                                    <li><strong>Vector Database (optional):</strong> Pinecone, Weaviate, or FAISS for large-scale document storage and fast similarity search</li>
+                                    <li><strong>SentenceTransformer:</strong> Converts text (queries and documents) into dense vector embeddings. Used in both indexing (documents) and query processing phases.</li>
+                                    <li><strong>Vector Database:</strong> Pinecone, Weaviate, Chroma, or FAISS stores document embeddings for fast similarity search. Documents are embedded once during indexing.</li>
+                                    <li><strong>NumPy:</strong> Computes cosine similarity using the formula: cos(θ) = (q·d) / (||q|| × ||d||). Compares query embedding with all stored document embeddings.</li>
+                                    <li><strong>NumPy argsort:</strong> Sorts similarity scores to find top-k documents with highest cosine similarity values.</li>
                                     <li><strong>OpenAI API / Transformers:</strong> Language model for generating answers based on retrieved context</li>
                                     <li><strong>Python String Operations:</strong> Assembles the final prompt with context and question</li>
                                 </ul>
+                                
+                                <h5>Key Process Steps:</h5>
+                                <ol>
+                                    <li><strong>Document Indexing (One-time):</strong> All documents are embedded using SentenceTransformer and stored in a vector database. This happens once when building the knowledge base.</li>
+                                    <li><strong>Query Processing (Per Query):</strong> Each user query is embedded, then cosine similarity is computed against all stored document embeddings to find the most relevant documents.</li>
+                                    <li><strong>Retrieval:</strong> Top-k documents with highest similarity scores are retrieved and used as context.</li>
+                                    <li><strong>Generation:</strong> LLM generates the final answer using the retrieved context.</li>
+                                </ol>
                             </div>
                         </div>
                     </div>
