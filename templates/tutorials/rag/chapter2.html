@@ -416,46 +416,291 @@
                     <div id="formulas" class="content-section">
                         <h2>Mathematical Formulations</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Similarity and Distance Metrics Overview</h3>
+                            <p>In RAG systems, we need to measure how similar two embedding vectors are. Different metrics serve different purposes and have different properties. Here are the most important ones used in production RAG systems:</p>
+                        </div>
+                        
                         <div class="formula-box">
                             <h4>Embedding Function</h4>
                             <div class="formula-display">
                                 \[E: \text{text} \rightarrow \mathbb{R}^d\]
                             </div>
                             <div class="formula-explanation">
+                                <h5>What This Represents:</h5>
+                                <p>This function maps any text input to a d-dimensional real-valued vector. The embedding model \(E\) learns this mapping during training.</p>
+                                
                                 <h5>Where:</h5>
                                 <ul>
-                                    <li>\(E\): Embedding model (e.g., sentence transformer)</li>
-                                    <li>\(\text{text}\): Input text string</li>
-                                    <li>\(\mathbb{R}^d\): d-dimensional real vector</li>
-                                    <li>Typical d: 384, 768, 1536</li>
+                                    <li>\(E\): Embedding model (e.g., SentenceTransformer, BERT)</li>
+                                    <li>\(\text{text}\): Input text string (word, sentence, or document)</li>
+                                    <li>\(\mathbb{R}^d\): d-dimensional real vector space</li>
+                                    <li>Typical d: 384 (fast), 768 (balanced), 1536 (high quality)</li>
                                 </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>\(E(\text{"machine learning"}) = [0.23, -0.45, 0.67, ..., 0.12] \in \mathbb{R}^{384}\)</p>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Cosine Similarity</h4>
+                            <h4>1. Cosine Similarity (Most Common in RAG)</h4>
                             <div class="formula-display">
                                 \[\text{similarity}(v_1, v_2) = \frac{v_1 \cdot v_2}{\|v_1\| \|v_2\|} = \cos(\theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Measures:</h5>
+                                <p>Cosine similarity measures the cosine of the angle between two vectors. It focuses on <strong>direction</strong> rather than magnitude, making it ideal for comparing embeddings where the length doesn't matter.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(v_1, v_2\): Embedding vectors</li>
-                                    <li>\(\theta\): Angle between vectors</li>
-                                    <li>Range: [-1, 1] (typically [0, 1] for normalized embeddings)</li>
-                                    <li>Higher value = more similar</li>
+                                    <li>\(v_1 \cdot v_2\): Dot product (sum of element-wise products)</li>
+                                    <li>\(\|v_1\|\): Magnitude (norm) of vector \(v_1 = \sqrt{\sum_{i=1}^{d} v_{1i}^2}\)</li>
+                                    <li>\(\|v_2\|\): Magnitude of vector \(v_2\)</li>
+                                    <li>\(\theta\): Angle between the two vectors</li>
+                                </ul>
+                                
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> [-1, 1], typically [0, 1] for normalized embeddings</li>
+                                    <li><strong>Scale-invariant:</strong> Only cares about direction, not magnitude</li>
+                                    <li><strong>Interpretation:</strong> 1.0 = identical direction, 0 = orthogonal, -1 = opposite</li>
+                                </ul>
+                                
+                                <h5>Why It's Preferred in RAG:</h5>
+                                <ul>
+                                    <li>Works well with normalized embeddings (most embedding models produce normalized vectors)</li>
+                                    <li>Focuses on semantic similarity (direction) rather than vector magnitude</li>
+                                    <li>Handles documents of different lengths well</li>
+                                    <li>Fast to compute</li>
+                                </ul>
+                                
+                                <h5>When to Use:</h5>
+                                <p>✅ <strong>Use cosine similarity when:</strong> Working with normalized embeddings, comparing semantic similarity, documents vary in length, or using most modern embedding models.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>2. Dot Product (Inner Product)</h4>
+                            <div class="formula-display">
+                                \[\text{dot\_product}(v_1, v_2) = v_1 \cdot v_2 = \sum_{i=1}^{d} v_{1i} \times v_{2i}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>The dot product is the sum of element-wise products of two vectors. It measures both direction AND magnitude, unlike cosine similarity which only measures direction.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li>For each dimension \(i\), multiply \(v_{1i} \times v_{2i}\)</li>
+                                    <li>Sum all these products: \(\sum_{i=1}^{d} v_{1i} \times v_{2i}\)</li>
+                                    <li>Result is a scalar value (single number)</li>
+                                </ul>
+                                
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> Unbounded (can be any real number)</li>
+                                    <li><strong>Magnitude-sensitive:</strong> Larger vectors produce larger dot products</li>
+                                    <li><strong>Relationship to cosine:</strong> If vectors are normalized, dot product = cosine similarity</li>
+                                </ul>
+                                
+                                <h5>When to Use:</h5>
+                                <ul>
+                                    <li>✅ <strong>Use dot product when:</strong> Embeddings are already normalized (then it's equivalent to cosine), you need maximum speed (slightly faster than cosine), or using FAISS with inner product index</li>
+                                    <li>❌ <strong>Avoid when:</strong> Embeddings aren't normalized, or you want magnitude-independent similarity</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>If \(v_1 = [0.5, 0.3, 0.8]\) and \(v_2 = [0.4, 0.6, 0.7]\), then:</p>
+                                <p>\(v_1 \cdot v_2 = (0.5 \times 0.4) + (0.3 \times 0.6) + (0.8 \times 0.7) = 0.2 + 0.18 + 0.56 = 0.94\)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>3. Euclidean Distance (L2 Distance)</h4>
+                            <div class="formula-display">
+                                \[d_{\text{euclidean}}(v_1, v_2) = \|v_1 - v_2\|_2 = \sqrt{\sum_{i=1}^{d} (v_{1i} - v_{2i})^2}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>Euclidean distance measures the straight-line distance between two points in vector space. It's the most intuitive distance measure - like measuring distance on a map.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li>For each dimension \(i\), compute the difference: \(v_{1i} - v_{2i}\)</li>
+                                    <li>Square each difference: \((v_{1i} - v_{2i})^2\)</li>
+                                    <li>Sum all squared differences: \(\sum_{i=1}^{d} (v_{1i} - v_{2i})^2\)</li>
+                                    <li>Take the square root: \(\sqrt{\sum_{i=1}^{d} (v_{1i} - v_{2i})^2}\)</li>
+                                </ul>
+                                
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> [0, ∞) - always non-negative</li>
+                                    <li><strong>Interpretation:</strong> Lower distance = more similar vectors</li>
+                                    <li><strong>Magnitude-sensitive:</strong> Affected by vector magnitudes</li>
+                                    <li><strong>Metric:</strong> Satisfies triangle inequality</li>
+                                </ul>
+                                
+                                <h5>Relationship to Cosine Similarity:</h5>
+                                <p>For normalized vectors, Euclidean distance and cosine similarity are related:</p>
+                                <p>If \(\|v_1\| = \|v_2\| = 1\), then: \(d_{\text{euclidean}}^2 = 2(1 - \cos(\theta))\)</p>
+                                <p>This means: <strong>lower Euclidean distance = higher cosine similarity</strong> (for normalized vectors)</p>
+                                
+                                <h5>When to Use:</h5>
+                                <ul>
+                                    <li>✅ <strong>Use Euclidean distance when:</strong> You want to consider both direction and magnitude, working with non-normalized embeddings, or using clustering algorithms that require distance metrics</li>
+                                    <li>❌ <strong>Less common in RAG:</strong> Cosine similarity is usually preferred for semantic search</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>If \(v_1 = [1, 2, 3]\) and \(v_2 = [4, 5, 6]\), then:</p>
+                                <p>\(d = \sqrt{(1-4)^2 + (2-5)^2 + (3-6)^2} = \sqrt{9 + 9 + 9} = \sqrt{27} \approx 5.20\)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>4. Manhattan Distance (L1 Distance)</h4>
+                            <div class="formula-display">
+                                \[d_{\text{manhattan}}(v_1, v_2) = \|v_1 - v_2\|_1 = \sum_{i=1}^{d} |v_{1i} - v_{2i}|\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>Manhattan distance (also called L1 distance or taxicab distance) measures the sum of absolute differences along each dimension. It's like measuring distance in a city with a grid layout - you can only move along streets, not diagonally.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li>For each dimension \(i\), compute the absolute difference: \(|v_{1i} - v_{2i}|\)</li>
+                                    <li>Sum all absolute differences: \(\sum_{i=1}^{d} |v_{1i} - v_{2i}|\)</li>
+                                    <li>No squaring or square root needed</li>
+                                </ul>
+                                
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Range:</strong> [0, ∞) - always non-negative</li>
+                                    <li><strong>Interpretation:</strong> Lower distance = more similar</li>
+                                    <li><strong>Robust to outliers:</strong> Less sensitive to large differences in individual dimensions (compared to Euclidean)</li>
+                                    <li><strong>Faster computation:</strong> No squaring or square root operations</li>
+                                </ul>
+                                
+                                <h5>When to Use:</h5>
+                                <ul>
+                                    <li>✅ <strong>Use Manhattan distance when:</strong> You have sparse embeddings, want robustness to outliers, need very fast computation, or working with high-dimensional data where Euclidean distance becomes less meaningful</li>
+                                    <li>❌ <strong>Less common in RAG:</strong> Cosine similarity is typically preferred for semantic similarity</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>If \(v_1 = [1, 2, 3]\) and \(v_2 = [4, 5, 6]\), then:</p>
+                                <p>\(d = |1-4| + |2-5| + |3-6| = 3 + 3 + 3 = 9\)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>5. Minkowski Distance (Generalization)</h4>
+                            <div class="formula-display">
+                                \[d_{\text{minkowski}}(v_1, v_2, p) = \left(\sum_{i=1}^{d} |v_{1i} - v_{2i}|^p\right)^{1/p}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Represents:</h5>
+                                <p>Minkowski distance is a generalization that includes both Euclidean and Manhattan distances as special cases. The parameter \(p\) controls the type of distance.</p>
+                                
+                                <h5>Special Cases:</h5>
+                                <ul>
+                                    <li><strong>\(p = 1\):</strong> Manhattan distance (L1): \(d = \sum |v_{1i} - v_{2i}|\)</li>
+                                    <li><strong>\(p = 2\):</strong> Euclidean distance (L2): \(d = \sqrt{\sum (v_{1i} - v_{2i})^2}\)</li>
+                                    <li><strong>\(p \to \infty\):</strong> Chebyshev distance (L∞): \(d = \max_i |v_{1i} - v_{2i}|\)</li>
+                                </ul>
+                                
+                                <h5>Properties:</h5>
+                                <ul>
+                                    <li><strong>Flexibility:</strong> Can tune \(p\) to balance between Manhattan (p=1) and Euclidean (p=2) behaviors</li>
+                                    <li><strong>Higher p:</strong> More emphasis on large differences in individual dimensions</li>
+                                    <li><strong>Lower p:</strong> More robust to outliers, treats all dimensions more equally</li>
+                                </ul>
+                                
+                                <h5>When to Use:</h5>
+                                <ul>
+                                    <li>✅ <strong>Use Minkowski distance when:</strong> You need to experiment with different distance metrics, want to tune the sensitivity to outliers, or working on research/optimization problems</li>
+                                    <li>❌ <strong>Less common in production RAG:</strong> Cosine similarity is the standard choice</li>
                                 </ul>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Euclidean Distance</h4>
+                            <h4>6. Normalized Dot Product (For Non-Normalized Embeddings)</h4>
                             <div class="formula-display">
-                                \[d(v_1, v_2) = \|v_1 - v_2\| = \sqrt{\sum_{i=1}^{d} (v_{1i} - v_{2i})^2}\]
+                                \[\text{normalized\_dot}(v_1, v_2) = \frac{v_1 \cdot v_2}{\|v_1\| \|v_2\|} = \cos(\theta)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Alternative similarity measure. Lower distance = more similar. For normalized embeddings, cosine similarity is often preferred.</p>
+                                <h5>What This Is:</h5>
+                                <p>This is actually the same as cosine similarity! When you normalize the dot product by dividing by the vector magnitudes, you get cosine similarity. This formula shows the relationship explicitly.</p>
+                                
+                                <h5>Key Insight:</h5>
+                                <p>If your embeddings are already normalized (most modern models produce normalized embeddings), then:</p>
+                                <ul>
+                                    <li>\(\|v_1\| = \|v_2\| = 1\)</li>
+                                    <li>Normalized dot product = dot product = cosine similarity</li>
+                                    <li>This is why many vector databases use dot product internally (it's faster) when embeddings are normalized</li>
+                                </ul>
                             </div>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Which Metric Should You Use in RAG?</h3>
+                            
+                            <div class="example-box">
+                                <h5>🥇 Recommended: Cosine Similarity</h5>
+                                <p><strong>Why:</strong> Most embedding models produce normalized vectors, and cosine similarity focuses on semantic direction rather than magnitude. It's the standard in production RAG systems.</p>
+                                <p><strong>When:</strong> Default choice for most RAG applications, especially with SentenceTransformers, OpenAI embeddings, or BERT-based models.</p>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>🥈 Alternative: Dot Product (for normalized embeddings)</h5>
+                                <p><strong>Why:</strong> Mathematically equivalent to cosine similarity for normalized vectors, but slightly faster to compute (no division needed).</p>
+                                <p><strong>When:</strong> When embeddings are guaranteed to be normalized and you need maximum speed, or when using FAISS with inner product index.</p>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>🥉 Special Cases: Euclidean or Manhattan</h5>
+                                <p><strong>Why:</strong> Useful when magnitude matters, or when working with non-normalized embeddings.</p>
+                                <p><strong>When:</strong> Clustering applications, when vector magnitude carries important information, or when experimenting with different metrics.</p>
+                            </div>
+                            
+                            <h4>Performance Comparison</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+                                <thead>
+                                    <tr style="background: var(--alpine-oat);">
+                                        <th style="padding: 0.75rem; border: 1px solid var(--dill-green); text-align: left;">Metric</th>
+                                        <th style="padding: 0.75rem; border: 1px solid var(--dill-green); text-align: left;">Speed</th>
+                                        <th style="padding: 0.75rem; border: 1px solid var(--dill-green); text-align: left;">Magnitude-Sensitive</th>
+                                        <th style="padding: 0.75rem; border: 1px solid var(--dill-green); text-align: left;">Common in RAG</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);"><strong>Cosine Similarity</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Fast</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">No</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">✅ Most common</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);"><strong>Dot Product</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Fastest</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Yes (unless normalized)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">✅ Common (when normalized)</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);"><strong>Euclidean Distance</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Medium</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Yes</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">⚠️ Less common</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);"><strong>Manhattan Distance</strong></td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Fast</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">Yes</td>
+                                        <td style="padding: 0.75rem; border: 1px solid var(--dill-green);">❌ Rare</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
