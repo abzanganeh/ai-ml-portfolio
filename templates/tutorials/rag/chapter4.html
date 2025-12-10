@@ -353,39 +353,174 @@
                     <div id="formulas" class="content-section">
                         <h2>Mathematical Formulations</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Vector Database Performance Metrics</h3>
+                            <p>Vector databases use sophisticated indexing algorithms to enable fast similarity search. Understanding the mathematical foundations helps you choose the right database, configure indexes, and optimize performance. These formulas describe how vector databases achieve sub-millisecond search times even with millions of vectors.</p>
+                        </div>
+                        
                         <div class="formula-box">
-                            <h4>Chunk Size Calculation</h4>
+                            <h4>1. HNSW Search Complexity</h4>
                             <div class="formula-display">
-                                \[\text{chunks} = \left\lceil \frac{\text{document\_length}}{\text{chunk\_size} - \text{overlap}} \right\rceil\]
+                                \[T_{\text{search}} = O(\log N)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Represents:</h5>
+                                <p>HNSW (Hierarchical Navigable Small World) achieves logarithmic search time complexity, meaning search time grows very slowly as the number of vectors increases. This is why it can search millions of vectors in milliseconds.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(\text{document\_length}\): Total length of document (characters or tokens)</li>
-                                    <li>\(\text{chunk\_size}\): Desired chunk size</li>
-                                    <li>\(\text{overlap}\): Overlap between chunks</li>
-                                    <li>Effective chunk size: chunk_size - overlap</li>
+                                    <li><strong>\(T_{\text{search}}\):</strong> Time complexity of search operation</li>
+                                    <li><strong>\(O(\log N)\):</strong> Big-O notation indicating logarithmic time complexity</li>
+                                    <li><strong>\(N\):</strong> Number of vectors in the database</li>
+                                </ul>
+                                
+                                <h5>What Logarithmic Means:</h5>
+                                <p>If you double the number of vectors, search time increases by a constant amount (not doubled). For example:</p>
+                                <ul>
+                                    <li>1,000 vectors: ~10 operations</li>
+                                    <li>10,000 vectors: ~13 operations (only 30% more!)</li>
+                                    <li>1,000,000 vectors: ~20 operations (only 100% more for 1000x more data!)</li>
+                                </ul>
+                                
+                                <h5>Comparison to Brute-Force:</h5>
+                                <p><strong>Brute-force:</strong> \(O(N)\) - linear time. To search 1M vectors, you must compare query with all 1M vectors.</p>
+                                <p><strong>HNSW:</strong> \(O(\log N)\) - logarithmic time. To search 1M vectors, you only need ~20 comparisons by navigating the graph structure.</p>
+                                
+                                <h5>Why HNSW is Fast:</h5>
+                                <p>HNSW builds a multi-layer graph where each layer has fewer nodes. Search starts at the top (few nodes), finds approximate location, then refines in lower layers. This hierarchical approach dramatically reduces comparisons needed.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>2. IVF Cluster Search Reduction</h4>
+                            <div class="formula-display">
+                                \[T_{\text{search}} = O(\sqrt{N} + k)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Represents:</h5>
+                                <p>IVF (Inverted File Index) partitions vectors into clusters. Instead of searching all \(N\) vectors, you only search within the nearest cluster(s), dramatically reducing search space.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(O(\sqrt{N})\):</strong> Time to find the nearest cluster(s) - grows with square root of N</li>
+                                    <li><strong>\(O(k)\):</strong> Time to search within the cluster(s) - constant or linear in cluster size</li>
+                                    <li><strong>Total:</strong> Much faster than \(O(N)\) brute-force search</li>
+                                </ul>
+                                
+                                <h5>How It Works:</h5>
+                                <ol>
+                                    <li>Partition all vectors into \(\sqrt{N}\) clusters using k-means</li>
+                                    <li>For a query, find the nearest cluster(s): \(O(\sqrt{N})\) operations</li>
+                                    <li>Search only within those clusters: \(O(k)\) where k is cluster size</li>
+                                    <li>Total: \(O(\sqrt{N} + k)\) instead of \(O(N)\)</li>
+                                </ol>
+                                
+                                <h5>Example:</h5>
+                                <p>1,000,000 vectors partitioned into 1,000 clusters (1,000 vectors per cluster):</p>
+                                <ul>
+                                    <li><strong>Brute-force:</strong> Compare with all 1,000,000 vectors</li>
+                                    <li><strong>IVF:</strong> Find nearest cluster (1,000 comparisons) + search within cluster (1,000 comparisons) = 2,000 total comparisons</li>
+                                    <li><strong>Speedup:</strong> 500x faster!</li>
+                                </ul>
+                                
+                                <h5>Trade-off:</h5>
+                                <p>IVF is faster than brute-force but may miss vectors near cluster boundaries. HNSW is more accurate but uses more memory. Choose based on your accuracy vs speed requirements.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>3. Product Quantization Compression Ratio</h4>
+                            <div class="formula-display">
+                                \[\text{compression\_ratio} = \frac{\text{original\_size}}{\text{compressed\_size}} = \frac{d \times 4 \text{ bytes}}{m \times \log_2(k) \text{ bits}}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>Product Quantization (PQ) compresses vectors by quantizing sub-vectors into codebooks. This formula calculates the compression ratio achieved.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(d\):</strong> Original vector dimension (e.g., 384)</li>
+                                    <li><strong>\(4 \text{ bytes}\):</strong> Size per float32 value (original storage)</li>
+                                    <li><strong>\(m\):</strong> Number of sub-vectors (e.g., 8 sub-vectors of 48 dimensions each)</li>
+                                    <li><strong>\(k\):</strong> Codebook size (number of quantization levels, e.g., 256)</li>
+                                    <li><strong>\(\log_2(k) \text{ bits}\):</strong> Bits needed to store codebook index (e.g., \(\log_2(256) = 8\) bits = 1 byte)</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Original: 384-dimensional vector = 384 × 4 bytes = 1,536 bytes<br>
+                                PQ compressed: 8 sub-vectors × 1 byte = 8 bytes<br>
+                                Compression ratio: \(\frac{1536}{8} = 192x\) reduction!</p>
+                                
+                                <h5>Trade-off:</h5>
+                                <p>Higher compression = less storage but some accuracy loss. Typical PQ achieves 10-100x compression with minimal accuracy degradation (95%+ recall maintained).</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>4. Vector Database Query Time</h4>
+                            <div class="formula-display">
+                                \[T_{\text{query}} = T_{\text{embed}} + T_{\text{search}} + T_{\text{retrieve}}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Represents:</h5>
+                                <p>Total query time in a RAG system is the sum of embedding generation, vector search, and document retrieval times. Understanding this breakdown helps you optimize each component.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(T_{\text{embed}}\):</strong> Time to convert query text to embedding vector (typically 10-50ms for local models, 50-200ms for API calls)</li>
+                                    <li><strong>\(T_{\text{search}}\):</strong> Time to find top-k similar vectors in the database (typically 10-100ms with HNSW for millions of vectors)</li>
+                                    <li><strong>\(T_{\text{retrieve}}\):</strong> Time to fetch actual document text using retrieved IDs (typically 1-10ms if documents are cached)</li>
+                                </ul>
+                                
+                                <h5>Typical Breakdown:</h5>
+                                <p>For a query in a system with 1M documents:</p>
+                                <ul>
+                                    <li>Embedding: 20ms (local model) or 100ms (API)</li>
+                                    <li>Vector search: 50ms (HNSW index)</li>
+                                    <li>Document retrieval: 5ms (cached)</li>
+                                    <li><strong>Total: 75ms (local) or 155ms (API)</strong></li>
+                                </ul>
+                                
+                                <h5>Optimization Strategies:</h5>
+                                <ul>
+                                    <li><strong>Reduce \(T_{\text{embed}}\):</strong> Cache query embeddings for common queries, use faster embedding models</li>
+                                    <li><strong>Reduce \(T_{\text{search}}\):</strong> Use efficient indexes (HNSW), limit search space with metadata filters</li>
+                                    <li><strong>Reduce \(T_{\text{retrieve}}\):</strong> Cache documents in memory, use fast storage (SSD, in-memory cache)</li>
                                 </ul>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Overlap Percentage</h4>
+                            <h4>5. Index Build Time</h4>
                             <div class="formula-display">
-                                \[\text{overlap\_percentage} = \frac{\text{overlap}}{\text{chunk\_size}} \times 100\%\]
+                                \[T_{\text{build}} = O(N \log N)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Typical overlap: 10-20%. Ensures context is preserved at chunk boundaries.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="formula-box">
-                            <h4>Storage Efficiency</h4>
-                            <div class="formula-display">
-                                \[\text{storage\_ratio} = \frac{\text{total\_chunks} \times \text{chunk\_size}}{\text{document\_length}}\]
-                            </div>
-                            <div class="formula-explanation">
-                                <p>With overlap, storage_ratio > 1. Higher overlap = more storage but better context preservation.</p>
+                                <h5>What This Represents:</h5>
+                                <p>Building an HNSW index takes \(O(N \log N)\) time, where \(N\) is the number of vectors. This is a one-time cost when indexing documents, but it's important to understand for planning indexing operations.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(N\):</strong> Number of vectors to index</li>
+                                    <li><strong>\(O(N \log N)\):</strong> Time complexity - grows faster than linear but slower than quadratic</li>
+                                    <li>For each vector, the algorithm needs to find its position in the graph structure</li>
+                                </ul>
+                                
+                                <h5>Practical Times:</h5>
+                                <ul>
+                                    <li>10,000 vectors: ~1-5 seconds</li>
+                                    <li>100,000 vectors: ~30-120 seconds (1-2 minutes)</li>
+                                    <li>1,000,000 vectors: ~10-30 minutes</li>
+                                    <li>10,000,000 vectors: ~2-8 hours</li>
+                                </ul>
+                                
+                                <h5>Strategies for Large Datasets:</h5>
+                                <ul>
+                                    <li><strong>Batch indexing:</strong> Index in batches rather than one-by-one</li>
+                                    <li><strong>Incremental updates:</strong> Use databases that support adding vectors without full rebuild (HNSW supports this)</li>
+                                    <li><strong>Parallel indexing:</strong> Use multiple CPU cores to speed up index building</li>
+                                    <li><strong>Background indexing:</strong> Build index in background while serving queries from old index</li>
+                                </ul>
                             </div>
                         </div>
                     </div>

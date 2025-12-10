@@ -336,52 +336,218 @@
                     <div id="formulas" class="content-section">
                         <h2>Mathematical Formulations</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Retrieval Scoring Formulas Overview</h3>
+                            <p>Retrieval strategies use mathematical formulas to score and rank documents. Understanding these formulas helps you choose the right retrieval method, tune parameters, and optimize performance. This section covers the key formulas used in dense, sparse, hybrid, and reranking approaches.</p>
+                        </div>
+                        
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>1. Hybrid Retrieval Score</h4>
                             <div class="formula-display">
-                                \[\text{retrieval\_score}(q, d) = \alpha \cdot \text{similarity}(E(q), E(d)) + \beta \cdot \text{keyword\_score}(q, d)\]
+                                \[\text{hybrid\_score}(q, d) = \alpha \cdot \text{cosine}(E(q), E(d)) + (1 - \alpha) \cdot \text{BM25}(q, d)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Combines:</h5>
+                                <p>Hybrid retrieval combines dense (semantic) and sparse (keyword) retrieval scores using a weighted average. This leverages both semantic understanding and exact keyword matching for better results than either method alone.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(E(q), E(d)\): Query and document embeddings</li>
-                                    <li>\(\text{similarity}\): Vector similarity (cosine, dot product)</li>
-                                    <li>\(\text{keyword\_score}\): BM25 or TF-IDF score</li>
-                                    <li>\(\alpha, \beta\): Weighting factors (typically \(\alpha + \beta = 1\))</li>
+                                    <li><strong>\(\text{cosine}(E(q), E(d))\):</strong> Dense retrieval score - cosine similarity between query embedding \(E(q)\) and document embedding \(E(d)\). Range: [-1, 1], typically [0, 1] for normalized embeddings.</li>
+                                    <li><strong>\(\text{BM25}(q, d)\):</strong> Sparse retrieval score - BM25 keyword matching score. Range: [0, ∞), but typically normalized to [0, 1] before combination.</li>
+                                    <li><strong>\(\alpha\):</strong> Weighting factor controlling the balance between dense and sparse scores. Range: [0, 1]</li>
+                                    <li><strong>\((1 - \alpha)\):</strong> Weight for sparse score (ensures weights sum to 1)</li>
+                                </ul>
+                                
+                                <h5>Choosing \(\alpha\):</h5>
+                                <ul>
+                                    <li><strong>\(\alpha = 0.7\) (70% dense, 30% sparse):</strong> Emphasizes semantic similarity. Good when synonyms and paraphrasing are important.</li>
+                                    <li><strong>\(\alpha = 0.5\) (50/50):</strong> Balanced approach, most common in production systems</li>
+                                    <li><strong>\(\alpha = 0.3\) (30% dense, 70% sparse):</strong> Emphasizes exact keyword matching. Good when specific terminology is critical.</li>
+                                </ul>
+                                
+                                <h5>Why Hybrid Works Better:</h5>
+                                <p>Dense retrieval finds semantically similar documents (handles synonyms), while sparse retrieval finds documents with exact keyword matches. Combining both ensures you don't miss relevant documents that use different terminology OR exact phrases.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "Python machine learning library"</p>
+                                <p>Document 1: "scikit-learn is a Python ML library" (semantic match, no exact phrase)<br>
+                                Dense score: 0.85, BM25 score: 0.60<br>
+                                Hybrid score (α=0.7): \(0.7 \times 0.85 + 0.3 \times 0.60 = 0.775\)</p>
+                                
+                                <p>Document 2: "Python machine learning library tutorial" (exact phrase match)<br>
+                                Dense score: 0.80, BM25 score: 0.95<br>
+                                Hybrid score (α=0.7): \(0.7 \times 0.80 + 0.3 \times 0.95 = 0.845\)</p>
+                                
+                                <p>✅ Both documents are retrieved, with Document 2 ranked higher due to exact phrase match.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>2. BM25 (Best Matching 25) Score</h4>
+                            <div class="formula-display">
+                                \[\text{BM25}(q, d) = \sum_{t \in q} \text{IDF}(t) \times \frac{f(t, d) \times (k_1 + 1)}{f(t, d) + k_1 \times (1 - b + b \times \frac{|d|}{\text{avgdl}})}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Formula Measures:</h5>
+                                <p>BM25 is a probabilistic ranking function that scores documents based on how well they match query keywords. It's an improvement over TF-IDF that handles document length normalization better and is widely used in search engines (including Elasticsearch, Solr).</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(\sum_{t \in q}\):</strong> Sum over all terms \(t\) in the query \(q\)</li>
+                                    <li><strong>\(\text{IDF}(t)\):</strong> Inverse Document Frequency - measures how rare/important a term is. Formula: \(\text{IDF}(t) = \log \frac{N - n(t) + 0.5}{n(t) + 0.5}\) where \(N\) is total documents and \(n(t)\) is documents containing term \(t\)</li>
+                                    <li><strong>\(f(t, d)\):</strong> Term frequency - how many times term \(t\) appears in document \(d\)</li>
+                                    <li><strong>\(\frac{f(t, d) \times (k_1 + 1)}{f(t, d) + k_1 \times (1 - b + b \times \frac{|d|}{\text{avgdl}})}\):</strong> Term frequency saturation function - prevents very frequent terms from dominating</li>
+                                    <li><strong>\(k_1\):</strong> Term frequency saturation parameter (typically 1.2-2.0). Controls how quickly term frequency saturates</li>
+                                    <li><strong>\(b\):</strong> Length normalization parameter (typically 0.75). Controls how much document length affects the score</li>
+                                    <li><strong>\(|d|\):</strong> Document length (number of words/tokens)</li>
+                                    <li><strong>\(\text{avgdl}\):</strong> Average document length in the collection</li>
+                                </ul>
+                                
+                                <h5>Key Components Explained:</h5>
+                                
+                                <p><strong>IDF Component:</strong> Rare terms (low document frequency) get higher IDF scores. This means documents containing rare, specific terms score higher than documents with common terms.</p>
+                                
+                                <p><strong>Term Frequency Saturation:</strong> The fraction \(\frac{f(t, d) \times (k_1 + 1)}{f(t, d) + k_1 \times \ldots}\) ensures that:
+                                <ul>
+                                    <li>First occurrence of a term: high contribution</li>
+                                    <li>Additional occurrences: diminishing returns (saturation)</li>
+                                    <li>Prevents documents with excessive term repetition from scoring too high</li>
+                                </ul>
+                                </p>
+                                
+                                <p><strong>Length Normalization:</strong> The term \(1 - b + b \times \frac{|d|}{\text{avgdl}}\) penalizes very long documents. Longer documents naturally have more term matches, so this normalization prevents them from always ranking highest.</p>
+                                
+                                <h5>Typical Parameter Values:</h5>
+                                <ul>
+                                    <li><strong>\(k_1 = 1.2\):</strong> Standard value, good for most use cases</li>
+                                    <li><strong>\(b = 0.75\):</strong> Standard value, moderate length normalization</li>
+                                    <li><strong>\(b = 0\):</strong> No length normalization (rarely used)</li>
+                                    <li><strong>\(b = 1\):</strong> Full length normalization (strong penalty for long docs)</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "machine learning"<br>
+                                Document 1: "Machine learning is a subset of AI. Machine learning uses algorithms." (2 occurrences, short doc)<br>
+                                Document 2: "Machine learning machine learning machine learning..." (10 occurrences, very long doc)</p>
+                                
+                                <p>BM25 gives Document 1 a higher score because:
+                                <ul>
+                                    <li>Length normalization penalizes Document 2's excessive length</li>
+                                    <li>Term frequency saturation means the extra occurrences in Document 2 don't help much</li>
+                                    <li>Document 1 has a better balance of term frequency and document length</li>
+                                </ul>
+                                </p>
+                                
+                                <h5>Why BM25 is Better Than TF-IDF:</h5>
+                                <ul>
+                                    <li>✅ <strong>Better length normalization:</strong> Handles document length more intelligently</li>
+                                    <li>✅ <strong>Term frequency saturation:</strong> Prevents excessive term repetition from dominating scores</li>
+                                    <li>✅ <strong>Proven in practice:</strong> Used by major search engines and information retrieval systems</li>
                                 </ul>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>BM25 Score</h4>
+                            <h4>3. Inverse Document Frequency (IDF)</h4>
                             <div class="formula-display">
-                                \[\text{BM25}(q, d) = \sum_{t \in q} \text{IDF}(t) \cdot \frac{f(t, d) \cdot (k_1 + 1)}{f(t, d) + k_1 \cdot (1 - b + b \cdot \frac{|d|}{\text{avgdl}})}\]
+                                \[\text{IDF}(t) = \log \frac{N - n(t) + 0.5}{n(t) + 0.5}\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Measures:</h5>
+                                <p>IDF measures how "rare" or "important" a term is across the entire document collection. Rare terms (appearing in few documents) get higher IDF scores, making them more important for ranking.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(f(t, d)\): Term frequency in document</li>
-                                    <li>\(\text{IDF}(t)\): Inverse document frequency</li>
-                                    <li>\(|d|\): Document length</li>
-                                    <li>\(\text{avgdl}\): Average document length</li>
-                                    <li>\(k_1, b\): Tuning parameters</li>
+                                    <li><strong>\(N\):</strong> Total number of documents in the collection</li>
+                                    <li><strong>\(n(t)\):</strong> Number of documents containing term \(t\)</li>
+                                    <li><strong>\(N - n(t)\):</strong> Number of documents NOT containing term \(t\)</li>
+                                    <li><strong>\(+ 0.5\):</strong> Smoothing factor to avoid division by zero and handle edge cases</li>
+                                    <li><strong>\(\log\):</strong> Logarithm (typically natural log or base 2) - compresses the range</li>
                                 </ul>
+                                
+                                <h5>Intuition:</h5>
+                                <p>If a term appears in many documents (common word like "the", "is"), it's not very informative - low IDF. If a term appears in few documents (rare word like "quantum", "neural"), it's very informative - high IDF.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Collection: 10,000 documents</p>
+                                <p>Term "the": appears in 9,500 documents<br>
+                                IDF: \(\log \frac{10000 - 9500 + 0.5}{9500 + 0.5} = \log \frac{500.5}{9500.5} \approx -2.95\) (very low, common word)</p>
+                                
+                                <p>Term "quantum": appears in 50 documents<br>
+                                IDF: \(\log \frac{10000 - 50 + 0.5}{50 + 0.5} = \log \frac{9950.5}{50.5} \approx 5.3\) (very high, rare and informative)</p>
+                                
+                                <p>When query contains "quantum computing", documents with "quantum" score much higher because it's a rare, informative term.</p>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Reranking Score</h4>
+                            <h4>4. Cross-Encoder Reranking Score</h4>
                             <div class="formula-display">
-                                \[\text{rerank\_score}(q, d) = \text{CrossEncoder}(q, d)\]
+                                \[\text{rerank\_score}(q, d) = \text{CrossEncoder}([q; d])\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Represents:</h5>
+                                <p>A cross-encoder is a neural network model (typically BERT-based) that processes the query and document together in a single forward pass. The notation \([q; d]\) means the query and document are concatenated: <code>[CLS] query [SEP] document [SEP]</code>.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(\text{CrossEncoder}\): Model that processes query and document together</li>
-                                    <li>More accurate than embedding-based similarity (bi-encoder)</li>
-                                    <li>Slower because it processes each query-document pair</li>
-                                    <li>Typically used to rerank top-k candidates from initial retrieval</li>
+                                    <li><strong>\(q\):</strong> Query text</li>
+                                    <li><strong>\(d\):</strong> Document text</li>
+                                    <li><strong>\([q; d]\):</strong> Concatenated input: query and document together</li>
+                                    <li><strong>\(\text{CrossEncoder}\):</strong> Neural network model that processes the concatenated input</li>
+                                    <li><strong>Output:</strong> Relevance score (typically 0-1 or similarity score)</li>
                                 </ul>
+                                
+                                <h5>Why Cross-Encoder is More Accurate:</h5>
+                                <p><strong>Bi-encoder (embedding-based):</strong> Processes query and document separately, then compares embeddings. Fast but loses interaction information.</p>
+                                <p><strong>Cross-encoder:</strong> Processes query and document together, allowing attention mechanisms to identify which parts of the document are most relevant to the query. More accurate but slower.</p>
+                                
+                                <h5>Attention Mechanism:</h5>
+                                <p>The cross-encoder's attention mechanism allows the model to "look" at specific parts of the document when processing the query. For example, when the query is "capital of France", the model can focus attention on the part of the document that mentions "Paris" or "capital".</p>
+                                
+                                <h5>Performance Trade-off:</h5>
+                                <ul>
+                                    <li><strong>Accuracy:</strong> Cross-encoder typically achieves 10-30% better accuracy than bi-encoder</li>
+                                    <li><strong>Speed:</strong> Cross-encoder is 10-100x slower because it must process each (query, document) pair separately</li>
+                                    <li><strong>Use case:</strong> Rerank top-50 to top-200 candidates from initial retrieval (too slow for full collection)</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "How to train a neural network?"<br>
+                                Document: "Training deep learning models requires adjusting hyperparameters..."</p>
+                                <p><strong>Bi-encoder:</strong> Embed query and document separately, compare embeddings → score: 0.75</p>
+                                <p><strong>Cross-encoder:</strong> Process "[CLS] How to train a neural network? [SEP] Training deep learning models requires adjusting hyperparameters... [SEP]" → score: 0.92</p>
+                                <p>✅ Cross-encoder sees the full interaction and understands that "neural network" and "deep learning models" are related in this context.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>5. Normalized Hybrid Score</h4>
+                            <div class="formula-display">
+                                \[\text{hybrid\_score}(q, d) = \alpha \cdot \frac{\text{cosine}(E(q), E(d)) - \min_{\text{cosine}}}{\max_{\text{cosine}} - \min_{\text{cosine}}} + (1 - \alpha) \cdot \frac{\text{BM25}(q, d) - \min_{\text{BM25}}}{\max_{\text{BM25}} - \min_{\text{BM25}}}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Does:</h5>
+                                <p>Before combining dense and sparse scores, they should be normalized to the same scale (typically [0, 1]). This ensures that one method doesn't dominate simply because its scores are larger.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>Min-max normalization:</strong> \(\frac{x - \min}{\max - \min}\) scales values to [0, 1] range</li>
+                                    <li><strong>\(\min_{\text{cosine}}, \max_{\text{cosine}}\):</strong> Minimum and maximum cosine similarity scores across all documents for this query</li>
+                                    <li><strong>\(\min_{\text{BM25}}, \max_{\text{BM25}}\):</strong> Minimum and maximum BM25 scores across all documents for this query</li>
+                                    <li>After normalization, both scores are in [0, 1] range, making them comparable</li>
+                                </ul>
+                                
+                                <h5>Why Normalization is Important:</h5>
+                                <p>Without normalization, if BM25 scores range from 0-100 and cosine scores range from 0-1, the BM25 component would dominate the hybrid score regardless of the \(\alpha\) value. Normalization ensures both components contribute proportionally.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>For a query, you get:</p>
+                                <ul>
+                                    <li>Cosine scores: [0.65, 0.72, 0.58, 0.80] → normalized: [0.27, 0.64, 0.0, 1.0]</li>
+                                    <li>BM25 scores: [12.5, 45.3, 8.2, 67.8] → normalized: [0.07, 0.62, 0.0, 1.0]</li>
+                                </ul>
+                                <p>Now both are on the same [0, 1] scale and can be meaningfully combined with \(\alpha = 0.7\).</p>
                             </div>
                         </div>
                     </div>

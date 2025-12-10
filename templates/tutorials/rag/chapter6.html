@@ -367,46 +367,210 @@
                     <div id="formulas" class="content-section">
                         <h2>Mathematical Formulations</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Advanced RAG Mathematical Models</h3>
+                            <p>Advanced RAG techniques involve mathematical models for generation, context management, and quality evaluation. Understanding these formulas helps you optimize context usage, implement iterative retrieval, and measure answer quality.</p>
+                        </div>
+                        
                         <div class="formula-box">
-                            <h4>Key Formulas</h4>
+                            <h4>1. RAG Generation Probability</h4>
                             <div class="formula-display">
                                 \[P(\text{answer} | \text{query}, \text{context}) = \prod_{i=1}^{n} P(\text{token}_i | \text{query}, \text{context}, \text{tokens}_{<i})\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Represents:</h5>
+                                <p>This is the fundamental probability model for RAG generation. The LLM generates the answer token by token, where each token's probability depends on the query, retrieved context, and all previously generated tokens.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(\text{query}\): User question</li>
-                                    <li>\(\text{context}\): Retrieved documents</li>
-                                    <li>\(\text{answer}\): Generated response</li>
-                                    <li>Model generates answer token by token, conditioning on query and context</li>
+                                    <li><strong>\(P(\text{answer} | \text{query}, \text{context})\):</strong> Probability of generating the entire answer given the query and retrieved context</li>
+                                    <li><strong>\(\prod_{i=1}^{n}\):</strong> Product over all \(n\) tokens in the answer (multiplication of probabilities)</li>
+                                    <li><strong>\(P(\text{token}_i | \text{query}, \text{context}, \text{tokens}_{<i})\):</strong> Probability of generating token \(i\) given:
+                                        <ul>
+                                            <li>The query (user's question)</li>
+                                            <li>The context (retrieved documents)</li>
+                                            <li>All previous tokens (\(\text{tokens}_{<i}\) means tokens before position \(i\))</li>
+                                        </ul>
+                                    </li>
                                 </ul>
+                                
+                                <h5>Why It's a Product:</h5>
+                                <p>To generate the full answer, the model must generate token 1, THEN token 2 given token 1, THEN token 3 given tokens 1 and 2, and so on. The probability of the entire sequence is the product of these conditional probabilities (chain rule of probability).</p>
+                                
+                                <h5>Key Insight:</h5>
+                                <p>The formula shows that the answer depends on BOTH the query AND the context. This is what makes RAG different from standard LLM generation - the context from retrieved documents directly influences each token's probability.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "What is the capital of France?"<br>
+                                Context: "France is a country in Europe. Its capital city is Paris."</p>
+                                
+                                <p>The model generates:</p>
+                                <ul>
+                                    <li>Token 1 ("The"): \(P(\text{"The"} | \text{query}, \text{context})\) - high probability because context mentions "capital"</li>
+                                    <li>Token 2 ("capital"): \(P(\text{"capital"} | \text{query}, \text{context}, \text{"The"})\) - high probability, matches context</li>
+                                    <li>Token 3 ("of"): \(P(\text{"of"} | \text{query}, \text{context}, \text{"The capital"})\) - high probability, grammatical continuation</li>
+                                    <li>Token 4 ("France"): \(P(\text{"France"} | \text{query}, \text{context}, \text{"The capital of"})\) - high probability, matches query</li>
+                                    <li>Token 5 ("is"): \(P(\text{"is"} | \text{query}, \text{context}, \text{"The capital of France"})\) - high probability</li>
+                                    <li>Token 6 ("Paris"): \(P(\text{"Paris"} | \text{query}, \text{context}, \text{"The capital of France is"})\) - very high probability, directly from context!</li>
+                                </ul>
+                                
+                                <p>The final answer "The capital of France is Paris" has high probability because each token is likely given the context.</p>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Context Window Constraint</h4>
+                            <h4>2. Context Window Constraint</h4>
                             <div class="formula-display">
                                 \[|\text{query}| + |\text{context}| + |\text{answer}| \leq \text{max\_context\_length}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Total tokens (query + context + answer) must fit within LLM's context window. Limits how much context can be included.</p>
+                                <h5>What This Constraint Enforces:</h5>
+                                <p>LLMs have fixed context window limits. The total number of tokens (query + retrieved context + generated answer) must fit within this limit. This constraint determines how much context you can include and how long answers can be.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(|\text{query}|\):</strong> Number of tokens in the user's query (typically 10-50 tokens)</li>
+                                    <li><strong>\(|\text{context}|\):</strong> Number of tokens in retrieved documents (can be 500-4000+ tokens depending on top-k and chunk size)</li>
+                                    <li><strong>\(|\text{answer}|\):</strong> Number of tokens in the generated answer (variable, depends on query complexity)</li>
+                                    <li><strong>\(\text{max\_context\_length}\):</strong> Maximum tokens the LLM can process (e.g., GPT-4: 8K-128K, Claude: 100K-200K, GPT-3.5: 4K-16K)</li>
+                                </ul>
+                                
+                                <h5>Practical Implications:</h5>
+                                <p>If your context window is 4,000 tokens and your query is 50 tokens, you have ~3,950 tokens available for context + answer. If you retrieve 3,000 tokens of context, you only have ~950 tokens left for the answer. This is why context compression is important!</p>
+                                
+                                <h5>Example:</h5>
+                                <p><strong>Scenario:</strong> GPT-3.5-turbo with 4,096 token context window</p>
+                                <ul>
+                                    <li>Query: 30 tokens</li>
+                                    <li>Retrieved context: 3,500 tokens (5 chunks × 700 tokens each)</li>
+                                    <li>Available for answer: 4,096 - 30 - 3,500 = 566 tokens</li>
+                                    <li>✅ Fits, but close to limit</li>
+                                </ul>
+                                
+                                <p><strong>Problem scenario:</strong></p>
+                                <ul>
+                                    <li>Query: 30 tokens</li>
+                                    <li>Retrieved context: 4,200 tokens (too much!)</li>
+                                    <li>Available for answer: 4,096 - 30 - 4,200 = -134 tokens ❌</li>
+                                    <li><strong>Solution:</strong> Compress context to 3,000 tokens, leaving 1,066 tokens for answer</li>
+                                </ul>
+                                
+                                <h5>Strategies to Handle This:</h5>
+                                <ul>
+                                    <li><strong>Context compression:</strong> Summarize or extract relevant parts to reduce \(|\text{context}|\)</li>
+                                    <li><strong>Prioritize chunks:</strong> Include only top-k most relevant chunks</li>
+                                    <li><strong>Reserve tokens:</strong> Leave 20-30% of context window for answer generation</li>
+                                    <li><strong>Use larger context windows:</strong> GPT-4 (128K) or Claude (200K) for very long contexts</li>
+                                </ul>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Answer Quality Score</h4>
+                            <h4>3. Answer Quality Score</h4>
                             <div class="formula-display">
                                 \[\text{quality} = \alpha \cdot \text{relevance} + \beta \cdot \text{faithfulness} + \gamma \cdot \text{completeness}\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Measures:</h5>
+                                <p>Answer quality in RAG systems is multi-dimensional. This formula combines three critical dimensions into a single quality score, allowing you to evaluate and optimize RAG system performance.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(\text{relevance}\): How well answer addresses query</li>
-                                    <li>\(\text{faithfulness}\): How well answer is grounded in context</li>
-                                    <li>\(\text{completeness}\): How complete the answer is</li>
-                                    <li>\(\alpha, \beta, \gamma\): Weighting factors</li>
+                                    <li><strong>\(\text{relevance}\):</strong> How well the answer addresses the query. Measured by semantic similarity between query and answer embeddings, or by human/LM evaluation. Range: [0, 1]</li>
+                                    <li><strong>\(\text{faithfulness}\):</strong> How well the answer is grounded in the retrieved context (not hallucinated). Measured as fraction of answer claims supported by context. Range: [0, 1]</li>
+                                    <li><strong>\(\text{completeness}\):</strong> How complete the answer is - does it fully address all parts of the query? Measured by coverage of query aspects. Range: [0, 1]</li>
+                                    <li><strong>\(\alpha, \beta, \gamma\):</strong> Weighting factors that sum to 1.0, controlling the relative importance of each dimension</li>
                                 </ul>
+                                
+                                <h5>Typical Weightings:</h5>
+                                <ul>
+                                    <li><strong>Balanced:</strong> \(\alpha = 0.4, \beta = 0.4, \gamma = 0.2\) - Equal emphasis on relevance and faithfulness, less on completeness</li>
+                                    <li><strong>Faithfulness-focused:</strong> \(\alpha = 0.3, \beta = 0.5, \gamma = 0.2\) - Emphasizes avoiding hallucinations (critical for factual domains)</li>
+                                    <li><strong>Completeness-focused:</strong> \(\alpha = 0.3, \beta = 0.3, \gamma = 0.4\) - Emphasizes comprehensive answers (good for complex queries)</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Query: "What are the main advantages of RAG?"</p>
+                                <p><strong>Answer 1:</strong> "RAG is good."<br>
+                                Relevance: 0.6 (somewhat relevant but vague)<br>
+                                Faithfulness: 1.0 (supported by context)<br>
+                                Completeness: 0.2 (very incomplete)<br>
+                                Quality (α=0.4, β=0.4, γ=0.2): \(0.4 \times 0.6 + 0.4 \times 1.0 + 0.2 \times 0.2 = 0.68\)</p>
+                                
+                                <p><strong>Answer 2:</strong> "RAG has several advantages: no training required, easy to update knowledge, can cite sources, works with any LLM."<br>
+                                Relevance: 0.95 (highly relevant)<br>
+                                Faithfulness: 0.9 (mostly supported, minor elaboration)<br>
+                                Completeness: 0.9 (covers main advantages)<br>
+                                Quality (α=0.4, β=0.4, γ=0.2): \(0.4 \times 0.95 + 0.4 \times 0.9 + 0.2 \times 0.9 = 0.92\)</p>
+                                
+                                <p>✅ Answer 2 scores much higher due to better relevance and completeness.</p>
+                                
+                                <h5>Using This for Optimization:</h5>
+                                <p>Track quality scores over time. If faithfulness drops, you might need better retrieval or context. If relevance drops, you might need better query understanding. If completeness drops, you might need to retrieve more documents or use iterative retrieval.</p>
                             </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>4. Multi-Query Retrieval Coverage</h4>
+                            <div class="formula-display">
+                                \[\text{coverage} = \frac{|\bigcup_{i=1}^{m} \text{Retrieve}(q_i, D)|}{|D_{\text{relevant}}|}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>Multi-query retrieval generates \(m\) query variations and retrieves documents for each. This formula measures what fraction of all relevant documents were found by at least one query variation.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(q_1, q_2, \ldots, q_m\):</strong> \(m\) different query variations (e.g., 3-5 variations)</li>
+                                    <li><strong>\(\text{Retrieve}(q_i, D)\):</strong> Documents retrieved for query variation \(q_i\)</li>
+                                    <li><strong>\(\bigcup_{i=1}^{m}\):</strong> Union of all retrieved document sets (removes duplicates)</li>
+                                    <li><strong>\(|D_{\text{relevant}}|\):</strong> Total number of relevant documents in the knowledge base</li>
+                                    <li><strong>Coverage:</strong> Fraction of relevant documents found by at least one query variation</li>
+                                </ul>
+                                
+                                <h5>Why Multi-Query Improves Coverage:</h5>
+                                <p>Different query phrasings might retrieve different relevant documents. By generating multiple variations and taking the union, you increase the chance of finding all relevant documents.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Original query: "How to train a neural network?"</p>
+                                <p>Query variations:</p>
+                                <ul>
+                                    <li>\(q_1\): "neural network training process" → retrieves docs: {A, B, C}</li>
+                                    <li>\(q_2\): "how to train deep learning models" → retrieves docs: {B, D, E}</li>
+                                    <li>\(q_3\): "backpropagation and gradient descent" → retrieves docs: {C, F, G}</li>
+                                </ul>
+                                
+                                <p>Union: {A, B, C, D, E, F, G} (7 unique documents)</p>
+                                <p>If single query \(q_1\) only retrieved {A, B, C}, multi-query found 4 additional relevant documents (D, E, F, G).</p>
+                                
+                                <p>Coverage improvement: From 3/7 = 43% to 7/7 = 100% of relevant documents found.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>5. Context Compression Ratio</h4>
+                            <div class="formula-display">
+                                \[\text{compression\_ratio} = \frac{|\text{original\_context}|}{|\text{compressed\_context}|}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Measures:</h5>
+                                <p>When retrieved context exceeds the LLM's context window, you need to compress it. This formula measures the compression achieved (how much smaller the compressed context is compared to original).</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(|\text{original\_context}|\):</strong> Token count of original retrieved context</li>
+                                    <li><strong>\(|\text{compressed\_context}|\):</strong> Token count after compression (summarization, extraction, etc.)</li>
+                                    <li><strong>Compression ratio:</strong> How many times smaller the compressed version is</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Original context: 5,000 tokens (5 retrieved chunks × 1,000 tokens each)<br>
+                                Compressed context: 2,000 tokens (summarized chunks)<br>
+                                Compression ratio: \(\frac{5000}{2000} = 2.5x\)</p>
+                                <p>This means the compressed context is 2.5 times smaller, allowing you to fit more chunks or leave more room for the answer.</p>
+                                
+                                <h5>Trade-off:</h5>
+                                <p>Higher compression ratio = more space saved but risk of losing important details. Lower compression ratio = preserves more information but less space saved. Typical compression ratios: 2-5x for summarization, 3-10x for sentence extraction.</p>
                             </div>
                         </div>
                     </div>

@@ -367,46 +367,175 @@
                     <div id="formulas" class="content-section">
                         <h2>Mathematical Formulations</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Chunking Mathematics Overview</h3>
+                            <p>Chunking involves several mathematical considerations: calculating the number of chunks needed, determining overlap, and understanding storage efficiency. These formulas help you make informed decisions about chunk size and overlap for optimal RAG performance.</p>
+                        </div>
+                        
                         <div class="formula-box">
-                            <h4>BM25 (Sparse Retrieval)</h4>
+                            <h4>1. Chunk Count Calculation</h4>
                             <div class="formula-display">
-                                \[\text{BM25}(q, d) = \sum_{t \in q} \text{IDF}(t) \times \frac{f(t,d) \times (k_1 + 1)}{f(t,d) + k_1 \times (1 - b + b \times \frac{|d|}{\text{avgdl}})}\]
+                                \[\text{num\_chunks} = \left\lceil \frac{\text{document\_length}}{\text{chunk\_size} - \text{overlap}} \right\rceil\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Calculates:</h5>
+                                <p>This formula determines how many chunks you'll get when splitting a document of a given length into chunks of a specified size with overlap. The ceiling function (\(\lceil \rceil\)) ensures you round up to include any partial chunk at the end.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(q\): Query</li>
-                                    <li>\(d\): Document</li>
-                                    <li>\(f(t,d)\): Term frequency in document</li>
-                                    <li>\(\text{IDF}(t)\): Inverse document frequency</li>
-                                    <li>\(k_1, b\): Tuning parameters</li>
-                                    <li>\(|d|, \text{avgdl}\): Document length and average length</li>
+                                    <li><strong>\(\text{document\_length}\):</strong> Total length of the document measured in characters or tokens (e.g., 10,000 characters or 2,500 tokens)</li>
+                                    <li><strong>\(\text{chunk\_size}\):</strong> Desired size of each chunk (e.g., 500 characters or 200 tokens)</li>
+                                    <li><strong>\(\text{overlap}\):</strong> Number of characters/tokens that consecutive chunks share at their boundaries (e.g., 100 characters or 20 tokens)</li>
+                                    <li><strong>\(\text{chunk\_size} - \text{overlap}\):</strong> Effective chunk size - the amount of new content each chunk adds (e.g., 500 - 100 = 400 characters of new content per chunk)</li>
+                                    <li><strong>\(\left\lceil \ldots \right\rceil\):</strong> Ceiling function - rounds up to the nearest integer (ensures partial chunks are counted)</li>
+                                </ul>
+                                
+                                <h5>Why Subtract Overlap?</h5>
+                                <p>If chunks overlap by 100 characters, then each chunk after the first only adds 400 new characters (500 - 100 = 400). The overlap is shared between chunks, so it doesn't count as "new" content for the chunk count calculation.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Document: 5,000 characters<br>
+                                Chunk size: 500 characters<br>
+                                Overlap: 100 characters<br>
+                                Effective chunk size: 500 - 100 = 400 characters<br>
+                                Number of chunks: \(\lceil 5000 / 400 \rceil = \lceil 12.5 \rceil = 13\) chunks</p>
+                                
+                                <p><strong>Chunk distribution:</strong></p>
+                                <ul>
+                                    <li>Chunk 1: characters 1-500</li>
+                                    <li>Chunk 2: characters 401-900 (overlaps 401-500 with Chunk 1)</li>
+                                    <li>Chunk 3: characters 801-1300 (overlaps 801-900 with Chunk 2)</li>
+                                    <li>... and so on</li>
                                 </ul>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Hybrid Score</h4>
+                            <h4>2. Overlap Percentage</h4>
                             <div class="formula-display">
-                                \[\text{score}(q, d) = \alpha \times \text{BM25}(q, d) + (1 - \alpha) \times \text{cosine}(E(q), E(d))\]
+                                \[\text{overlap\_percentage} = \frac{\text{overlap}}{\text{chunk\_size}} \times 100\%\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h5>What This Formula Measures:</h5>
+                                <p>This formula calculates what percentage of each chunk is shared with the next chunk. It helps you understand the trade-off between context preservation and storage efficiency.</p>
+                                
+                                <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li>\(\alpha\): Weight between sparse and dense (typically 0.3-0.7)</li>
-                                    <li>Combines keyword matching with semantic similarity</li>
-                                    <li>Often outperforms either method alone</li>
+                                    <li><strong>\(\text{overlap}\):</strong> Number of overlapping characters/tokens between consecutive chunks</li>
+                                    <li><strong>\(\text{chunk\_size}\):</strong> Total size of each chunk</li>
+                                    <li><strong>\(\frac{\text{overlap}}{\text{chunk\_size}}\):</strong> Fraction of chunk that overlaps (e.g., 100/500 = 0.2 = 20%)</li>
+                                    <li><strong>\(\times 100\%\):</strong> Converts fraction to percentage</li>
                                 </ul>
+                                
+                                <h5>Typical Values:</h5>
+                                <ul>
+                                    <li><strong>10-20%:</strong> Standard overlap, good balance between context preservation and storage efficiency</li>
+                                    <li><strong>5-10%:</strong> Low overlap, minimal storage overhead but less context preservation</li>
+                                    <li><strong>20-30%:</strong> High overlap, better context preservation but significant storage increase</li>
+                                    <li><strong>30%+:</strong> Very high overlap, rarely justified except for critical documents</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Chunk size: 500 characters<br>
+                                Overlap: 100 characters<br>
+                                Overlap percentage: \(\frac{100}{500} \times 100\% = 20\%\)</p>
+                                <p>This means 20% of each chunk (100 out of 500 characters) is shared with the next chunk, ensuring context is preserved at boundaries.</p>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Reranking Score</h4>
+                            <h4>3. Storage Efficiency Ratio</h4>
                             <div class="formula-display">
-                                \[\text{rerank\_score}(q, d) = \text{CrossEncoder}([q; d])\]
+                                \[\text{storage\_ratio} = \frac{\text{total\_chunks} \times \text{chunk\_size}}{\text{document\_length}}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Cross-encoder processes query and document together, providing more accurate relevance score than bi-encoder (embedding-based) methods.</p>
+                                <h5>What This Formula Measures:</h5>
+                                <p>This formula calculates how much storage space is needed for chunks compared to the original document. With overlap, you store more data than the original document (ratio > 1), but this preserves context at boundaries.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(\text{total\_chunks}\):</strong> Number of chunks created from the document</li>
+                                    <li><strong>\(\text{chunk\_size}\):</strong> Size of each chunk (characters or tokens)</li>
+                                    <li><strong>\(\text{total\_chunks} \times \text{chunk\_size}\):</strong> Total storage needed for all chunks (includes overlap)</li>
+                                    <li><strong>\(\text{document\_length}\):</strong> Original document size</li>
+                                    <li><strong>Ratio:</strong> How many times more storage is needed compared to original</li>
+                                </ul>
+                                
+                                <h5>Interpreting the Ratio:</h5>
+                                <ul>
+                                    <li><strong>Ratio = 1.0:</strong> No overlap, storage equals original document size (rare in practice)</li>
+                                    <li><strong>Ratio = 1.1-1.3:</strong> Moderate overlap (10-20%), typical for most RAG systems</li>
+                                    <li><strong>Ratio = 1.3-1.5:</strong> High overlap (20-30%), better context but more storage</li>
+                                    <li><strong>Ratio > 1.5:</strong> Very high overlap, usually not justified</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Document: 10,000 characters<br>
+                                Chunk size: 500 characters<br>
+                                Overlap: 100 characters (20%)<br>
+                                Number of chunks: \(\lceil 10000 / (500-100) \rceil = \lceil 25 \rceil = 25\) chunks<br>
+                                Storage ratio: \(\frac{25 \times 500}{10000} = \frac{12500}{10000} = 1.25\)</p>
+                                <p>This means you need 25% more storage than the original document, but you preserve context at all chunk boundaries.</p>
+                                
+                                <h5>Trade-off:</h5>
+                                <p>Higher storage ratio = better context preservation but more storage costs and embedding costs. Lower storage ratio = less storage but risk of losing context at boundaries.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>4. Effective Chunk Size (New Content Per Chunk)</h4>
+                            <div class="formula-display">
+                                \[\text{effective\_chunk\_size} = \text{chunk\_size} - \text{overlap}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Represents:</h5>
+                                <p>The effective chunk size is the amount of <strong>new</strong> content each chunk adds, excluding the overlap that's shared with the previous chunk. This is what actually "advances" you through the document.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li><strong>\(\text{chunk\_size}\):</strong> Total size of each chunk</li>
+                                    <li><strong>\(\text{overlap}\):</strong> Amount shared with previous chunk</li>
+                                    <li><strong>\(\text{chunk\_size} - \text{overlap}\):</strong> New content unique to this chunk</li>
+                                </ul>
+                                
+                                <h5>Why This Matters:</h5>
+                                <p>When calculating how many chunks you need, you use the effective chunk size, not the total chunk size, because overlap doesn't advance you through the document.</p>
+                                
+                                <h5>Example:</h5>
+                                <p>Chunk size: 500 characters<br>
+                                Overlap: 100 characters<br>
+                                Effective chunk size: 500 - 100 = 400 characters</p>
+                                <p>This means each chunk after the first adds 400 new characters of content, while 100 characters are shared with the previous chunk for context.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box">
+                            <h4>5. Total Storage with Overlap</h4>
+                            <div class="formula-display">
+                                \[\text{total\_storage} = \text{num\_chunks} \times \text{chunk\_size} = \left\lceil \frac{\text{document\_length}}{\text{chunk\_size} - \text{overlap}} \right\rceil \times \text{chunk\_size}\]
+                            </div>
+                            <div class="formula-explanation">
+                                <h5>What This Calculates:</h5>
+                                <p>Total storage space needed to store all chunks, including overlap. This helps you estimate storage costs and embedding API costs.</p>
+                                
+                                <h5>Breaking It Down:</h5>
+                                <ul>
+                                    <li>First, calculate number of chunks using the chunk count formula</li>
+                                    <li>Then multiply by chunk size to get total storage</li>
+                                    <li>Result includes all overlap, so it's larger than the original document</li>
+                                </ul>
+                                
+                                <h5>Example:</h5>
+                                <p>Document: 20,000 characters<br>
+                                Chunk size: 1000 characters<br>
+                                Overlap: 200 characters (20%)<br>
+                                Number of chunks: \(\lceil 20000 / (1000-200) \rceil = \lceil 25 \rceil = 25\) chunks<br>
+                                Total storage: \(25 \times 1000 = 25,000\) characters</p>
+                                <p>Original document: 20,000 characters<br>
+                                Storage overhead: 25,000 - 20,000 = 5,000 characters (25% increase)</p>
+                                
+                                <h5>Cost Implications:</h5>
+                                <p>If you're using a paid embedding API (e.g., OpenAI), you pay per token/character embedded. With 25% storage overhead, you pay 25% more for embeddings. This is usually worth it for better retrieval quality, but it's important to be aware of the cost.</p>
                             </div>
                         </div>
                     </div>
