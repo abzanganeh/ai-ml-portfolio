@@ -155,6 +155,85 @@
                                     <li>Like trying to summarize War and Peace in one sentence</li>
                                 </ul>
                             </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Detailed Analysis of the Bottleneck</h4>
+                                <p><strong>The fundamental issue:</strong> Traditional encoder-decoder architectures compress all information from the source sequence into a fixed-size context vector, regardless of sequence length. This creates several critical problems:</p>
+                                
+                                <div class="example-box">
+                                    <h5>1. Information Loss in Long Sequences</h5>
+                                    <p>Consider translating a 50-word sentence:</p>
+                                    <ul>
+                                        <li><strong>Encoder processes:</strong> Word 1 → Word 2 → ... → Word 50</li>
+                                        <li><strong>Each step:</strong> Hidden state updates, but earlier information gets diluted</li>
+                                        <li><strong>Final state:</strong> Must encode all 50 words in same-size vector as a 5-word sentence</li>
+                                        <li><strong>Result:</strong> Early words and fine details are lost or compressed beyond recognition</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>2. Fixed Context Window</h5>
+                                    <p>The context vector has a fixed dimension (e.g., 512 or 1024), which means:</p>
+                                    <ul>
+                                        <li>Short sequences: Most of the vector space is unused or redundant</li>
+                                        <li>Long sequences: Critical information must be discarded or averaged out</li>
+                                        <li>No adaptive allocation of representation capacity based on sequence complexity</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>3. Sequential Processing Bottleneck</h5>
+                                    <p>RNNs process sequences sequentially, which means:</p>
+                                    <ul>
+                                        <li>Cannot parallelize computation across sequence positions</li>
+                                        <li>Long-range dependencies require many steps, leading to vanishing gradients</li>
+                                        <li>Each word's representation depends on all previous words, creating a dependency chain</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>4. Real-World Impact</h5>
+                                    <p><strong>Translation example:</strong> Translating "The cat that the dog that the bird saw chased sat on the mat"</p>
+                                    <ul>
+                                        <li>Complex nested structure with multiple relative clauses</li>
+                                        <li>RNN encoder: Must compress all relationships into one vector</li>
+                                        <li>Decoder: Tries to reconstruct meaning from compressed representation</li>
+                                        <li><strong>Problem:</strong> Which "that" refers to which noun? This information is lost!</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Why This Matters for NLP Tasks</h4>
+                                <p><strong>Different tasks suffer differently from the bottleneck:</strong></p>
+                                
+                                <div class="example-box">
+                                    <h5>Machine Translation</h5>
+                                    <ul>
+                                        <li>Long sentences lose word alignment information</li>
+                                        <li>Complex grammatical structures get flattened</li>
+                                        <li>Idiomatic expressions and context-dependent meanings are lost</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Text Summarization</h5>
+                                    <ul>
+                                        <li>Important details from early in the document are forgotten</li>
+                                        <li>Key relationships between distant sentences are lost</li>
+                                        <li>Summary quality degrades significantly for long documents</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Question Answering</h5>
+                                    <ul>
+                                        <li>Questions about specific details require accessing exact source positions</li>
+                                        <li>Single vector cannot preserve all positional information</li>
+                                        <li>Answer quality drops for questions requiring long-range context</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -174,6 +253,120 @@
                                     <li>Create weighted combination of encoder hidden states</li>
                                     <li>Use this combination (context vector) for decoding</li>
                                 </ol>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Breaking Down the Attention Process</h4>
+                                <p><strong>Attention fundamentally changes how information flows from encoder to decoder:</strong></p>
+                                
+                                <div class="example-box">
+                                    <h5>Traditional Approach (Without Attention)</h5>
+                                    <ul>
+                                        <li>Encoder: Input sequence → Final hidden state (single vector)</li>
+                                        <li>Decoder: Final hidden state → Output sequence</li>
+                                        <li><strong>Information flow:</strong> All input → One vector → All output</li>
+                                        <li><strong>Problem:</strong> Information bottleneck at the single vector</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Attention-Based Approach</h5>
+                                    <ul>
+                                        <li>Encoder: Input sequence → All hidden states (one per input position)</li>
+                                        <li>Decoder: For each output position, dynamically selects relevant encoder states</li>
+                                        <li><strong>Information flow:</strong> All input states → Dynamic selection → Each output position</li>
+                                        <li><strong>Advantage:</strong> Each output can access any input position directly</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Step-by-Step Attention Process</h4>
+                                
+                                <div class="example-box">
+                                    <h5>Step 1: Compute Attention Scores</h5>
+                                    <p>For each decoder position, compute how relevant each encoder position is:</p>
+                                    <ul>
+                                        <li>Compare decoder's current state with all encoder hidden states</li>
+                                        <li>Generate a score for each encoder position</li>
+                                        <li>Higher score = more relevant for current decoding step</li>
+                                        <li><strong>Result:</strong> A vector of scores (one per encoder position)</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Step 2: Normalize to Attention Weights</h5>
+                                    <p>Convert raw scores into probabilities using softmax:</p>
+                                    <ul>
+                                        <li>Apply softmax to attention scores</li>
+                                        <li>Ensures all weights sum to 1 (probability distribution)</li>
+                                        <li>Higher scores get exponentially higher weights</li>
+                                        <li><strong>Result:</strong> Attention weights that sum to 1.0</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Step 3: Create Context Vector</h5>
+                                    <p>Weighted combination of encoder hidden states:</p>
+                                    <ul>
+                                        <li>Multiply each encoder hidden state by its attention weight</li>
+                                        <li>Sum all weighted encoder states</li>
+                                        <li>This creates a context vector specific to current decoder position</li>
+                                        <li><strong>Result:</strong> A context vector that emphasizes relevant input positions</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Step 4: Use Context for Decoding</h5>
+                                    <p>Combine context vector with decoder's current state:</p>
+                                    <ul>
+                                        <li>Context vector provides relevant source information</li>
+                                        <li>Decoder state provides target-side context</li>
+                                        <li>Combined information guides next token generation</li>
+                                        <li><strong>Result:</strong> Better translation/decoding quality</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Why Attention Solves the Bottleneck</h4>
+                                <p><strong>Key advantages of attention over fixed context vector:</strong></p>
+                                
+                                <div class="example-box">
+                                    <h5>1. Dynamic Information Access</h5>
+                                    <ul>
+                                        <li>Each decoder position can focus on different encoder positions</li>
+                                        <li>No fixed compression - information remains accessible</li>
+                                        <li>Model learns which positions to attend to for each output</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>2. Preserves All Information</h5>
+                                    <ul>
+                                        <li>All encoder hidden states are available, not just the final one</li>
+                                        <li>No information is lost through compression</li>
+                                        <li>Early and late positions in input are equally accessible</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>3. Interpretable Alignment</h5>
+                                    <ul>
+                                        <li>Attention weights show which input words align with which output words</li>
+                                        <li>Provides interpretability - we can visualize what the model focuses on</li>
+                                        <li>Helps debug and understand model behavior</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>4. Handles Variable Lengths</h5>
+                                    <ul>
+                                        <li>Works equally well for short and long sequences</li>
+                                        <li>No fixed-size bottleneck</li>
+                                        <li>Scales naturally with sequence length</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -202,6 +395,105 @@
                                     <li>Combine the relevant Values to answer your question</li>
                                 </ol>
                             </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Understanding Query, Key, and Value</h4>
+                                
+                                <div class="example-box">
+                                    <h5>Query (Q) - "What am I looking for?"</h5>
+                                    <p><strong>In sequence-to-sequence models:</strong></p>
+                                    <ul>
+                                        <li>Query comes from the decoder's current hidden state</li>
+                                        <li>Represents: "What information do I need right now to generate the next word?"</li>
+                                        <li>Example: When generating "chat" (French for "cat"), the query asks "What in the source sentence relates to what I'm translating?"</li>
+                                        <li><strong>Shape:</strong> (1, d_k) for one query, or (n, d_k) for multiple queries</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Key (K) - "What information is available?"</h5>
+                                    <p><strong>In sequence-to-sequence models:</strong></p>
+                                    <ul>
+                                        <li>Keys come from encoder hidden states</li>
+                                        <li>Represents: "What information does each source position contain?"</li>
+                                        <li>Example: Each source word has a key that describes its content and relevance</li>
+                                        <li><strong>Shape:</strong> (m, d_k) where m is source sequence length</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Value (V) - "What is the actual information?"</h5>
+                                    <p><strong>In sequence-to-sequence models:</strong></p>
+                                    <ul>
+                                        <li>Values also come from encoder hidden states</li>
+                                        <li>Represents: "The actual content/representation at each source position"</li>
+                                        <li>Example: The full semantic representation of each source word</li>
+                                        <li><strong>Shape:</strong> (m, d_v) where m is source sequence length</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Why Separate Q, K, and V?</h4>
+                                <p><strong>Key insight: Query and Key determine relevance, Value provides the information</strong></p>
+                                
+                                <div class="example-box">
+                                    <h5>1. Separation of Concerns</h5>
+                                    <ul>
+                                        <li><strong>Q and K:</strong> Used together to compute "how relevant is this?"</li>
+                                        <li><strong>V:</strong> Used to provide "what is the actual information?"</li>
+                                        <li>This separation allows the model to learn different representations for matching vs. content</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>2. Flexibility in Representation</h5>
+                                    <ul>
+                                        <li>Q, K, V can have different learned projections</li>
+                                        <li>Model can learn: "How to describe what I'm looking for" (Q) vs "How to describe what I have" (K) vs "What information to extract" (V)</li>
+                                        <li>This flexibility improves model capacity and performance</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>3. Real-World Example</h5>
+                                    <p><strong>Translating: "The cat sat on the mat" → "Le chat s'est assis sur le tapis"</strong></p>
+                                    <ul>
+                                        <li>When generating "chat":</li>
+                                        <li><strong>Query:</strong> "I'm generating a noun, what should it be?"</li>
+                                        <li><strong>Keys:</strong> ["The" → article, "cat" → noun, "sat" → verb, ...]</li>
+                                        <li><strong>Attention:</strong> High score for "cat" key (matches query for noun)</li>
+                                        <li><strong>Value:</strong> The full representation of "cat" (semantic, grammatical info)</li>
+                                        <li><strong>Result:</strong> Context vector emphasizes "cat" information</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="explanation-box" style="margin-top: 2rem;">
+                                <h4>Computing Q, K, V from Input</h4>
+                                <p><strong>In practice, Q, K, V are computed from input embeddings using learned linear transformations:</strong></p>
+                                
+                                <div class="example-box">
+                                    <h5>Linear Projections</h5>
+                                    <ul>
+                                        <li><strong>Input:</strong> Embeddings X (e.g., from encoder or decoder)</li>
+                                        <li><strong>Query:</strong> Q = X × W_Q (learned weight matrix)</li>
+                                        <li><strong>Key:</strong> K = X × W_K (learned weight matrix)</li>
+                                        <li><strong>Value:</strong> V = X × W_V (learned weight matrix)</li>
+                                        <li><strong>Why different matrices?</strong> Allows model to learn different "views" of the same input</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="example-box">
+                                    <h5>Dimension Considerations</h5>
+                                    <ul>
+                                        <li>Q and K typically have same dimension (d_k) for dot product compatibility</li>
+                                        <li>V can have different dimension (d_v), though often d_v = d_k</li>
+                                        <li>Common: d_k = d_v = 64 (for each head in multi-head attention)</li>
+                                        <li>Original Transformer: d_model = 512, d_k = d_v = 64</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -223,6 +515,131 @@
                                     <li><strong>softmax(...):</strong> Convert scores to probabilities (attention weights)</li>
                                     <li><strong>× V:</strong> Weighted sum of values based on attention weights</li>
                                 </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box" style="margin-top: 2rem;">
+                            <h4>Deep Dive into Each Component</h4>
+                            
+                            <div class="example-box">
+                                <h5>1. Computing QK^T (Dot Product Similarity)</h5>
+                                <p><strong>What it does:</strong> Measures how similar each query is to each key</p>
+                                <ul>
+                                    <li><strong>Mathematical operation:</strong> Matrix multiplication of Q and K^T (transpose of K)</li>
+                                    <li><strong>Result shape:</strong> (num_queries, num_keys)</li>
+                                    <li><strong>Each element:</strong> Dot product between one query and one key</li>
+                                    <li><strong>Higher values:</strong> Query and key are more similar/relevant</li>
+                                </ul>
+                                
+                                <p><strong>Example:</strong> If Q has 1 query and K has 5 keys:</p>
+                                <ul>
+                                    <li>QK^T produces 5 scores: [score_1, score_2, score_3, score_4, score_5]</li>
+                                    <li>score_1 = how similar query is to key_1</li>
+                                    <li>score_2 = how similar query is to key_2</li>
+                                    <li>And so on...</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>2. Scaling by √d_k (Why It's Critical)</h5>
+                                <p><strong>The problem without scaling:</strong></p>
+                                <ul>
+                                    <li>Dot products grow with dimension d_k</li>
+                                    <li>For large d_k, dot products can be very large (e.g., 100, 200, 500+)</li>
+                                    <li>Large values push softmax into saturation regions</li>
+                                    <li><strong>Result:</strong> Very small gradients, making training difficult</li>
+                                </ul>
+                                
+                                <p><strong>The solution - scaling:</strong></p>
+                                <ul>
+                                    <li>Divide by √d_k to normalize the scale</li>
+                                    <li>Keeps dot products in a reasonable range (typically -10 to +10)</li>
+                                    <li>Softmax operates in a region with good gradients</li>
+                                    <li><strong>Result:</strong> Stable training and better gradients</li>
+                                </ul>
+                                
+                                <p><strong>Mathematical intuition:</strong> If Q and K have dimension d_k, their dot product has variance proportional to d_k. Dividing by √d_k normalizes the variance to 1.</p>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>3. Softmax Normalization</h5>
+                                <p><strong>What softmax does:</strong> Converts raw scores into a probability distribution</p>
+                                <ul>
+                                    <li><strong>Input:</strong> Raw attention scores (can be any real numbers)</li>
+                                    <li><strong>Output:</strong> Probabilities that sum to 1.0</li>
+                                    <li><strong>Formula:</strong> softmax(x_i) = exp(x_i) / Σ exp(x_j)</li>
+                                    <li><strong>Effect:</strong> Higher scores get exponentially higher probabilities</li>
+                                </ul>
+                                
+                                <p><strong>Example:</strong> Scores [2, 1, 0.5] → Softmax → [0.58, 0.32, 0.10]</p>
+                                <ul>
+                                    <li>Highest score (2) gets 58% of attention</li>
+                                    <li>Medium score (1) gets 32%</li>
+                                    <li>Lowest score (0.5) gets 10%</li>
+                                    <li>All sum to 1.0 (probability distribution)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>4. Weighted Sum with Values</h5>
+                                <p><strong>Final step:</strong> Multiply attention weights by values and sum</p>
+                                <ul>
+                                    <li><strong>Attention weights:</strong> [0.58, 0.32, 0.10] (from softmax)</li>
+                                    <li><strong>Values:</strong> [V₁, V₂, V₃] (encoder hidden states)</li>
+                                    <li><strong>Output:</strong> 0.58×V₁ + 0.32×V₂ + 0.10×V₃</li>
+                                    <li><strong>Result:</strong> A context vector that emphasizes V₁ (most relevant)</li>
+                                </ul>
+                                
+                                <p><strong>Why this works:</strong></p>
+                                <ul>
+                                    <li>More relevant positions (higher attention weights) contribute more</li>
+                                    <li>Less relevant positions contribute less</li>
+                                    <li>Creates a focused representation for the current decoding step</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box" style="margin-top: 2rem;">
+                            <h4>Complete Mathematical Flow</h4>
+                            <p><strong>Let's trace through a concrete example:</strong></p>
+                            
+                            <div class="example-box">
+                                <h5>Example: Translating "cat" → "chat"</h5>
+                                <p><strong>Setup:</strong></p>
+                                <ul>
+                                    <li>Source: "The cat sat on the mat" (5 words)</li>
+                                    <li>Currently generating: "chat" (French for "cat")</li>
+                                    <li>d_k = 64</li>
+                                </ul>
+                                
+                                <p><strong>Step 1: Compute QK^T</strong></p>
+                                <ul>
+                                    <li>Q: Query from decoder (1 query vector, 64-dim)</li>
+                                    <li>K: Keys from encoder (5 key vectors, each 64-dim)</li>
+                                    <li>QK^T: [0.2, 8.5, 1.1, 0.3, 0.5] (5 scores, one per source word)</li>
+                                    <li>High score (8.5) at position 1 → "cat" is highly relevant!</li>
+                                </ul>
+                                
+                                <p><strong>Step 2: Scale by √d_k</strong></p>
+                                <ul>
+                                    <li>√64 = 8</li>
+                                    <li>Scaled scores: [0.025, 1.0625, 0.1375, 0.0375, 0.0625]</li>
+                                    <li>Scores are now in a reasonable range</li>
+                                </ul>
+                                
+                                <p><strong>Step 3: Apply Softmax</strong></p>
+                                <ul>
+                                    <li>Softmax([0.025, 1.0625, 0.1375, 0.0375, 0.0625])</li>
+                                    <li>Attention weights: [0.05, 0.70, 0.10, 0.05, 0.10]</li>
+                                    <li>70% attention on "cat" (position 1) - exactly what we want!</li>
+                                </ul>
+                                
+                                <p><strong>Step 4: Weighted Sum</strong></p>
+                                <ul>
+                                    <li>0.05×V("The") + 0.70×V("cat") + 0.10×V("sat") + 0.05×V("on") + 0.10×V("the")</li>
+                                    <li>Context vector heavily emphasizes "cat" information</li>
+                                    <li>Decoder uses this to generate "chat"</li>
+                                </ul>
                             </div>
                         </div>
                     </div>

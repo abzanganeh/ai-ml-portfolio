@@ -188,6 +188,53 @@
                                 <li>Final embedding: [0.3, -0.2, 0.6, ...] (element-wise addition)</li>
                                 <li>This preserves the embedding space while adding position info</li>
                             </ul>
+                            
+                            <div class="example-box" style="margin-top: 1.5rem;">
+                                <h4>Why Addition Instead of Concatenation?</h4>
+                                <p><strong>Mathematical and practical reasons:</strong></p>
+                                <ul>
+                                    <li><strong>Dimension preservation:</strong> Addition keeps d_model constant, concatenation doubles it</li>
+                                    <li><strong>Computational efficiency:</strong> Smaller matrices in subsequent operations</li>
+                                    <li><strong>Information mixing:</strong> Model learns to separate token and position information</li>
+                                    <li><strong>Empirical performance:</strong> Addition works as well or better than concatenation</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box" style="margin-top: 1.5rem;">
+                                <h4>How the Model Separates Information</h4>
+                                <p><strong>The model learns to distinguish token vs position information:</strong></p>
+                                <ul>
+                                    <li>During training, the model sees many tokens at different positions</li>
+                                    <li>It learns: "This part of the embedding is about the word, that part is about position"</li>
+                                    <li>The learned transformations can separate and use both types of information</li>
+                                    <li>Like learning to read both the content and page number of a book simultaneously</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box" style="margin-top: 2rem;">
+                            <h3>Relative vs Absolute Positional Encoding</h3>
+                            <p><strong>Two approaches to encoding position:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Absolute Positional Encoding (Original Transformer)</h4>
+                                <ul>
+                                    <li><strong>What it encodes:</strong> Exact position in sequence (0, 1, 2, ...)</li>
+                                    <li><strong>Example:</strong> Position 5 always gets the same encoding</li>
+                                    <li><strong>Advantage:</strong> Simple, direct</li>
+                                    <li><strong>Limitation:</strong> Doesn't explicitly encode relative distances</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Relative Positional Encoding (Modern Variants)</h4>
+                                <ul>
+                                    <li><strong>What it encodes:</strong> Distance between positions (i - j)</li>
+                                    <li><strong>Example:</strong> Encodes "these two words are 3 positions apart"</li>
+                                    <li><strong>Advantage:</strong> Better generalization, captures relative relationships</li>
+                                    <li><strong>Implementation:</strong> Modifies attention scores directly</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -199,6 +246,9 @@
                             
                             <div class="formula-display">
                                 \[PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right)\]
+                            </div>
+                            
+                            <div class="formula-display" style="margin-top: 1rem;">
                                 \[PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)\]
                             </div>
                             
@@ -218,6 +268,15 @@
                                     <li>Relative positions can be computed: PE(pos+k) can be derived from PE(pos)</li>
                                     <li>Allows model to understand relative distances</li>
                                 </ul>
+                                
+                                <h5>Understanding the Formula Components:</h5>
+                                <ul>
+                                    <li><strong>pos:</strong> The absolute position (0, 1, 2, ...)</li>
+                                    <li><strong>10000^{2i/d_model}:</strong> Creates different frequencies for different dimensions</li>
+                                    <li><strong>Lower i (dimensions 0, 1):</strong> Higher frequency, captures fine-grained position differences</li>
+                                    <li><strong>Higher i (dimensions 254, 255):</strong> Lower frequency, captures coarse position differences</li>
+                                    <li><strong>Sine and cosine:</strong> Provide complementary information, enable relative position computation</li>
+                                </ul>
                             </div>
                         </div>
 
@@ -235,6 +294,34 @@
                                     <li>Positional encoding: Position information</li>
                                     <li>Addition: Combines both types of information</li>
                                     <li>Result: Each token has both semantic and positional information</li>
+                                </ul>
+                                
+                                <h5>Mathematical Properties:</h5>
+                                <ul>
+                                    <li><strong>Element-wise addition:</strong> Each dimension adds independently</li>
+                                    <li><strong>Preserves norms:</strong> Roughly maintains embedding magnitude</li>
+                                    <li><strong>Learnable separation:</strong> Model learns to use both components</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box" style="margin-top: 2rem;">
+                            <h4>Relative Position Property</h4>
+                            
+                            <div class="formula-display">
+                                \[PE_{pos+k} = f(PE_{pos}, PE_k)\]
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Key Insight:</h5>
+                                <p>The sinusoidal encoding has a special property: the encoding for position (pos + k) can be computed from the encodings for position pos and position k using trigonometric identities. This allows the model to understand relative positions even if it hasn't seen that exact absolute position during training.</p>
+                                
+                                <h5>Mathematical Derivation:</h5>
+                                <p>Using trigonometric addition formulas:</p>
+                                <ul>
+                                    <li>sin(a + b) = sin(a)cos(b) + cos(a)sin(b)</li>
+                                    <li>cos(a + b) = cos(a)cos(b) - sin(a)sin(b)</li>
+                                    <li>This enables computing relative positions from absolute positions</li>
                                 </ul>
                             </div>
                         </div>

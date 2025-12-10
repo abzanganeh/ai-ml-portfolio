@@ -180,9 +180,6 @@
                                 </ul>
                             </div>
                             </div>
-                            <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
-                            </div>
                         </div>
                     </div>
 
@@ -294,11 +291,99 @@ def generate_answer(query, retrieved_docs, llm):
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Advanced RAG Techniques</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What are advanced RAG techniques?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Methods to improve RAG performance: query expansion, multi-query retrieval, parent-child chunking, context compression, iterative retrieval, and metadata filtering</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only using better models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only using more data</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No advanced techniques exist</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Interview question: "What is query expansion and why is it useful?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Rewriting or expanding queries with synonyms, related terms, or context to improve retrieval. Helps find relevant documents that use different terminology than the query</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Making queries longer</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Shortening queries</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Query expansion is not useful</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is parent-child chunking?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Store small chunks for precise retrieval, but include parent document context when generating answers. Balances retrieval precision with generation context</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking by file hierarchy</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random chunking</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No parent-child relationship</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: Interview question: "How do you handle context window limitations in RAG?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use context compression (summarize chunks, extract relevant sentences), prioritize most relevant chunks, use parent-child chunking, or implement iterative retrieval for complex queries</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Ignore context limits</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only use first chunks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No solution exists</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is multi-query retrieval?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Generating multiple query variations, retrieving documents for each, and combining results to improve coverage and find more relevant information</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Using multiple databases</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Asking multiple users</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference from single query</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: Interview question: "What is iterative retrieval and when would you use it?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Multi-hop retrieval where if initial answer is incomplete, generate follow-up queries and retrieve more context. Repeat until complete. Useful for complex, multi-part questions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Retrieving once</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Retrieving randomly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Iterative retrieval is never needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: In the context window constraint \(|\text{query}| + |\text{context}| + |\text{answer}| \leq \text{max\_context\_length}\), what does this mean?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Total tokens (query + context + answer) must fit within LLM's context window, limiting how much retrieved context can be included</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only query length matters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Context length is unlimited</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Answer length doesn't count</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: Interview question: "What is Self-RAG and how does it differ from standard RAG?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Self-RAG is an autonomous system where the model decides when to retrieve, when to generate, and when to stop. More flexible than fixed retrieval-then-generate pipeline</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Same as standard RAG</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No retrieval needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only generation, no retrieval</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What is the answer quality score formula measuring?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Combined score of relevance (addresses query), faithfulness (grounded in context), and completeness (comprehensive answer) with weighting factors</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only answer length</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only retrieval score</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random score</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: Interview question: "How do you implement metadata filtering in RAG?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Store document metadata (date, type, source) with embeddings, filter by metadata before or after similarity search, use vector database metadata filters, and combine with semantic search</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only filter after search</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Metadata is not used</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only use metadata, no search</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is context compression and why is it needed?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Reducing retrieved context size (summarize, extract relevant parts) to fit in LLM context window while preserving important information. Needed when retrieved chunks exceed context limits</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Compressing files</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Reducing embedding size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Context compression is not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Interview question: "How would you optimize RAG for better answer quality?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Improve retrieval (better embeddings, hybrid search, reranking), use query expansion, implement parent-child chunking, add context compression, use iterative retrieval for complex queries, and evaluate with quality metrics</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only use better LLM</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only use more documents</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No optimization possible</div>
                             </div>
                         </div>
                     </div>

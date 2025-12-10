@@ -155,6 +155,70 @@
                                 </ul>
                             </div>
                         </div>
+                        
+                        <div class="explanation-box" style="margin-top: 2rem;">
+                            <h4>Detailed Comparison</h4>
+                            
+                            <div class="example-box">
+                                <h5>Architectural Differences</h5>
+                                <p><strong>Regular Attention (Cross-Attention):</strong></p>
+                                <ul>
+                                    <li><strong>Two sequences:</strong> Source sequence and target sequence</li>
+                                    <li><strong>Information flow:</strong> From source to target</li>
+                                    <li><strong>Query source:</strong> Target sequence (decoder)</li>
+                                    <li><strong>Key/Value source:</strong> Source sequence (encoder)</li>
+                                    <li><strong>Purpose:</strong> Allow target to access source information</li>
+                                    <li><strong>Example:</strong> When translating, decoder queries encoder states to find relevant source words</li>
+                                </ul>
+                                
+                                <p><strong>Self-Attention:</strong></p>
+                                <ul>
+                                    <li><strong>One sequence:</strong> Same sequence for all components</li>
+                                    <li><strong>Information flow:</strong> Within the sequence itself</li>
+                                    <li><strong>Query, Key, Value:</strong> All from the same sequence</li>
+                                    <li><strong>Purpose:</strong> Allow each position to access all other positions</li>
+                                    <li><strong>Example:</strong> In "The cat sat", "cat" can attend to "The" and "sat" to understand its role</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>When to Use Each</h5>
+                                <p><strong>Regular Attention:</strong></p>
+                                <ul>
+                                    <li>Sequence-to-sequence tasks (translation, summarization)</li>
+                                    <li>When you need to align two different sequences</li>
+                                    <li>Encoder-decoder architectures</li>
+                                    <li>Tasks requiring cross-sequence information flow</li>
+                                </ul>
+                                
+                                <p><strong>Self-Attention:</strong></p>
+                                <ul>
+                                    <li>Understanding relationships within a single sequence</li>
+                                    <li>Creating contextualized word embeddings</li>
+                                    <li>Encoder-only models (BERT) or decoder-only models (GPT)</li>
+                                    <li>Tasks requiring intra-sequence understanding</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h5>Computational Differences</h5>
+                                <p><strong>Regular Attention:</strong></p>
+                                <ul>
+                                    <li>Q shape: (target_len, d_k)</li>
+                                    <li>K, V shape: (source_len, d_k)</li>
+                                    <li>Attention matrix: (target_len, source_len)</li>
+                                    <li>Complexity: O(target_len × source_len)</li>
+                                </ul>
+                                
+                                <p><strong>Self-Attention:</strong></p>
+                                <ul>
+                                    <li>Q, K, V shape: (seq_len, d_k) - all same length!</li>
+                                    <li>Attention matrix: (seq_len, seq_len) - square matrix</li>
+                                    <li>Complexity: O(seq_len²)</li>
+                                    <li>Can process all positions in parallel</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="computation" class="content-section">

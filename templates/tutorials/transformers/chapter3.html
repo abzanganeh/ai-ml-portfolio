@@ -160,6 +160,60 @@
                                 <li>Each head operates in its own 64-dimensional subspace</li>
                                 <li>This allows parallel computation and specialization</li>
                             </ul>
+                            
+                            <div class="example-box" style="margin-top: 1.5rem;">
+                                <h4>Detailed Dimension Breakdown</h4>
+                                <p><strong>Example with d_model = 512, num_heads = 8:</strong></p>
+                                <ul>
+                                    <li><strong>Input:</strong> X shape (batch, seq_len, 512)</li>
+                                    <li><strong>Q projection:</strong> W_Q shape (512, 512) → Q shape (batch, seq_len, 512)</li>
+                                    <li><strong>Split Q:</strong> 8 heads, each (batch, seq_len, 64)</li>
+                                    <li><strong>Same for K and V:</strong> Each split into 8 heads of 64 dimensions</li>
+                                    <li><strong>Each head:</strong> Computes attention independently in 64-dim space</li>
+                                    <li><strong>After attention:</strong> Each head outputs (batch, seq_len, 64)</li>
+                                    <li><strong>Concatenate:</strong> 8 heads × 64 dims = 512 dims (batch, seq_len, 512)</li>
+                                    <li><strong>Output projection:</strong> W_O shape (512, 512) → Final (batch, seq_len, 512)</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box" style="margin-top: 1.5rem;">
+                                <h4>Why Split Dimensions?</h4>
+                                <p><strong>Advantages of dimension splitting:</strong></p>
+                                <ul>
+                                    <li><strong>Computational efficiency:</strong> Each head operates on smaller matrices (64×64 vs 512×512)</li>
+                                    <li><strong>Parallel processing:</strong> All heads can compute simultaneously</li>
+                                    <li><strong>Specialization:</strong> Each head learns different patterns in its subspace</li>
+                                    <li><strong>Parameter efficiency:</strong> Total parameters similar to single-head, but more expressive</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box" style="margin-top: 2rem;">
+                            <h3>Head Specialization in Practice</h3>
+                            <p><strong>Research shows that different heads learn different patterns:</strong></p>
+                            
+                            <div class="example-box">
+                                <h4>Observed Head Behaviors</h4>
+                                <ul>
+                                    <li><strong>Syntactic heads:</strong> Focus on grammatical relationships (subject-verb, adjective-noun)</li>
+                                    <li><strong>Semantic heads:</strong> Focus on meaning and topic relationships</li>
+                                    <li><strong>Positional heads:</strong> Focus on relative positions and distances</li>
+                                    <li><strong>Long-range heads:</strong> Capture dependencies between distant words</li>
+                                    <li><strong>Local heads:</strong> Focus on immediate neighbors</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="example-box">
+                                <h4>Example: Multi-Head Analysis</h4>
+                                <p><strong>Sentence:</strong> "The bank that the river flows by is closed."</p>
+                                <ul>
+                                    <li><strong>Head 1:</strong> "bank" attends to "closed" (subject-predicate)</li>
+                                    <li><strong>Head 2:</strong> "bank" attends to "river" (disambiguates "bank" = financial, not riverbank)</li>
+                                    <li><strong>Head 3:</strong> "that" attends to "bank" (relative pronoun)</li>
+                                    <li><strong>Head 4:</strong> "flows" attends to "river" (verb-subject)</li>
+                                    <li><strong>Result:</strong> Multiple perspectives combined for complete understanding</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -171,6 +225,9 @@
                             
                             <div class="formula-display">
                                 \[\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O\]
+                            </div>
+                            
+                            <div class="formula-display" style="margin-top: 1rem;">
                                 \[\text{where } \text{head}_i = \text{Attention}(QW^Q_i, KW^K_i, VW^V_i)\]
                             </div>
                             
@@ -191,6 +248,38 @@
                                     <li>Each head: (batch, seq_len, d_model/h)</li>
                                     <li>After concat: (batch, seq_len, d_model)</li>
                                     <li>After W^O: (batch, seq_len, d_model)</li>
+                                </ul>
+                                
+                                <h5>Step-by-Step Computation:</h5>
+                                <ol>
+                                    <li><strong>Create Q, K, V:</strong> Q = XW_Q, K = XW_K, V = XW_V (all shape: batch × seq_len × d_model)</li>
+                                    <li><strong>Split into heads:</strong> Reshape to (batch × h, seq_len, d_model/h) for each of Q, K, V</li>
+                                    <li><strong>Compute attention per head:</strong> Each head computes scaled dot-product attention independently</li>
+                                    <li><strong>Concatenate:</strong> Combine all h heads → (batch, seq_len, d_model)</li>
+                                    <li><strong>Output projection:</strong> Multiply by W^O to get final output</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="formula-box" style="margin-top: 2rem;">
+                            <h4>Efficient Implementation Formula</h4>
+                            
+                            <div class="formula-display">
+                                \[\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O\]
+                            </div>
+                            
+                            <div class="formula-display" style="margin-top: 1rem;">
+                                \[\text{where } \text{head}_i = \text{Attention}(Q_i, K_i, V_i) = \text{softmax}\left(\frac{Q_i K_i^T}{\sqrt{d_k}}\right) V_i\]
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Efficient Computation:</h5>
+                                <ul>
+                                    <li>All heads can be computed in parallel using batched matrix operations</li>
+                                    <li>Instead of h separate computations, use one large batched computation</li>
+                                    <li>Q, K, V are reshaped to include head dimension: (batch, h, seq_len, d_k)</li>
+                                    <li>Attention computed for all heads simultaneously</li>
+                                    <li>Much faster on GPUs than sequential head computation</li>
                                 </ul>
                             </div>
                         </div>

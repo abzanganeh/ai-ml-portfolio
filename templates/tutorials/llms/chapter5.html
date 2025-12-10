@@ -325,11 +325,99 @@ def format_instruction(example):
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Fine-tuning Strategies</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is the main purpose of fine-tuning a pre-trained LLM?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To adapt the pre-trained model to a specific task or domain by updating its parameters on task-specific data, leveraging the general knowledge learned during pre-training</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To retrain the model from scratch</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce the model size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To change the model architecture</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the difference between full fine-tuning and parameter-efficient fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Full fine-tuning updates all model parameters and requires more resources, while parameter-efficient methods (like LoRA) only train a small subset of parameters, making it more memory and compute efficient</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are identical approaches</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Full fine-tuning is faster than parameter-efficient methods</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Parameter-efficient methods require more memory</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: Why are lower learning rates typically used for fine-tuning compared to training from scratch?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-trained weights are already good, and high learning rates can destroy this pre-trained knowledge, so smaller updates (1e-5 to 1e-3) preserve the learned representations while adapting to the new task</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Lower learning rates make training faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Higher learning rates are always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Learning rate doesn't matter for fine-tuning</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is catastrophic forgetting in the context of fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The phenomenon where fine-tuning on a new task causes the model to forget what it learned during pre-training, which can be mitigated with lower learning rates, freezing early layers, and regularization</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A technique to improve fine-tuning performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) A method to reduce model size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A type of optimization algorithm</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is instruction tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Fine-tuning on diverse tasks formatted as instructions, which teaches the model to follow instructions and generalize to new instruction-formatted tasks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A method to reduce model parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) A technique for generating instructions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A way to speed up training</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the mathematical formulation for fine-tuning loss?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(L_{\text{ft}} = -\frac{1}{N} \sum_{i=1}^{N} \log P(y_i | x_i, \theta_0 + \Delta\theta)\) where \(\theta_0\) are pre-trained parameters and \(\Delta\theta\) are small updates</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(L = \sum_{i=1}^{N} y_i\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(L = \max_i P(y_i | x_i)\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(L = \frac{1}{N} \sum_{i=1}^{N} x_i\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What is multi-task fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Training on multiple tasks simultaneously by combining data from different tasks, which helps the model learn to handle diverse scenarios and improves generalization</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Training on one task at a time sequentially</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Using multiple models for one task</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A method to reduce training time</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: When should you use fine-tuning versus prompting?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use fine-tuning when you have task-specific labeled data and need high performance on a specific domain, while use prompting when you have limited data and need quick iteration</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use fine-tuning, never prompting</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use prompting, never fine-tuning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They are interchangeable</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What is partial fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Freezing early layers and only training later layers plus the task-specific head, which reduces memory requirements while maintaining most performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Training only the first layer</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Training only the output layer</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Training with partial data</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What are some common fine-tuning use cases?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Domain-specific applications (medical, legal, code), task-specific models (sentiment analysis, NER, QA), and instruction-tuned models for better instruction following</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only image classification</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only speech recognition</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only data preprocessing</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is the learning rate schedule formula used in fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Warmup phase gradually increases learning rate, then linear decay: \(\text{lr}(t) = \text{lr}_{\text{max}} \times \frac{t}{T_{\text{warmup}}}\) for warmup, then linear decay afterward</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Constant learning rate throughout</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Exponential increase</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random learning rate</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What is the multi-task loss formulation?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(L = \sum_{t=1}^{T} \alpha_t L_t\) where \(T\) is the number of tasks, \(L_t\) is the loss for task t, and \(\alpha_t\) is the task weight</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(L = \max_t L_t\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(L = \frac{1}{T} \sum_{t=1}^{T} L_t\) (equal weights only)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(L = \prod_{t=1}^{T} L_t\)</div>
                             </div>
                         </div>
                     </div>

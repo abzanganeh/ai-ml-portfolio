@@ -182,10 +182,13 @@
                                 \[\text{rerank\_score}(q, d) = \text{CrossEncoder}(q, d)\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Cross-encoder model takes query and document as input and outputs relevance score. More accurate than embedding similarity but slower.</p>
-                            </div>
-                            <div class="formula-explanation">
-                                <p>Step-by-step formula breakdowns with explanations.</p>
+                                <h5>Where:</h5>
+                                <ul>
+                                    <li>\(\text{CrossEncoder}\): Model that processes query and document together</li>
+                                    <li>More accurate than embedding-based similarity (bi-encoder)</li>
+                                    <li>Slower because it processes each query-document pair</li>
+                                    <li>Typically used to rerank top-k candidates from initial retrieval</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -299,11 +302,99 @@ def rerank(query, documents, top_k=3):
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Retrieval Strategies</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What are the main retrieval strategies in RAG?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dense retrieval (semantic search), sparse retrieval (keyword/BM25), and hybrid retrieval (combining both)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only keyword search</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only semantic search</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random selection</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Interview question: "What is the difference between dense and sparse retrieval?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dense uses embeddings for semantic similarity (handles synonyms, paraphrasing). Sparse uses keyword matching (BM25, TF-IDF) for exact term matching. Dense is better for meaning, sparse for keywords</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Dense is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sparse is always better</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is hybrid retrieval and why is it effective?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Combining dense and sparse retrieval scores, leveraging semantic understanding and keyword matching together for better results than either alone</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Using two different models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Searching twice</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Hybrid is not effective</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: In the hybrid score formula \(\text{score}(q, d) = \alpha \times \text{BM25}(q, d) + (1 - \alpha) \times \text{cosine}(E(q), E(d))\), what does \(\alpha\) control?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The weight between sparse (BM25) and dense (cosine similarity) scores. Higher α emphasizes keywords, lower α emphasizes semantics</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The number of results</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The similarity threshold</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The embedding dimension</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: Interview question: "What is BM25 and how does it work?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Best Matching 25 - a probabilistic ranking function that scores documents based on term frequency, inverse document frequency, and document length normalization. Better than TF-IDF for retrieval</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A neural network</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) An embedding model</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A database</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is reranking in retrieval?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Re-scoring initial retrieval results using more accurate models (cross-encoders) to improve relevance ordering before passing to LLM</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Removing results</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Combining results</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Reranking is not used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: Interview question: "When would you use dense vs sparse retrieval?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dense for semantic queries, synonyms, paraphrasing. Sparse for exact keyword matching, technical terms, names. Hybrid for best of both</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use dense</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use sparse</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random choice</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What is a cross-encoder and how is it used in reranking?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A model that processes query and document together (not separately like bi-encoder), providing more accurate relevance scores but slower. Used for reranking top-k results</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A database</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) An embedding model</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A search algorithm</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: Interview question: "How do you choose top-k for retrieval?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Balance context quality (more docs = more info) vs cost/latency (fewer = faster, cheaper). Typical: 3-10. Test on your data. Use reranking if retrieving more initially</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use k=1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use k=100</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) k doesn't matter</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What is the typical value of α in hybrid retrieval?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) 0.3-0.7, often around 0.5. Tune based on your data - more semantic queries need lower α, more keyword queries need higher α</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always 0.0</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always 1.0</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) α is not used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: Interview question: "How do you evaluate retrieval quality?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use metrics like precision@k, recall@k, MRR (Mean Reciprocal Rank), NDCG. Test on labeled query-document pairs. Measure downstream RAG answer quality</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only check speed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only check cost</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No evaluation needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What is the trade-off between retrieval speed and accuracy?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) More accurate methods (reranking, exact search) are slower. Approximate search (ANN) is faster but less accurate. Balance based on latency requirements and quality needs</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Speed and accuracy are the same</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Faster is always more accurate</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Slower is always more accurate</div>
                             </div>
                         </div>
                     </div>

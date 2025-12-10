@@ -238,7 +238,7 @@
                             <p>For a 2D convolution:</p>
                             
                             <div class="formula-display">
-                                <strong>(I * K)[i, j] = Σₘ Σₙ I[i+m, j+n] × K[m, n]</strong>
+                                \[(I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -602,10 +602,12 @@ print("Convolution result:\n", result)</code></pre>
                             <p><strong>Takes the maximum value in each pooling window:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>Output[i, j] = max(Input[i×s : i×s+p, j×s : j×s+p])</strong>
+                                \[\text{Output}[i, j] = \max(\text{Input}[i \times s : i \times s + p, j \times s : j \times s + p])\]
                             </div>
                             
-                            <p>Where <strong>s</strong> is stride and <strong>p</strong> is pool size</p>
+                            <div class="formula-explanation">
+                                <p>Where \(s\) is stride and \(p\) is pool size</p>
+                            </div>
                             
                             <div class="formula-explanation">
                                 <h5>Why Max Pooling?</h5>
@@ -843,8 +845,13 @@ cnn = SimpleCNN()
                             <p><strong>For convolution layer:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂K = I * (∂L/∂O)</strong> (convolved with input)<br>
-                                <strong>∂L/∂I = K * (∂L/∂O)</strong> (convolved with kernel, transposed)
+                                \[\frac{\partial L}{\partial K} = I * \left(\frac{\partial L}{\partial O}\right)\]
+                            </div>
+                            <div class="formula-display" style="margin-top: 1rem;">
+                                \[\frac{\partial L}{\partial I} = K * \left(\frac{\partial L}{\partial O}\right)\]
+                            </div>
+                            <div class="formula-explanation">
+                                <p>First equation: convolved with input. Second equation: convolved with kernel (transposed).</p>
                             </div>
                             
                             <div class="formula-explanation">
@@ -862,7 +869,7 @@ cnn = SimpleCNN()
                             <p><strong>For max pooling:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>Gradient flows only to the maximum value position</strong>
+                                \[\frac{\partial L}{\partial \text{Input}[i,j]} = \begin{cases} \frac{\partial L}{\partial \text{Output}[i',j']} & \text{if } \text{Input}[i,j] = \max(\text{pool region}) \\ 0 & \text{otherwise} \end{cases}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -1005,6 +1012,78 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) High-level object recognition</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Classification decisions</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only color information</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: What is the mathematical formula for convolution operation?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \((I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\) where I is input and K is kernel</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \((I * K) = I + K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \((I * K) = I \times K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \((I * K) = I - K\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is parameter sharing in CNNs?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The same filter weights are used at every spatial location, dramatically reducing the number of parameters compared to fully connected layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All layers share the same parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Parameters are randomly shared</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No parameters are used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the purpose of pooling layers in CNNs?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To reduce spatial dimensions, decrease computational cost, and provide translation invariance by downsampling feature maps</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase image resolution</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add more parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To remove all features</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What is the formula for max pooling?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(\text{Output}[i, j] = \max(\text{Input}[i \times s : i \times s + p, j \times s : j \times s + p])\) where s is stride and p is pool size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(\text{Output} = \text{Input} + 1\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(\text{Output} = \text{Input} \times 2\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(\text{Output} = \text{mean}(\text{Input})\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: How does backpropagation work in convolutional layers?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients are computed using convolution operations: \(\partial L/\partial K = I * (\partial L/\partial O)\) and \(\partial L/\partial I = K * (\partial L/\partial O)\) where the second uses a transposed convolution</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Same as fully connected layers</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No gradients are computed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only forward pass is used</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What is the difference between valid and same padding in convolution?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Valid padding uses no padding, output size is smaller than input. Same padding adds zeros to maintain output size equal to input size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're identical</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Valid padding is larger</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same padding reduces size</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: What is the output size formula for convolution with padding and stride?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(\text{output\_size} = \frac{\text{input\_size} + 2 \times \text{padding} - \text{kernel\_size}}{\text{stride}} + 1\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(\text{output\_size} = \text{input\_size}\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(\text{output\_size} = \text{input\_size} \times 2\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(\text{output\_size} = \text{input\_size} - \text{kernel\_size}\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: Why are CNNs translation invariant?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Because the same filters scan the entire image, and pooling layers reduce sensitivity to exact positions, allowing the network to recognize patterns regardless of their location</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're not translation invariant</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only because of pooling</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only because of convolution</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What is the typical architecture progression in a CNN?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Early layers: small filters detecting edges/textures → Middle layers: larger filters detecting patterns/shapes → Late layers: detecting high-level features/objects → Fully connected layers: classification</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All layers are identical</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only convolution, no pooling</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only pooling, no convolution</div>
                             </div>
                         </div>
                     </div>

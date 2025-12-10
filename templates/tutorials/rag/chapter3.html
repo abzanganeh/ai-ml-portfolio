@@ -376,11 +376,99 @@ print(reranked)</code></pre>
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Document Processing & Chunking</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: Why is document chunking important in RAG systems?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LLMs have context limits, chunking breaks documents into manageable pieces that fit in context windows while preserving semantic meaning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To make documents smaller</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce storage</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking is not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: Interview question: "What are the different chunking strategies and when would you use each?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Fixed-size: Simple, fast, good for uniform text. Semantic: Preserves meaning, better for varied content. Recursive: Handles nested structures. Use fixed-size for speed, semantic for quality, recursive for structured documents</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only fixed-size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only semantic</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking strategy doesn't matter</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is chunk overlap and why is it used?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Overlapping chunks share some content to preserve context at boundaries, preventing information loss when sentences/paragraphs are split</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To reduce storage</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To make chunks smaller</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Overlap is not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: Interview question: "How do you determine optimal chunk size?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Balance LLM context window, retrieval precision (smaller = more precise), and semantic completeness (larger = more context). Common: 200-1000 tokens. Test on your data and downstream task</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use 100 tokens</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use 5000 tokens</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunk size doesn't matter</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What is semantic chunking?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Chunking based on semantic boundaries (sentences, paragraphs, topics) rather than fixed sizes, preserving meaning and context</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking by file size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random chunking</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking by word count only</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: Interview question: "How do you handle different document types (PDF, HTML, Markdown) in RAG?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use appropriate parsers (PyPDF2, BeautifulSoup, markdown), extract text while preserving structure, handle metadata, and apply document-type-specific chunking strategies</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Convert all to text first</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only support one format</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No special handling needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What is metadata extraction in document processing?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Extracting document properties (title, author, date, source, section) to enable filtering and better retrieval in vector databases</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Extracting all text</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Compressing documents</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Metadata is not needed</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: Interview question: "How do you preserve context when chunking documents?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use chunk overlap, preserve sentence/paragraph boundaries, include surrounding context in metadata, and use semantic chunking to keep related content together</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No context preservation needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only use fixed-size chunks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Split randomly</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What are the trade-offs between small and large chunk sizes?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Small chunks: More precise retrieval but may lose context. Large chunks: More context but less precise retrieval. Balance based on query type and document structure</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Small is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Large is always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Size doesn't matter</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: Interview question: "How would you handle very long documents (e.g., books) in RAG?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use hierarchical chunking (chapters → sections → paragraphs), maintain document structure in metadata, use multi-level retrieval, and consider document summarization for overview</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Split into equal chunks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only first part</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Skip long documents</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What is recursive chunking?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Chunking that tries multiple strategies in order (e.g., paragraphs → sentences → characters) until chunks fit size requirements, handling nested document structures</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking twice</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random chunking</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference from fixed-size</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: Interview question: "How do you evaluate chunking quality?"</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Measure retrieval performance (precision@k, recall@k), test downstream RAG quality, check if relevant information is preserved, and evaluate chunk coherence</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only check chunk size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No evaluation needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only check number of chunks</div>
                             </div>
                         </div>
                     </div>

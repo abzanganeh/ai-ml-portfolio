@@ -378,11 +378,99 @@ class LoRALayer(nn.Module):
                         
                         <div class="quiz-container">
                             <div class="quiz-question">
-                                <h3>Question 1: What is the main concept covered in this chapter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LoRA & Parameter-Efficient Fine-tuning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Related concept</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Different topic</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Unrelated topic</div>
+                                <h3>Question 1: What is the main problem that parameter-efficient fine-tuning methods like LoRA solve?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Large models require massive memory and compute for full fine-tuning, making it infeasible for many users. Parameter-efficient methods only train a small subset of parameters, dramatically reducing requirements</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Models are too small</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Training is too fast</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Models don't need fine-tuning</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 2: What is the key insight behind LoRA (Low-Rank Adaptation)?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Weight updates during fine-tuning have low intrinsic rank, so we can approximate updates with low-rank matrices B and A, where W' = W + BA, training only B and A instead of the full weight matrix W</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All weights must be trained</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) High-rank matrices are needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) LoRA increases model size</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 3: What is the mathematical formulation for LoRA weight update?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(W' = W_0 + \Delta W = W_0 + BA\) where \(W_0\) is frozen, and only low-rank matrices B and A are trainable</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(W' = W_0 \times BA\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(W' = W_0 - BA\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(W' = BA\) only</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 4: For a weight matrix of size 768×768, how many parameters does LoRA train if rank r=8?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) 12,288 parameters (2×768×8), which is only about 2% of the original 589,824 parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) 589,824 parameters (same as full fine-tuning)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) 768 parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) 8 parameters</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 5: What are other parameter-efficient fine-tuning methods besides LoRA?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Adapter layers (small trainable layers inserted between transformer layers), prompt tuning (learn soft prompts), and prefix tuning (similar to prompt tuning but applied to all layers)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only LoRA exists</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Full fine-tuning is the only method</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only freezing layers</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 6: What is the forward pass computation with LoRA?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(h = W'x = (W_0 + BA)x = W_0x + B(Ax)\), where \(W_0x\) can be cached and only \(B(Ax)\) needs recomputation during training</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(h = W_0x\) only</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(h = BAx\) only</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(h = W_0 \times BA \times x\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 7: What is the compression ratio formula for LoRA?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(\text{Compression ratio} = \frac{2dr}{d^2} = \frac{2r}{d}\), which for r=8 and d=768 is approximately 2%</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(\text{Compression ratio} = \frac{d}{r}\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(\text{Compression ratio} = d^2\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(\text{Compression ratio} = 2r\)</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 8: What are typical rank values (r) used in LoRA?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Typically 4-16, where lower rank means more compression but potentially lower performance, and higher rank means better performance but more parameters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always 1</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always equal to the dimension d</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random values</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 9: What are the benefits of LoRA fine-tuning compared to full fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) 10-100x reduction in trainable parameters, much less memory usage, faster training, ability to fine-tune on single GPU, and can store many LoRA adapters in the space of one full model</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) LoRA requires more memory</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) LoRA is slower</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) LoRA requires multiple GPUs</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 10: How are LoRA matrices typically initialized?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) B is initialized to zeros (so W' = W initially) and A is initialized with small random values, ensuring training starts from pre-trained weights</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Both are initialized randomly</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Both are initialized to zeros</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Both are initialized to ones</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 11: What are some use cases for LoRA?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Personalized models (one base model with multiple user-specific LoRA adapters), multi-task deployment (switch between tasks by loading different LoRA weights), and edge deployment (fine-tune on devices with limited memory)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only for large-scale training</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only for image tasks</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for speech recognition</div>
+                            </div>
+                            
+                            <div class="quiz-question" style="margin-top: 2rem;">
+                                <h3>Question 12: What is the typical performance trade-off when using LoRA compared to full fine-tuning?</h3>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LoRA typically achieves 90-95% of full fine-tuning performance while using only 1-10% of the trainable parameters, making it an excellent efficiency-performance trade-off</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) LoRA always outperforms full fine-tuning</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) LoRA performs significantly worse (less than 50% of full fine-tuning)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) LoRA and full fine-tuning have identical performance</div>
                             </div>
                         </div>
                     </div>
