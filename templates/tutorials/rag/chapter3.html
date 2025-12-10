@@ -105,57 +105,225 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>Retrieval Strategies</h3>
-                            <p><strong>Dense retrieval (semantic search):</strong></p>
+                            <h3>Why Chunking is Critical for RAG Systems</h3>
+                            
+                            <h4>The Core Problem</h4>
+                            <p>Raw documents in real-world RAG systems are often <strong>extremely long</strong>—think research papers (10,000+ words), legal documents (hundreds of pages), technical documentation (thousands of sections), or entire books. These documents present several fundamental challenges:</p>
+                            
                             <ul>
-                                <li>Uses embeddings for semantic similarity</li>
-                                <li>Finds documents with similar meaning</li>
-                                <li>Handles synonyms and paraphrasing</li>
-                                <li>Most common in RAG systems</li>
+                                <li><strong>Context Window Limits:</strong> Most LLMs have fixed context windows (e.g., GPT-4: 8K-128K tokens, Claude: 100K-200K tokens). A single large document can easily exceed these limits, making it impossible to process the entire document at once.</li>
+                                <li><strong>Embedding Model Constraints:</strong> Embedding models like SentenceTransformers work best with text segments of 128-512 tokens. Very long documents produce embeddings that lose semantic precision—the model struggles to capture the meaning of a 10,000-word document in a single 384-dimensional vector.</li>
+                                <li><strong>Retrieval Precision:</strong> When you retrieve a 50-page document for a specific question, most of that document is irrelevant. The LLM has to sift through thousands of words to find the answer, leading to poor performance and high costs.</li>
+                                <li><strong>Computational Efficiency:</strong> Processing entire documents is computationally expensive. Smaller chunks allow for faster embedding generation, more efficient storage, and quicker retrieval.</li>
                             </ul>
                             
-                            <p><strong>Sparse retrieval (keyword search):</strong></p>
+                            <h4>The Solution: Intelligent Chunking</h4>
+                            <p>Chunking splits large documents into smaller, manageable pieces that:</p>
+                            
                             <ul>
-                                <li>Uses keyword matching (BM25, TF-IDF)</li>
-                                <li>Faster but less semantic understanding</li>
-                                <li>Good for exact term matching</li>
-                                <li>Often combined with dense retrieval (hybrid)</li>
+                                <li><strong>Fit within context limits:</strong> Each chunk is small enough to fit comfortably in the LLM's context window, even when combined with the query and other chunks.</li>
+                                <li><strong>Are semantically meaningful:</strong> Each chunk represents a coherent unit of information (a paragraph, a section, a concept) rather than arbitrary text splits.</li>
+                                <li><strong>Can be retrieved independently:</strong> Each chunk can be embedded and stored separately, allowing the retrieval system to find the most relevant chunk(s) for a specific query.</li>
+                                <li><strong>Maintain context when possible:</strong> Chunks preserve surrounding context (through overlap or metadata) so the LLM understands the broader context when generating answers.</li>
                             </ul>
                             
-                            <p><strong>Hybrid retrieval:</strong></p>
-                            <ul>
-                                <li>Combines dense and sparse retrieval</li>
-                                <li>Reranks results from both methods</li>
-                                <li>Best of both worlds</li>
-                            </ul>
+                            <div class="example-box">
+                                <h5>Real-World Example:</h5>
+                                <p>Imagine you have a 200-page technical manual about machine learning. Without chunking:</p>
+                                <ul>
+                                    <li>❌ The entire document is too large to embed meaningfully</li>
+                                    <li>❌ Retrieval returns the whole manual, even if the question is about a specific algorithm</li>
+                                    <li>❌ The LLM wastes tokens processing irrelevant sections</li>
+                                </ul>
+                                <p>With intelligent chunking:</p>
+                                <ul>
+                                    <li>✅ The manual is split into 500 chunks (one per section/topic)</li>
+                                    <li>✅ Each chunk is embedded separately and stored in the vector database</li>
+                                    <li>✅ A query about "gradient descent" retrieves only the 2-3 most relevant chunks</li>
+                                    <li>✅ The LLM receives focused, relevant context and generates accurate answers</li>
+                                </ul>
+                            </div>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Retrieval Parameters</h3>
-                            <p><strong>Top-k selection:</strong></p>
+                            <h3>Chunking Strategies: Choosing the Right Approach</h3>
+                            
+                            <p>Different chunking strategies serve different purposes. The choice depends on your document type, use case, and performance requirements.</p>
+                            
+                            <h4>1. Fixed-Size Chunking</h4>
+                            <p><strong>What it is:</strong> Splits documents into chunks of a fixed size (measured in characters or tokens), regardless of content structure.</p>
+                            
+                            <p><strong>How it works:</strong></p>
                             <ul>
-                                <li>Number of documents to retrieve (typically 3-10)</li>
-                                <li>More documents = more context but higher cost</li>
-                                <li>Fewer documents = faster but may miss relevant info</li>
+                                <li>Divide the document into equal-sized segments (e.g., 500 characters or 200 tokens)</li>
+                                <li>Each chunk has exactly the same size (except possibly the last chunk)</li>
+                                <li>No consideration for sentence boundaries, paragraphs, or semantic meaning</li>
                             </ul>
                             
-                            <p><strong>Similarity threshold:</strong></p>
+                            <p><strong>Advantages:</strong></p>
                             <ul>
-                                <li>Minimum similarity score to include document</li>
-                                <li>Filters out irrelevant documents</li>
-                                <li>Prevents low-quality context</li>
+                                <li>✅ <strong>Simple and fast:</strong> Very easy to implement, no complex logic needed</li>
+                                <li>✅ <strong>Predictable:</strong> You know exactly how many chunks you'll get for any document size</li>
+                                <li>✅ <strong>Efficient storage:</strong> Uniform chunk sizes make storage and indexing straightforward</li>
+                                <li>✅ <strong>Good for uniform content:</strong> Works well when documents have consistent structure</li>
                             </ul>
+                            
+                            <p><strong>Disadvantages:</strong></p>
+                            <ul>
+                                <li>❌ <strong>May break sentences:</strong> A chunk might end mid-sentence, losing meaning</li>
+                                <li>❌ <strong>Ignores semantic boundaries:</strong> A single concept might be split across two chunks</li>
+                                <li>❌ <strong>Poor for structured content:</strong> Doesn't respect paragraphs, sections, or logical divisions</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> When you have uniform, unstructured text where semantic boundaries don't matter much, or when you need maximum speed and simplicity.</p>
+                            
+                            <h4>2. Sentence-Based Chunking</h4>
+                            <p><strong>What it is:</strong> Splits documents at sentence boundaries, grouping multiple sentences into chunks of roughly equal size.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Identify sentence boundaries using NLP tools (NLTK, spaCy, or regex)</li>
+                                <li>Group sentences together until reaching a target chunk size (e.g., 5-10 sentences or 200-500 tokens)</li>
+                                <li>Each chunk contains complete sentences, never breaking mid-sentence</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Preserves sentence integrity:</strong> Sentences remain intact, maintaining grammatical and semantic coherence</li>
+                                <li>✅ <strong>Better semantic coherence:</strong> Related sentences stay together, improving embedding quality</li>
+                                <li>✅ <strong>Respects natural boundaries:</strong> Works with how humans structure information</li>
+                                <li>✅ <strong>Good for narrative content:</strong> Excellent for articles, stories, and prose</li>
+                            </ul>
+                            
+                            <p><strong>Disadvantages:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Variable chunk sizes:</strong> Chunks may vary significantly in size depending on sentence length</li>
+                                <li>❌ <strong>May split related concepts:</strong> A concept spanning multiple sentences might be split across chunks</li>
+                                <li>❌ <strong>Requires sentence detection:</strong> Needs reliable sentence segmentation (can fail with abbreviations, decimals, etc.)</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For narrative text, articles, blog posts, or any content where sentence boundaries matter. This is often the default choice for general-purpose RAG systems.</p>
+                            
+                            <h4>3. Semantic Chunking (Advanced)</h4>
+                            <p><strong>What it is:</strong> Uses embeddings and similarity calculations to group semantically related sentences together, creating chunks based on meaning rather than size.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Embed each sentence (or small group of sentences) into vector space</li>
+                                <li>Calculate similarity between consecutive sentences</li>
+                                <li>When similarity drops below a threshold, that's a chunk boundary (new topic/concept)</li>
+                                <li>Group similar sentences together until reaching a maximum chunk size</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Most semantically coherent:</strong> Chunks represent complete concepts or topics</li>
+                                <li>✅ <strong>Adaptive to content:</strong> Automatically adjusts to document structure</li>
+                                <li>✅ <strong>Better retrieval quality:</strong> Chunks are more likely to be fully relevant or fully irrelevant</li>
+                                <li>✅ <strong>Respects topic boundaries:</strong> Natural breaks occur at topic transitions</li>
+                            </ul>
+                            
+                            <p><strong>Disadvantages:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Computationally expensive:</strong> Requires embedding every sentence, then calculating similarities</li>
+                                <li>❌ <strong>More complex to implement:</strong> Needs careful tuning of similarity thresholds</li>
+                                <li>❌ <strong>Variable chunk sizes:</strong> Can produce very small or very large chunks</li>
+                                <li>❌ <strong>Requires embedding model:</strong> Needs a good sentence embedding model to work well</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For high-quality RAG systems where retrieval precision matters more than speed. Ideal for technical documentation, research papers, or any content with clear topic boundaries.</p>
+                            
+                            <h4>4. Recursive Chunking (Hierarchical)</h4>
+                            <p><strong>What it is:</strong> A hybrid approach that tries multiple chunking strategies in a hierarchy (e.g., try paragraphs first, then sentences, then fixed-size).</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>First, try to split by paragraphs (if they exist and are reasonable size)</li>
+                                <li>If paragraphs are too large, split by sentences</li>
+                                <li>If sentences are still too large, use fixed-size chunking as fallback</li>
+                                <li>Maintains hierarchy: parent chunks contain metadata about child chunks</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Adaptive:</strong> Automatically chooses the best strategy for each part of the document</li>
+                                <li>✅ <strong>Respects structure:</strong> Uses document structure when available</li>
+                                <li>✅ <strong>Robust:</strong> Falls back gracefully when structure is missing</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> When you have diverse document types with varying structures. Popular in production RAG systems (used by LangChain, LlamaIndex).</p>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Reranking</h3>
-                            <p><strong>Why rerank:</strong> Initial retrieval may not perfectly match query intent. Reranking improves relevance.</p>
+                            <h3>Chunk Overlap: Preserving Context at Boundaries</h3>
                             
-                            <p><strong>Methods:</strong></p>
+                            <h4>Why Overlap is Essential</h4>
+                            <p>When you split a document into chunks, you create <strong>boundaries</strong> between chunks. These boundaries are artificial—they don't exist in the original document. This creates a critical problem:</p>
+                            
+                            <p><strong>The Boundary Problem:</strong> Important information often appears at the edges of chunks. Consider this example:</p>
+                            
+                            <div class="example-box">
+                                <h5>Example: The Boundary Problem</h5>
+                                <p><strong>Original Document:</strong></p>
+                                <p>"Machine learning models require careful tuning. <strong>Hyperparameters like learning rate and batch size significantly impact model performance.</strong> Regularization techniques help prevent overfitting."</p>
+                                
+                                <p><strong>Without Overlap (Bad):</strong></p>
+                                <ul>
+                                    <li><strong>Chunk 1:</strong> "Machine learning models require careful tuning. Hyperparameters like learning rate and batch size significantly impact model performance."</li>
+                                    <li><strong>Chunk 2:</strong> "Regularization techniques help prevent overfitting."</li>
+                                </ul>
+                                <p>❌ If a query asks about "hyperparameters and regularization," Chunk 1 might be retrieved (mentions hyperparameters) but Chunk 2 (mentions regularization) might not be, even though they're related concepts.</p>
+                                
+                                <p><strong>With Overlap (Good):</strong></p>
+                                <ul>
+                                    <li><strong>Chunk 1:</strong> "Machine learning models require careful tuning. Hyperparameters like learning rate and batch size significantly impact model performance. Regularization techniques help prevent overfitting."</li>
+                                    <li><strong>Chunk 2:</strong> "Hyperparameters like learning rate and batch size significantly impact model performance. Regularization techniques help prevent overfitting."</li>
+                                </ul>
+                                <p>✅ Now both chunks contain information about hyperparameters AND regularization, improving retrieval quality.</p>
+                            </div>
+                            
+                            <h4>How Overlap Works</h4>
+                            <p>Overlap means that consecutive chunks share some content at their boundaries. For example, with 20% overlap:</p>
+                            
                             <ul>
-                                <li>Cross-encoder models (more accurate but slower)</li>
-                                <li>LLM-based reranking</li>
-                                <li>Learning-to-rank algorithms</li>
+                                <li>If chunk size is 500 tokens, overlap is 100 tokens</li>
+                                <li>Chunk 1: tokens 1-500</li>
+                                <li>Chunk 2: tokens 401-900 (starts at token 401, overlapping the last 100 tokens of Chunk 1)</li>
+                                <li>Chunk 3: tokens 801-1300 (overlaps with Chunk 2)</li>
+                            </ul>
+                            
+                            <h4>Choosing the Right Overlap</h4>
+                            <p><strong>Typical overlap:</strong> 10-20% of chunk size is standard. Here's why:</p>
+                            
+                            <ul>
+                                <li><strong>Too little overlap (0-5%):</strong> ❌ Doesn't solve the boundary problem. Important context at boundaries is still lost. Not recommended.</li>
+                                <li><strong>Moderate overlap (10-20%):</strong> ✅ Good balance. Preserves context without excessive storage overhead. This is the sweet spot for most use cases.</li>
+                                <li><strong>High overlap (30-50%):</strong> ⚠️ Better context preservation but significantly increases storage costs. Use only when context preservation is critical (e.g., legal documents, medical records).</li>
+                                <li><strong>Very high overlap (50%+):</strong> ❌ Wasteful. You're essentially storing the document twice. Rarely justified.</li>
+                            </ul>
+                            
+                            <h4>Trade-offs</h4>
+                            <p><strong>Benefits of overlap:</strong></p>
+                            <ul>
+                                <li>✅ Preserves context at boundaries</li>
+                                <li>✅ Improves retrieval quality (related concepts stay together)</li>
+                                <li>✅ Reduces risk of missing relevant information</li>
+                                <li>✅ Better for queries that span multiple topics</li>
+                            </ul>
+                            
+                            <p><strong>Costs of overlap:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Increased storage:</strong> More chunks = more embeddings to store</li>
+                                <li>❌ <strong>Higher embedding costs:</strong> More chunks to embed (if using paid APIs)</li>
+                                <li>❌ <strong>Potential redundancy:</strong> Same information retrieved multiple times (though this is usually acceptable)</li>
+                            </ul>
+                            
+                            <h4>Best Practices</h4>
+                            <ul>
+                                <li><strong>Start with 10-20% overlap:</strong> This works well for most documents</li>
+                                <li><strong>Increase for critical documents:</strong> Use 20-30% for legal, medical, or financial documents where context is crucial</li>
+                                <li><strong>Decrease for uniform content:</strong> Use 5-10% for structured data or lists where boundaries are less important</li>
+                                <li><strong>Test and measure:</strong> Evaluate retrieval quality with different overlap percentages on your specific documents</li>
                             </ul>
                         </div>
                     </div>
