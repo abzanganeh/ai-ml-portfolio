@@ -105,47 +105,213 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>Why Chunking is Important</h3>
-                            <p><strong>Problem:</strong> Documents are often too long for LLM context windows or embedding models.</p>
+                            <h3>Vector Database Indexing Strategies: How Fast Retrieval Works</h3>
                             
-                            <p><strong>Solution:</strong> Split documents into smaller chunks that:</p>
+                            <p>Vector databases use sophisticated indexing algorithms to enable fast similarity search across millions of vectors. Understanding these indexing strategies is crucial for choosing the right database and optimizing performance.</p>
+                            
+                            <h4>1. HNSW (Hierarchical Navigable Small World)</h4>
+                            <p><strong>What it is:</strong> HNSW is one of the most popular and effective indexing algorithms for approximate nearest neighbor (ANN) search. It builds a multi-layer graph where each layer is a subset of the previous layer, creating a "small world" network that allows efficient navigation.</p>
+                            
+                            <p><strong>How it works:</strong></p>
                             <ul>
-                                <li>Fit within context limits</li>
-                                <li>Are semantically meaningful</li>
-                                <li>Can be retrieved independently</li>
-                                <li>Maintain context when possible</li>
+                                <li><strong>Multi-layer structure:</strong> Creates multiple layers (levels) of graphs, with the top layer having few nodes and bottom layer having all nodes</li>
+                                <li><strong>Greedy search:</strong> Starts at the top layer, finds the nearest neighbor, then moves to the next layer and continues</li>
+                                <li><strong>Small world property:</strong> Each node is connected to a small number of "long-range" connections, allowing fast navigation across the graph</li>
+                                <li><strong>Dynamic insertion:</strong> New vectors can be added without rebuilding the entire index</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Very fast:</strong> Sub-millisecond search times even for millions of vectors</li>
+                                <li>✅ <strong>High accuracy:</strong> Can achieve 95%+ recall (finds 95% of true nearest neighbors)</li>
+                                <li>✅ <strong>Scalable:</strong> Works well with billions of vectors</li>
+                                <li>✅ <strong>Used by major databases:</strong> Pinecone, Weaviate, Qdrant all use HNSW variants</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li>⚠️ <strong>Memory intensive:</strong> Stores the graph structure in memory (though can be optimized)</li>
+                                <li>⚠️ <strong>Indexing time:</strong> Building the index takes time, though it's a one-time cost</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For production RAG systems where speed and accuracy are critical. This is the default choice for most vector databases.</p>
+                            
+                            <h4>2. IVF (Inverted File Index)</h4>
+                            <p><strong>What it is:</strong> IVF partitions the vector space into clusters (Voronoi cells) and creates an inverted index mapping each cluster to its vectors.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li><strong>Clustering:</strong> Uses k-means or similar to partition vectors into clusters</li>
+                                <li><strong>Inverted index:</strong> For each cluster, stores a list of vectors belonging to that cluster</li>
+                                <li><strong>Search:</strong> Finds the nearest cluster(s) to the query vector, then searches only within those clusters</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Memory efficient:</strong> Lower memory footprint than HNSW</li>
+                                <li>✅ <strong>Fast for large datasets:</strong> Only searches relevant clusters, not all vectors</li>
+                                <li>✅ <strong>Used by FAISS:</strong> FAISS's IVF-Flat and IVF-PQ use this approach</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li>⚠️ <strong>Lower accuracy:</strong> May miss vectors near cluster boundaries</li>
+                                <li>⚠️ <strong>Requires tuning:</strong> Number of clusters needs careful selection</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For very large datasets (billions of vectors) where memory is a constraint, or when using FAISS.</p>
+                            
+                            <h4>3. Product Quantization (PQ)</h4>
+                            <p><strong>What it is:</strong> A compression technique that reduces vector storage by quantizing (discretizing) vector components into a smaller number of values.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li><strong>Vector splitting:</strong> Splits each vector into multiple sub-vectors</li>
+                                <li><strong>Quantization:</strong> Each sub-vector is mapped to a "codebook" (set of representative vectors)</li>
+                                <li><strong>Compression:</strong> Stores only the codebook indices, not full vectors</li>
+                                <li><strong>Fast distance:</strong> Uses lookup tables for fast approximate distance calculations</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Massive storage reduction:</strong> Can reduce storage by 10-100x</li>
+                                <li>✅ <strong>Fast search:</strong> Approximate distances computed quickly using lookup tables</li>
+                                <li>✅ <strong>Enables billion-scale:</strong> Makes it feasible to store billions of vectors</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li>⚠️ <strong>Accuracy loss:</strong> Compression introduces approximation errors</li>
+                                <li>⚠️ <strong>Training required:</strong> Codebooks need to be trained on representative data</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For extremely large datasets where storage is a primary concern. Often combined with IVF (IVF-PQ).</p>
+                            
+                            <h4>4. LSH (Locality-Sensitive Hashing)</h4>
+                            <p><strong>What it is:</strong> Uses hash functions that map similar vectors to the same hash buckets, enabling fast approximate search.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li><strong>Hash functions:</strong> Creates multiple hash functions that preserve similarity (similar vectors hash to same bucket)</li>
+                                <li><strong>Bucketing:</strong> Vectors are placed into hash buckets</li>
+                                <li><strong>Search:</strong> Query vector is hashed, then only vectors in the same bucket(s) are searched</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Very fast:</strong> Constant-time hash lookup</li>
+                                <li>✅ <strong>Simple:</strong> Easy to understand and implement</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong></p>
+                            <ul>
+                                <li>⚠️ <strong>Lower accuracy:</strong> May miss some similar vectors</li>
+                                <li>⚠️ <strong>Parameter tuning:</strong> Number of hash functions and buckets needs tuning</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For very fast, approximate search when some accuracy loss is acceptable. Less common in modern RAG systems.</p>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Metadata Filtering: Combining Vector Search with Traditional Filters</h3>
+                            
+                            <p>Real-world RAG systems often need to filter documents by metadata (date, author, category, etc.) in addition to semantic similarity. Vector databases support this through <strong>metadata filtering</strong>.</p>
+                            
+                            <h4>How Metadata Filtering Works</h4>
+                            <p><strong>Two-stage process:</strong></p>
+                            <ol>
+                                <li><strong>Filter first:</strong> Apply metadata filters to reduce the search space (e.g., "only documents from 2023")</li>
+                                <li><strong>Search in filtered set:</strong> Perform vector similarity search only on the filtered documents</li>
+                            </ol>
+                            
+                            <p><strong>Example:</strong></p>
+                            <div class="example-box">
+                                <h5>Query with Metadata Filtering</h5>
+                                <p><strong>Query:</strong> "machine learning best practices"</p>
+                                <p><strong>Metadata filters:</strong> 
+                                    <ul>
+                                        <li>Category = "Technical Blog"</li>
+                                        <li>Date >= "2023-01-01"</li>
+                                        <li>Author = "John Doe"</li>
+                                    </ul>
+                                </p>
+                                <p><strong>Process:</strong></p>
+                                <ol>
+                                    <li>Filter 1M documents → 50K documents matching metadata</li>
+                                    <li>Vector search in 50K documents → Top 5 most similar</li>
+                                </ol>
+                                <p>✅ Much faster than searching all 1M documents!</p>
+                            </div>
+                            
+                            <h4>Types of Metadata Filters</h4>
+                            <ul>
+                                <li><strong>Equality filters:</strong> <code>author = "John Doe"</code></li>
+                                <li><strong>Range filters:</strong> <code>date >= "2023-01-01" AND date <= "2023-12-31"</code></li>
+                                <li><strong>In filters:</strong> <code>category IN ["Tech", "Science"]</code></li>
+                                <li><strong>Boolean combinations:</strong> <code>(category = "Tech" OR category = "Science") AND date >= "2023"</code></li>
+                            </ul>
+                            
+                            <h4>Benefits of Metadata Filtering</h4>
+                            <ul>
+                                <li>✅ <strong>Faster search:</strong> Reduces the number of vectors to search</li>
+                                <li>✅ <strong>More relevant results:</strong> Ensures results match business constraints</li>
+                                <li>✅ <strong>Better user experience:</strong> Users can narrow down by date, source, etc.</li>
+                                <li>✅ <strong>Compliance:</strong> Can filter by access permissions, data retention policies</li>
                             </ul>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Chunking Strategies</h3>
-                            <p><strong>Fixed-size chunking:</strong></p>
+                            <h3>Vector Database Operations: Indexing, Querying, and Maintenance</h3>
+                            
+                            <h4>1. Indexing (One-Time Setup)</h4>
+                            <p><strong>What happens:</strong> When you add documents to a vector database, they go through an indexing process:</p>
+                            
+                            <ol>
+                                <li><strong>Embedding generation:</strong> Each document chunk is converted to a vector using an embedding model</li>
+                                <li><strong>Metadata extraction:</strong> Extract and store metadata (title, date, author, etc.)</li>
+                                <li><strong>Index building:</strong> Vector is inserted into the index structure (HNSW, IVF, etc.)</li>
+                                <li><strong>Storage:</strong> Vector, metadata, and original text are stored</li>
+                            </ol>
+                            
+                            <p><strong>Performance considerations:</strong></p>
                             <ul>
-                                <li>Split by character/token count</li>
-                                <li>Simple but may break sentences</li>
-                                <li>Fast and predictable</li>
+                                <li>⚠️ <strong>Indexing is slow:</strong> Building indexes takes time (minutes to hours for large datasets)</li>
+                                <li>⚠️ <strong>Batch processing:</strong> More efficient to index in batches rather than one-by-one</li>
+                                <li>⚠️ <strong>Incremental updates:</strong> Some databases support adding vectors without rebuilding (HNSW), others require full rebuild (IVF)</li>
                             </ul>
                             
-                            <p><strong>Sentence-based chunking:</strong></p>
+                            <h4>2. Querying (Per-Request)</h4>
+                            <p><strong>What happens:</strong> When a user query arrives:</p>
+                            
+                            <ol>
+                                <li><strong>Query embedding:</strong> Convert query to vector using the same embedding model</li>
+                                <li><strong>Metadata filtering (optional):</strong> Apply metadata filters to reduce search space</li>
+                                <li><strong>Vector search:</strong> Use the index to find top-k most similar vectors</li>
+                                <li><strong>Result retrieval:</strong> Return document IDs, metadata, and similarity scores</li>
+                                <li><strong>Document fetching:</strong> Retrieve actual document text using IDs</li>
+                            </ol>
+                            
+                            <p><strong>Performance considerations:</strong></p>
                             <ul>
-                                <li>Split at sentence boundaries</li>
-                                <li>Preserves sentence integrity</li>
-                                <li>Better semantic coherence</li>
+                                <li>✅ <strong>Very fast:</strong> Sub-100ms for millions of vectors with good indexes</li>
+                                <li>✅ <strong>Scalable:</strong> Query time grows slowly with dataset size (logarithmic for HNSW)</li>
+                                <li>⚠️ <strong>First query slower:</strong> May need to load index into memory</li>
                             </ul>
                             
-                            <p><strong>Semantic chunking:</strong></p>
+                            <h4>3. Maintenance Operations</h4>
+                            <p><strong>Index updates:</strong> When documents are added, updated, or deleted:</p>
                             <ul>
-                                <li>Group related sentences together</li>
-                                <li>Uses embeddings to find boundaries</li>
-                                <li>Most semantically coherent</li>
+                                <li><strong>Add:</strong> Insert new vector into index (fast for HNSW, may require rebuild for IVF)</li>
+                                <li><strong>Update:</strong> Delete old vector, insert new one (or update in-place if supported)</li>
+                                <li><strong>Delete:</strong> Remove vector from index (mark as deleted or physically remove)</li>
                             </ul>
-                        </div>
-                        
-                        <div class="explanation-box">
-                            <h3>Chunk Overlap</h3>
-                            <p><strong>Why overlap:</strong> Prevents losing context at chunk boundaries. Important information at boundaries can be preserved.</p>
                             
-                            <p><strong>Typical overlap:</strong> 10-20% of chunk size. Too much overlap wastes storage, too little loses context.</p>
+                            <p><strong>Index optimization:</strong></p>
+                            <ul>
+                                <li><strong>Rebuilding:</strong> Periodically rebuild index to optimize structure (especially for IVF)</li>
+                                <li><strong>Compaction:</strong> Remove deleted vectors and optimize storage</li>
+                                <li><strong>Monitoring:</strong> Track index size, query performance, accuracy metrics</li>
+                            </ul>
                         </div>
                     </div>
 

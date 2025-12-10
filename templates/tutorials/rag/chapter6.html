@@ -105,34 +105,222 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>Advanced RAG Techniques</h3>
-                            <p><strong>Query expansion:</strong> Rewrite or expand query to improve retrieval. Example: "Python ML" → "Python machine learning libraries scikit-learn TensorFlow"</p>
+                            <h3>Advanced RAG Techniques: Beyond Basic Retrieval</h3>
                             
-                            <p><strong>Multi-query retrieval:</strong> Generate multiple query variations, retrieve for each, combine results. Improves coverage.</p>
+                            <p>Basic RAG (retrieve top-k documents, pass to LLM) works well for simple queries, but real-world applications often need more sophisticated techniques to handle complex queries, improve accuracy, and optimize performance.</p>
                             
-                            <p><strong>Parent-child chunking:</strong> Store small chunks for retrieval, but include parent context in generation. Balances precision and context.</p>
+                            <h4>1. Query Expansion: Improving Retrieval Coverage</h4>
+                            <p><strong>What it is:</strong> Query expansion rewrites or augments the user's query to include synonyms, related terms, or alternative phrasings before retrieval. This helps find documents that use different terminology than the original query.</p>
                             
-                            <p><strong>Metadata filtering:</strong> Filter by document type, date, source before similarity search. Reduces search space.</p>
+                            <p><strong>Why it's needed:</strong> Users often write short, ambiguous queries. A query like "Python ML" could mean many things, and documents might use different terminology ("machine learning," "deep learning," "scikit-learn," etc.).</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Synonym expansion:</strong> Add synonyms for key terms (e.g., "ML" → "machine learning," "deep learning")</li>
+                                <li><strong>Related term expansion:</strong> Add related concepts (e.g., "Python ML" → "scikit-learn," "TensorFlow," "PyTorch")</li>
+                                <li><strong>LLM-based expansion:</strong> Use an LLM to generate query variations or rewrite the query more clearly</li>
+                                <li><strong>Retrieve with expanded query:</strong> Use the expanded query for retrieval (or retrieve for each variation and combine)</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Example: Query Expansion</h5>
+                                <p><strong>Original query:</strong> "Python ML"</p>
+                                <p><strong>Expanded query:</strong> "Python machine learning libraries scikit-learn TensorFlow PyTorch data science"</p>
+                                <p><strong>Result:</strong> ✅ Retrieves documents that mention "scikit-learn" or "TensorFlow" even if they don't contain "Python ML" as a phrase.</p>
+                            </div>
+                            
+                            <p><strong>When to use:</strong> When queries are short, ambiguous, or use abbreviations. Particularly useful for technical domains with lots of synonyms and jargon.</p>
+                            
+                            <h4>2. Multi-Query Retrieval: Generating Multiple Query Variations</h4>
+                            <p><strong>What it is:</strong> Instead of retrieving with a single query, generate multiple query variations, retrieve documents for each variation, then combine and deduplicate the results.</p>
+                            
+                            <p><strong>Why it works:</strong> Different phrasings of the same question might retrieve different relevant documents. By generating multiple variations, you increase the chance of finding all relevant information.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Generate query variations:</strong> Use an LLM to generate 3-5 different phrasings of the original query</li>
+                                <li><strong>Retrieve for each:</strong> Run retrieval for each query variation</li>
+                                <li><strong>Combine results:</strong> Merge all retrieved documents, removing duplicates</li>
+                                <li><strong>Rerank:</strong> Rerank the combined results to get the most relevant documents</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Example: Multi-Query Retrieval</h5>
+                                <p><strong>Original query:</strong> "How to train a neural network?"</p>
+                                <p><strong>Generated variations:</strong></p>
+                                <ul>
+                                    <li>"neural network training process"</li>
+                                    <li>"how to train deep learning models"</li>
+                                    <li>"backpropagation and gradient descent for neural networks"</li>
+                                </ul>
+                                <p><strong>Result:</strong> ✅ Each variation might retrieve slightly different documents, giving you comprehensive coverage of the topic.</p>
+                            </div>
+                            
+                            <p><strong>When to use:</strong> For complex queries where a single phrasing might miss relevant documents. Particularly effective when combined with query expansion.</p>
+                            
+                            <h4>3. Parent-Child Chunking: Balancing Precision and Context</h4>
+                            <p><strong>What it is:</strong> A hierarchical chunking strategy where you store small, precise chunks for retrieval (children), but also store larger parent chunks that contain surrounding context.</p>
+                            
+                            <p><strong>The problem it solves:</strong> Small chunks are better for precise retrieval (more likely to be fully relevant), but they lack context. Large chunks have more context but are less precise (may contain irrelevant information).</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Create parent chunks:</strong> Split documents into larger chunks (e.g., 1000 tokens) that preserve context</li>
+                                <li><strong>Create child chunks:</strong> Split each parent into smaller chunks (e.g., 200 tokens) for precise retrieval</li>
+                                <li><strong>Store both:</strong> Embed and store both parent and child chunks, with metadata linking children to parents</li>
+                                <li><strong>Retrieve children:</strong> Use small child chunks for retrieval (precise matching)</li>
+                                <li><strong>Include parent context:</strong> When a child is retrieved, also include its parent chunk in the context sent to the LLM</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Example: Parent-Child Chunking</h5>
+                                <p><strong>Parent chunk (1000 tokens):</strong> "Machine learning models require careful tuning. Hyperparameters like learning rate significantly impact performance. Regularization techniques help prevent overfitting..."</p>
+                                <p><strong>Child chunk 1 (200 tokens):</strong> "Hyperparameters like learning rate significantly impact performance."</p>
+                                <p><strong>Query:</strong> "What is learning rate?"</p>
+                                <p><strong>Result:</strong> ✅ Child chunk 1 is retrieved (precise match), but parent chunk is also included, providing context about hyperparameters and regularization.</p>
+                            </div>
+                            
+                            <p><strong>When to use:</strong> When you need both precise retrieval (small chunks) and rich context (large chunks). Common in production RAG systems.</p>
+                            
+                            <h4>4. Metadata Filtering: Reducing Search Space</h4>
+                            <p><strong>What it is:</strong> Apply filters based on document metadata (date, author, category, source) <strong>before</strong> performing vector similarity search. This reduces the number of documents to search.</p>
+                            
+                            <p><strong>Why it's important:</strong> Searching 1 million documents is slow. If you can filter to 50,000 relevant documents first (e.g., "only documents from 2023"), search becomes much faster and more accurate.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Extract metadata:</strong> When indexing, extract and store metadata (date, category, author, etc.)</li>
+                                <li><strong>Apply filters:</strong> Before vector search, filter documents by metadata criteria</li>
+                                <li><strong>Search filtered set:</strong> Perform vector similarity search only on filtered documents</li>
+                                <li><strong>Return results:</strong> Return top-k documents from the filtered search</li>
+                            </ol>
+                            
+                            <p><strong>When to use:</strong> When documents have meaningful metadata and queries can be scoped (e.g., "recent articles," "technical documentation," "from specific author").</p>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Context Compression</h3>
-                            <p><strong>Problem:</strong> Retrieved context may be too long for LLM context window.</p>
+                            <h3>Context Compression: Fitting Retrieved Information into LLM Windows</h3>
                             
-                            <p><strong>Solutions:</strong></p>
+                            <h4>The Problem</h4>
+                            <p>After retrieving top-k documents, you might have 10,000+ tokens of context. But LLMs have context window limits (e.g., GPT-4: 8K-128K tokens, Claude: 100K-200K tokens). If your query + context + answer exceeds the limit, you need to compress the context.</p>
+                            
+                            <h4>Context Compression Techniques</h4>
+                            
+                            <h5>1. Summarization</h5>
+                            <p><strong>What it is:</strong> Use an LLM to summarize each retrieved chunk, reducing token count while preserving key information.</p>
+                            
+                            <p><strong>How it works:</strong></p>
                             <ul>
-                                <li>Summarize retrieved chunks</li>
-                                <li>Extract only relevant sentences</li>
-                                <li>Use LLM to compress context</li>
-                                <li>Prioritize most relevant chunks</li>
+                                <li>For each retrieved chunk, create a summary prompt: "Summarize this text in 2-3 sentences: [chunk text]"</li>
+                                <li>Generate summaries (much shorter than originals)</li>
+                                <li>Use summaries as context instead of full chunks</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong> ✅ Reduces tokens significantly. ❌ May lose important details. ⚠️ Adds latency (need to summarize each chunk).</p>
+                            
+                            <h5>2. Sentence Extraction</h5>
+                            <p><strong>What it is:</strong> Extract only the most relevant sentences from retrieved chunks, discarding the rest.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Score each sentence in retrieved chunks for relevance to the query (using embeddings or LLM)</li>
+                                <li>Select top-N most relevant sentences</li>
+                                <li>Use only these sentences as context</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong> ✅ Very fast. ✅ Preserves exact information (no summarization loss). ❌ May lose context between sentences.</p>
+                            
+                            <h5>3. LLM-Based Compression</h5>
+                            <p><strong>What it is:</strong> Use an LLM to compress the entire retrieved context into a shorter version that preserves information relevant to the query.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Prompt: "Compress this context to [target tokens] while preserving all information relevant to: [query]"</li>
+                                <li>LLM generates compressed version</li>
+                                <li>Use compressed context for final answer generation</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong> ✅ Most intelligent compression. ✅ Preserves query-relevant information. ❌ Expensive and slow. ❌ May introduce hallucinations.</p>
+                            
+                            <h5>4. Relevance-Based Prioritization</h5>
+                            <p><strong>What it is:</strong> Instead of compressing, prioritize chunks by relevance score and include only the most relevant ones until you hit the token limit.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Sort retrieved chunks by similarity score (most relevant first)</li>
+                                <li>Add chunks to context one by one until you reach token limit</li>
+                                <li>Discard remaining chunks</li>
+                            </ul>
+                            
+                            <p><strong>Trade-offs:</strong> ✅ Fast and simple. ✅ No information loss (just truncation). ❌ May miss important information in lower-ranked chunks.</p>
+                            
+                            <h4>Best Practices</h4>
+                            <ul>
+                                <li><strong>Combine techniques:</strong> Use summarization for less relevant chunks, full text for most relevant</li>
+                                <li><strong>Reserve tokens for answer:</strong> Leave 20-30% of context window for the LLM's answer</li>
+                                <li><strong>Monitor compression quality:</strong> Track answer quality with and without compression</li>
                             </ul>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Iterative Retrieval</h3>
-                            <p><strong>Multi-hop retrieval:</strong> If initial answer is incomplete, generate follow-up queries and retrieve more context. Repeat until answer is complete.</p>
+                            <h3>Iterative Retrieval: Multi-Hop and Self-RAG</h3>
                             
-                            <p><strong>Self-RAG:</strong> Model decides when to retrieve, when to generate, and when to stop. More autonomous.</p>
+                            <h4>1. Multi-Hop Retrieval</h4>
+                            <p><strong>What it is:</strong> If the initial answer is incomplete or the model needs more information, generate follow-up queries, retrieve additional context, and repeat until the answer is complete.</p>
+                            
+                            <p><strong>Why it's needed:</strong> Complex questions often require information from multiple documents. A single retrieval might not find all necessary information.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Initial retrieval:</strong> Retrieve top-k documents for the original query</li>
+                                <li><strong>Generate answer:</strong> Attempt to generate answer from retrieved context</li>
+                                <li><strong>Check completeness:</strong> Determine if answer is complete (using LLM or heuristics)</li>
+                                <li><strong>Generate follow-up query:</strong> If incomplete, generate a new query to find missing information</li>
+                                <li><strong>Retrieve again:</strong> Retrieve documents for the follow-up query</li>
+                                <li><strong>Combine context:</strong> Add new context to existing context</li>
+                                <li><strong>Generate final answer:</strong> Generate answer from combined context</li>
+                                <li><strong>Repeat if needed:</strong> Continue until answer is complete or max iterations reached</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Example: Multi-Hop Retrieval</h5>
+                                <p><strong>Query:</strong> "What is the capital of France and what is its population?"</p>
+                                <p><strong>Hop 1:</strong> Query "capital of France" → Retrieves document about Paris being the capital</p>
+                                <p><strong>Hop 2:</strong> Query "Paris population" → Retrieves document with population statistics</p>
+                                <p><strong>Result:</strong> ✅ Combines information from both hops to answer the complete question.</p>
+                            </div>
+                            
+                            <p><strong>When to use:</strong> For complex, multi-part questions that require information from multiple sources. Common in question-answering systems.</p>
+                            
+                            <h4>2. Self-RAG: Autonomous Retrieval and Generation</h4>
+                            <p><strong>What it is:</strong> An advanced technique where the model itself decides when to retrieve, what to retrieve, when to generate, and when to stop—making the RAG system more autonomous.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li><strong>Retrieve decision:</strong> Model decides if retrieval is needed (some queries can be answered from its training data)</li>
+                                <li><strong>Query generation:</strong> If retrieval needed, model generates the retrieval query</li>
+                                <li><strong>Retrieval:</strong> Retrieve documents using generated query</li>
+                                <li><strong>Relevance check:</strong> Model evaluates if retrieved documents are relevant</li>
+                                <li><strong>Generate or retrieve again:</strong> If relevant, generate answer; if not, retrieve again with different query</li>
+                                <li><strong>Self-critique:</strong> Model evaluates its own answer for completeness and accuracy</li>
+                                <li><strong>Iterate or stop:</strong> If answer is good, stop; if not, continue retrieving and generating</li>
+                            </ol>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>More autonomous:</strong> Doesn't always retrieve (saves cost when not needed)</li>
+                                <li>✅ <strong>Adaptive:</strong> Adjusts retrieval strategy based on query complexity</li>
+                                <li>✅ <strong>Self-correcting:</strong> Can identify when answers are incomplete and retrieve more</li>
+                            </ul>
+                            
+                            <p><strong>Challenges:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Complex to implement:</strong> Requires fine-tuning or prompt engineering</li>
+                                <li>❌ <strong>Higher latency:</strong> Multiple decision points add time</li>
+                                <li>❌ <strong>Cost:</strong> More LLM calls (retrieve decisions, query generation, self-critique)</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For high-value applications where accuracy is critical and you can afford the complexity and cost. Still experimental but promising.</p>
                         </div>
                     </div>
 

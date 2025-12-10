@@ -105,38 +105,201 @@
                         <h2>Key Concepts</h2>
                         
                         <div class="explanation-box">
-                            <h3>Dense vs Sparse Retrieval</h3>
-                            <p><strong>Dense retrieval (semantic search):</strong></p>
+                            <h3>Retrieval Strategies: Dense, Sparse, and Hybrid Approaches</h3>
+                            
+                            <p>Retrieval is the heart of RAG systems—it's the process of finding the most relevant documents for a user's query. There are three main approaches, each with distinct characteristics and use cases.</p>
+                            
+                            <h4>1. Dense Retrieval (Semantic Search)</h4>
+                            <p><strong>What it is:</strong> Dense retrieval uses <strong>vector embeddings</strong> to represent both queries and documents in a high-dimensional space, then finds documents whose embeddings are "close" to the query embedding using similarity metrics like cosine similarity.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li>Convert the query into a dense vector using an embedding model (e.g., SentenceTransformer, OpenAI embeddings)</li>
+                                <li>Compare this query vector with all document vectors in the vector database</li>
+                                <li>Calculate similarity scores (cosine similarity, dot product, or Euclidean distance)</li>
+                                <li>Return the top-k documents with highest similarity scores</li>
+                            </ol>
+                            
+                            <p><strong>Key Advantages:</strong></p>
                             <ul>
-                                <li>Uses embeddings to find semantically similar documents</li>
-                                <li>Handles synonyms and paraphrasing well</li>
-                                <li>Example: Query "automobile" finds docs about "car"</li>
-                                <li>More computationally expensive</li>
+                                <li>✅ <strong>Semantic understanding:</strong> Understands meaning, not just keywords. A query about "automobile" will find documents about "car," "vehicle," or "auto" even if those exact words aren't present.</li>
+                                <li>✅ <strong>Handles synonyms and paraphrasing:</strong> "Machine learning" and "ML" are treated as similar concepts. "How do I train a model?" finds documents about "model training" even if they use different wording.</li>
+                                <li>✅ <strong>Context-aware:</strong> Understands that "Python programming" is different from "python snake" based on context.</li>
+                                <li>✅ <strong>Language-agnostic:</strong> Works across languages if using multilingual embeddings (e.g., multilingual-MiniLM)</li>
+                                <li>✅ <strong>Most common in modern RAG:</strong> This is the default approach for most production RAG systems</li>
                             </ul>
                             
-                            <p><strong>Sparse retrieval (keyword search):</strong></p>
+                            <p><strong>Limitations:</strong></p>
                             <ul>
-                                <li>Uses keyword matching (BM25, TF-IDF)</li>
-                                <li>Faster but requires exact term matches</li>
-                                <li>Example: Query "automobile" won't find "car" unless both terms present</li>
-                                <li>Good for exact term matching</li>
+                                <li>❌ <strong>More computationally expensive:</strong> Requires embedding models and vector similarity calculations</li>
+                                <li>❌ <strong>May miss exact keyword matches:</strong> If a document uses very specific terminology not well-represented in the embedding model's training data, it might be missed</li>
+                                <li>❌ <strong>Requires good embeddings:</strong> Quality depends heavily on the embedding model used</li>
+                                <li>❌ <strong>Storage overhead:</strong> Need to store vector embeddings for all documents</li>
                             </ul>
                             
-                            <p><strong>Hybrid retrieval:</strong> Combines both methods for best results.</p>
+                            <div class="example-box">
+                                <h5>Example: Dense Retrieval in Action</h5>
+                                <p><strong>Query:</strong> "How do I train a neural network?"</p>
+                                <p><strong>Document 1:</strong> "Training deep learning models requires adjusting hyperparameters like learning rate..." (No exact match for "neural network")</p>
+                                <p><strong>Document 2:</strong> "Neural networks are trained using backpropagation..." (Exact match)</p>
+                                <p><strong>Result:</strong> Dense retrieval finds BOTH documents because it understands that "neural network" and "deep learning model" are semantically similar concepts, even though Document 1 doesn't contain the exact phrase.</p>
+                            </div>
+                            
+                            <h4>2. Sparse Retrieval (Keyword Search)</h4>
+                            <p><strong>What it is:</strong> Sparse retrieval uses <strong>keyword matching</strong> based on term frequency and document frequency. The most common algorithms are BM25 (Best Matching 25) and TF-IDF (Term Frequency-Inverse Document Frequency).</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li>Extract keywords from the query (tokenization, stemming, stop word removal)</li>
+                                <li>Count how often each keyword appears in each document (term frequency)</li>
+                                <li>Weight keywords by their rarity across all documents (inverse document frequency - rare words are more important)</li>
+                                <li>Calculate a relevance score for each document based on keyword matches</li>
+                                <li>Return the top-k documents with highest scores</li>
+                            </ol>
+                            
+                            <p><strong>Key Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Fast:</strong> Very efficient, especially with inverted indexes (traditional search engine technology used by Google, Elasticsearch)</li>
+                                <li>✅ <strong>Good for exact matches:</strong> Excellent when you need to find documents containing specific terms or phrases</li>
+                                <li>✅ <strong>Interpretable:</strong> You can see exactly which keywords matched and why a document was retrieved</li>
+                                <li>✅ <strong>No embedding model needed:</strong> Works with raw text, no neural networks required</li>
+                                <li>✅ <strong>Low storage:</strong> Only stores keyword indexes, not full vectors</li>
+                            </ul>
+                            
+                            <p><strong>Limitations:</strong></p>
+                            <ul>
+                                <li>❌ <strong>No semantic understanding:</strong> "automobile" won't find "car" unless both terms are present in the document</li>
+                                <li>❌ <strong>Requires exact term matches:</strong> Misses synonyms, paraphrases, and related concepts</li>
+                                <li>❌ <strong>Language-specific:</strong> Needs language-specific tokenization and stemming</li>
+                                <li>❌ <strong>Poor for conceptual queries:</strong> Struggles with queries like "things that help you learn" (no specific keywords)</li>
+                            </ul>
+                            
+                            <div class="example-box">
+                                <h5>Example: Sparse Retrieval Limitation</h5>
+                                <p><strong>Query:</strong> "automobile safety features"</p>
+                                <p><strong>Document:</strong> "Modern cars have advanced safety systems including airbags and ABS brakes."</p>
+                                <p><strong>Result:</strong> ❌ Sparse retrieval might MISS this document because it doesn't contain "automobile" or "safety features" as exact terms, even though the document is highly relevant (mentions "cars" and "safety systems").</p>
+                            </div>
+                            
+                            <h4>3. Hybrid Retrieval: Best of Both Worlds</h4>
+                            <p><strong>What it is:</strong> Hybrid retrieval <strong>combines</strong> dense and sparse retrieval, taking advantage of both approaches' strengths. This is often the best approach for production RAG systems.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ol>
+                                <li>Run both dense retrieval and sparse retrieval separately</li>
+                                <li>Get top-k results from each method (e.g., top 50 from each)</li>
+                                <li>Combine the results (union or intersection of result sets)</li>
+                                <li>Rerank the combined results using a weighted score: <code>final_score = α × dense_score + (1-α) × sparse_score</code> where α is typically 0.3-0.7</li>
+                                <li>Return the top-k documents from the reranked list</li>
+                            </ol>
+                            
+                            <p><strong>Why Hybrid Works Better:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Catches both semantic and exact matches:</strong> Dense finds semantically similar docs, sparse finds exact keyword matches</li>
+                                <li>✅ <strong>More comprehensive:</strong> Less likely to miss relevant documents</li>
+                                <li>✅ <strong>Better for diverse queries:</strong> Some queries benefit from semantic search (conceptual questions), others from keyword search (specific term lookups)</li>
+                                <li>✅ <strong>Production-proven:</strong> Used by many production systems (e.g., Google Search uses hybrid approaches)</li>
+                            </ul>
+                            
+                            <div class="example-box">
+                                <h5>Example: Hybrid Retrieval</h5>
+                                <p><strong>Query:</strong> "Python machine learning library"</p>
+                                <p><strong>Dense retrieval finds:</strong> Documents about "scikit-learn," "TensorFlow," "PyTorch" (semantic similarity - these are ML libraries for Python)</p>
+                                <p><strong>Sparse retrieval finds:</strong> Documents containing exact phrase "Python machine learning library"</p>
+                                <p><strong>Hybrid result:</strong> Combines both, ensuring you get both semantically similar libraries AND documents that explicitly mention the exact phrase. This gives you comprehensive coverage.</p>
+                            </div>
+                            
+                            <p><strong>When to use:</strong></p>
+                            <ul>
+                                <li>✅ When you have diverse query types (some need semantic understanding, others need exact matches)</li>
+                                <li>✅ When retrieval quality is critical and you can afford the computational cost</li>
+                                <li>✅ For production systems where you want maximum coverage and accuracy</li>
+                            </ul>
                         </div>
                         
                         <div class="explanation-box">
-                            <h3>Reranking Strategies</h3>
-                            <p><strong>Why rerank:</strong> Initial retrieval may miss perfect matches. Reranking refines results.</p>
+                            <h3>Reranking: Refining Initial Retrieval Results</h3>
                             
-                            <p><strong>Cross-encoder reranking:</strong></p>
+                            <h4>Why Reranking is Necessary</h4>
+                            <p>Initial retrieval (whether dense, sparse, or hybrid) is fast but not perfect. It uses relatively simple similarity calculations that may not capture the nuanced relationship between a query and a document. Reranking is a <strong>second-stage refinement</strong> that improves relevance by using more sophisticated (but slower) models.</p>
+                            
+                            <p><strong>The Problem with Initial Retrieval:</strong></p>
                             <ul>
-                                <li>More accurate than embedding similarity</li>
-                                <li>Slower (processes query-document pairs)</li>
-                                <li>Used on top-k candidates from initial retrieval</li>
+                                <li>❌ <strong>Embedding similarity is approximate:</strong> Two documents might have similar embeddings but different relevance to a specific query. For example, two documents about "Python" might be similar (both about programming), but one might be about "Python for data science" and the other about "Python web development" - only one is relevant to a query about "data science."</li>
+                                <li>❌ <strong>Keyword matching is surface-level:</strong> A document might contain all query keywords but not actually answer the question. For example, a document might mention "machine learning" and "tutorial" but be about a different topic entirely.</li>
+                                <li>❌ <strong>Context matters:</strong> The same words in different contexts have different meanings. "Bank" could mean financial institution or river bank.</li>
+                                <li>❌ <strong>Query intent:</strong> Initial retrieval doesn't deeply understand what the user is really asking. A query "how to install" might retrieve documents about installation in general, but the user might specifically want installation on Windows.</li>
                             </ul>
                             
-                            <p><strong>LLM-based reranking:</strong> Uses LLM to score relevance, most accurate but slowest.</p>
+                            <p><strong>The Solution: Reranking</strong></p>
+                            <p>Reranking takes the top-k candidates from initial retrieval (e.g., top 100) and uses a more sophisticated model to re-score and reorder them, producing a final top-k list (e.g., top 5-10) that better matches query intent.</p>
+                            
+                            <h4>Reranking Methods</h4>
+                            
+                            <h5>1. Cross-Encoder Reranking</h5>
+                            <p><strong>What it is:</strong> A neural network model (typically BERT-based) that processes the query and document <strong>together</strong> in a single forward pass, allowing the model to see the full interaction between query and document through attention mechanisms.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>Input: <code>[CLS] query [SEP] document [SEP]</code> (concatenated query and document)</li>
+                                <li>The model processes both simultaneously, allowing attention mechanisms to identify which parts of the document are most relevant to the query</li>
+                                <li>Output: A relevance score (typically 0-1 or a similarity score)</li>
+                                <li>Documents are reranked by these scores</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>More accurate:</strong> Significantly better than embedding-based similarity because it sees the full query-document interaction</li>
+                                <li>✅ <strong>Context-aware:</strong> Understands how query and document relate in context</li>
+                                <li>✅ <strong>Better for nuanced queries:</strong> Handles complex questions that require deep understanding</li>
+                                <li>✅ <strong>Production-ready models:</strong> Pre-trained models available (e.g., ms-marco-MiniLM, cross-encoder models from SentenceTransformers)</li>
+                            </ul>
+                            
+                            <p><strong>Disadvantages:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Slower:</strong> Must process each query-document pair separately (can't batch efficiently for different queries)</li>
+                                <li>❌ <strong>More expensive:</strong> Requires running a neural network for each candidate</li>
+                                <li>❌ <strong>Limited to top-k:</strong> Too slow to use on entire document collection (typically used on top 50-200 candidates)</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> When you have a small candidate set (50-200 documents) from initial retrieval and want maximum accuracy. This is the most common reranking approach in production RAG systems.</p>
+                            
+                            <h5>2. LLM-Based Reranking</h5>
+                            <p><strong>What it is:</strong> Uses a large language model (like GPT-4, Claude) to score or rank documents based on their relevance to the query.</p>
+                            
+                            <p><strong>How it works:</strong></p>
+                            <ul>
+                                <li>For each candidate document, create a prompt asking the LLM to score relevance</li>
+                                <li>Example prompt: "Rate how relevant this document is to the query 'X' on a scale of 1-10. Document: [document text]"</li>
+                                <li>Use LLM's output to rerank documents</li>
+                                <li>Alternatively, ask LLM to directly rank documents in order of relevance</li>
+                            </ul>
+                            
+                            <p><strong>Advantages:</strong></p>
+                            <ul>
+                                <li>✅ <strong>Most accurate:</strong> LLMs have deep understanding of language and context</li>
+                                <li>✅ <strong>Handles complex queries:</strong> Can understand nuanced questions and multi-part queries</li>
+                                <li>✅ <strong>Flexible:</strong> Can be prompted to consider specific factors (relevance, completeness, accuracy)</li>
+                            </ul>
+                            
+                            <p><strong>Disadvantages:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Very slow:</strong> LLM inference is much slower than specialized reranking models</li>
+                                <li>❌ <strong>Expensive:</strong> API costs can be high if reranking many documents</li>
+                                <li>❌ <strong>Inconsistent:</strong> LLM outputs can be non-deterministic</li>
+                                <li>❌ <strong>Limited scalability:</strong> Not practical for high-volume systems</li>
+                            </ul>
+                            
+                            <p><strong>When to use:</strong> For high-value queries where accuracy is critical and you can afford the latency and cost. Often used in research or low-volume production systems.</p>
+                            
+                            <h4>Reranking Best Practices</h4>
+                            <ul>
+                                <li><strong>Use two-stage retrieval:</strong> Fast initial retrieval (dense/sparse) → slower reranking on top-k candidates</li>
+                                <li><strong>Typical pipeline:</strong> Retrieve top 100-200 → Rerank to top 5-10</li>
+                                <li><strong>Balance accuracy vs speed:</strong> More accurate reranking is slower; choose based on your latency requirements</li>
+                                <li><strong>Cache reranking results:</strong> For common queries, cache reranked results to avoid recomputation</li>
+                                <li><strong>Monitor performance:</strong> Track reranking accuracy, latency, and cost</li>
+                            </ul>
                         </div>
                     </div>
 
