@@ -90,14 +90,50 @@
                         <h2>Document Processing & Chunking</h2>
                         
                         <div class="explanation-box">
-                            <h3>Introduction</h3>
-                            <p><strong>Preparing Documents for Retrieval</strong></p>
-                            <p>This chapter provides comprehensive coverage of document processing & chunking, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>Why Document Processing is Critical in RAG</h3>
+                            <p>Before you can retrieve relevant information, you need to prepare your documents. Real-world documents come in many formats (PDFs, Word docs, HTML pages, markdown files, databases) and sizes (from short paragraphs to entire books with thousands of pages). <strong>Document processing and chunking</strong> is the crucial first step that transforms raw documents into a format that RAG systems can effectively search and retrieve.</p>
+                            
+                            <p><strong>The fundamental challenge:</strong> Most documents are too large to process as a single unit. LLMs have context window limits (typically 4K-128K tokens), and embedding models work best with text segments of 128-512 tokens. A single research paper might be 10,000+ words, and a technical manual could be hundreds of pages. You can't embed or process these as single units.</p>
+                            
+                            <h4>What Document Processing & Chunking Involves</h4>
+                            <ol>
+                                <li><strong>Document Loading:</strong> Extract text from various formats (PDF, HTML, Word, etc.) while preserving structure and metadata</li>
+                                <li><strong>Text Cleaning:</strong> Remove formatting artifacts, handle special characters, normalize whitespace</li>
+                                <li><strong>Chunking:</strong> Split large documents into smaller, semantically meaningful pieces (chunks) that fit within context windows</li>
+                                <li><strong>Metadata Extraction:</strong> Capture document properties (title, author, date, section, category) for filtering and organization</li>
+                                <li><strong>Context Preservation:</strong> Maintain relationships between chunks (overlap, hierarchy) so retrieved chunks have sufficient context</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Real-World Example:</h5>
+                                <p>Imagine you have a 200-page technical manual about machine learning. Without proper processing:</p>
+                                <ul>
+                                    <li>❌ The entire document is too large to embed meaningfully (loses semantic precision)</li>
+                                    <li>❌ Retrieval returns the whole manual even for specific questions (wastes tokens, poor accuracy)</li>
+                                    <li>❌ LLM struggles to find relevant information in 200 pages of text</li>
+                                </ul>
+                                <p>With proper chunking:</p>
+                                <ul>
+                                    <li>✅ Manual is split into 500 focused chunks (one per section/topic)</li>
+                                    <li>✅ Each chunk is embedded separately and stored in vector database</li>
+                                    <li>✅ Query about "gradient descent" retrieves only the 2-3 most relevant chunks</li>
+                                    <li>✅ LLM receives focused, relevant context and generates accurate answers</li>
+                                </ul>
+                            </div>
                         </div>
 
-                        <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding document processing & chunking is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                        <div class="explanation-box">
+                            <h3>Key Concepts You'll Learn</h3>
+                            <ul>
+                                <li><strong>Chunking Strategies:</strong> Fixed-size, sentence-based, semantic, and recursive chunking - when to use each and why</li>
+                                <li><strong>Chunk Overlap:</strong> Why overlapping chunks preserve context at boundaries and how to choose the right overlap percentage</li>
+                                <li><strong>Optimal Chunk Size:</strong> Balancing retrieval precision (smaller chunks) with context completeness (larger chunks)</li>
+                                <li><strong>Document Type Handling:</strong> Processing PDFs, HTML, markdown, and structured documents with appropriate parsers</li>
+                                <li><strong>Metadata Management:</strong> Extracting and storing document properties for filtering and organization</li>
+                                <li><strong>Context Preservation:</strong> Techniques to maintain semantic relationships between chunks</li>
+                            </ul>
+                            
+                            <p><strong>Why this matters:</strong> Poor chunking leads to poor retrieval. If chunks are too large, retrieval is imprecise. If chunks are too small, context is lost. If chunks break at wrong boundaries, semantic meaning is destroyed. Getting chunking right is foundational to RAG system performance.</p>
                         </div>
                     </div>
 

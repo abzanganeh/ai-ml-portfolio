@@ -90,14 +90,54 @@
                         <h2>Advanced RAG Techniques</h2>
                         
                         <div class="explanation-box">
-                            <h3>Introduction</h3>
-                            <p><strong>Improving Performance</strong></p>
-                            <p>This chapter provides comprehensive coverage of advanced rag techniques, including detailed explanations, mathematical formulations, code implementations, and real-world examples.</p>
+                            <h3>Beyond Basic RAG: Optimizing for Real-World Performance</h3>
+                            <p>Basic RAG (retrieve top-k documents, pass to LLM, generate answer) works well for simple queries, but real-world applications face complex challenges: ambiguous queries, context window limits, multi-part questions, and the need for higher accuracy. <strong>Advanced RAG techniques</strong> address these challenges to significantly improve system performance.</p>
+                            
+                            <p><strong>Common problems with basic RAG:</strong></p>
+                            <ul>
+                                <li>❌ <strong>Query ambiguity:</strong> Short queries like "Python ML" are unclear - does the user want Python machine learning libraries, Python ML algorithms, or something else?</li>
+                                <li>❌ <strong>Context overflow:</strong> Retrieved chunks might exceed LLM context window limits, forcing truncation and loss of information</li>
+                                <li>❌ <strong>Incomplete answers:</strong> Complex questions require information from multiple documents, but basic RAG retrieves once and generates once</li>
+                                <li>❌ <strong>Precision vs context trade-off:</strong> Small chunks are precise but lack context; large chunks have context but are less precise</li>
+                                <li>❌ <strong>Single retrieval limitation:</strong> One retrieval pass might miss relevant documents that use different terminology</li>
+                            </ul>
+                            
+                            <h4>Advanced Techniques That Solve These Problems</h4>
+                            <ol>
+                                <li><strong>Query Expansion:</strong> Automatically expand or rewrite queries to include synonyms, related terms, and alternative phrasings before retrieval</li>
+                                <li><strong>Multi-Query Retrieval:</strong> Generate multiple query variations, retrieve for each, and combine results for comprehensive coverage</li>
+                                <li><strong>Parent-Child Chunking:</strong> Store small chunks for precise retrieval, but include parent document context when generating answers</li>
+                                <li><strong>Context Compression:</strong> Summarize or extract only relevant parts of retrieved chunks to fit within context windows</li>
+                                <li><strong>Iterative Retrieval:</strong> If initial answer is incomplete, generate follow-up queries and retrieve more context (multi-hop retrieval)</li>
+                                <li><strong>Self-RAG:</strong> Autonomous system where the model decides when to retrieve, when to generate, and when to stop</li>
+                            </ol>
+                            
+                            <div class="example-box">
+                                <h5>Example: Multi-Query Retrieval in Action</h5>
+                                <p><strong>Original query:</strong> "How to train a neural network?"</p>
+                                <p><strong>Generated variations:</strong></p>
+                                <ul>
+                                    <li>"neural network training process"</li>
+                                    <li>"how to train deep learning models"</li>
+                                    <li>"backpropagation and gradient descent for neural networks"</li>
+                                </ul>
+                                <p><strong>Result:</strong> Each variation retrieves slightly different documents. Combined, you get comprehensive coverage of the topic - you don't miss relevant information that uses different terminology.</p>
+                            </div>
                         </div>
 
-                        <div class="example-box">
-                            <h4>📚 Why This Matters</h4>
-                            <p>Understanding advanced rag techniques is crucial for mastering modern AI systems. This chapter breaks down complex concepts into digestible explanations with step-by-step examples.</p>
+                        <div class="explanation-box">
+                            <h3>Key Concepts You'll Learn</h3>
+                            <ul>
+                                <li><strong>Query Expansion:</strong> Techniques to improve retrieval by expanding queries with synonyms and related terms</li>
+                                <li><strong>Multi-Query Retrieval:</strong> Generating multiple query variations and combining results for better coverage</li>
+                                <li><strong>Parent-Child Chunking:</strong> Hierarchical chunking strategy that balances retrieval precision with generation context</li>
+                                <li><strong>Context Compression:</strong> Methods to reduce retrieved context size (summarization, sentence extraction) while preserving important information</li>
+                                <li><strong>Iterative Retrieval:</strong> Multi-hop retrieval where follow-up queries retrieve additional context if initial answer is incomplete</li>
+                                <li><strong>Self-RAG:</strong> Advanced autonomous RAG where the model controls retrieval and generation decisions</li>
+                                <li><strong>Metadata Filtering:</strong> Combining vector search with traditional filters to reduce search space and improve precision</li>
+                            </ul>
+                            
+                            <p><strong>Why this matters:</strong> These advanced techniques can improve RAG system accuracy by 20-40% compared to basic RAG. They're essential for production systems where accuracy, completeness, and user experience are critical. Understanding when and how to apply these techniques is what separates basic RAG implementations from production-grade systems.</p>
                         </div>
                     </div>
 
