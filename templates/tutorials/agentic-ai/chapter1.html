@@ -364,14 +364,33 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>Breaking Down:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function represents the core decision-making process of an AI agent.</strong> It takes the current environment state, the agent's goal, its memory of past experiences, and available tools, then outputs the action the agent should take next. This is the fundamental equation that drives autonomous agent behavior.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>state:</strong> Current environment state (observations)</li>
-                                    <li><strong>goal:</strong> Desired outcome or task</li>
-                                    <li><strong>memory:</strong> Past experiences and context</li>
-                                    <li><strong>tools:</strong> Available actions/tools</li>
-                                    <li><strong>action:</strong> Selected action to take</li>
+                                    <li><strong>state:</strong> Current environment state (observations) - what the agent perceives right now, including user input, tool results, and environmental conditions</li>
+                                    <li><strong>goal:</strong> Desired outcome or task - the objective the agent is trying to achieve, which guides all decision-making</li>
+                                    <li><strong>memory:</strong> Past experiences and context - both short-term (recent conversation) and long-term (learned facts, preferences, patterns)</li>
+                                    <li><strong>tools:</strong> Available actions/tools - the set of functions, APIs, or capabilities the agent can use to interact with the world</li>
+                                    <li><strong>action:</strong> Selected action to take - the output decision, which could be using a tool, generating a response, asking for clarification, or updating memory</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This function is called at every step of the agent's decision loop. Whenever the agent needs to decide what to do next (after observing the environment, after receiving tool results, after reasoning about the situation), this function is invoked to select the optimal action.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>This formula encapsulates the essence of agent autonomy. Unlike traditional systems that follow fixed rules, agents use this function to dynamically decide actions based on context, making them adaptable and intelligent. The quality of this decision function directly determines agent performance.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> state = "User asked about weather", goal = "Provide accurate weather info", memory = "User prefers Celsius", tools = ["get_weather", "search_web"]</p>
+                                    <p><strong>Step 1:</strong> Agent analyzes state and goal → needs weather data</p>
+                                    <p><strong>Step 2:</strong> Agent checks memory → user prefers Celsius</p>
+                                    <p><strong>Step 3:</strong> Agent selects tool → get_weather</p>
+                                    <p><strong>Result:</strong> action = "call get_weather with location parameter"</p>
+                                    <p><strong>Interpretation:</strong> The agent decided to use the weather tool to fulfill the user's request, incorporating the preference for Celsius from memory.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -383,13 +402,43 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>Agent selects action that maximizes utility:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function calculates the total utility (value) of taking a specific action.</strong> It combines immediate rewards, execution costs, and expected future value to determine which action will be most beneficial. The agent selects the action with the highest utility score.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>\(R(\text{state}, \text{action})\):</strong> Immediate benefit of action</li>
-                                    <li><strong>\(C(\text{action})\):</strong> Cost of executing action (time, tokens, API calls)</li>
-                                    <li><strong>\(V(\text{future\_state})\):</strong> Expected value of resulting state</li>
-                                    <li><strong>Agent chooses:</strong> \[\text{action}^* = \underset{\text{action}}{\arg\max} \, U(\text{action})\]</li>
+                                    <li><strong>\(R(\text{state}, \text{action})\):</strong> Immediate benefit of action - the reward or value gained right now from taking this action (e.g., successfully answering user question, completing a subtask, making progress toward goal)</li>
+                                    <li><strong>\(C(\text{action})\):</strong> Cost of executing action - resources consumed (time, tokens, API calls, computational cost). This is subtracted because costs reduce utility</li>
+                                    <li><strong>\(V(\text{future\_state})\):</strong> Expected value of resulting state - the predicted long-term benefit of reaching the state that results from this action. This captures strategic thinking beyond immediate gains</li>
+                                    <li><strong>Agent chooses:</strong> \[\text{action}^* = \underset{\text{action}}{\arg\max} \, U(\text{action})\] - The agent selects the action that maximizes utility across all available options</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This utility function is evaluated for every possible action the agent can take. In practice, agents use LLM reasoning to estimate these values, or use learned models to predict rewards and costs. This happens during the "Reason" step of the agent loop.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>This formula enables intelligent trade-offs. An action might have high immediate reward but also high cost, or it might lead to a better future state. By combining all factors, agents can make optimal decisions that balance short-term and long-term goals, efficiency and effectiveness.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> Agent needs to answer "What's the weather?"</p>
+                                    <p><strong>Action 1:</strong> Call weather API</p>
+                                    <ul>
+                                        <li>R = 0.9 (high immediate value - gets accurate answer)</li>
+                                        <li>C = 0.1 (low cost - one API call)</li>
+                                        <li>V = 0.2 (moderate future value - user satisfied)</li>
+                                        <li>U = 0.9 - 0.1 + 0.2 = 1.0</li>
+                                    </ul>
+                                    <p><strong>Action 2:</strong> Guess from memory</p>
+                                    <ul>
+                                        <li>R = 0.3 (low value - might be wrong)</li>
+                                        <li>C = 0.0 (no cost)</li>
+                                        <li>V = 0.1 (low future value - user might be unsatisfied)</li>
+                                        <li>U = 0.3 - 0.0 + 0.1 = 0.4</li>
+                                    </ul>
+                                    <p><strong>Result:</strong> Agent chooses Action 1 (U = 1.0 > 0.4)</p>
+                                    <p><strong>Interpretation:</strong> Even though Action 2 has no cost, Action 1 provides much better immediate and future value, making it the optimal choice.</p>
+                                </div>
                             </div>
                             
                             <div class="formula-display" style="margin-top: 1rem;">
@@ -405,13 +454,35 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>How agent state evolves:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function describes how the agent's internal state evolves over time.</strong> After taking an action and observing the result, the agent updates its understanding of the world, its progress toward the goal, and its knowledge base. This state evolution enables the agent to learn and adapt.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>state_t:</strong> Current state at time t</li>
-                                    <li><strong>action_t:</strong> Action taken at time t</li>
-                                    <li><strong>observation_t:</strong> Result/observation from action</li>
-                                    <li><strong>state_{t+1}:</strong> Updated state after action</li>
+                                    <li><strong>state_t:</strong> Current state at time t - the agent's complete understanding at this moment, including what it knows, what it's trying to do, what it has done, and the current environment</li>
+                                    <li><strong>action_t:</strong> Action taken at time t - the specific action the agent executed (e.g., called a tool, generated text, updated memory)</li>
+                                    <li><strong>observation_t:</strong> Result/observation from action - what happened as a result of the action (tool output, user response, error message, environmental change)</li>
+                                    <li><strong>state_{t+1}:</strong> Updated state after action - the new state incorporating the action and its result, ready for the next decision cycle</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This update happens after every action in the agent loop. The Update function typically: (1) adds the observation to memory, (2) updates progress tracking, (3) modifies beliefs/knowledge based on new information, (4) adjusts the goal or plan if needed, and (5) prepares the state for the next decision.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>State updates enable agents to be adaptive and learn from experience. Without proper state updates, agents would make the same decisions repeatedly without learning. This function ensures agents incorporate new information, track progress, and evolve their understanding, which is essential for autonomous behavior.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong></p>
+                                    <p>state_t = {"goal": "Get weather", "memory": ["User asked about weather"], "tools_used": []}</p>
+                                    <p>action_t = "call get_weather('New York')"</p>
+                                    <p>observation_t = {"temp": 72, "condition": "sunny"}</p>
+                                    <p><strong>Step 1:</strong> Add observation to memory</p>
+                                    <p><strong>Step 2:</strong> Mark tool as used</p>
+                                    <p><strong>Step 3:</strong> Update goal progress (weather obtained)</p>
+                                    <p><strong>Result:</strong> state_{t+1} = {"goal": "Get weather", "memory": ["User asked", "Weather: 72°F sunny"], "tools_used": ["get_weather"], "progress": "weather_obtained"}</p>
+                                    <p><strong>Interpretation:</strong> The agent's state now includes the weather information, knows it has used the weather tool, and recognizes it has made progress toward the goal. This updated state will inform the next decision (likely to generate a response).</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -856,100 +927,91 @@ tools = [
                         <h2>Test Your Understanding</h2>
                         
                         <div class="quiz-container">
-                            <div class="quiz-question">
+                        <div class="quiz-question">
                                 <h3>Question 1: What is the key difference between an AI agent and a traditional LLM?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Agents are faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Agents can use tools, access real-time data, and take autonomous actions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Agents have more parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) There is no difference</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Agents can use tools, access real-time data, and take autonomous actions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What are the four core capabilities of AI agents?</h3>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">A) Reasoning, Tool Use, Memory, and Planning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Speed, Accuracy, Efficiency, and Cost</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Text generation, translation, summarization, and Q&A</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Learning, training, inference, and deployment</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This approach doesn't work for agent systems</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is the agent decision loop?</h3>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">A) Observe → Reason → Act → Check (repeat until goal achieved)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Input → Process → Output</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Train → Validate → Test</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Plan → Execute → Review</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: In the agent utility function \(U(\text{action}) = R(\text{state}, \text{action}) - C(\text{action}) + V(\text{future\_state})\), what does \(V(\text{future\_state})\) represent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) The immediate reward from the action</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The cost of executing the action</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) The expected value of the resulting state after the action</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The probability of success</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The expected value of the resulting state after the action</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This approach doesn't work for agent systems</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Which type of agent is best suited for tasks requiring multi-step planning and sequential execution?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Simple reactive agents</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Tool-using agents</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Planning agents</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) All agents are equally capable</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Planning agents</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the primary advantage of multi-agent systems over single agents?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They are faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) They allow specialization and parallel processing of complex tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They require less memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They are easier to implement</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) They allow specialization and parallel processing of complex tasks</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: In an interview, you're asked: "How would you design an agent that can handle both short-term and long-term memory?" What key components would you mention?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only a vector database for embeddings</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Short-term memory buffer for recent context, long-term memory store (vector DB or knowledge graph) for persistent facts, and a retrieval mechanism</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Just storing all conversations in a list</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Using only the LLM's context window</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Short-term memory buffer for recent context, long-term memory store (vector DB or knowledge graph) for persistent facts, and a retrieval mechanism</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What is the state update function state_{t+1} = Update(state_t, action_t, observation_t) used for?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To calculate the reward</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">B) To evolve the agent's internal representation based on actions taken and observations received</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To select the next action</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To terminate the agent loop</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This approach doesn't work for agent systems</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: Interview question: "How do you prevent an agent from getting stuck in an infinite loop?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) There's no way to prevent it</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Implement max_iterations limit, detect repeated states, use timeout mechanisms, and track goal progress</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only allow one action per turn</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Disable the agent's reasoning capability</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Implement max_iterations limit, detect repeated states, use timeout mechanisms, and track goal progress</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What makes an agent "autonomous" compared to a traditional chatbot?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It responds faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It has more training data</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) It can make decisions, take actions, and adapt its behavior without constant human intervention</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It uses a larger model</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) It can make decisions, take actions, and adapt its behavior without constant human intervention</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Interview question: "Explain the difference between reactive agents and planning agents. When would you use each?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They are the same thing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Reactive agents respond immediately to current input without planning, suitable for simple tasks. Planning agents create multi-step plans, suitable for complex tasks requiring sequential actions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Reactive agents are always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Planning agents are always better</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This approach doesn't work for agent systems</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Reactive agents respond immediately to current input without planning, suitable for simple tasks. Planning agents create multi-step plans, suitable for complex tasks requiring sequential actions</div>
                             </div>
-                            
-                            <div class="quiz-question" style="margin-top: 2rem;">
+                        <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: In the agent decision function action = Agent(state, goal, memory, tools), what role does the "goal" parameter play?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It stores the agent's training data</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This comprehensive approach has been considered but doesn't align with agent architecture best practices and would introduce unnecessary complexity</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">B) It defines the desired outcome or task, guiding the agent's decision-making process</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It contains the agent's weights</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not used in decision-making</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While this might seem reasonable, it's not the correct approach for AI agents and would lead to poor performance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This approach doesn't work for agent systems</div>
+                            </div>
+                        </div>
                             </div>
                         </div>
                     </div>
