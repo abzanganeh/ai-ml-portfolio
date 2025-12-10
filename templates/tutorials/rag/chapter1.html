@@ -782,44 +782,9 @@ if __name__ == "__main__":
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tutorials/rag/shared-tutorial.js') }}"></script>
     <script>
-        function checkAnswer(element, isCorrect) {
-            // Store original text for all options before modifying
-            const questionContainer = element.closest('.quiz-question');
-            const allOptions = questionContainer.querySelectorAll('.quiz-option');
-            
-            // Restore original text and remove classes from all options
-            allOptions.forEach(opt => {
-                if (!opt.dataset.originalText) {
-                    opt.dataset.originalText = opt.textContent.trim();
-                }
-                opt.textContent = opt.dataset.originalText;
-                opt.classList.remove('correct', 'incorrect');
-                opt.style.pointerEvents = 'none'; // Disable further clicks
-            });
-            
-            if (isCorrect) {
-                // Correct answer selected
-                element.classList.add('correct');
-                element.textContent = element.dataset.originalText + ' ✓ Correct!';
-            } else {
-                // Wrong answer selected
-                element.classList.add('incorrect');
-                element.textContent = element.dataset.originalText + ' ✗ Incorrect';
-                
-                // Find and highlight the correct answer
-                const correctOption = Array.from(allOptions).find(opt => {
-                    const onclick = opt.getAttribute('onclick') || '';
-                    return onclick.includes('checkAnswer(this, true)');
-                });
-                
-                if (correctOption) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent = correctOption.dataset.originalText + ' ✓ Correct Answer';
-                }
-            }
-        }
             
 // Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
