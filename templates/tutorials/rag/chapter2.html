@@ -708,43 +708,192 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Example: Text to Embedding</h4>
-                            <p><strong>Input text:</strong> "The capital of France is Paris"</p>
+                            <h4>Example 1: Converting Text to Embeddings - Step by Step</h4>
+                            <p><strong>Scenario:</strong> You have a document about machine learning and want to convert it to an embedding vector for storage in a vector database.</p>
                             
-                            <p><strong>Embedding process:</strong></p>
+                            <p><strong>Input text:</strong> "Machine learning is a subset of artificial intelligence that enables computers to learn from data without explicit programming."</p>
+                            
+                            <p><strong>Step 1: Preprocessing</strong></p>
                             <ul>
-                                <li>Tokenize: ["The", "capital", "of", "France", "is", "Paris"]</li>
-                                <li>Pass through transformer model</li>
-                                <li>Output: [0.23, -0.45, 0.67, ..., 0.12] (384-dimensional vector)</li>
+                                <li>Text is cleaned and normalized (handling special characters, whitespace)</li>
+                                <li>Result: Clean text ready for tokenization</li>
                             </ul>
                             
-                            <p><strong>Similar texts get similar vectors:</strong></p>
+                            <p><strong>Step 2: Tokenization</strong></p>
                             <ul>
-                                <li>"Paris is the capital of France" → [0.25, -0.43, 0.65, ..., 0.11] (very similar!)</li>
-                                <li>"The weather is nice today" → [0.12, 0.34, -0.21, ..., -0.45] (different)</li>
+                                <li>The sentence is split into tokens (subwords or words depending on the model)</li>
+                                <li>Example tokens: ["Machine", "learning", "is", "a", "subset", "of", "artificial", "intelligence", ...]</li>
+                                <li>Each token is mapped to a token ID from the model's vocabulary</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Model Processing</strong></p>
+                            <ul>
+                                <li>Token IDs are passed through the transformer model (e.g., SentenceTransformer)</li>
+                                <li>The model processes the entire sentence, using attention mechanisms to understand relationships between words</li>
+                                <li>Hidden states are generated for each token position</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Pooling</strong></p>
+                            <ul>
+                                <li>Token-level embeddings are pooled (typically mean pooling) to create a single sentence-level embedding</li>
+                                <li>This creates a fixed-size vector regardless of sentence length</li>
+                            </ul>
+                            
+                            <p><strong>Step 5: Normalization</strong></p>
+                            <ul>
+                                <li>The embedding vector is normalized (L2 normalization) so its magnitude is 1</li>
+                                <li>This makes cosine similarity equivalent to dot product</li>
+                            </ul>
+                            
+                            <p><strong>Final Output:</strong></p>
+                            <ul>
+                                <li>384-dimensional vector: [0.23, -0.45, 0.67, 0.12, -0.34, ..., 0.89]</li>
+                                <li>Each dimension captures some aspect of semantic meaning</li>
+                                <li>This vector can now be stored in a vector database</li>
                             </ul>
                         </div>
                         
                         <div class="example-box">
-                            <h4>Example: Similarity Search</h4>
-                            <p><strong>Query:</strong> "What is the capital of France?"</p>
+                            <h4>Example 2: Semantic Similarity in Action</h4>
+                            <p><strong>Scenario:</strong> Demonstrating how embeddings capture semantic meaning, not just word matching.</p>
                             
-                            <p><strong>Step 1: Embed query</strong></p>
+                            <p><strong>Document 1:</strong> "The capital of France is Paris"<br>
+                            <strong>Embedding:</strong> [0.24, -0.44, 0.66, 0.12, ...]</p>
+                            
+                            <p><strong>Document 2:</strong> "Paris is the capital city of France"<br>
+                            <strong>Embedding:</strong> [0.25, -0.43, 0.65, 0.11, ...]</p>
+                            
+                            <p><strong>Document 3:</strong> "The weather in Paris is sunny today"<br>
+                            <strong>Embedding:</strong> [0.15, 0.22, -0.18, 0.45, ...]</p>
+                            
+                            <p><strong>Query:</strong> "What is the capital of France?"<br>
+                            <strong>Query Embedding:</strong> [0.24, -0.44, 0.66, 0.12, ...]</p>
+                            
+                            <p><strong>Similarity Calculations:</strong></p>
                             <ul>
-                                <li>Query embedding: [0.24, -0.44, 0.66, ...]</li>
+                                <li><strong>Query vs Doc 1:</strong> Cosine similarity = 0.98 (almost identical - same meaning, different word order)</li>
+                                <li><strong>Query vs Doc 2:</strong> Cosine similarity = 0.97 (very similar - paraphrased but same meaning)</li>
+                                <li><strong>Query vs Doc 3:</strong> Cosine similarity = 0.42 (different topic - about weather, not capitals)</li>
                             </ul>
                             
-                            <p><strong>Step 2: Compare with document embeddings</strong></p>
+                            <p><strong>Key Insight:</strong> Even though Doc 1 and Doc 2 use different word orders and slightly different phrasing, they have very similar embeddings because they convey the same semantic meaning. Doc 3 has a different embedding because it's about a different topic (weather vs. geography).</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 3: Complete Embedding and Retrieval Workflow</h4>
+                            <p><strong>Scenario:</strong> Building a knowledge base and querying it using embeddings.</p>
+                            
+                            <p><strong>Step 1: Document Indexing</strong></p>
+                            <p>You have 3 documents to index:</p>
                             <ul>
-                                <li>Doc 1: "France's capital is Paris" → similarity: 0.95</li>
-                                <li>Doc 2: "Germany's capital is Berlin" → similarity: 0.45</li>
-                                <li>Doc 3: "Italy is a country" → similarity: 0.32</li>
+                                <li>Doc 1: "Machine learning uses algorithms to learn from data"</li>
+                                <li>Doc 2: "Deep learning is a subset of machine learning using neural networks"</li>
+                                <li>Doc 3: "Python is a popular programming language for data science"</li>
                             </ul>
                             
-                            <p><strong>Step 3: Retrieve top-k</strong></p>
+                            <p><strong>Step 2: Generate Embeddings</strong></p>
                             <ul>
-                                <li>Top-1: Doc 1 (highest similarity)</li>
+                                <li>Doc 1 embedding: [0.45, -0.23, 0.67, ..., 0.12]</li>
+                                <li>Doc 2 embedding: [0.48, -0.25, 0.65, ..., 0.14]</li>
+                                <li>Doc 3 embedding: [0.12, 0.34, -0.21, ..., -0.45]</li>
                             </ul>
+                            
+                            <p><strong>Step 3: Store in Vector Database</strong></p>
+                            <ul>
+                                <li>All three embeddings are stored in the vector database with their document IDs</li>
+                                <li>An index (e.g., HNSW) is built for fast similarity search</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Query Processing</strong></p>
+                            <p>User asks: "What is machine learning?"</p>
+                            <ul>
+                                <li>Query embedding: [0.46, -0.24, 0.66, ..., 0.13]</li>
+                            </ul>
+                            
+                            <p><strong>Step 5: Similarity Search</strong></p>
+                            <ul>
+                                <li>Compare query embedding with all document embeddings:</li>
+                                <li>Query vs Doc 1: similarity = 0.95 (very high - directly about machine learning)</li>
+                                <li>Query vs Doc 2: similarity = 0.92 (high - related, mentions machine learning)</li>
+                                <li>Query vs Doc 3: similarity = 0.35 (low - about Python, not machine learning)</li>
+                            </ul>
+                            
+                            <p><strong>Step 6: Top-k Retrieval</strong></p>
+                            <ul>
+                                <li>Retrieve top-2: Doc 1 and Doc 2 (highest similarity scores)</li>
+                                <li>These documents are passed to the LLM as context</li>
+                            </ul>
+                            
+                            <p><strong>Result:</strong> The system successfully finds documents about machine learning, even though the query uses slightly different wording than the documents.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 4: Embedding Dimension Comparison</h4>
+                            <p><strong>Scenario:</strong> Comparing embeddings of different dimensions to understand the trade-offs.</p>
+                            
+                            <p><strong>Same text:</strong> "Neural networks are used for deep learning"</p>
+                            
+                            <p><strong>384-dimensional embedding (all-MiniLM-L6-v2):</strong></p>
+                            <ul>
+                                <li>Size: 384 values</li>
+                                <li>Storage: ~1.5 KB per embedding</li>
+                                <li>Speed: Fast (quick to compute and compare)</li>
+                                <li>Quality: Good for most use cases</li>
+                                <li>Example: [0.23, -0.45, 0.67, ..., 0.12] (384 values)</li>
+                            </ul>
+                            
+                            <p><strong>768-dimensional embedding (all-mpnet-base-v2):</strong></p>
+                            <ul>
+                                <li>Size: 768 values</li>
+                                <li>Storage: ~3 KB per embedding (2x larger)</li>
+                                <li>Speed: Slower (more computation)</li>
+                                <li>Quality: Higher (better semantic understanding)</li>
+                                <li>Example: [0.23, -0.45, 0.67, 0.12, ..., 0.89] (768 values)</li>
+                            </ul>
+                            
+                            <p><strong>1536-dimensional embedding (OpenAI text-embedding-ada-002):</strong></p>
+                            <ul>
+                                <li>Size: 1536 values</li>
+                                <li>Storage: ~6 KB per embedding (4x larger than 384-dim)</li>
+                                <li>Speed: Slower (requires API call)</li>
+                                <li>Quality: Highest (best semantic understanding)</li>
+                                <li>Example: [0.23, -0.45, 0.67, ..., 0.12] (1536 values)</li>
+                            </ul>
+                            
+                            <p><strong>Trade-off Analysis:</strong></p>
+                            <p>For 1 million documents:</p>
+                            <ul>
+                                <li>384-dim: 1.5 GB storage, fast search, good quality</li>
+                                <li>768-dim: 3 GB storage, slower search, better quality</li>
+                                <li>1536-dim: 6 GB storage, slowest (API), best quality</li>
+                            </ul>
+                            
+                            <p><strong>Recommendation:</strong> Start with 384-dim for speed, upgrade to 768-dim if quality is insufficient, use 1536-dim only if quality is critical and you can afford the cost/latency.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 5: Handling Synonyms and Paraphrasing</h4>
+                            <p><strong>Scenario:</strong> Demonstrating how embeddings handle synonyms and different phrasings.</p>
+                            
+                            <p><strong>Query:</strong> "How do I train a neural network?"</p>
+                            
+                            <p><strong>Document 1:</strong> "Training deep learning models requires adjusting hyperparameters"<br>
+                            <strong>Note:</strong> Uses "deep learning models" instead of "neural network", and "training" instead of "train"</p>
+                            
+                            <p><strong>Document 2:</strong> "Neural networks are trained using backpropagation"<br>
+                            <strong>Note:</strong> Uses exact phrase "neural network" and "trained"</p>
+                            
+                            <p><strong>Document 3:</strong> "The weather forecast predicts rain tomorrow"<br>
+                            <strong>Note:</strong> Completely unrelated topic</p>
+                            
+                            <p><strong>Similarity Results:</strong></p>
+                            <ul>
+                                <li>Query vs Doc 1: 0.88 (high - understands "deep learning models" ≈ "neural network")</li>
+                                <li>Query vs Doc 2: 0.92 (very high - exact terminology match)</li>
+                                <li>Query vs Doc 3: 0.15 (very low - completely different topic)</li>
+                            </ul>
+                            
+                            <p><strong>Key Insight:</strong> Embeddings understand that "neural network" and "deep learning model" are semantically similar concepts, so Doc 1 is retrieved even though it doesn't contain the exact phrase "neural network". This is the power of semantic search - it finds relevant documents even when they use different terminology.</p>
                         </div>
                     </div>
 

@@ -615,45 +615,369 @@
                     <div id="implementation" class="content-section">
                         <h2>Implementation</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Implementation Overview</h3>
+                            <p>This section provides practical Python code examples for implementing advanced RAG techniques including query expansion, multi-query retrieval, context compression, and iterative retrieval. These techniques significantly improve RAG system performance beyond basic retrieval and generation.</p>
+                        </div>
+                        
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">import numpy as np
+                            <h4>1. Query Expansion Implementation</h4>
+                            <p><strong>What this does:</strong> Expands user queries with synonyms and related terms to improve retrieval coverage. Helps find documents that use different terminology than the original query.</p>
+                            <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+from typing import List
+import re
 
-from langchain.llms import OpenAI
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
+class QueryExpander:
+    """
+    Query expansion system that adds synonyms and related terms.
+    
+    Improves retrieval by finding documents that use different
+    terminology than the original query.
+    """
+    
+    def __init__(self):
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        # In production, use a proper synonym dictionary or LLM-based expansion
+        self.synonym_dict = {
+            "machine learning": ["ML", "artificial intelligence", "AI", "deep learning"],
+            "neural network": ["neural net", "NN", "deep learning model"],
+            "python": ["Python programming", "Python language"],
+            "tutorial": ["guide", "how-to", "instructions", "walkthrough"]
+        }
+    
+    def expand_with_synonyms(self, query: str) -> str:
+        """
+        Expand query by replacing terms with synonyms.
+        
+        Args:
+            query: Original query
+            
+        Returns:
+            Expanded query with synonyms
+        """
+        expanded_terms = []
+        words = query.lower().split()
+        
+        for word in words:
+            expanded_terms.append(word)
+            # Check if word is part of a key phrase
+            for key, synonyms in self.synonym_dict.items():
+                if key in query.lower():
+                    expanded_terms.extend(synonyms)
+        
+        # Remove duplicates and join
+        expanded_query = " ".join(list(set(expanded_terms)))
+        return expanded_query
+    
+    def expand_with_llm(self, query: str, num_expansions: int = 3) -> List[str]:
+        """
+        Use LLM to generate query variations.
+        
+        Args:
+            query: Original query
+            num_expansions: Number of variations to generate
+            
+        Returns:
+            List of expanded query variations
+        """
+        # In production, use OpenAI API or similar
+        # This is a simplified example
+        prompt = f"""Generate {num_expansions} different ways to ask this question:
+"{query}"
 
-# RAG generation with custom prompt
-template = """Context: {context}
+Return only the variations, one per line:"""
+        
+        # For demonstration, return manual variations
+        # In production, call LLM API here
+        variations = [
+            query,  # Original
+            f"Explain {query}",
+            f"What is {query}?",
+            f"Tell me about {query}"
+        ]
+        return variations[:num_expansions]
 
-Question: {question}
+# Example usage
+expander = QueryExpander()
 
-Answer based on the context above. If the answer is not in the context, say "I don't know":"""
+query = "Python machine learning tutorial"
+expanded = expander.expand_with_synonyms(query)
+print(f"Original: {query}")
+print(f"Expanded: {expanded}")
 
-prompt = PromptTemplate(template=template, input_variables=["context", "question"])
+# Use expanded query for retrieval
+# retriever.retrieve(expanded)</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Synonym expansion:</strong> Adds related terms to improve coverage</li>
+                                    <li><strong>LLM-based expansion:</strong> Can generate query variations automatically</li>
+                                    <li><strong>Use case:</strong> Particularly useful for short, ambiguous queries</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>2. Multi-Query Retrieval Implementation</h4>
+                            <p><strong>What this does:</strong> Generates multiple query variations, retrieves documents for each, then combines and deduplicates results for better coverage.</p>
+                            <pre><code class="language-python">from typing import List, Set
+from sentence_transformers import SentenceTransformer
 
-# Create RAG chain
-llm = OpenAI(temperature=0)
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True,
-    chain_type_kwargs={"prompt": prompt}
+class MultiQueryRetriever:
+    """
+    Multi-query retrieval that generates multiple query variations
+    and combines results for better coverage.
+    """
+    
+    def __init__(self, base_retriever):
+        """
+        Initialize multi-query retriever.
+        
+        Args:
+            base_retriever: Underlying retriever (HybridRetriever, etc.)
+        """
+        self.base_retriever = base_retriever
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    def generate_query_variations(self, query: str, num_variations: int = 3) -> List[str]:
+        """
+        Generate query variations using embedding similarity.
+        
+        Args:
+            query: Original query
+            num_variations: Number of variations to generate
+            
+        Returns:
+            List of query variations
+        """
+        # In production, use LLM to generate variations
+        # For demonstration, create simple variations
+        variations = [query]  # Include original
+        
+        # Add variations based on query structure
+        if "?" in query:
+            variations.append(query.replace("?", ""))
+            variations.append(f"Explain {query.lower()}")
+        else:
+            variations.append(f"{query} explanation")
+            variations.append(f"What is {query}?")
+        
+        return variations[:num_variations]
+    
+    def retrieve_multi_query(self, query: str, top_k_per_query: int = 10, final_k: int = 5) -> List[dict]:
+        """
+        Retrieve using multiple query variations and combine results.
+        
+        Args:
+            query: Original query
+            top_k_per_query: Number of results per query variation
+            final_k: Final number of results after combining
+            
+        Returns:
+            Combined and deduplicated results
+        """
+        # Step 1: Generate query variations
+        query_variations = self.generate_query_variations(query, num_variations=3)
+        print(f"Generated {len(query_variations)} query variations")
+        
+        # Step 2: Retrieve for each variation
+        all_results = []
+        seen_documents = set()
+        
+        for variation in query_variations:
+            results = self.base_retriever.retrieve(variation, top_k=top_k_per_query)
+            
+            # Deduplicate and add to combined results
+            for result in results:
+                doc_text = result['document']
+                if doc_text not in seen_documents:
+                    all_results.append(result)
+                    seen_documents.add(doc_text)
+        
+        # Step 3: Rerank combined results (optional but recommended)
+        # For simplicity, sort by hybrid_score
+        all_results.sort(key=lambda x: x.get('hybrid_score', 0), reverse=True)
+        
+        # Step 4: Return top-k
+        return all_results[:final_k]
+
+# Example usage
+# multi_retriever = MultiQueryRetriever(hybrid_retriever)
+# results = multi_retriever.retrieve_multi_query("machine learning", final_k=5)</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>3. Context Compression Implementation</h4>
+                            <p><strong>What this does:</strong> Compresses retrieved context to fit within LLM context windows while preserving the most relevant information.</p>
+                            <pre><code class="language-python">from typing import List
+import re
+
+class ContextCompressor:
+    """
+    Compresses retrieved context to fit within context window limits
+    while preserving the most relevant information.
+    """
+    
+    def __init__(self, max_tokens: int = 2000):
+        """
+        Initialize context compressor.
+        
+        Args:
+            max_tokens: Maximum tokens allowed in compressed context
+        """
+        self.max_tokens = max_tokens
+    
+    def compress_by_relevance(self, query: str, documents: List[str], 
+                              relevance_scores: List[float]) -> str:
+        """
+        Compress context by keeping only most relevant parts.
+        
+        Args:
+            query: User query
+            documents: List of retrieved documents
+            relevance_scores: Relevance scores for each document
+            
+        Returns:
+            Compressed context string
+        """
+        # Sort documents by relevance
+        doc_scores = list(zip(documents, relevance_scores))
+        doc_scores.sort(key=lambda x: x[1], reverse=True)
+        
+        # Add documents until we hit token limit
+        compressed_parts = []
+        current_tokens = 0
+        
+        for doc, score in doc_scores:
+            doc_tokens = len(doc.split())  # Approximate token count
+            if current_tokens + doc_tokens <= self.max_tokens:
+                compressed_parts.append(doc)
+                current_tokens += doc_tokens
+            else:
+                # Truncate last document if needed
+                remaining_tokens = self.max_tokens - current_tokens
+                if remaining_tokens > 50:  # Only if meaningful space left
+                    words = doc.split()[:remaining_tokens]
+                    compressed_parts.append(" ".join(words) + "...")
+                break
+        
+        return "\n\n".join(compressed_parts)
+    
+    def compress_by_summarization(self, documents: List[str]) -> str:
+        """
+        Compress by summarizing documents (simplified example).
+        
+        In production, use LLM-based summarization.
+        """
+        # Simplified: extract first sentence of each document
+        summaries = []
+        for doc in documents:
+            sentences = doc.split('.')
+            if sentences:
+                summaries.append(sentences[0] + '.')
+        
+        return " ".join(summaries)
+
+# Example usage
+compressor = ContextCompressor(max_tokens=1000)
+
+documents = [
+    "Machine learning is a subset of artificial intelligence...",
+    "Deep learning uses neural networks...",
+    "Python is a programming language..."
+]
+
+scores = [0.95, 0.85, 0.60]
+
+compressed = compressor.compress_by_relevance(
+    "What is machine learning?",
+    documents,
+    scores
 )
+print(f"Compressed context ({len(compressed.split())} tokens):")
+print(compressed)</code></pre>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>4. Complete Advanced RAG Pipeline</h4>
+                            <p><strong>What this does:</strong> Combines all advanced techniques into a complete RAG system with query expansion, multi-query retrieval, context compression, and generation.</p>
+                            <pre><code class="language-python">class AdvancedRAG:
+    """
+    Complete advanced RAG system with query expansion, multi-query,
+    context compression, and generation.
+    """
+    
+    def __init__(self, retriever, llm):
+        self.retriever = retriever
+        self.llm = llm
+        self.query_expander = QueryExpander()
+        self.multi_query = MultiQueryRetriever(retriever)
+        self.compressor = ContextCompressor(max_tokens=2000)
+    
+    def query(self, user_query: str, use_expansion: bool = True,
+              use_multi_query: bool = True, use_compression: bool = True):
+        """
+        Complete advanced RAG query pipeline.
+        
+        Args:
+            user_query: User's question
+            use_expansion: Whether to expand query
+            use_multi_query: Whether to use multi-query retrieval
+            use_compression: Whether to compress context
+        """
+        # Step 1: Query expansion (optional)
+        if use_expansion:
+            expanded_query = self.query_expander.expand_with_synonyms(user_query)
+        else:
+            expanded_query = user_query
+        
+        # Step 2: Multi-query retrieval (optional)
+        if use_multi_query:
+            retrieved = self.multi_query.retrieve_multi_query(
+                expanded_query,
+                top_k_per_query=10,
+                final_k=10
+            )
+            documents = [r['document'] for r in retrieved]
+            scores = [r.get('hybrid_score', 0.5) for r in retrieved]
+        else:
+            retrieved = self.retriever.retrieve(expanded_query, top_k=10)
+            documents = [r['document'] for r in retrieved]
+            scores = [r.get('hybrid_score', 0.5) for r in retrieved]
+        
+        # Step 3: Context compression (optional)
+        if use_compression:
+            context = self.compressor.compress_by_relevance(
+                user_query,
+                documents,
+                scores
+            )
+        else:
+            context = "\n\n".join(documents)
+        
+        # Step 4: Generate answer
+        prompt = f"""Context:
+{context}
 
-# Query
-query = "What is the capital of France?"
-result = qa_chain({"query": query})
-print(f"Answer: {result['result']}")
-print(f"Sources: {result['source_documents']}")
+Question: {user_query}
 
-# Alternative: Manual generation
-def generate_answer(query, retrieved_docs, llm):
-    context = "\n\n".join([doc.page_content for doc in retrieved_docs])
-    prompt = f"Context: {context}\n\nQuestion: {query}\n\nAnswer:"
-    answer = llm.generate([prompt])
-    return answer</code></pre>
+Answer based on the context above:"""
+        
+        # In production, use actual LLM API
+        answer = f"Generated answer for: {user_query}"  # Placeholder
+        return answer
+
+# Example usage
+# advanced_rag = AdvancedRAG(hybrid_retriever, llm)
+# answer = advanced_rag.query("What is machine learning?")</code></pre>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Installation Requirements</h3>
+                            <p>Install required packages:</p>
+                            <pre><code class="language-bash">pip install sentence-transformers langchain openai</code></pre>
+                            <p><strong>Note:</strong> For production, implement proper LLM-based query expansion and summarization using OpenAI API or similar services.</p>
                         </div>
                     </div>
 

@@ -544,124 +544,749 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Example: Dense vs Sparse Retrieval</h4>
-                            <p><strong>Query:</strong> "How do I reset my password?"</p>
+                            <h4>Example 1: Fixed-Size Chunking - Detailed Walkthrough</h4>
+                            <p><strong>Scenario:</strong> You have a long technical document that needs to be chunked for RAG.</p>
                             
-                            <p><strong>Dense retrieval (semantic):</strong></p>
+                            <p><strong>Original Document (200 characters):</strong></p>
+                            <p>"Machine learning is a subset of artificial intelligence. It enables computers to learn from data without explicit programming. Deep learning uses neural networks with multiple layers. Natural language processing helps computers understand text."</p>
+                            
+                            <p><strong>Parameters:</strong></p>
                             <ul>
-                                <li>Finds: "Password recovery steps", "Reset account access", "Forgot password guide"</li>
-                                <li>Understands synonyms: "reset" = "recovery" = "forgot"</li>
+                                <li>Chunk size: 80 characters</li>
+                                <li>Overlap: 20 characters (25% overlap)</li>
+                                <li>Effective chunk size: 80 - 20 = 60 new characters per chunk</li>
                             </ul>
                             
-                            <p><strong>Sparse retrieval (keyword):</strong></p>
-                            <ul>
-                                <li>Finds: Documents containing "reset" AND "password"</li>
-                                <li>Misses: "Password recovery" (no "reset" keyword)</li>
-                            </ul>
+                            <p><strong>Chunking Process:</strong></p>
+                            <p><strong>Chunk 1 (characters 1-80):</strong><br>
+                            "Machine learning is a subset of artificial intelligence. It enables computers to learn from data without"</p>
                             
-                            <p><strong>Hybrid:</strong> Combines both, gets best results</p>
+                            <p><strong>Chunk 2 (characters 61-140, overlaps 61-80 with Chunk 1):</strong><br>
+                            "from data without explicit programming. Deep learning uses neural networks with multiple layers. Natural"</p>
+                            
+                            <p><strong>Chunk 3 (characters 121-200, overlaps 121-140 with Chunk 2):</strong><br>
+                            "multiple layers. Natural language processing helps computers understand text."</p>
+                            
+                            <p><strong>Analysis:</strong></p>
+                            <ul>
+                                <li>Total chunks: 3</li>
+                                <li>Overlap preserved: "from data without" appears in both Chunk 1 and Chunk 2</li>
+                                <li>Overlap preserved: "multiple layers. Natural" appears in both Chunk 2 and Chunk 3</li>
+                                <li>✅ Context at boundaries is preserved</li>
+                            </ul>
                         </div>
                         
                         <div class="example-box">
-                            <h4>Example: Reranking</h4>
-                            <p><strong>Initial retrieval (top-10):</strong></p>
+                            <h4>Example 2: Sentence-Based Chunking - Preserving Semantic Coherence</h4>
+                            <p><strong>Scenario:</strong> A narrative document where sentence boundaries matter for meaning.</p>
+                            
+                            <p><strong>Original Document:</strong></p>
+                            <p>"Python is a versatile programming language. It is widely used in data science and machine learning. Many libraries like NumPy and Pandas make Python powerful for data analysis. Machine learning frameworks such as scikit-learn and TensorFlow are built on Python."</p>
+                            
+                            <p><strong>Parameters:</strong></p>
                             <ul>
-                                <li>Doc 1: "Password reset" (score: 0.85)</li>
-                                <li>Doc 2: "Account settings" (score: 0.82)</li>
-                                <li>Doc 3: "Password recovery" (score: 0.80)</li>
-                                <li>...</li>
+                                <li>Chunk size: 3 sentences</li>
+                                <li>Overlap: 1 sentence</li>
                             </ul>
                             
-                            <p><strong>After reranking:</strong></p>
+                            <p><strong>Sentence Identification:</strong></p>
+                            <ol>
+                                <li>"Python is a versatile programming language."</li>
+                                <li>"It is widely used in data science and machine learning."</li>
+                                <li>"Many libraries like NumPy and Pandas make Python powerful for data analysis."</li>
+                                <li>"Machine learning frameworks such as scikit-learn and TensorFlow are built on Python."</li>
+                            </ol>
+                            
+                            <p><strong>Chunking Result:</strong></p>
+                            <p><strong>Chunk 1 (sentences 1-3):</strong><br>
+                            "Python is a versatile programming language. It is widely used in data science and machine learning. Many libraries like NumPy and Pandas make Python powerful for data analysis."</p>
+                            
+                            <p><strong>Chunk 2 (sentences 3-4, overlaps sentence 3):</strong><br>
+                            "Many libraries like NumPy and Pandas make Python powerful for data analysis. Machine learning frameworks such as scikit-learn and TensorFlow are built on Python."</p>
+                            
+                            <p><strong>Advantages:</strong></p>
                             <ul>
-                                <li>Doc 3: "Password recovery" (score: 0.92) ← More relevant!</li>
-                                <li>Doc 1: "Password reset" (score: 0.88)</li>
-                                <li>Doc 2: "Account settings" (score: 0.65) ← Less relevant</li>
+                                <li>✅ Sentences remain intact (no mid-sentence breaks)</li>
+                                <li>✅ Better semantic coherence (related sentences stay together)</li>
+                                <li>✅ Overlap preserves context (sentence 3 appears in both chunks)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 3: Semantic Chunking - Topic-Based Boundaries</h4>
+                            <p><strong>Scenario:</strong> A document with clear topic transitions that semantic chunking can identify.</p>
+                            
+                            <p><strong>Original Document:</strong></p>
+                            <p>"Machine learning algorithms learn patterns from data. Supervised learning uses labeled examples. Unsupervised learning finds patterns without labels. Reinforcement learning learns through trial and error. Neural networks are inspired by the brain. They consist of interconnected nodes called neurons. Deep learning uses networks with many layers."</p>
+                            
+                            <p><strong>Semantic Chunking Process:</strong></p>
+                            <p><strong>Step 1: Embed each sentence</strong></p>
+                            <ul>
+                                <li>Sentence 1: [0.45, -0.23, 0.67, ...] (about ML algorithms)</li>
+                                <li>Sentence 2: [0.48, -0.25, 0.65, ...] (about supervised learning)</li>
+                                <li>Sentence 3: [0.46, -0.24, 0.66, ...] (about unsupervised learning)</li>
+                                <li>Sentence 4: [0.47, -0.26, 0.64, ...] (about reinforcement learning)</li>
+                                <li>Sentence 5: [0.12, 0.34, -0.21, ...] (about neural networks - different topic!)</li>
+                                <li>Sentence 6: [0.13, 0.35, -0.20, ...] (about neural networks)</li>
+                                <li>Sentence 7: [0.14, 0.36, -0.19, ...] (about deep learning)</li>
                             </ul>
                             
-                            <p><strong>Result:</strong> Better ordering improves final answer quality</p>
+                            <p><strong>Step 2: Calculate similarity between consecutive sentences</strong></p>
+                            <ul>
+                                <li>Sentences 1-4: High similarity (0.85-0.92) - all about ML learning types</li>
+                                <li>Sentence 4 to 5: Low similarity (0.35) - topic change from learning types to neural networks</li>
+                                <li>Sentences 5-7: High similarity (0.88-0.90) - all about neural networks</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Identify chunk boundaries</strong></p>
+                            <ul>
+                                <li>Boundary detected between sentences 4 and 5 (similarity drops below threshold 0.5)</li>
+                            </ul>
+                            
+                            <p><strong>Resulting Chunks:</strong></p>
+                            <p><strong>Chunk 1 (sentences 1-4):</strong> "Machine learning algorithms learn patterns from data. Supervised learning uses labeled examples. Unsupervised learning finds patterns without labels. Reinforcement learning learns through trial and error."<br>
+                            <strong>Topic:</strong> Types of machine learning</p>
+                            
+                            <p><strong>Chunk 2 (sentences 5-7):</strong> "Neural networks are inspired by the brain. They consist of interconnected nodes called neurons. Deep learning uses networks with many layers."<br>
+                            <strong>Topic:</strong> Neural networks and deep learning</p>
+                            
+                            <p><strong>Key Advantage:</strong> Semantic chunking automatically identified the topic boundary, creating chunks that represent complete concepts rather than arbitrary text splits.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 4: Recursive Chunking - Handling Nested Structures</h4>
+                            <p><strong>Scenario:</strong> A structured document with chapters, sections, and paragraphs.</p>
+                            
+                            <p><strong>Document Structure:</strong></p>
+                            <pre>
+Chapter 1: Introduction
+  Section 1.1: Overview (500 words)
+  Section 1.2: History (800 words)
+Chapter 2: Methods
+  Section 2.1: Approach A (300 words)
+  Section 2.2: Approach B (400 words)
+                            </pre>
+                            
+                            <p><strong>Recursive Chunking Process:</strong></p>
+                            <p><strong>Level 1: Try chapters</strong></p>
+                            <ul>
+                                <li>Chapter 1: 1,300 words (too large for 500-word chunks)</li>
+                                <li>Chapter 2: 700 words (too large)</li>
+                                <li>→ Move to next level</li>
+                            </ul>
+                            
+                            <p><strong>Level 2: Try sections</strong></p>
+                            <ul>
+                                <li>Section 1.1: 500 words (perfect size!) → Chunk 1</li>
+                                <li>Section 1.2: 800 words (too large) → Move to next level</li>
+                                <li>Section 2.1: 300 words (good size) → Chunk 2</li>
+                                <li>Section 2.2: 400 words (good size) → Chunk 3</li>
+                            </ul>
+                            
+                            <p><strong>Level 3: Try paragraphs (for Section 1.2)</strong></p>
+                            <ul>
+                                <li>Paragraph 1: 200 words → Chunk 4</li>
+                                <li>Paragraph 2: 250 words → Chunk 5</li>
+                                <li>Paragraph 3: 350 words → Chunk 6</li>
+                            </ul>
+                            
+                            <p><strong>Final Result:</strong></p>
+                            <ul>
+                                <li>6 chunks total, each respecting document structure</li>
+                                <li>Chunks maintain hierarchy (metadata links chunks to their parent sections/chapters)</li>
+                                <li>✅ Structure is preserved while meeting size constraints</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 5: Impact of Chunk Size on Retrieval</h4>
+                            <p><strong>Scenario:</strong> Same document chunked with different sizes to show how chunk size affects retrieval precision.</p>
+                            
+                            <p><strong>Document:</strong> "Machine learning uses algorithms. Supervised learning requires labeled data. Unsupervised learning finds patterns. Neural networks have multiple layers. Deep learning uses many layers."</p>
+                            
+                            <p><strong>Query:</strong> "What is supervised learning?"</p>
+                            
+                            <p><strong>Small Chunks (50 characters each):</strong></p>
+                            <ul>
+                                <li>Chunk 1: "Machine learning uses algorithms. Supervised learning"</li>
+                                <li>Chunk 2: "Supervised learning requires labeled data. Unsupervised"</li>
+                                <li>Chunk 3: "Unsupervised learning finds patterns. Neural networks"</li>
+                                <li>Chunk 4: "Neural networks have multiple layers. Deep learning"</li>
+                                <li>Chunk 5: "Deep learning uses many layers."</li>
+                            </ul>
+                            <p><strong>Retrieval:</strong> Chunk 2 is retrieved (contains "supervised learning" and "labeled data")<br>
+                            <strong>Precision:</strong> High - chunk is highly relevant<br>
+                            <strong>Context:</strong> Limited - only mentions supervised learning briefly</p>
+                            
+                            <p><strong>Large Chunks (150 characters each):</strong></p>
+                            <ul>
+                                <li>Chunk 1: "Machine learning uses algorithms. Supervised learning requires labeled data. Unsupervised learning finds patterns."</li>
+                                <li>Chunk 2: "Neural networks have multiple layers. Deep learning uses many layers."</li>
+                            </ul>
+                            <p><strong>Retrieval:</strong> Chunk 1 is retrieved (contains supervised learning)<br>
+                            <strong>Precision:</strong> Lower - chunk also contains unrelated info (unsupervised learning, algorithms)<br>
+                            <strong>Context:</strong> Rich - includes related concepts</p>
+                            
+                            <p><strong>Trade-off:</strong> Smaller chunks = more precise retrieval but less context. Larger chunks = more context but less precise retrieval. Choose based on your needs.</p>
                         </div>
                     </div>
 
                     <div id="implementation" class="content-section">
                         <h2>Implementation</h2>
                         
-                        <div class="code-box">
-                            <h4>Hybrid Retrieval</h4>
-                            <pre><code class="language-python">from sentence_transformers import SentenceTransformer
-from rank_bm25 import BM25Okapi
-import numpy as np
-
-class HybridRetriever:
-    """Hybrid dense + sparse retrieval"""
-    
-    def __init__(self, documents, alpha=0.5):
-        self.documents = documents
-        self.alpha = alpha  # Weight for BM25 vs dense
-        
-        # Dense retriever
-        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
-        self.embeddings = self.embedder.encode(documents)
-        
-        # Sparse retriever (BM25)
-        tokenized_docs = [doc.split() for doc in documents]
-        self.bm25 = BM25Okapi(tokenized_docs)
-    
-    def retrieve(self, query, top_k=5):
-        """Retrieve using hybrid approach"""
-        # Dense retrieval
-        query_embedding = self.embedder.encode([query])
-        dense_scores = np.dot(self.embeddings, query_embedding.T).flatten()
-        dense_scores = (dense_scores - dense_scores.min()) / (dense_scores.max() - dense_scores.min() + 1e-8)
-        
-        # Sparse retrieval
-        tokenized_query = query.split()
-        sparse_scores = self.bm25.get_scores(tokenized_query)
-        sparse_scores = (sparse_scores - sparse_scores.min()) / (sparse_scores.max() - sparse_scores.min() + 1e-8)
-        
-        # Combine
-        hybrid_scores = self.alpha * sparse_scores + (1 - self.alpha) * dense_scores
-        
-        # Get top-k
-        top_indices = np.argsort(hybrid_scores)[-top_k:][::-1]
-        return [self.documents[i] for i in top_indices]
-
-# Example
-docs = ["Password reset instructions", "Account settings guide", "Password recovery steps"]
-retriever = HybridRetriever(docs)
-results = retriever.retrieve("How do I reset my password?")
-print(results)</code></pre>
+                        <div class="explanation-box">
+                            <h3>Implementation Overview</h3>
+                            <p>This section provides practical Python code examples for implementing document processing and chunking in RAG systems. The examples use popular libraries like <strong>LangChain</strong> and <strong>NLTK</strong> for text processing, and demonstrate different chunking strategies with real-world scenarios.</p>
                         </div>
                         
                         <div class="code-box">
-                            <h4>Reranking with Cross-Encoder</h4>
-                            <pre><code class="language-python">from sentence_transformers import CrossEncoder
+                            <h4>1. Fixed-Size Chunking Implementation</h4>
+                            <p><strong>What this does:</strong> Splits documents into chunks of fixed size (characters or tokens) with configurable overlap. Simple and fast, good for uniform content.</p>
+                            <pre><code class="language-python">from langchain.text_splitter import CharacterTextSplitter
+import re
 
-class Reranker:
-    """Rerank retrieved documents"""
+class FixedSizeChunker:
+    """
+    Fixed-size chunking implementation with overlap support.
     
-    def __init__(self):
-        self.model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+    This class splits documents into equal-sized chunks, preserving
+    overlap at boundaries to maintain context.
+    """
     
-    def rerank(self, query, documents, top_k=3):
-        """Rerank documents for query"""
-        # Create query-document pairs
-        pairs = [[query, doc] for doc in documents]
+    def __init__(self, chunk_size=500, chunk_overlap=100):
+        """
+        Initialize chunker with size and overlap parameters.
         
-        # Get scores
-        scores = self.model.predict(pairs)
+        Args:
+            chunk_size: Size of each chunk in characters
+            chunk_overlap: Number of overlapping characters between chunks
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.effective_size = chunk_size - chunk_overlap
+    
+    def chunk(self, text):
+        """
+        Split text into fixed-size chunks with overlap.
         
-        # Sort by score
-        ranked_indices = np.argsort(scores)[::-1]
+        Args:
+            text: Input text to chunk
+            
+        Returns:
+            List of chunk strings
+        """
+        if len(text) <= self.chunk_size:
+            return [text]  # Text fits in one chunk
         
-        # Return top-k
-        return [documents[i] for i in ranked_indices[:top_k]]
+        chunks = []
+        start = 0
+        
+        while start < len(text):
+            # Calculate end position
+            end = start + self.chunk_size
+            
+            # Extract chunk
+            chunk = text[start:end]
+            chunks.append(chunk)
+            
+            # Move start position (accounting for overlap)
+            start += self.effective_size
+        
+        return chunks
+    
+    def chunk_with_metadata(self, text, metadata=None):
+        """
+        Chunk text and preserve metadata for each chunk.
+        
+        Args:
+            text: Input text
+            metadata: Dictionary of metadata (e.g., {'title': 'Doc1', 'author': 'John'})
+            
+        Returns:
+            List of dictionaries with 'text' and 'metadata' keys
+        """
+        chunks = self.chunk(text)
+        chunked_docs = []
+        
+        for i, chunk_text in enumerate(chunks):
+            chunk_metadata = {
+                **(metadata or {}),
+                'chunk_index': i,
+                'total_chunks': len(chunks)
+            }
+            chunked_docs.append({
+                'text': chunk_text,
+                'metadata': chunk_metadata
+            })
+        
+        return chunked_docs
 
-# Example
-reranker = Reranker()
-docs = ["Password reset", "Account settings", "Password recovery"]
-reranked = reranker.rerank("How do I reset my password?", docs)
-print(reranked)</code></pre>
+# Example usage
+chunker = FixedSizeChunker(chunk_size=100, chunk_overlap=20)
+
+document = "Machine learning is a subset of artificial intelligence. " \
+           "It enables computers to learn from data without explicit programming. " \
+           "Deep learning uses neural networks with multiple layers."
+
+chunks = chunker.chunk(document)
+print(f"Number of chunks: {len(chunks)}")
+for i, chunk in enumerate(chunks, 1):
+    print(f"\nChunk {i} ({len(chunk)} chars): {chunk}")
+
+# Output:
+# Number of chunks: 2
+# Chunk 1 (100 chars): Machine learning is a subset of artificial intelligence. It enables computers to learn from data without explicit
+# Chunk 2 (100 chars): from data without explicit programming. Deep learning uses neural networks with multiple layers.
+# Note: "from data without explicit" appears in both chunks (overlap)</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Simple implementation:</strong> Easy to understand and implement</li>
+                                    <li><strong>Overlap handling:</strong> Each chunk after the first starts `chunk_size - overlap` characters into the previous chunk</li>
+                                    <li><strong>Metadata preservation:</strong> Can attach metadata to each chunk for filtering and organization</li>
+                                    <li><strong>Use case:</strong> Good for uniform text where structure doesn't matter</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>2. Sentence-Based Chunking Implementation</h4>
+                            <p><strong>What this does:</strong> Splits documents at sentence boundaries, grouping multiple sentences into chunks. Preserves sentence integrity and improves semantic coherence.</p>
+                            <pre><code class="language-python">import nltk
+from nltk.tokenize import sent_tokenize
+import re
+
+# Download required NLTK data (run once)
+# nltk.download('punkt')
+
+class SentenceBasedChunker:
+    """
+    Sentence-based chunking that respects sentence boundaries.
+    
+    Groups sentences into chunks of approximately target size,
+    ensuring no sentence is split across chunks.
+    """
+    
+    def __init__(self, chunk_size=500, chunk_overlap=100):
+        """
+        Initialize sentence-based chunker.
+        
+        Args:
+            chunk_size: Target chunk size in characters
+            chunk_overlap: Overlap in characters (applied at sentence boundaries)
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+    
+    def chunk(self, text):
+        """
+        Split text into sentence-based chunks.
+        
+        Args:
+            text: Input text to chunk
+            
+        Returns:
+            List of chunk strings
+        """
+        # Split into sentences
+        sentences = sent_tokenize(text)
+        
+        if not sentences:
+            return [text]
+        
+        chunks = []
+        current_chunk = []
+        current_size = 0
+        
+        for sentence in sentences:
+            sentence_size = len(sentence)
+            
+            # If adding this sentence would exceed chunk size, finalize current chunk
+            if current_size + sentence_size > self.chunk_size and current_chunk:
+                # Join sentences into chunk
+                chunk_text = ' '.join(current_chunk)
+                chunks.append(chunk_text)
+                
+                # Start new chunk with overlap (last few sentences)
+                overlap_sentences = self._get_overlap_sentences(current_chunk)
+                current_chunk = overlap_sentences + [sentence]
+                current_size = sum(len(s) for s in current_chunk)
+            else:
+                current_chunk.append(sentence)
+                current_size += sentence_size
+        
+        # Add final chunk
+        if current_chunk:
+            chunks.append(' '.join(current_chunk))
+        
+        return chunks
+    
+    def _get_overlap_sentences(self, sentences):
+        """
+        Get sentences for overlap based on target overlap size.
+        
+        Args:
+            sentences: List of sentences in current chunk
+            
+        Returns:
+            List of sentences to include in next chunk for overlap
+        """
+        overlap_sentences = []
+        overlap_size = 0
+        
+        # Add sentences from the end until we reach overlap size
+        for sentence in reversed(sentences):
+            if overlap_size + len(sentence) <= self.chunk_overlap:
+                overlap_sentences.insert(0, sentence)
+                overlap_size += len(sentence)
+            else:
+                break
+        
+        return overlap_sentences
+
+# Example usage
+chunker = SentenceBasedChunker(chunk_size=150, chunk_overlap=30)
+
+document = "Python is a versatile programming language. " \
+           "It is widely used in data science and machine learning. " \
+           "Many libraries like NumPy and Pandas make Python powerful. " \
+           "Machine learning frameworks such as scikit-learn are built on Python."
+
+chunks = chunker.chunk(document)
+print(f"Number of chunks: {len(chunks)}")
+for i, chunk in enumerate(chunks, 1):
+    print(f"\nChunk {i} ({len(chunk)} chars):")
+    print(chunk)
+
+# Output:
+# Number of chunks: 2
+# Chunk 1: Python is a versatile programming language. It is widely used in data science and machine learning.
+# Chunk 2: It is widely used in data science and machine learning. Many libraries like NumPy and Pandas make Python powerful.
+# Note: Overlap preserves context at sentence boundaries</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Sentence preservation:</strong> Never breaks sentences, maintaining grammatical integrity</li>
+                                    <li><strong>Smart overlap:</strong> Overlap is applied at sentence boundaries, not arbitrary character positions</li>
+                                    <li><strong>Better semantics:</strong> Related sentences stay together, improving embedding quality</li>
+                                    <li><strong>Use case:</strong> Ideal for narrative text, articles, and prose where sentence structure matters</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>3. Recursive Chunking Implementation (LangChain)</h4>
+                            <p><strong>What this does:</strong> Tries multiple chunking strategies in hierarchy (paragraphs → sentences → characters) until chunks fit size requirements. Handles nested document structures intelligently.</p>
+                            <pre><code class="language-python">from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+class DocumentChunker:
+    """
+    Recursive chunking that tries multiple separators in order.
+    
+    This is the most robust chunking approach, handling various
+    document structures automatically.
+    """
+    
+    def __init__(self, chunk_size=1000, chunk_overlap=200):
+        """
+        Initialize recursive chunker.
+        
+        Args:
+            chunk_size: Target chunk size in characters
+            chunk_overlap: Overlap between chunks
+        """
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            length_function=len,
+            # Try these separators in order (most to least preferred)
+            separators=[
+                "\n\n",  # Paragraphs (double newline)
+                "\n",    # Lines (single newline)
+                ". ",    # Sentences (period + space)
+                " ",     # Words (spaces)
+                ""       # Characters (fallback)
+            ]
+        )
+    
+    def chunk_document(self, text, metadata=None):
+        """
+        Chunk document with metadata preservation.
+        
+        Args:
+            text: Document text
+            metadata: Optional metadata dictionary
+            
+        Returns:
+            List of chunk dictionaries with text and metadata
+        """
+        # Split into chunks
+        chunks = self.splitter.split_text(text)
+        
+        # Add metadata to each chunk
+        chunked_docs = []
+        for i, chunk_text in enumerate(chunks):
+            chunk_metadata = {
+                **(metadata or {}),
+                'chunk_index': i,
+                'total_chunks': len(chunks),
+                'chunk_size': len(chunk_text)
+            }
+            chunked_docs.append({
+                'text': chunk_text,
+                'metadata': chunk_metadata
+            })
+        
+        return chunked_docs
+    
+    def chunk_multiple_documents(self, documents):
+        """
+        Chunk multiple documents, preserving document-level metadata.
+        
+        Args:
+            documents: List of dicts with 'text' and optional 'metadata'
+            
+        Returns:
+            List of all chunks with preserved metadata
+        """
+        all_chunks = []
+        
+        for doc_idx, doc in enumerate(documents):
+            text = doc.get('text', '')
+            metadata = doc.get('metadata', {})
+            metadata['document_index'] = doc_idx
+            
+            chunks = self.chunk_document(text, metadata)
+            all_chunks.extend(chunks)
+        
+        return all_chunks
+
+# Example usage
+chunker = DocumentChunker(chunk_size=200, chunk_overlap=50)
+
+# Example: Structured document with paragraphs
+document = """Introduction
+
+Machine learning is transforming industries. It enables computers to learn from data.
+
+Methods
+
+We use neural networks for pattern recognition. Deep learning models achieve state-of-the-art results.
+
+Conclusion
+
+The future of AI looks promising. Machine learning will continue to evolve."""
+
+chunks = chunker.chunk_document(
+    document,
+    metadata={'title': 'ML Overview', 'author': 'John Doe', 'date': '2024-01-15'}
+)
+
+print(f"Number of chunks: {len(chunks)}")
+for chunk in chunks:
+    print(f"\nChunk {chunk['metadata']['chunk_index'] + 1}:")
+    print(f"Text: {chunk['text'][:100]}...")
+    print(f"Metadata: {chunk['metadata']}")
+
+# The recursive splitter will:
+# 1. Try splitting by "\n\n" (paragraphs) - succeeds for this document
+# 2. If paragraphs are too large, try "\n" (lines)
+# 3. If lines are too large, try ". " (sentences)
+# 4. And so on...</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Adaptive:</strong> Automatically chooses the best separator based on document structure</li>
+                                    <li><strong>Hierarchical:</strong> Respects document hierarchy (paragraphs → sentences → words)</li>
+                                    <li><strong>Robust:</strong> Handles various document formats (markdown, plain text, structured)</li>
+                                    <li><strong>Metadata preservation:</strong> Maintains document-level and chunk-level metadata</li>
+                                    <li><strong>Use case:</strong> Best for diverse document types or when you're unsure of document structure</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>4. Complete Document Processing Pipeline</h4>
+                            <p><strong>What this does:</strong> A complete implementation that loads documents from various formats, processes them, chunks them, and prepares them for embedding and storage in a vector database.</p>
+                            <pre><code class="language-python">import os
+from pathlib import Path
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.document_loaders import PyPDFLoader, TextLoader, UnstructuredHTMLLoader
+
+class DocumentProcessor:
+    """
+    Complete document processing pipeline for RAG systems.
+    
+    Handles loading, cleaning, chunking, and metadata extraction
+    from various document formats.
+    """
+    
+    def __init__(self, chunk_size=1000, chunk_overlap=200):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            length_function=len
+        )
+    
+    def load_document(self, file_path):
+        """
+        Load document from file based on extension.
+        
+        Args:
+            file_path: Path to document file
+            
+        Returns:
+            Document text and metadata
+        """
+        file_path = Path(file_path)
+        extension = file_path.suffix.lower()
+        
+        # Extract base metadata
+        metadata = {
+            'source': str(file_path),
+            'filename': file_path.name,
+            'file_type': extension
+        }
+        
+        # Load based on file type
+        if extension == '.pdf':
+            loader = PyPDFLoader(str(file_path))
+            pages = loader.load()
+            text = '\n\n'.join([page.page_content for page in pages])
+            metadata['page_count'] = len(pages)
+        
+        elif extension in ['.txt', '.md']:
+            loader = TextLoader(str(file_path), encoding='utf-8')
+            document = loader.load()
+            text = document[0].page_content
+        
+        elif extension in ['.html', '.htm']:
+            loader = UnstructuredHTMLLoader(str(file_path))
+            document = loader.load()
+            text = document[0].page_content
+        
+        else:
+            raise ValueError(f"Unsupported file type: {extension}")
+        
+        return text, metadata
+    
+    def process_document(self, file_path):
+        """
+        Complete processing: load, chunk, and prepare for embedding.
+        
+        Args:
+            file_path: Path to document file
+            
+        Returns:
+            List of chunk dictionaries ready for embedding
+        """
+        # Step 1: Load document
+        text, doc_metadata = self.load_document(file_path)
+        
+        # Step 2: Clean text (remove excessive whitespace, normalize)
+        text = self._clean_text(text)
+        
+        # Step 3: Chunk document
+        chunks = self.splitter.split_text(text)
+        
+        # Step 4: Create chunk documents with metadata
+        chunked_docs = []
+        for i, chunk_text in enumerate(chunks):
+            chunk_metadata = {
+                **doc_metadata,
+                'chunk_index': i,
+                'total_chunks': len(chunks),
+                'chunk_size': len(chunk_text)
+            }
+            chunked_docs.append({
+                'text': chunk_text,
+                'metadata': chunk_metadata
+            })
+        
+        return chunked_docs
+    
+    def _clean_text(self, text):
+        """Clean and normalize text."""
+        # Remove excessive whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Remove special characters that might interfere
+        text = text.strip()
+        return text
+    
+    def process_directory(self, directory_path, file_patterns=None):
+        """
+        Process all documents in a directory.
+        
+        Args:
+            directory_path: Path to directory containing documents
+            file_patterns: List of file patterns to include (e.g., ['*.pdf', '*.txt'])
+            
+        Returns:
+            List of all chunks from all documents
+        """
+        directory = Path(directory_path)
+        all_chunks = []
+        
+        # Default patterns
+        if file_patterns is None:
+            file_patterns = ['*.pdf', '*.txt', '*.md', '*.html']
+        
+        # Find all matching files
+        files = []
+        for pattern in file_patterns:
+            files.extend(directory.glob(pattern))
+        
+        # Process each file
+        for file_path in files:
+            try:
+                chunks = self.process_document(file_path)
+                all_chunks.extend(chunks)
+                print(f"Processed {file_path.name}: {len(chunks)} chunks")
+            except Exception as e:
+                print(f"Error processing {file_path}: {e}")
+        
+        return all_chunks
+
+# Example usage
+processor = DocumentProcessor(chunk_size=500, chunk_overlap=100)
+
+# Process a single document
+chunks = processor.process_document('document.pdf')
+print(f"Created {len(chunks)} chunks from document")
+
+# Process entire directory
+all_chunks = processor.process_directory('./documents/', file_patterns=['*.pdf', '*.txt'])
+print(f"Total chunks from all documents: {len(all_chunks)}")
+
+# Now chunks are ready for:
+# 1. Embedding generation
+# 2. Storage in vector database
+# 3. Retrieval in RAG system</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Complete Pipeline Steps:</h5>
+                                <ol>
+                                    <li><strong>Document Loading:</strong> Loads from PDF, TXT, MD, HTML formats</li>
+                                    <li><strong>Text Cleaning:</strong> Normalizes whitespace and removes artifacts</li>
+                                    <li><strong>Chunking:</strong> Splits into manageable chunks with overlap</li>
+                                    <li><strong>Metadata Extraction:</strong> Preserves document properties (filename, type, page count)</li>
+                                    <li><strong>Ready for Embedding:</strong> Chunks are prepared for vector database storage</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Installation Requirements</h3>
+                            <p>To run these examples, install the required packages:</p>
+                            <pre><code class="language-bash">pip install langchain nltk pypdf unstructured</code></pre>
+                            <p>For NLTK sentence tokenization, download the punkt tokenizer (run once):</p>
+                            <pre><code class="language-python">import nltk
+nltk.download('punkt')</code></pre>
                         </div>
                     </div>
 

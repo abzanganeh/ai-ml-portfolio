@@ -651,103 +651,430 @@
                     <div id="implementation" class="content-section">
                         <h2>Implementation</h2>
                         
-                        <div class="code-box">
-                            <h4>RAG Evaluation Metrics</h4>
-                            <pre><code class="language-python">def evaluate_retrieval(relevant_docs, retrieved_docs, k=10):
-    """
-    Evaluate retrieval quality
-    """
-    # Precision@k
-    relevant_retrieved = len(set(relevant_docs) & set(retrieved_docs[:k]))
-    precision = relevant_retrieved / k
-    
-    # Recall@k
-    recall = relevant_retrieved / len(relevant_docs) if relevant_docs else 0
-    
-    # F1 score
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-    
-    return {
-        'precision@k': precision,
-        'recall@k': recall,
-        'f1@k': f1
-    }
-
-def evaluate_answer_faithfulness(answer, context):
-    """
-    Check if answer claims are supported by context
-    """
-    # Extract claims from answer (simplified)
-    answer_claims = extract_claims(answer)
-    context_claims = extract_claims(context)
-    
-    # Check how many answer claims are in context
-    supported = len(set(answer_claims) & set(context_claims))
-    faithfulness = supported / len(answer_claims) if answer_claims else 0
-    
-    return faithfulness
-
-# Example usage
-relevant = ['doc1', 'doc2', 'doc3']
-retrieved = ['doc1', 'doc4', 'doc2', 'doc5']
-metrics = evaluate_retrieval(relevant, retrieved, k=3)
-print(metrics)</code></pre>
+                        <div class="explanation-box">
+                            <h3>Implementation Overview</h3>
+                            <p>This section provides practical Python code examples for evaluating RAG systems and building production-ready implementations with error handling, monitoring, caching, and scalability features. These implementations are essential for deploying RAG systems in real-world environments.</p>
                         </div>
                         
                         <div class="code-box">
-                            <h4>Production RAG with Error Handling</h4>
-                            <pre><code class="language-python">class ProductionRAG:
-    """Production-ready RAG with error handling"""
+                            <h4>1. Complete RAG Evaluation System</h4>
+                            <p><strong>What this does:</strong> Implements comprehensive evaluation metrics for both retrieval and generation quality, including precision, recall, faithfulness, relevance, and completeness.</p>
+                            <pre><code class="language-python">from typing import List, Set, Dict
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+class RAGEvaluator:
+    """
+    Comprehensive RAG system evaluator.
     
-    def __init__(self, embedder, vector_db, llm):
+    Evaluates both retrieval quality (precision, recall) and
+    generation quality (faithfulness, relevance, completeness).
+    """
+    
+    def __init__(self):
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    def evaluate_retrieval(self, relevant_doc_ids: Set[str], 
+                          retrieved_doc_ids: List[str], k: int = 10) -> Dict:
+        """
+        Evaluate retrieval quality.
+        
+        Args:
+            relevant_doc_ids: Set of document IDs that are actually relevant
+            retrieved_doc_ids: List of retrieved document IDs (in order)
+            k: Number of top-k to evaluate
+            
+        Returns:
+            Dictionary with precision@k, recall@k, f1@k
+        """
+        # Get top-k retrieved
+        top_k_retrieved = set(retrieved_doc_ids[:k])
+        
+        # Calculate metrics
+        relevant_retrieved = relevant_doc_ids & top_k_retrieved
+        precision = len(relevant_retrieved) / k if k > 0 else 0
+        recall = len(relevant_retrieved) / len(relevant_doc_ids) if relevant_doc_ids else 0
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        
+        return {
+            'precision@k': precision,
+            'recall@k': recall,
+            'f1@k': f1,
+            'relevant_retrieved': len(relevant_retrieved),
+            'total_relevant': len(relevant_doc_ids),
+            'k': k
+        }
+    
+    def evaluate_faithfulness(self, answer: str, context: str) -> float:
+        """
+        Evaluate if answer claims are supported by context.
+        
+        Args:
+            answer: Generated answer
+            context: Retrieved context
+            
+        Returns:
+            Faithfulness score [0, 1]
+        """
+        # Extract key claims from answer (simplified - use NER in production)
+        answer_claims = self._extract_claims(answer)
+        context_claims = self._extract_claims(context)
+        
+        # Check how many answer claims appear in context
+        supported = len(set(answer_claims) & set(context_claims))
+        faithfulness = supported / len(answer_claims) if answer_claims else 1.0
+        
+        return faithfulness
+    
+    def evaluate_relevance(self, query: str, answer: str) -> float:
+        """
+        Evaluate semantic relevance between query and answer.
+        
+        Args:
+            query: User query
+            answer: Generated answer
+            
+        Returns:
+            Relevance score [0, 1] (cosine similarity)
+        """
+        query_emb = self.embedder.encode([query])
+        answer_emb = self.embedder.encode([answer])
+        
+        # Cosine similarity
+        similarity = np.dot(query_emb[0], answer_emb[0]) / (
+            np.linalg.norm(query_emb[0]) * np.linalg.norm(answer_emb[0])
+        )
+        
+        # Normalize to [0, 1] (assuming normalized embeddings)
+        relevance = (similarity + 1) / 2
+        return float(relevance)
+    
+    def evaluate_completeness(self, query: str, answer: str) -> float:
+        """
+        Evaluate if answer addresses all aspects of query.
+        
+        Args:
+            query: User query (may have multiple parts)
+            answer: Generated answer
+            
+        Returns:
+            Completeness score [0, 1]
+        """
+        # Extract query aspects (simplified)
+        query_aspects = self._extract_query_aspects(query)
+        answered_aspects = self._check_aspects_answered(query_aspects, answer)
+        
+        completeness = answered_aspects / len(query_aspects) if query_aspects else 1.0
+        return completeness
+    
+    def _extract_claims(self, text: str) -> List[str]:
+        """Extract factual claims from text (simplified)."""
+        # In production, use NER, dependency parsing, or LLM-based extraction
+        sentences = text.split('.')
+        return [s.strip() for s in sentences if len(s.strip()) > 10]
+    
+    def _extract_query_aspects(self, query: str) -> List[str]:
+        """Extract different aspects/questions from query."""
+        # Simple: split by "and", "or", etc.
+        aspects = re.split(r'\s+and\s+|\s+or\s+', query.lower())
+        return [a.strip() for a in aspects if a.strip()]
+    
+    def _check_aspects_answered(self, aspects: List[str], answer: str) -> int:
+        """Check how many aspects are addressed in answer."""
+        answer_lower = answer.lower()
+        answered = sum(1 for aspect in aspects if any(word in answer_lower for word in aspect.split()))
+        return answered
+    
+    def evaluate_complete(self, query: str, answer: str, context: str,
+                         relevant_doc_ids: Set[str], retrieved_doc_ids: List[str]) -> Dict:
+        """
+        Complete evaluation of RAG system.
+        
+        Returns:
+            Dictionary with all evaluation metrics
+        """
+        retrieval_metrics = self.evaluate_retrieval(relevant_doc_ids, retrieved_doc_ids)
+        
+        faithfulness = self.evaluate_faithfulness(answer, context)
+        relevance = self.evaluate_relevance(query, answer)
+        completeness = self.evaluate_completeness(query, answer)
+        
+        # Overall quality score
+        quality = 0.4 * faithfulness + 0.4 * relevance + 0.2 * completeness
+        
+        return {
+            **retrieval_metrics,
+            'faithfulness': faithfulness,
+            'relevance': relevance,
+            'completeness': completeness,
+            'overall_quality': quality
+        }
+
+# Example usage
+evaluator = RAGEvaluator()
+
+# Example evaluation
+relevant = {'doc1', 'doc2', 'doc3'}
+retrieved = ['doc1', 'doc4', 'doc2', 'doc5', 'doc6']
+
+metrics = evaluator.evaluate_retrieval(relevant, retrieved, k=5)
+print("Retrieval Metrics:")
+print(f"Precision@5: {metrics['precision@k']:.3f}")
+print(f"Recall@5: {metrics['recall@k']:.3f}")
+print(f"F1@5: {metrics['f1@k']:.3f}")
+
+query = "What is machine learning?"
+answer = "Machine learning is a subset of AI that learns from data."
+context = "Machine learning is a subset of artificial intelligence. It enables computers to learn from data."
+
+faithfulness = evaluator.evaluate_faithfulness(answer, context)
+relevance = evaluator.evaluate_relevance(query, answer)
+print(f"\nGeneration Metrics:")
+print(f"Faithfulness: {faithfulness:.3f}")
+print(f"Relevance: {relevance:.3f}")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Retrieval metrics:</strong> Precision, recall, F1 measure retrieval quality</li>
+                                    <li><strong>Generation metrics:</strong> Faithfulness, relevance, completeness measure answer quality</li>
+                                    <li><strong>Production use:</strong> Run evaluation on test sets to monitor system performance</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>2. Production RAG System with Monitoring and Error Handling</h4>
+                            <p><strong>What this does:</strong> Implements a production-ready RAG system with comprehensive error handling, caching, logging, monitoring, and fallback mechanisms.</p>
+                            <pre><code class="language-python">import time
+import logging
+from typing import Optional, Dict, List
+from functools import lru_cache
+import json
+
+class ProductionRAG:
+    """
+    Production-ready RAG system with error handling, caching,
+    monitoring, and scalability features.
+    """
+    
+    def __init__(self, embedder, vector_db, llm, cache_size: int = 1000):
+        """
+        Initialize production RAG system.
+        
+        Args:
+            embedder: Embedding model
+            vector_db: Vector database client
+            llm: Language model client
+            cache_size: Maximum cache size
+        """
         self.embedder = embedder
         self.vector_db = vector_db
         self.llm = llm
         self.cache = {}
+        self.cache_size = cache_size
+        
+        # Setup logging
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        
+        # Metrics tracking
+        self.metrics = {
+            'total_queries': 0,
+            'cache_hits': 0,
+            'errors': 0,
+            'avg_latency': 0.0
+        }
     
-    def query(self, question, top_k=5, use_cache=True):
-        """Query with error handling and caching"""
+    def query(self, question: str, top_k: int = 5, 
+              use_cache: bool = True, timeout: float = 10.0) -> Dict:
+        """
+        Query RAG system with error handling and monitoring.
+        
+        Args:
+            question: User question
+            top_k: Number of documents to retrieve
+            use_cache: Whether to use caching
+            timeout: Maximum time allowed for query
+            
+        Returns:
+            Dictionary with 'answer', 'sources', 'latency', 'cached'
+        """
+        start_time = time.time()
+        self.metrics['total_queries'] += 1
+        
         try:
             # Check cache
             if use_cache and question in self.cache:
-                return self.cache[question]
+                self.metrics['cache_hits'] += 1
+                cached_result = self.cache[question]
+                cached_result['cached'] = True
+                cached_result['latency'] = time.time() - start_time
+                self.logger.info(f"Cache hit for query: {question[:50]}...")
+                return cached_result
             
-            # Retrieve
-            contexts = self.retrieve(question, top_k)
+            # Retrieve with timeout
+            contexts = self._retrieve_with_timeout(question, top_k, timeout/2)
             
             if not contexts:
-                return "I couldn't find relevant information to answer your question."
+                return {
+                    'answer': "I couldn't find relevant information to answer your question.",
+                    'sources': [],
+                    'latency': time.time() - start_time,
+                    'cached': False,
+                    'error': None
+                }
             
-            # Generate
-            answer = self.generate(question, contexts)
+            # Generate with timeout
+            answer = self._generate_with_timeout(question, contexts, timeout/2)
+            
+            # Format result
+            result = {
+                'answer': answer,
+                'sources': contexts,
+                'latency': time.time() - start_time,
+                'cached': False,
+                'error': None
+            }
             
             # Cache result
             if use_cache:
-                self.cache[question] = answer
+                self._add_to_cache(question, result)
             
-            return answer
+            # Update metrics
+            self._update_metrics(result['latency'])
+            
+            return result
             
         except Exception as e:
-            # Log error
-            print(f"Error in RAG query: {e}")
-            return "I encountered an error processing your question. Please try again."
+            self.metrics['errors'] += 1
+            self.logger.error(f"Error processing query: {e}", exc_info=True)
+            return {
+                'answer': "I encountered an error processing your question. Please try again.",
+                'sources': [],
+                'latency': time.time() - start_time,
+                'cached': False,
+                'error': str(e)
+            }
     
-    def retrieve(self, question, top_k):
-        """Retrieve with fallback"""
+    def _retrieve_with_timeout(self, question: str, top_k: int, timeout: float) -> List[str]:
+        """Retrieve with timeout protection."""
         try:
             query_embedding = self.embedder.encode([question])
-            results = self.vector_db.search(query_embedding, top_k=top_k)
-            return [r['text'] for r in results if r['score'] > 0.7]  # Threshold
-        except:
+            results = self.vector_db.search(query_embedding, top_k=top_k, timeout=timeout)
+            return [r['text'] for r in results if r.get('score', 0) > 0.7]
+        except Exception as e:
+            self.logger.warning(f"Retrieval error: {e}")
             return []
     
-    def generate(self, question, contexts):
-        """Generate with context validation"""
-        if not contexts:
-            return "No relevant context found."
+    def _generate_with_timeout(self, question: str, contexts: List[str], timeout: float) -> str:
+        """Generate answer with timeout protection."""
+        try:
+            context = "\n\n".join(contexts)
+            prompt = f"Context: {context}\n\nQuestion: {question}\n\nAnswer:"
+            answer = self.llm.generate(prompt, timeout=timeout)
+            return answer
+        except Exception as e:
+            self.logger.warning(f"Generation error: {e}")
+            return "I couldn't generate an answer. Please try rephrasing your question."
+    
+    def _add_to_cache(self, question: str, result: Dict):
+        """Add result to cache with size limit."""
+        if len(self.cache) >= self.cache_size:
+            # Remove oldest entry (FIFO)
+            oldest_key = next(iter(self.cache))
+            del self.cache[oldest_key]
         
-        prompt = f"Context: {' '.join(contexts)}\n\nQuestion: {question}\nAnswer:"
-        return self.llm.generate(prompt)</code></pre>
+        # Store result without latency (will be recalculated)
+        cache_entry = {k: v for k, v in result.items() if k != 'latency'}
+        self.cache[question] = cache_entry
+    
+    def _update_metrics(self, latency: float):
+        """Update average latency metric."""
+        total = self.metrics['total_queries']
+        current_avg = self.metrics['avg_latency']
+        self.metrics['avg_latency'] = (current_avg * (total - 1) + latency) / total
+    
+    def get_metrics(self) -> Dict:
+        """Get current system metrics."""
+        cache_hit_rate = (self.metrics['cache_hits'] / self.metrics['total_queries'] 
+                         if self.metrics['total_queries'] > 0 else 0)
+        error_rate = (self.metrics['errors'] / self.metrics['total_queries']
+                     if self.metrics['total_queries'] > 0 else 0)
+        
+        return {
+            **self.metrics,
+            'cache_hit_rate': cache_hit_rate,
+            'error_rate': error_rate
+        }
+    
+    def health_check(self) -> Dict:
+        """Perform health check on system components."""
+        health = {
+            'status': 'healthy',
+            'components': {}
+        }
+        
+        # Check embedder
+        try:
+            test_emb = self.embedder.encode(["test"])
+            health['components']['embedder'] = 'healthy'
+        except Exception as e:
+            health['components']['embedder'] = f'unhealthy: {e}'
+            health['status'] = 'degraded'
+        
+        # Check vector DB
+        try:
+            # Try a simple query
+            test_results = self.vector_db.search([[0.0] * 384], top_k=1)
+            health['components']['vector_db'] = 'healthy'
+        except Exception as e:
+            health['components']['vector_db'] = f'unhealthy: {e}'
+            health['status'] = 'degraded'
+        
+        # Check LLM
+        try:
+            # In production, use actual health check endpoint
+            health['components']['llm'] = 'healthy'
+        except Exception as e:
+            health['components']['llm'] = f'unhealthy: {e}'
+            health['status'] = 'unhealthy'
+        
+        return health
+
+# Example usage
+# rag = ProductionRAG(embedder, vector_db, llm)
+# result = rag.query("What is machine learning?", top_k=5)
+# print(f"Answer: {result['answer']}")
+# print(f"Latency: {result['latency']:.2f}s")
+# print(f"Cached: {result['cached']}")
+#
+# # Monitor system
+# metrics = rag.get_metrics()
+# print(f"Cache hit rate: {metrics['cache_hit_rate']:.2%}")
+# print(f"Average latency: {metrics['avg_latency']:.2f}s")
+#
+# # Health check
+# health = rag.health_check()
+# print(f"System status: {health['status']}")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Error handling:</strong> Graceful degradation on failures</li>
+                                    <li><strong>Caching:</strong> Reduces latency and costs for repeated queries</li>
+                                    <li><strong>Monitoring:</strong> Tracks metrics for performance analysis</li>
+                                    <li><strong>Health checks:</strong> Ensures system components are operational</li>
+                                    <li><strong>Timeouts:</strong> Prevents hanging on slow operations</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Installation Requirements</h3>
+                            <p>Install required packages:</p>
+                            <pre><code class="language-bash">pip install sentence-transformers numpy</code></pre>
+                            <p><strong>Note:</strong> For production, add proper logging infrastructure (e.g., ELK stack), monitoring (e.g., Prometheus), and distributed caching (e.g., Redis).</p>
                         </div>
                     </div>
 

@@ -529,73 +529,833 @@
                         <h2>Detailed Examples</h2>
                         
                         <div class="example-box">
-                            <h4>Example: Fixed-Size Chunking</h4>
-                            <p><strong>Document:</strong> "Python is a programming language. It is widely used for data science. Machine learning uses Python extensively."</p>
+                            <h4>Example 1: Vector Database Indexing and Querying - Complete Workflow</h4>
+                            <p><strong>Scenario:</strong> Setting up a vector database for a RAG system with 10,000 document chunks.</p>
                             
-                            <p><strong>Chunk size:</strong> 50 characters, overlap: 10 characters</p>
-                            
-                            <p><strong>Chunks:</strong></p>
+                            <p><strong>Step 1: Document Preparation</strong></p>
+                            <p>You have 10,000 document chunks, each already embedded:</p>
                             <ul>
-                                <li>Chunk 1: "Python is a programming language. It is widely used for data"</li>
-                                <li>Chunk 2: "for data science. Machine learning uses Python extensively."</li>
+                                <li>Chunk 1: "Machine learning is..." → Embedding: [0.45, -0.23, 0.67, ...] (384-dim)</li>
+                                <li>Chunk 2: "Deep learning uses..." → Embedding: [0.48, -0.25, 0.65, ...]</li>
+                                <li>... (9,998 more chunks)</li>
                             </ul>
                             
-                            <p><strong>Note:</strong> Overlap ensures "for data" appears in both chunks, preserving context.</p>
+                            <p><strong>Step 2: Index Building</strong></p>
+                            <ul>
+                                <li>All 10,000 embeddings are inserted into the vector database</li>
+                                <li>HNSW index is built (takes ~2-5 minutes for 10K vectors)</li>
+                                <li>Index creates a multi-layer graph structure for fast search</li>
+                                <li>Total storage: 10,000 × 384 × 4 bytes = ~15 MB (just for embeddings)</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Query Processing</strong></p>
+                            <p>User query: "What is neural network training?"</p>
+                            <ul>
+                                <li>Query embedding: [0.46, -0.24, 0.66, ...]</li>
+                                <li>Vector database searches the HNSW index</li>
+                                <li>Finds top-5 most similar vectors in ~10-50 milliseconds</li>
+                                <li>Returns document IDs: [doc_123, doc_456, doc_789, doc_234, doc_567]</li>
+                            </ul>
+                            
+                            <p><strong>Step 4: Document Retrieval</strong></p>
+                            <ul>
+                                <li>Using document IDs, fetch actual text from storage</li>
+                                <li>Returns: ["Neural networks are trained using...", "Training involves...", ...]</li>
+                                <li>Total query time: ~50-100ms (embedding + search + retrieval)</li>
+                            </ul>
+                            
+                            <p><strong>Performance:</strong> Without vector database (brute-force), this would take ~16 seconds. With HNSW index, it takes ~50ms - a 320x speedup!</p>
                         </div>
                         
                         <div class="example-box">
-                            <h4>Example: Sentence-Based Chunking</h4>
-                            <p><strong>Document:</strong> "Python is a programming language. It is widely used. Machine learning uses Python."</p>
+                            <h4>Example 2: Metadata Filtering in Action</h4>
+                            <p><strong>Scenario:</strong> A knowledge base with documents from different years, and you want to filter by date before similarity search.</p>
                             
-                            <p><strong>Chunk size:</strong> 2 sentences</p>
-                            
-                            <p><strong>Chunks:</strong></p>
+                            <p><strong>Knowledge Base:</strong> 1,000,000 documents</p>
                             <ul>
-                                <li>Chunk 1: "Python is a programming language. It is widely used."</li>
-                                <li>Chunk 2: "It is widely used. Machine learning uses Python."</li>
+                                <li>500,000 documents from 2023</li>
+                                <li>300,000 documents from 2024</li>
+                                <li>200,000 documents from 2025</li>
                             </ul>
                             
-                            <p><strong>Advantage:</strong> Preserves sentence integrity, better semantic coherence.</p>
+                            <p><strong>Query:</strong> "Latest machine learning trends"</p>
+                            
+                            <p><strong>Without Metadata Filtering:</strong></p>
+                            <ul>
+                                <li>Search all 1,000,000 documents</li>
+                                <li>Time: ~200ms</li>
+                                <li>Results might include outdated 2023 documents</li>
+                            </ul>
+                            
+                            <p><strong>With Metadata Filtering (date >= 2024):</strong></p>
+                            <ul>
+                                <li>Filter to 500,000 documents (2024 + 2025)</li>
+                                <li>Search only in filtered set</li>
+                                <li>Time: ~100ms (50% faster!)</li>
+                                <li>Results are more recent and relevant</li>
+                            </ul>
+                            
+                            <p><strong>Combined Filter Example:</strong></p>
+                            <p>Query: "Python machine learning tutorials from 2024"</p>
+                            <ul>
+                                <li>Metadata filters: category="tutorial", year=2024, language="Python"</li>
+                                <li>Filter from 1M → 50,000 documents</li>
+                                <li>Vector search in 50K documents: ~30ms</li>
+                                <li>✅ Much faster and more precise than searching all 1M documents</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 3: HNSW vs Brute-Force Performance Comparison</h4>
+                            <p><strong>Scenario:</strong> Comparing search performance for different database sizes.</p>
+                            
+                            <p><strong>Test Setup:</strong> Find top-5 most similar vectors to a query</p>
+                            
+                            <p><strong>1,000 Documents:</strong></p>
+                            <ul>
+                                <li><strong>Brute-force:</strong> Compare query with all 1,000 vectors = 1,000 comparisons = ~16ms</li>
+                                <li><strong>HNSW:</strong> Navigate graph structure = ~10 comparisons = ~2ms</li>
+                                <li><strong>Speedup:</strong> 8x faster</li>
+                            </ul>
+                            
+                            <p><strong>100,000 Documents:</strong></p>
+                            <ul>
+                                <li><strong>Brute-force:</strong> 100,000 comparisons = ~1.6 seconds</li>
+                                <li><strong>HNSW:</strong> ~15 comparisons = ~5ms</li>
+                                <li><strong>Speedup:</strong> 320x faster!</li>
+                            </ul>
+                            
+                            <p><strong>1,000,000 Documents:</strong></p>
+                            <ul>
+                                <li><strong>Brute-force:</strong> 1,000,000 comparisons = ~16 seconds (unacceptable!)</li>
+                                <li><strong>HNSW:</strong> ~20 comparisons = ~50ms</li>
+                                <li><strong>Speedup:</strong> 320x faster!</li>
+                            </ul>
+                            
+                            <p><strong>10,000,000 Documents:</strong></p>
+                            <ul>
+                                <li><strong>Brute-force:</strong> 10,000,000 comparisons = ~2.7 minutes (completely impractical!)</li>
+                                <li><strong>HNSW:</strong> ~25 comparisons = ~100ms</li>
+                                <li><strong>Speedup:</strong> 1,600x faster!</li>
+                            </ul>
+                            
+                            <p><strong>Key Insight:</strong> As database size grows, brute-force becomes exponentially slower, while HNSW search time grows only logarithmically. This is why vector databases are essential for production RAG systems.</p>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 4: Incremental Updates to Vector Database</h4>
+                            <p><strong>Scenario:</strong> Adding new documents to an existing vector database without rebuilding the entire index.</p>
+                            
+                            <p><strong>Initial State:</strong></p>
+                            <ul>
+                                <li>Database has 100,000 documents indexed</li>
+                                <li>HNSW index is built and optimized</li>
+                                <li>Query time: ~50ms</li>
+                            </ul>
+                            
+                            <p><strong>New Documents Arrive:</strong></p>
+                            <ul>
+                                <li>1,000 new documents need to be added</li>
+                                <li>Each document is embedded: [0.45, -0.23, 0.67, ...]</li>
+                            </ul>
+                            
+                            <p><strong>Incremental Update Process:</strong></p>
+                            <p><strong>Step 1: Embed new documents</strong></p>
+                            <ul>
+                                <li>Generate embeddings for 1,000 new documents</li>
+                                <li>Time: ~10-30 seconds (depending on embedding model)</li>
+                            </ul>
+                            
+                            <p><strong>Step 2: Insert into HNSW index</strong></p>
+                            <ul>
+                                <li>For each new vector, find its position in the graph</li>
+                                <li>Connect it to nearest neighbors in each layer</li>
+                                <li>Time: ~5-10 seconds for 1,000 vectors</li>
+                                <li>✅ No need to rebuild entire index!</li>
+                            </ul>
+                            
+                            <p><strong>Step 3: Verify</strong></p>
+                            <ul>
+                                <li>Database now has 101,000 documents</li>
+                                <li>Query time: ~52ms (slightly slower, but still fast)</li>
+                                <li>New documents are immediately searchable</li>
+                            </ul>
+                            
+                            <p><strong>Comparison to Full Rebuild:</strong></p>
+                            <ul>
+                                <li><strong>Incremental update:</strong> ~15-40 seconds total</li>
+                                <li><strong>Full rebuild:</strong> ~10-30 minutes (would require rebuilding entire index)</li>
+                                <li>✅ Incremental updates are 15-120x faster!</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="example-box">
+                            <h4>Example 5: Choosing Between Vector Database Options</h4>
+                            <p><strong>Scenario:</strong> You need to choose a vector database for your RAG system. Here's how different options compare for a specific use case.</p>
+                            
+                            <p><strong>Use Case:</strong> 5 million documents, need sub-100ms query time, cloud deployment preferred</p>
+                            
+                            <p><strong>Option 1: Pinecone (Managed Cloud)</strong></p>
+                            <ul>
+                                <li>✅ Setup: 5 minutes (just create account, API key)</li>
+                                <li>✅ Scaling: Automatic, handles 5M+ documents easily</li>
+                                <li>✅ Performance: ~50ms query time</li>
+                                <li>✅ Maintenance: Zero (fully managed)</li>
+                                <li>❌ Cost: ~$70-200/month for 5M vectors</li>
+                                <li>❌ Vendor lock-in: Data stored in Pinecone's cloud</li>
+                                <li><strong>Best for:</strong> Quick deployment, teams without DevOps resources</li>
+                            </ul>
+                            
+                            <p><strong>Option 2: Chroma (Self-Hosted)</strong></p>
+                            <ul>
+                                <li>✅ Setup: 30-60 minutes (install, configure, deploy)</li>
+                                <li>✅ Scaling: Manual (need to set up infrastructure)</li>
+                                <li>✅ Performance: ~60-80ms query time</li>
+                                <li>✅ Cost: ~$20-50/month (server costs only)</li>
+                                <li>✅ Control: Full control over data and infrastructure</li>
+                                <li>❌ Maintenance: You manage servers, updates, backups</li>
+                                <li><strong>Best for:</strong> Cost-sensitive, need data control, have DevOps team</li>
+                            </ul>
+                            
+                            <p><strong>Option 3: FAISS (Library, Self-Hosted)</strong></p>
+                            <ul>
+                                <li>✅ Setup: 1-2 hours (integrate into your application)</li>
+                                <li>✅ Performance: ~40-60ms query time (very fast)</li>
+                                <li>✅ Cost: Server costs only</li>
+                                <li>✅ Flexibility: Full control, can customize</li>
+                                <li>❌ Scaling: Manual, need to implement sharding yourself</li>
+                                <li>❌ Features: No built-in metadata filtering, need to implement yourself</li>
+                                <li><strong>Best for:</strong> Research, maximum performance, full customization needed</li>
+                            </ul>
+                            
+                            <p><strong>Recommendation for this use case:</strong> Pinecone for fastest deployment, Chroma for cost savings, FAISS for maximum performance and control.</p>
                         </div>
                     </div>
 
                     <div id="implementation" class="content-section">
                         <h2>Implementation</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Implementation Overview</h3>
+                            <p>This section provides practical Python code examples for working with vector databases in RAG systems. The examples demonstrate how to set up, index documents, query, and manage vector databases using popular options like <strong>Chroma</strong>, <strong>Pinecone</strong>, and <strong>FAISS</strong>.</p>
+                        </div>
+                        
                         <div class="code-box">
-                            <h4>Code Implementation</h4>
-                            <pre><code class="language-python">from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
+                            <h4>1. Chroma Vector Database - Complete Setup</h4>
+                            <p><strong>What this does:</strong> Sets up Chroma, indexes documents with embeddings, and performs similarity search. Chroma is easy to use and good for self-hosted solutions.</p>
+                            <pre><code class="language-python">import chromadb
+from chromadb.config import Settings
+from sentence_transformers import SentenceTransformer
+import numpy as np
 
-# Fixed-size chunking
-text_splitter = CharacterTextSplitter(
-    separator="\n",
-    chunk_size=1000,
-    chunk_overlap=200,
-    length_function=len
+class ChromaRAG:
+    """
+    Complete RAG implementation using Chroma vector database.
+    
+    This class handles:
+    1. Document indexing with embeddings
+    2. Query processing and retrieval
+    3. Metadata filtering
+    """
+    
+    def __init__(self, collection_name="documents", persist_directory="./chroma_db"):
+        """
+        Initialize Chroma client and collection.
+        
+        Args:
+            collection_name: Name of the collection to create/use
+            persist_directory: Directory to persist data (for PersistentClient)
+        """
+        # Use PersistentClient for production (saves to disk)
+        self.client = chromadb.PersistentClient(path=persist_directory)
+        
+        # Get or create collection
+        self.collection = self.client.get_or_create_collection(
+            name=collection_name,
+            metadata={"hnsw:space": "cosine"}  # Use cosine similarity
+        )
+        
+        # Initialize embedding model
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        print(f"Initialized Chroma collection: {collection_name}")
+    
+    def add_documents(self, documents, ids=None, metadatas=None):
+        """
+        Add documents to the vector database.
+        
+        Args:
+            documents: List of document text strings
+            ids: Optional list of document IDs (auto-generated if None)
+            metadatas: Optional list of metadata dictionaries
+        """
+        if not documents:
+            raise ValueError("Documents list cannot be empty")
+        
+        # Generate IDs if not provided
+        if ids is None:
+            ids = [f"doc_{i}" for i in range(len(documents))]
+        
+        # Generate embeddings
+        print(f"Generating embeddings for {len(documents)} documents...")
+        embeddings = self.embedder.encode(documents, show_progress_bar=True)
+        embeddings_list = embeddings.tolist()
+        
+        # Prepare metadatas (ensure all have same keys)
+        if metadatas is None:
+            metadatas = [{}] * len(documents)
+        
+        # Add to collection
+        self.collection.add(
+            documents=documents,
+            embeddings=embeddings_list,
+            ids=ids,
+            metadatas=metadatas
+        )
+        
+        print(f"Added {len(documents)} documents to collection")
+        print(f"Collection now has {self.collection.count()} total documents")
+    
+    def query(self, query_text, n_results=5, where_filter=None):
+        """
+        Query the vector database for similar documents.
+        
+        Args:
+            query_text: User query string
+            n_results: Number of results to return
+            where_filter: Optional metadata filter (e.g., {"year": 2024})
+            
+        Returns:
+            Dictionary with 'documents', 'ids', 'distances', 'metadatas'
+        """
+        # Generate query embedding
+        query_embedding = self.embedder.encode([query_text])
+        
+        # Build query
+        query_kwargs = {
+            "query_embeddings": query_embedding.tolist(),
+            "n_results": n_results
+        }
+        
+        # Add metadata filter if provided
+        if where_filter:
+            query_kwargs["where"] = where_filter
+        
+        # Execute query
+        results = self.collection.query(**query_kwargs)
+        
+        return {
+            'documents': results['documents'][0],
+            'ids': results['ids'][0],
+            'distances': results['distances'][0],
+            'metadatas': results['metadatas'][0]
+        }
+    
+    def update_document(self, doc_id, new_text, new_metadata=None):
+        """
+        Update an existing document.
+        
+        Args:
+            doc_id: ID of document to update
+            new_text: New document text
+            new_metadata: New metadata (optional)
+        """
+        # Generate new embedding
+        new_embedding = self.embedder.encode([new_text])[0].tolist()
+        
+        # Update in collection
+        self.collection.update(
+            ids=[doc_id],
+            documents=[new_text],
+            embeddings=[new_embedding],
+            metadatas=[new_metadata] if new_metadata else None
+        )
+        print(f"Updated document: {doc_id}")
+    
+    def delete_documents(self, doc_ids):
+        """Delete documents by IDs."""
+        self.collection.delete(ids=doc_ids)
+        print(f"Deleted {len(doc_ids)} documents")
+
+# Example usage
+rag = ChromaRAG(collection_name="knowledge_base")
+
+# Add documents with metadata
+documents = [
+    "Machine learning is a subset of AI that learns from data.",
+    "Deep learning uses neural networks with multiple layers.",
+    "Python is a popular programming language for data science."
+]
+
+metadatas = [
+    {"topic": "machine_learning", "year": 2024, "category": "AI"},
+    {"topic": "deep_learning", "year": 2024, "category": "AI"},
+    {"topic": "programming", "year": 2024, "category": "languages"}
+]
+
+ids = ["doc_ml", "doc_dl", "doc_python"]
+
+rag.add_documents(documents, ids=ids, metadatas=metadatas)
+
+# Query without filter
+results = rag.query("What is machine learning?", n_results=2)
+print("\nQuery results:")
+for i, (doc, distance) in enumerate(zip(results['documents'], results['distances']), 1):
+    print(f"{i}. {doc} (distance: {distance:.3f})")
+
+# Query with metadata filter
+filtered_results = rag.query(
+    "What is machine learning?",
+    n_results=2,
+    where_filter={"category": "AI"}  # Only search in AI category
+)
+print("\nFiltered results (AI category only):")
+for i, doc in enumerate(filtered_results['documents'], 1):
+    print(f"{i}. {doc}")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Persistent storage:</strong> Uses PersistentClient to save data to disk (survives restarts)</li>
+                                    <li><strong>Automatic indexing:</strong> Chroma automatically builds HNSW index for fast search</li>
+                                    <li><strong>Metadata filtering:</strong> Can filter by metadata before similarity search</li>
+                                    <li><strong>Update support:</strong> Can update documents without rebuilding entire index</li>
+                                    <li><strong>Distance vs similarity:</strong> Chroma returns distances (lower = more similar), not similarity scores</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>2. Pinecone Vector Database - Cloud Deployment</h4>
+                            <p><strong>What this does:</strong> Sets up Pinecone (managed cloud service), indexes documents, and performs queries. Ideal for production deployments without infrastructure management.</p>
+                            <pre><code class="language-python">import pinecone
+from sentence_transformers import SentenceTransformer
+import os
+
+class PineconeRAG:
+    """
+    RAG implementation using Pinecone (managed cloud vector database).
+    
+    Pinecone handles infrastructure, scaling, and optimization automatically.
+    Good for production systems where you want minimal DevOps overhead.
+    """
+    
+    def __init__(self, api_key, environment, index_name="rag-index"):
+        """
+        Initialize Pinecone connection.
+        
+        Args:
+            api_key: Pinecone API key (get from pinecone.io)
+            environment: Pinecone environment (e.g., "us-west1-gcp")
+            index_name: Name of the index to create/use
+        """
+        # Initialize Pinecone
+        pinecone.init(api_key=api_key, environment=environment)
+        
+        # Get or create index
+        if index_name not in pinecone.list_indexes():
+            # Create index with specifications
+            pinecone.create_index(
+                index_name,
+                dimension=384,  # Match embedding dimension
+                metric="cosine",  # Use cosine similarity
+                metadata_config={"indexed": ["category", "year", "source"]}  # Indexed metadata for filtering
+            )
+            print(f"Created new index: {index_name}")
+        else:
+            print(f"Using existing index: {index_name}")
+        
+        self.index = pinecone.Index(index_name)
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        print(f"Connected to Pinecone index: {index_name}")
+    
+    def add_documents(self, documents, ids=None, metadatas=None):
+        """
+        Add documents to Pinecone index.
+        
+        Args:
+            documents: List of document strings
+            ids: Optional list of IDs
+            metadatas: Optional list of metadata dicts
+        """
+        if ids is None:
+            ids = [f"doc_{i}" for i in range(len(documents))]
+        
+        if metadatas is None:
+            metadatas = [{}] * len(documents)
+        
+        # Generate embeddings
+        embeddings = self.embedder.encode(documents, show_progress_bar=True)
+        
+        # Prepare vectors for upsert (Pinecone format)
+        vectors = []
+        for i, (doc_id, embedding, metadata) in enumerate(zip(ids, embeddings, metadatas)):
+            vectors.append({
+                "id": doc_id,
+                "values": embedding.tolist(),
+                "metadata": {**metadata, "text": documents[i]}  # Store text in metadata
+            })
+        
+        # Upsert in batches (Pinecone supports batch operations)
+        batch_size = 100
+        for i in range(0, len(vectors), batch_size):
+            batch = vectors[i:i + batch_size]
+            self.index.upsert(vectors=batch)
+        
+        print(f"Added {len(documents)} documents to Pinecone")
+        print(f"Index stats: {self.index.describe_index_stats()}")
+    
+    def query(self, query_text, top_k=5, filter_dict=None):
+        """
+        Query Pinecone index.
+        
+        Args:
+            query_text: User query
+            top_k: Number of results
+            filter_dict: Optional metadata filter (e.g., {"category": "AI"})
+            
+        Returns:
+            Query results with documents, scores, and metadata
+        """
+        # Generate query embedding
+        query_embedding = self.embedder.encode([query_text])[0].tolist()
+        
+        # Build query
+        query_kwargs = {
+            "vector": query_embedding,
+            "top_k": top_k,
+            "include_metadata": True
+        }
+        
+        # Add filter if provided
+        if filter_dict:
+            query_kwargs["filter"] = filter_dict
+        
+        # Execute query
+        results = self.index.query(**query_kwargs)
+        
+        # Format results
+        formatted_results = []
+        for match in results['matches']:
+            formatted_results.append({
+                'id': match['id'],
+                'score': match['score'],  # Pinecone returns similarity scores (higher = more similar)
+                'text': match['metadata'].get('text', ''),
+                'metadata': {k: v for k, v in match['metadata'].items() if k != 'text'}
+            })
+        
+        return formatted_results
+
+# Example usage
+# Initialize (requires Pinecone API key)
+# rag = PineconeRAG(
+#     api_key=os.getenv("PINECONE_API_KEY"),
+#     environment="us-west1-gcp",
+#     index_name="rag-tutorial"
+# )
+#
+# # Add documents
+# documents = ["Machine learning is...", "Deep learning uses...", ...]
+# rag.add_documents(documents, metadatas=[{"category": "AI"}, ...])
+#
+# # Query
+# results = rag.query("What is machine learning?", top_k=3)
+# for result in results:
+#     print(f"Score: {result['score']:.3f}")
+#     print(f"Text: {result['text']}")
+#     print(f"Metadata: {result['metadata']}\n")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Managed service:</strong> No infrastructure to manage - Pinecone handles everything</li>
+                                    <li><strong>Automatic scaling:</strong> Handles millions of vectors without configuration</li>
+                                    <li><strong>Metadata indexing:</strong> Can index specific metadata fields for fast filtering</li>
+                                    <li><strong>Batch operations:</strong> Efficient batch upsert for large document sets</li>
+                                    <li><strong>Cost:</strong> Pay-per-use pricing, good for production but has ongoing costs</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>3. FAISS - High-Performance Self-Hosted Solution</h4>
+                            <p><strong>What this does:</strong> Sets up FAISS (Facebook AI Similarity Search) for maximum performance and control. Best for research, self-hosted solutions, or when you need fine-grained control.</p>
+                            <pre><code class="language-python">import faiss
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+class FAISSRAG:
+    """
+    RAG implementation using FAISS for vector similarity search.
+    
+    FAISS provides maximum performance and flexibility, but requires
+    more setup and infrastructure management than managed services.
+    """
+    
+    def __init__(self, dimension=384, index_type="L2"):
+        """
+        Initialize FAISS index.
+        
+        Args:
+            dimension: Embedding dimension (384 for all-MiniLM-L6-v2)
+            index_type: "L2" (Euclidean) or "IP" (Inner Product/Cosine for normalized)
+        """
+        self.dimension = dimension
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        
+        # Create FAISS index
+        # IndexFlatL2: Exact search (slower but accurate)
+        # IndexIVFFlat: Approximate search (faster, good for large datasets)
+        # For production, use IndexIVFFlat or IndexHNSWFlat for speed
+        
+        # Simple exact search index (for small datasets)
+        if index_type == "L2":
+            self.index = faiss.IndexFlatL2(dimension)
+        else:  # Inner product (for normalized embeddings = cosine similarity)
+            self.index = faiss.IndexFlatIP(dimension)
+        
+        # Store document texts and metadata
+        self.documents = []
+        self.metadatas = []
+        print(f"Initialized FAISS index: {index_type}, dimension: {dimension}")
+    
+    def add_documents(self, documents, metadatas=None):
+        """
+        Add documents to FAISS index.
+        
+        Args:
+            documents: List of document strings
+            metadatas: Optional list of metadata dictionaries
+        """
+        if not documents:
+            raise ValueError("Documents list cannot be empty")
+        
+        # Generate embeddings
+        embeddings = self.embedder.encode(documents, show_progress_bar=True)
+        
+        # Normalize embeddings for cosine similarity (if using IP index)
+        if isinstance(self.index, faiss.IndexFlatIP):
+            faiss.normalize_L2(embeddings)  # Normalize for cosine similarity
+        
+        # Convert to numpy array (float32 for FAISS)
+        embeddings = np.array(embeddings).astype('float32')
+        
+        # Add to index
+        self.index.add(embeddings)
+        
+        # Store documents and metadata
+        self.documents.extend(documents)
+        if metadatas:
+            self.metadatas.extend(metadatas)
+        else:
+            self.metadatas.extend([{}] * len(documents))
+        
+        print(f"Added {len(documents)} documents. Index now has {self.index.ntotal} vectors")
+    
+    def search(self, query_text, top_k=5):
+        """
+        Search for similar documents.
+        
+        Args:
+            query_text: User query
+            top_k: Number of results
+            
+        Returns:
+            List of (document, distance, metadata) tuples
+        """
+        if self.index.ntotal == 0:
+            raise ValueError("Index is empty. Add documents first.")
+        
+        # Generate query embedding
+        query_embedding = self.embedder.encode([query_text])
+        
+        # Normalize if using IP index
+        if isinstance(self.index, faiss.IndexFlatIP):
+            query_embedding = query_embedding.astype('float32')
+            faiss.normalize_L2(query_embedding)
+        else:
+            query_embedding = query_embedding.astype('float32')
+        
+        # Search
+        distances, indices = self.index.search(query_embedding, top_k)
+        
+        # Format results
+        results = []
+        for i, (distance, idx) in enumerate(zip(distances[0], indices[0])):
+            if idx < len(self.documents):  # Valid index
+                results.append({
+                    'document': self.documents[idx],
+                    'distance': float(distance),
+                    'similarity': 1.0 - float(distance) if isinstance(self.index, faiss.IndexFlatL2) else float(distance),
+                    'metadata': self.metadatas[idx] if idx < len(self.metadatas) else {}
+                })
+        
+        return results
+    
+    def save_index(self, filepath):
+        """Save FAISS index to disk."""
+        faiss.write_index(self.index, filepath)
+        print(f"Saved index to {filepath}")
+    
+    def load_index(self, filepath):
+        """Load FAISS index from disk."""
+        self.index = faiss.read_index(filepath)
+        print(f"Loaded index from {filepath}")
+
+# Example usage
+rag = FAISSRAG(dimension=384, index_type="IP")  # IP = Inner Product (cosine for normalized)
+
+# Add documents
+documents = [
+    "Machine learning algorithms learn from data.",
+    "Deep learning uses neural networks.",
+    "Python is a programming language."
+]
+rag.add_documents(documents, metadatas=[
+    {"topic": "ML"}, {"topic": "DL"}, {"topic": "programming"}
+])
+
+# Search
+results = rag.search("What is machine learning?", top_k=2)
+for result in results:
+    print(f"Similarity: {result['similarity']:.3f}")
+    print(f"Document: {result['document']}\n")
+
+# Save for later use
+rag.save_index("faiss_index.bin")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Maximum performance:</strong> FAISS is highly optimized C++ code, very fast</li>
+                                    <li><strong>Full control:</strong> You control indexing, storage, and search parameters</li>
+                                    <li><strong>Index types:</strong> Choose between exact (IndexFlat) or approximate (IndexIVF, IndexHNSW) search</li>
+                                    <li><strong>Normalization:</strong> For cosine similarity with IP index, normalize embeddings first</li>
+                                    <li><strong>Persistence:</strong> Can save/load indexes to disk</li>
+                                    <li><strong>Use case:</strong> Best for research, maximum performance needs, or when you want full control</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>4. Metadata Filtering Implementation</h4>
+                            <p><strong>What this does:</strong> Demonstrates how to combine vector similarity search with metadata filtering for precise retrieval.</p>
+                            <pre><code class="language-python">import chromadb
+from sentence_transformers import SentenceTransformer
+
+class FilteredVectorSearch:
+    """
+    Vector search with metadata filtering capabilities.
+    
+    Filters documents by metadata before or after similarity search,
+    enabling precise retrieval based on document properties.
+    """
+    
+    def __init__(self):
+        self.client = chromadb.Client()
+        self.collection = self.client.create_collection(
+            name="filtered_docs",
+            metadata={"hnsw:space": "cosine"}
+        )
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    def add_documents_with_metadata(self, documents, metadatas):
+        """
+        Add documents with rich metadata for filtering.
+        
+        Args:
+            documents: List of document texts
+            metadatas: List of metadata dicts with filterable fields
+        """
+        embeddings = self.embedder.encode(documents).tolist()
+        ids = [f"doc_{i}" for i in range(len(documents))]
+        
+        self.collection.add(
+            documents=documents,
+            embeddings=embeddings,
+            ids=ids,
+            metadatas=metadatas
+        )
+    
+    def search_with_filters(self, query, top_k=5, filters=None):
+        """
+        Search with metadata filters.
+        
+        Args:
+            query: Search query
+            top_k: Number of results
+            filters: Metadata filter dict (e.g., {"year": 2024, "category": "AI"})
+            
+        Returns:
+            Filtered search results
+        """
+        query_embedding = self.embedder.encode([query]).tolist()
+        
+        query_kwargs = {
+            "query_embeddings": query_embedding,
+            "n_results": top_k
+        }
+        
+        # Add metadata filters
+        if filters:
+            # Chroma supports where clauses
+            where_clause = {}
+            for key, value in filters.items():
+                if isinstance(value, list):
+                    where_clause[key] = {"$in": value}  # IN operator
+                elif isinstance(value, dict) and "$gte" in value:
+                    where_clause[key] = value  # Range operators
+                else:
+                    where_clause[key] = value  # Equality
+            
+            query_kwargs["where"] = where_clause
+        
+        results = self.collection.query(**query_kwargs)
+        return results
+
+# Example: Filtered search
+search = FilteredVectorSearch()
+
+# Add documents with metadata
+documents = [
+    "Machine learning tutorial for beginners",
+    "Advanced deep learning techniques",
+    "Python programming guide",
+    "Machine learning research paper 2024"
+]
+
+metadatas = [
+    {"category": "tutorial", "year": 2023, "difficulty": "beginner"},
+    {"category": "tutorial", "year": 2024, "difficulty": "advanced"},
+    {"category": "programming", "year": 2023, "difficulty": "beginner"},
+    {"category": "research", "year": 2024, "difficulty": "advanced"}
+]
+
+search.add_documents_with_metadata(documents, metadatas)
+
+# Search with filters
+results = search.search_with_filters(
+    "machine learning",
+    top_k=3,
+    filters={"year": 2024, "category": "tutorial"}  # Only 2024 tutorials
 )
 
-text = "Your long document text here..."
-chunks = text_splitter.split_text(text)
+print("Filtered results (2024 tutorials only):")
+for doc in results['documents'][0]:
+    print(f"- {doc}")</code></pre>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Installation Requirements</h3>
+                            <p>Install the required packages based on your vector database choice:</p>
+                            <pre><code class="language-bash"># For Chroma
+pip install chromadb sentence-transformers
 
-# Recursive chunking (tries multiple separators)
-recursive_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,
-    length_function=len,
-    separators=["\n\n", "\n", " ", ""]
-)
+# For Pinecone
+pip install pinecone-client sentence-transformers
 
-chunks = recursive_splitter.split_text(text)
-
-# Sentence-based chunking
-from langchain.text_splitter import SentenceTransformersTokenTextSplitter
-
-splitter = SentenceTransformersTokenTextSplitter(
-    chunk_overlap=50,
-    model_name="sentence-transformers/all-MiniLM-L6-v2"
-)
-
-chunks = splitter.split_text(text)</code></pre>
+# For FAISS
+pip install faiss-cpu sentence-transformers  # CPU version
+# or: pip install faiss-gpu sentence-transformers  # GPU version (faster)</code></pre>
                         </div>
                     </div>
 
