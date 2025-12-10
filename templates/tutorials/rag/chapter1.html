@@ -353,57 +353,170 @@
                             <h4>Simple RAG Implementation</h4>
                             <pre><code class="language-python">from sentence_transformers import SentenceTransformer
 import numpy as np
-from transformers import pipeline
+from openai import OpenAI  # Or use transformers pipeline for local models
 
 class SimpleRAG:
-    """Basic RAG implementation"""
+    """
+    Basic RAG implementation with proper cosine similarity calculation.
     
-    def __init__(self):
-        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
-        self.llm = pipeline("text-generation", model="gpt2")
+    This class implements the core RAG pipeline:
+    1. Document embedding and storage
+    2. Query embedding and retrieval
+    3. Context augmentation and generation
+    """
+    
+    def __init__(self, embedding_model='all-MiniLM-L6-v2'):
+        """
+        Initialize RAG system with embedding model.
+        
+        Args:
+            embedding_model: Sentence transformer model name
+        """
+        self.embedder = SentenceTransformer(embedding_model)
+        # For production, use OpenAI API or better local models
+        # self.client = OpenAI(api_key="your-api-key")
         self.documents = []
         self.embeddings = None
     
     def add_documents(self, docs):
-        """Add documents to knowledge base"""
+        """
+        Add documents to knowledge base and compute embeddings.
+        
+        Args:
+            docs: List of document strings to add
+        """
+        if not docs:
+            raise ValueError("Documents list cannot be empty")
+        
         self.documents = docs
-        self.embeddings = self.embedder.encode(docs)
+        # Encode all documents into embeddings (vectors)
+        self.embeddings = self.embedder.encode(docs, show_progress_bar=False)
+        print(f"Added {len(docs)} documents to knowledge base")
     
     def retrieve(self, query, top_k=3):
-        """Retrieve top-k relevant documents"""
+        """
+        Retrieve top-k most relevant documents using cosine similarity.
+        
+        Args:
+            query: User query string
+            top_k: Number of documents to retrieve
+            
+        Returns:
+            List of top-k most relevant document strings
+        """
+        if self.embeddings is None or len(self.documents) == 0:
+            raise ValueError("No documents in knowledge base. Call add_documents() first.")
+        
+        # Encode query into embedding vector
         query_embedding = self.embedder.encode([query])
         
-        # Compute cosine similarity
-        scores = np.dot(self.embeddings, query_embedding.T).flatten()
+        # Compute cosine similarity: (q · d) / (||q|| * ||d||)
+        # Step 1: Compute dot product between query and all document embeddings
+        dot_products = np.dot(self.embeddings, query_embedding.T).flatten()
         
-        # Get top-k indices
-        top_indices = np.argsort(scores)[-top_k:][::-1]
+        # Step 2: Compute norms (magnitudes) of embeddings
+        query_norm = np.linalg.norm(query_embedding)
+        doc_norms = np.linalg.norm(self.embeddings, axis=1)
         
-        return [self.documents[i] for i in top_indices]
+        # Step 3: Normalize to get cosine similarity (range: -1 to 1, typically 0 to 1)
+        cosine_similarities = dot_products / (query_norm * doc_norms)
+        
+        # Step 4: Get indices of top-k documents with highest similarity
+        top_indices = np.argsort(cosine_similarities)[-top_k:][::-1]
+        
+        # Return the actual documents (not just indices)
+        retrieved_docs = [self.documents[i] for i in top_indices]
+        
+        print(f"Retrieved {len(retrieved_docs)} documents with similarities: {cosine_similarities[top_indices]}")
+        return retrieved_docs
     
-    def generate(self, query, top_k=3):
-        """Generate answer using RAG"""
-        # Retrieve relevant documents
+    def generate(self, query, top_k=3, use_openai=False):
+        """
+        Generate answer using RAG pipeline.
+        
+        Args:
+            query: User query
+            top_k: Number of documents to retrieve
+            use_openai: Whether to use OpenAI API (requires API key)
+            
+        Returns:
+            Generated answer string
+        """
+        # Step 1: Retrieve relevant documents
         context_docs = self.retrieve(query, top_k)
         
-        # Build prompt
-        context = "\n".join(context_docs)
-        prompt = f"Context: {context}\n\nQuestion: {query}\n\nAnswer:"
+        # Step 2: Build prompt with retrieved context
+        context = "\n\n".join([f"Document {i+1}: {doc}" for i, doc in enumerate(context_docs)])
+        prompt = f"""Based on the following context documents, answer the question.
+
+Context:
+{context}
+
+Question: {query}
+
+Answer:"""
         
-        # Generate
-        result = self.llm(prompt, max_length=200, num_return_sequences=1)
-        return result[0]['generated_text']
+        # Step 3: Generate answer using LLM
+        if use_openai:
+            # Using OpenAI API (recommended for production)
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that answers questions based on provided context."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=200
+            )
+            return response.choices[0].message.content
+        else:
+            # Using local model (for demonstration)
+            # Note: GPT-2 is not ideal for Q&A. Use better models in production.
+            from transformers import pipeline
+            llm = pipeline("text-generation", model="gpt2")
+            result = llm(prompt, max_length=len(prompt.split()) + 100, num_return_sequences=1)
+            # Extract only the generated part (after the prompt)
+            generated_text = result[0]['generated_text']
+            answer = generated_text[len(prompt):].strip()
+            return answer
 
 # Example usage
-rag = SimpleRAG()
-rag.add_documents([
-    "France is a country in Europe. Its capital is Paris.",
-    "Germany is a country in Europe. Its capital is Berlin.",
-    "Italy is a country in Europe. Its capital is Rome."
-])
-
-answer = rag.generate("What is the capital of France?")
-print(answer)</code></pre>
+if __name__ == "__main__":
+    # Initialize RAG system
+    rag = SimpleRAG()
+    
+    # Add documents to knowledge base
+    rag.add_documents([
+        "France is a country in Europe. Its capital is Paris, a major cultural and economic center.",
+        "Germany is a country in Central Europe. Its capital is Berlin, known for its history and technology sector.",
+        "Italy is a country in Southern Europe. Its capital is Rome, famous for its ancient history and art."
+    ])
+    
+    # Ask a question
+    query = "What is the capital of France?"
+    answer = rag.generate(query, top_k=2)
+    print(f"\nQuestion: {query}")
+    print(f"Answer: {answer}")</code></pre>
+                            
+                            <div class="code-explanation">
+                                <h5>Key Implementation Details:</h5>
+                                <ul>
+                                    <li><strong>Cosine Similarity Calculation:</strong> Properly normalized by dividing dot product by the product of vector norms. This ensures values are in the range [-1, 1] and represent true cosine similarity.</li>
+                                    <li><strong>Document Embedding:</strong> All documents are embedded once when added to the knowledge base, making retrieval fast.</li>
+                                    <li><strong>Top-k Retrieval:</strong> Uses <code>np.argsort</code> to efficiently find the k documents with highest similarity scores.</li>
+                                    <li><strong>Prompt Engineering:</strong> Structured prompt that clearly separates context from question, helping the LLM understand what to answer.</li>
+                                    <li><strong>Error Handling:</strong> Checks for empty documents and missing knowledge base before operations.</li>
+                                </ul>
+                                
+                                <h5>Production Considerations:</h5>
+                                <ul>
+                                    <li>Use OpenAI API, Anthropic Claude, or better local models (like Llama 2) instead of GPT-2 for better Q&A performance.</li>
+                                    <li>Implement vector database (Pinecone, Weaviate) for large-scale document storage.</li>
+                                    <li>Add caching for frequently asked queries.</li>
+                                    <li>Implement proper logging and monitoring.</li>
+                                    <li>Add source citation to show which documents were used.</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
