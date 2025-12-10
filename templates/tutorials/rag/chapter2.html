@@ -751,68 +751,240 @@
                     <div id="implementation" class="content-section">
                         <h2>Implementation</h2>
                         
+                        <div class="explanation-box">
+                            <h3>Implementation Overview</h3>
+                            <p>This section provides practical Python code examples for creating embeddings and using vector databases in RAG systems. The examples use popular libraries: <strong>SentenceTransformers</strong> for embeddings and <strong>Chroma</strong> for vector storage.</p>
+                        </div>
+                        
                         <div class="code-box">
-                            <h4>Creating Embeddings</h4>
+                            <h4>1. Creating Embeddings with SentenceTransformers</h4>
+                            <p><strong>What this does:</strong> Converts text documents into dense vector embeddings that capture semantic meaning, enabling similarity search.</p>
                             <pre><code class="language-python">from sentence_transformers import SentenceTransformer
 import numpy as np
 
 # Load embedding model
+# 'all-MiniLM-L6-v2' is a popular, fast model (384 dimensions)
+# Other options: 'all-mpnet-base-v2' (768 dims, higher quality)
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# Create embeddings
+# Create embeddings for multiple documents
 texts = [
     "The capital of France is Paris",
     "Germany's capital is Berlin",
     "Italy is a country in Europe"
 ]
 
-embeddings = model.encode(texts)
+# Encode all texts at once (batch processing is more efficient)
+embeddings = model.encode(texts, show_progress_bar=True)
 print(f"Embedding shape: {embeddings.shape}")  # (3, 384)
+# Output: 3 documents, each with 384-dimensional vector
 
-# Query embedding
+# Create query embedding
 query = "What is the capital of France?"
-query_embedding = model.encode([query])
+query_embedding = model.encode([query])  # Shape: (1, 384)
 
-# Compute similarities
+# Compute cosine similarities
+# For normalized embeddings, dot product = cosine similarity
 similarities = np.dot(embeddings, query_embedding.T).flatten()
 print(f"Similarities: {similarities}")
+# Output: [0.95, 0.45, 0.32] (example values)
+# Higher values = more similar
 
-# Get most similar
+# Get most similar document
 most_similar_idx = np.argmax(similarities)
-print(f"Most similar: {texts[most_similar_idx]}")</code></pre>
+print(f"Most similar: {texts[most_similar_idx]}")
+# Output: "The capital of France is Paris"
+
+# Get top-k most similar
+top_k = 2
+top_k_indices = np.argsort(similarities)[-top_k:][::-1]  # Sort descending
+print(f"Top {top_k} most similar:")
+for idx in top_k_indices:
+    print(f"  {texts[idx]} (similarity: {similarities[idx]:.3f})")</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Model selection:</strong> <code>all-MiniLM-L6-v2</code> is fast and good for most use cases. Use <code>all-mpnet-base-v2</code> for higher quality.</li>
+                                    <li><strong>Batch encoding:</strong> Always encode multiple texts together for efficiency (faster than one-by-one).</li>
+                                    <li><strong>Normalized embeddings:</strong> SentenceTransformers produces normalized embeddings, so dot product equals cosine similarity.</li>
+                                    <li><strong>Similarity scores:</strong> Range from -1 to 1, typically 0 to 1 for normalized embeddings. Higher = more similar.</li>
+                                </ul>
+                            </div>
                         </div>
                         
                         <div class="code-box">
-                            <h4>Using Vector Database (Chroma)</h4>
+                            <h4>2. Using Vector Database (Chroma)</h4>
+                            <p><strong>What this does:</strong> Stores document embeddings in a vector database for efficient similarity search across large document collections.</p>
                             <pre><code class="language-python">import chromadb
 from chromadb.config import Settings
 
-# Initialize Chroma
-client = chromadb.Client(Settings())
+# Initialize Chroma client
+# For production, use PersistentClient to save data to disk
+client = chromadb.PersistentClient(path="./chroma_db")
 
-# Create collection
-collection = client.create_collection(name="documents")
+# Or use in-memory client for testing
+# client = chromadb.Client(Settings())
 
-# Add documents
+# Create or get a collection
+# Collections are like tables in traditional databases
+collection = client.get_or_create_collection(
+    name="documents",
+    metadata={"hnsw:space": "cosine"}  # Use cosine similarity
+)
+
+# Add documents with metadata
 documents = [
     "The capital of France is Paris",
     "Germany's capital is Berlin",
     "Italy's capital is Rome"
 ]
 
+# Metadata for filtering (optional but recommended)
+metadatas = [
+    {"country": "France", "type": "capital"},
+    {"country": "Germany", "type": "capital"},
+    {"country": "Italy", "type": "capital"}
+]
+
+ids = ["doc1", "doc2", "doc3"]
+
+# Add to collection
+# Chroma automatically generates embeddings using default model
+# Or you can provide your own embeddings
 collection.add(
     documents=documents,
-    ids=["doc1", "doc2", "doc3"]
+    metadatas=metadatas,
+    ids=ids
 )
 
-# Query
+# Query the collection
 query = "What is the capital of France?"
 results = collection.query(
     query_texts=[query],
+    n_results=2,  # Return top 2 most similar
+    # Optional: filter by metadata
+    # where={"country": "France"}
+)
+
+# Access results
+print("Retrieved documents:", results['documents'][0])
+print("Similarity distances:", results['distances'][0])
+print("Document IDs:", results['ids'][0])
+print("Metadata:", results['metadatas'][0])
+
+# Output example:
+# Retrieved documents: ['The capital of France is Paris', 'Germany's capital is Berlin']
+# Similarity distances: [0.12, 0.45]  # Lower = more similar (distance, not similarity)
+# Document IDs: ['doc1', 'doc2']
+# Metadata: [{'country': 'France', 'type': 'capital'}, {'country': 'Germany', 'type': 'capital'}]</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Key Points:</h5>
+                                <ul>
+                                    <li><strong>Persistent storage:</strong> Use <code>PersistentClient</code> in production to save data to disk.</li>
+                                    <li><strong>Collections:</strong> Organize documents into collections (like tables).</li>
+                                    <li><strong>Metadata filtering:</strong> Store metadata (date, category, etc.) to enable filtering before similarity search.</li>
+                                    <li><strong>Automatic embeddings:</strong> Chroma can generate embeddings automatically, or you can provide your own.</li>
+                                    <li><strong>Distance vs similarity:</strong> Chroma returns distances (lower = more similar), not similarity scores.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-box">
+                            <h4>3. Complete RAG Example: Embedding + Vector DB + Similarity Search</h4>
+                            <p><strong>What this does:</strong> A complete example combining embedding generation, vector database storage, and similarity search for a RAG system.</p>
+                            <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+import chromadb
+import numpy as np
+
+# Step 1: Initialize embedding model
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+# Step 2: Initialize vector database
+client = chromadb.PersistentClient(path="./rag_db")
+collection = client.get_or_create_collection(
+    name="knowledge_base",
+    metadata={"hnsw:space": "cosine"}
+)
+
+# Step 3: Prepare documents (in real RAG, these come from your knowledge base)
+documents = [
+    "Machine learning is a subset of artificial intelligence.",
+    "Deep learning uses neural networks with multiple layers.",
+    "Natural language processing enables computers to understand text.",
+    "Computer vision allows machines to interpret visual information."
+]
+
+# Step 4: Generate embeddings
+embeddings = embedding_model.encode(documents, show_progress_bar=True)
+
+# Step 5: Add to vector database with custom embeddings
+ids = [f"doc_{i}" for i in range(len(documents))]
+collection.add(
+    embeddings=embeddings.tolist(),  # Convert numpy array to list
+    documents=documents,
+    ids=ids
+)
+
+# Step 6: Query the knowledge base
+user_query = "What is machine learning?"
+query_embedding = embedding_model.encode([user_query])
+
+# Retrieve top-k most similar documents
+results = collection.query(
+    query_embeddings=query_embedding.tolist(),
     n_results=2
 )
 
-print(results['documents'][0])  # Retrieved documents</code></pre>
+# Step 7: Use retrieved context for RAG
+retrieved_docs = results['documents'][0]
+print("Retrieved context:")
+for i, doc in enumerate(retrieved_docs, 1):
+    print(f"{i}. {doc}")
+
+# In a real RAG system, you would:
+# 1. Combine retrieved_docs into a prompt
+# 2. Send prompt + query to LLM (OpenAI, Anthropic, etc.)
+# 3. Return LLM's generated answer
+
+# Example prompt construction:
+context = "\n\n".join(retrieved_docs)
+prompt = f"""Context:
+{context}
+
+Question: {user_query}
+
+Answer:"""
+print("\nConstructed prompt:")
+print(prompt)</code></pre>
+                            
+                            <div class="example-box">
+                                <h5>Complete RAG Pipeline:</h5>
+                                <ol>
+                                    <li><strong>Document Processing:</strong> Load and chunk documents from your knowledge base</li>
+                                    <li><strong>Embedding Generation:</strong> Convert chunks to embeddings (this example)</li>
+                                    <li><strong>Vector Storage:</strong> Store embeddings in vector database (this example)</li>
+                                    <li><strong>Query Processing:</strong> Embed user query and retrieve similar documents (this example)</li>
+                                    <li><strong>Context Assembly:</strong> Combine retrieved documents into prompt (this example)</li>
+                                    <li><strong>LLM Generation:</strong> Send prompt to LLM to generate answer (not shown - requires LLM API)</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="explanation-box">
+                            <h3>Installation Requirements</h3>
+                            <p>To run these examples, install the required packages:</p>
+                            <pre><code class="language-bash">pip install sentence-transformers chromadb numpy</code></pre>
+                            
+                            <h4>Alternative Vector Databases</h4>
+                            <p>While this example uses Chroma, you can use other vector databases with similar APIs:</p>
+                            <ul>
+                                <li><strong>Pinecone:</strong> Managed cloud service, easy setup, good for production</li>
+                                <li><strong>Weaviate:</strong> Self-hosted or cloud, supports GraphQL, good for complex queries</li>
+                                <li><strong>Qdrant:</strong> Fast, supports filtering, good for high-performance applications</li>
+                                <li><strong>FAISS:</strong> Facebook's library, good for research and self-hosted solutions</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -863,98 +1035,98 @@ print(results['documents'][0])  # Retrieved documents</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What are text embeddings?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dense vector representations of text that capture semantic meaning, allowing similar texts to have similar vectors</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Text compression algorithms</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Text formatting methods</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Text compression algorithms</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Text formatting methods</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Dense vector representations of text that capture semantic meaning, allowing similar texts to have similar vectors</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Text storage formats</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: Interview question: "What is the difference between dense and sparse embeddings?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dense embeddings are learned vector representations (e.g., 384-dim) that capture semantic meaning. Sparse embeddings are high-dimensional with mostly zeros, based on word frequencies (e.g., TF-IDF, BM25)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Dense is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Dense is faster</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Dense embeddings are learned vector representations (e.g., 384-dim) that capture semantic meaning. Sparse embeddings are high-dimensional with mostly zeros, based on word frequencies (e.g., TF-IDF, BM25)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Sparse is better</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) They are the same</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is cosine similarity used for in embeddings?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Measuring semantic similarity between embedding vectors by computing the cosine of the angle between them (range: -1 to 1)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Training embedding models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Generating embeddings</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Storing embeddings</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Training embedding models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Generating embeddings</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Storing embeddings</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Measuring semantic similarity between embedding vectors by computing the cosine of the angle between them (range: -1 to 1)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What are popular embedding models used in RAG systems?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) OpenAI text-embedding-ada-002, Sentence-BERT (all-MiniLM-L6-v2), and other transformer-based models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only GPT models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only BERT models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only GPT models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only BERT models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) OpenAI text-embedding-ada-002, Sentence-BERT (all-MiniLM-L6-v2), and other transformer-based models</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only word2vec</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Interview question: "How do you choose the right embedding dimension?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Balance between quality (higher dim = better) and efficiency (lower dim = faster, less storage). Common: 384-1536 dimensions. Consider model capabilities, storage costs, and retrieval speed requirements</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use highest dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use lowest dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Dimension doesn't matter</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Always use highest dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use lowest dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Dimension doesn't matter</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Balance between quality (higher dim = better) and efficiency (lower dim = faster, less storage). Common: 384-1536 dimensions. Consider model capabilities, storage costs, and retrieval speed requirements</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What does the cosine similarity formula \(\cos(\theta) = \frac{q \cdot d}{\|q\| \|d\|}\) represent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The cosine of the angle between query vector q and document vector d, normalized by their magnitudes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Euclidean distance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Euclidean distance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) The cosine of the angle between query vector q and document vector d, normalized by their magnitudes</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Dot product</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Vector addition</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: Why do similar texts get similar embedding vectors?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Embedding models are trained to map semantically similar texts to nearby points in vector space, capturing meaning rather than exact word matching</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They use the same words</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They have the same length</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random chance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They use the same words</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They have the same length</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random chance</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Embedding models are trained to map semantically similar texts to nearby points in vector space, capturing meaning rather than exact word matching</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "How would you evaluate embedding quality?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use semantic similarity benchmarks (STS, SICK), test on domain-specific tasks, measure retrieval performance (precision@k, recall@k), and evaluate on downstream RAG tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only check embedding dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only check model size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No evaluation needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only check embedding dimension</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only check model size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No evaluation needed</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Use semantic similarity benchmarks (STS, SICK), test on domain-specific tasks, measure retrieval performance (precision@k, recall@k), and evaluate on downstream RAG tasks</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the advantage of using pre-trained embedding models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) They capture general semantic knowledge from large text corpora, work well out-of-the-box, and don't require training on your specific data</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are always better than custom models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They are always better than custom models</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) They capture general semantic knowledge from large text corpora, work well out-of-the-box, and don't require training on your specific data</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) They are faster to train</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) They use less memory</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is the typical embedding dimension range used in production RAG systems?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) 384-1536 dimensions, with 384-768 being common for efficiency and 1536 for higher quality</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) 10-50 dimensions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) 10000+ dimensions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Dimension doesn't matter</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) 10-50 dimensions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) 10000+ dimensions</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Dimension doesn't matter</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) 384-1536 dimensions, with 384-768 being common for efficiency and 1536 for higher quality</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Interview question: "How do you handle out-of-vocabulary words in embeddings?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Modern embedding models (subword tokenization) handle OOV words by breaking them into subwords. For truly unknown tokens, models use special UNK tokens or character-level embeddings</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Skip those words</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use random vectors</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) OOV words don't exist</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Skip those words</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Use random vectors</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) OOV words don't exist</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Modern embedding models (subword tokenization) handle OOV words by breaking them into subwords. For truly unknown tokens, models use special UNK tokens or character-level embeddings</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the relationship between embedding quality and RAG performance?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Better embeddings lead to more accurate semantic retrieval, which improves RAG answer quality. Embedding quality directly impacts retrieval precision and recall</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Embedding quality doesn't affect RAG</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only LLM quality matters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Embeddings are optional</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Embedding quality doesn't affect RAG</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only LLM quality matters</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Embeddings are optional</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Better embeddings lead to more accurate semantic retrieval, which improves RAG answer quality. Embedding quality directly impacts retrieval precision and recall</div>
                             </div>
                         </div>
                     </div>
