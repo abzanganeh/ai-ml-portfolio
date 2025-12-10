@@ -5,14 +5,24 @@
 
 // Universal checkAnswer function - works with onclick pattern
 function checkAnswer(element, isCorrect) {
+    if (!element) {
+        console.error('checkAnswer: element is null');
+        return;
+    }
+    
     // Store original text for all options before modifying
     const questionContainer = element.closest('.quiz-question') || element.closest('.enhanced-quiz-container');
     if (!questionContainer) {
-        console.error('Quiz question container not found');
+        console.error('Quiz question container not found for element:', element);
         return;
     }
     
     const allOptions = questionContainer.querySelectorAll('.quiz-option, .enhanced-quiz-option');
+    
+    if (allOptions.length === 0) {
+        console.error('No quiz options found');
+        return;
+    }
     
     // Restore original text and remove classes from all options
     allOptions.forEach(opt => {
@@ -25,15 +35,19 @@ function checkAnswer(element, isCorrect) {
     });
     
     if (isCorrect) {
-        // Correct answer selected
+        // Correct answer selected - add green glow
         element.classList.add('correct');
         element.textContent = element.dataset.originalText + ' ✓ Correct!';
+        // Force reflow to ensure animation triggers
+        element.offsetHeight;
     } else {
-        // Wrong answer selected
+        // Wrong answer selected - add red glow
         element.classList.add('incorrect');
         element.textContent = element.dataset.originalText + ' ✗ Incorrect';
+        // Force reflow to ensure animation triggers
+        element.offsetHeight;
         
-        // Find and highlight the correct answer
+        // Find and highlight the correct answer with green glow
         const correctOption = Array.from(allOptions).find(opt => {
             // Check for onclick pattern: checkAnswer(this, true)
             const onclick = opt.getAttribute('onclick') || '';
@@ -50,6 +64,8 @@ function checkAnswer(element, isCorrect) {
         if (correctOption) {
             correctOption.classList.add('correct');
             correctOption.textContent = correctOption.dataset.originalText + ' ✓ Correct Answer';
+            // Force reflow to ensure animation triggers
+            correctOption.offsetHeight;
         }
     }
     
