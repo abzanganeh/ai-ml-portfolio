@@ -117,3 +117,28 @@ function initializeProgressBars() {
     }
 }
 
+// Scroll to Section Navigation
+function scrollToSectionNav() {
+    const sectionNav = document.querySelector('.section-nav');
+    const tutorialHeader = document.querySelector('.tutorial-header');
+    
+    // Try to find section-nav first, then tutorial-header as fallback
+    const targetElement = sectionNav || tutorialHeader;
+    
+    if (targetElement) {
+        // Get the header height (fixed header is 70px, but get it dynamically)
+        const header = document.querySelector('.azbn-header');
+        const headerHeight = header ? header.offsetHeight : 70;
+        
+        // Get the position of the target element
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+        
+        // Scroll to the position accounting for fixed header
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+        });
+    }
+}
+
