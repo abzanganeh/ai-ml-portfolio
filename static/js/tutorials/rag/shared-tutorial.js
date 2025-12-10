@@ -176,13 +176,20 @@ function scrollToSectionNav() {
         const header = document.querySelector('.azbn-header');
         const headerHeight = header ? header.offsetHeight : 70;
         
-        // Get the position of the target element
-        const elementPosition = targetElement.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerHeight;
+        // Calculate the position accounting for fixed header
+        const rect = targetElement.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const targetPosition = rect.top + scrollTop - headerHeight - 10; // 10px extra padding
         
         // Scroll to the position accounting for fixed header
         window.scrollTo({
-            top: offsetPosition,
+            top: Math.max(0, targetPosition), // Ensure we don't scroll to negative position
+            behavior: 'smooth'
+        });
+    } else {
+        // Fallback: just scroll to top
+        window.scrollTo({
+            top: 0,
             behavior: 'smooth'
         });
     }
