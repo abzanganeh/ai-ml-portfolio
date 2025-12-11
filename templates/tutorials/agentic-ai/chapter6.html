@@ -206,33 +206,128 @@
                                 \[\text{Task} = \{T_1, T_2, \ldots, T_n\} \text{ where } T_i \text{ are subtasks}\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Complex task is decomposed into n subtasks. Each subtask can be assigned to appropriate agent.</p>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula represents how a complex task is broken down into smaller, manageable subtasks.</strong> It shows that a single complex task is decomposed into n subtasks, where each subtask can be assigned to an appropriate agent. This decomposition is the foundation of agent orchestration - it enables parallel execution, specialization, and systematic task completion.</p>
+                                
+                                <h4>Breaking It Down</h4>
+                                <ul>
+                                    <li><strong>Task:</strong> The original complex task - a high-level objective that requires multiple steps to complete (e.g., "Research quantum computing and write a comprehensive report", "Build a web application with authentication"). Complex tasks cannot be completed by a single action - they require multiple coordinated steps.</li>
+                                    <li><strong>{T_1, T_2, ..., T_n}:</strong> Set of subtasks - the decomposed components of the original task. Each T_i is a specific, actionable subtask that contributes to completing the overall task. Subtasks should be: independent (can be done in parallel when possible), specific (clear what needs to be done), manageable (each can be completed by an agent), and complete (all subtasks together accomplish the original task).</li>
+                                    <li><strong>n:</strong> Number of subtasks - the count of decomposed components. More subtasks allow finer-grained parallelization but increase coordination complexity. Fewer subtasks are simpler to coordinate but may not fully utilize parallel capabilities.</li>
+                                    <li><strong>T_i:</strong> Individual subtask i - a specific work item that can be assigned to an agent (e.g., T_1 = "Research quantum computing articles", T_2 = "Extract key findings", T_3 = "Write summary", T_4 = "Review and edit"). Each subtask has: requirements (skills, tools needed), dependencies (which subtasks must complete first), and expected output (what it produces).</li>
+                                </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>Task decomposition happens at the start of orchestration when a complex task arrives. The orchestrator: (1) receives the complex task, (2) analyzes what needs to be done, (3) breaks it down into subtasks {T_1, T_2, ..., T_n}, (4) identifies dependencies between subtasks, (5) assigns each subtask to appropriate agents. This decomposition enables the orchestrator to manage complex workflows systematically.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Effective task decomposition is essential for multi-agent orchestration. Without decomposition, complex tasks cannot be: parallelized (agents don't know what parts to work on), specialized (agents can't focus on their expertise), managed (orchestrator can't track progress), or completed systematically (no clear path to completion). Good decomposition enables: parallel execution (multiple agents work simultaneously), specialization (each agent does what it's best at), progress tracking (know which subtasks are done), and systematic completion (clear sequence of steps). Poor decomposition leads to: inefficient execution, unclear responsibilities, and incomplete tasks.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> Complex task = "Research quantum computing and write a comprehensive report"</p>
+                                    <p><strong>Step 1:</strong> Analyze task → requires research, analysis, writing, review</p>
+                                    <p><strong>Step 2:</strong> Decompose into subtasks:</p>
+                                    <ul>
+                                        <li>T_1 = "Search for quantum computing articles and papers"</li>
+                                        <li>T_2 = "Read and extract key findings from articles"</li>
+                                        <li>T_3 = "Organize findings into logical structure"</li>
+                                        <li>T_4 = "Write comprehensive report (5000 words)"</li>
+                                        <li>T_5 = "Review report for accuracy and completeness"</li>
+                                        <li>T_6 = "Edit and format final report"</li>
+                                    </ul>
+                                    <p><strong>Result:</strong> Task = {T_1, T_2, T_3, T_4, T_5, T_6} where n = 6</p>
+                                    <p><strong>Dependencies:</strong> T_2 depends on T_1, T_3 depends on T_2, T_4 depends on T_3, T_5 depends on T_4, T_6 depends on T_5 (sequential chain)</p>
+                                    <p><strong>Interpretation:</strong> The complex task was decomposed into 6 specific subtasks. Each subtask is clear and actionable. The dependencies show a sequential workflow (each step builds on the previous). This decomposition enables the orchestrator to: assign T_1 to researcher agent, T_2 to analysis agent, T_4 to writer agent, T_5 to reviewer agent, and track progress through each step. This demonstrates how decomposition makes complex tasks manageable.</p>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="formula-box">
-                            <h4>Agent Selection</h4>
+                            <h4>Agent Selection in Orchestration</h4>
                             <div class="formula-display">
-                                \[\text{Agent}(T_i) = \arg\max_{A_j} \text{score}(A_j, T_i)\]
+                                \[\text{Agent}(T_i) = \arg\max_{A_j \in \mathcal{A}} \text{score}(A_j, T_i)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function selects the best agent for a given subtask during orchestration.</strong> It evaluates all available agents, calculates how well each agent matches the subtask requirements, and assigns the subtask to the agent with the highest capability score. This ensures optimal task-agent matching in orchestrated workflows.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(T_i\): Subtask</li>
-                                    <li>\(A_j\): Available agents</li>
-                                    <li>\(\text{score}\): Agent capability score for task</li>
-                                    <li>Select agent with highest score for task</li>
+                                    <li><strong>T_i:</strong> Subtask i - a specific work item from the decomposed task that needs to be assigned (e.g., "write summary", "review document", "calculate statistics"). Each subtask has requirements: skills needed, tools required, complexity level, and expected output.</li>
+                                    <li><strong>A_j:</strong> Agent j from the set of available agents \(\mathcal{A}\) - one of the agents in the orchestrated system. The set \(\mathcal{A}\) includes agents that are: currently available (not busy with other tasks), healthy (not in error state), and capable (have required skills/tools).</li>
+                                    <li><strong>score(A_j, T_i):</strong> Capability score of agent j for subtask i - a numerical value (0-1) measuring agent-task match quality. The score considers: agent specialization (does agent have the right expertise?), tool availability (can agent use required tools?), current workload (is agent overloaded?), past performance (has agent done similar tasks well?), and task-agent alignment (how well does subtask match agent's purpose?). Higher scores indicate better matches.</li>
+                                    <li><strong>\(\arg\max\):</strong> Selects the agent with highest score - finds the agent j that maximizes score(A_j, T_i) across all available agents. This optimization ensures the best possible agent-task pairing.</li>
+                                    <li><strong>Agent(T_i):</strong> The selected agent - the agent assigned to subtask T_i. This agent will receive the subtask from the orchestrator and execute it as part of the overall workflow.</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This function is called by the orchestrator for each subtask during workflow execution. The process: (1) subtask T_i is ready (dependencies met), (2) orchestrator identifies available agents \(\mathcal{A}\), (3) calculates score(A_j, T_i) for each agent, (4) selects agent with maximum score, (5) assigns T_i to that agent. This happens dynamically as the workflow progresses, with different subtasks potentially assigned to different agents based on their capabilities.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Optimal agent selection is crucial for orchestrated workflow performance. Assigning subtasks to the wrong agents leads to: poor quality (agent lacks required skills), slow completion (agent not optimized for task type), workflow delays (bottleneck agents slow down entire workflow), and resource waste (capable agents idle while wrong agents struggle). By selecting the best agent for each subtask, orchestration ensures: high quality (right expertise for each step), efficient execution (agents work on tasks they excel at), balanced workload (tasks distributed optimally), and fast completion (workflow progresses smoothly). This is what makes orchestration effective - intelligent task-agent matching.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> Orchestrated research workflow</p>
+                                    <ul>
+                                        <li>T_i = "Write a 500-word summary of research findings"</li>
+                                        <li>\(\mathcal{A}\) = {researcher_agent, writer_agent, reviewer_agent, calculator_agent}</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Calculate score(A_j, T_i) for each agent:</p>
+                                    <ul>
+                                        <li>score(researcher_agent, T_i) = 0.4 (can write but not specialized)</li>
+                                        <li>score(writer_agent, T_i) = 0.95 (highly specialized for writing, has formatting tools, optimal for this task)</li>
+                                        <li>score(reviewer_agent, T_i) = 0.5 (can write but better at reviewing)</li>
+                                        <li>score(calculator_agent, T_i) = 0.1 (not relevant for writing task)</li>
+                                    </ul>
+                                    <p><strong>Step 2:</strong> Find maximum: max score = 0.95</p>
+                                    <p><strong>Result:</strong> Agent(T_i) = writer_agent (score = 0.95)</p>
+                                    <p><strong>Workflow Impact:</strong> Writer agent receives the subtask, completes it efficiently (specialized for writing), and workflow progresses smoothly. If researcher_agent had been selected (score 0.4), the writing would take longer and be lower quality, slowing down the entire workflow.</p>
+                                    <p><strong>Interpretation:</strong> The orchestrator correctly identified writer_agent as the optimal choice for a writing subtask. The high score (0.95) reflects perfect task-agent alignment. This demonstrates how optimal agent selection in orchestration improves workflow efficiency and quality.</p>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="formula-box">
                             <h4>Workflow Execution Time</h4>
                             <div class="formula-display">
-                                \[T_{\text{total}} = \max(\text{sequential path}) + \sum(\text{parallel overhead})\]
+                                \[T_{\text{total}} = \max(\text{sequential\_path}) + \sum(\text{parallel\_overhead})\]
                             </div>
                             <div class="formula-explanation">
-                                <p>Total execution time is determined by longest sequential path plus overhead from parallel coordination.</p>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula calculates the total time required to execute an orchestrated workflow.</strong> It accounts for both sequential dependencies (tasks that must happen in order) and parallel execution overhead (coordination costs). This helps predict workflow performance and identify optimization opportunities.</p>
+                                
+                                <h4>Breaking It Down</h4>
+                                <ul>
+                                    <li><strong>T_total:</strong> Total execution time - the wall-clock time from workflow start to completion. This is what users experience - the actual time to get results from the orchestrated system.</li>
+                                    <li><strong>max(sequential_path):</strong> Maximum time along any sequential path - the longest chain of dependent tasks that must execute in order. In a workflow, some tasks have dependencies (T_2 needs T_1 to finish first). The longest such chain determines the minimum execution time. Even if other tasks run in parallel, the workflow cannot complete faster than this sequential bottleneck.</li>
+                                    <li><strong>sequential_path:</strong> A path of dependent tasks - a sequence of tasks where each task depends on the previous one (e.g., T_1 → T_2 → T_3, where T_2 needs T_1's output, T_3 needs T_2's output). Multiple sequential paths may exist in a workflow, and the longest one is the bottleneck.</li>
+                                    <li><strong>\(\sum\)(parallel_overhead):</strong> Sum of overhead from parallel coordination - additional time spent on: task allocation (assigning tasks to agents), result aggregation (combining parallel results), state synchronization (keeping agent states consistent), conflict resolution (handling disagreements), and workflow management (tracking progress, managing dependencies). This overhead is the "cost" of parallelization - it adds time but enables faster execution through parallelism.</li>
+                                    <li><strong>parallel_overhead:</strong> Individual overhead components - each parallel execution step incurs some coordination overhead. The sum accounts for all overhead across the workflow.</li>
+                                </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This formula is used to: (1) estimate workflow performance (how long will execution take?), (2) identify bottlenecks (which sequential path is longest?), (3) optimize workflow design (reduce sequential dependencies, minimize overhead), (4) evaluate orchestration efficiency (is overhead reasonable?), and (5) compare workflow alternatives (which design is faster?). This helps orchestrator designers optimize workflow performance.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Understanding workflow execution time is crucial for system design and optimization. The formula reveals that: (1) sequential dependencies limit speedup (can't parallelize dependent tasks), (2) parallel overhead reduces benefits (too much overhead negates parallelization gains), (3) workflow structure matters (better dependency design = faster execution), and (4) there's a trade-off (more parallelism = more overhead). This helps designers: minimize sequential dependencies (enable more parallelization), reduce coordination overhead (optimize orchestration mechanisms), balance parallelism and overhead (find optimal point), and set realistic performance expectations (account for both factors).</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> Research workflow with 6 subtasks</p>
+                                    <ul>
+                                        <li>Sequential path 1: T_1 (2 min) → T_2 (1 min) → T_3 (3 min) → T_4 (2 min) = 8 minutes total</li>
+                                        <li>Sequential path 2: T_5 (1 min) → T_6 (1 min) = 2 minutes total</li>
+                                        <li>Parallel overhead: 0.2 min (task allocation) + 0.3 min (result aggregation) = 0.5 minutes</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Find longest sequential path: max(8, 2) = 8 minutes</p>
+                                    <p><strong>Step 2:</strong> Add parallel overhead: 8 + 0.5 = 8.5 minutes</p>
+                                    <p><strong>Result:</strong> T_total = 8.5 minutes</p>
+                                    <p><strong>Analysis:</strong> Path 1 (8 min) is the bottleneck - even though Path 2 finishes in 2 min, the workflow must wait for Path 1. The overhead (0.5 min) is small relative to task times, so parallelization is beneficial.</p>
+                                    <p><strong>Optimization:</strong> To improve, could: reduce T_3 time (3 min is longest in bottleneck path), enable more parallelization (break dependencies if possible), or reduce overhead (optimize coordination mechanisms).</p>
+                                    <p><strong>Interpretation:</strong> The workflow execution time (8.5 min) is determined by the longest sequential path (8 min) plus coordination overhead (0.5 min). This demonstrates how sequential dependencies create bottlenecks and how overhead affects total time. Understanding this helps optimize workflow design.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

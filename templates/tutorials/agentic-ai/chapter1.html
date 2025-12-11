@@ -369,27 +369,34 @@
                                 
                                 <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>state:</strong> Current environment state (observations) - what the agent perceives right now, including user input, tool results, and environmental conditions</li>
-                                    <li><strong>goal:</strong> Desired outcome or task - the objective the agent is trying to achieve, which guides all decision-making</li>
-                                    <li><strong>memory:</strong> Past experiences and context - both short-term (recent conversation) and long-term (learned facts, preferences, patterns)</li>
-                                    <li><strong>tools:</strong> Available actions/tools - the set of functions, APIs, or capabilities the agent can use to interact with the world</li>
-                                    <li><strong>action:</strong> Selected action to take - the output decision, which could be using a tool, generating a response, asking for clarification, or updating memory</li>
+                                    <li><strong>state:</strong> Current environment state (observations) - what the agent perceives right now, including user input, tool results, and environmental conditions. This represents the agent's current understanding of its situation.</li>
+                                    <li><strong>goal:</strong> Desired outcome or task - the objective the agent is trying to achieve, which guides all decision-making. The goal acts as a north star, directing the agent's actions toward a specific objective.</li>
+                                    <li><strong>memory:</strong> Past experiences and context - both short-term (recent conversation turns, immediate context) and long-term (learned facts, user preferences, patterns from past interactions). Memory enables the agent to learn and adapt.</li>
+                                    <li><strong>tools:</strong> Available actions/tools - the set of functions, APIs, or capabilities the agent can use to interact with the world. Tools extend the agent's capabilities beyond text generation.</li>
+                                    <li><strong>action:</strong> Selected action to take - the output decision, which could be using a tool, generating a response, asking for clarification, or updating memory. This is the agent's chosen next step.</li>
                                 </ul>
                                 
                                 <h4>Where This Is Used</h4>
-                                <p>This function is called at every step of the agent's decision loop. Whenever the agent needs to decide what to do next (after observing the environment, after receiving tool results, after reasoning about the situation), this function is invoked to select the optimal action.</p>
+                                <p>This function is called at every step of the agent's decision loop. Whenever the agent needs to decide what to do next (after observing the environment, after receiving tool results, after reasoning about the situation), this function is invoked to select the optimal action. It's the heart of the agent's autonomous decision-making capability.</p>
                                 
                                 <h4>Why This Matters</h4>
-                                <p>This formula encapsulates the essence of agent autonomy. Unlike traditional systems that follow fixed rules, agents use this function to dynamically decide actions based on context, making them adaptable and intelligent. The quality of this decision function directly determines agent performance.</p>
+                                <p>This formula encapsulates the essence of agent autonomy. Unlike traditional systems that follow fixed rules, agents use this function to dynamically decide actions based on context, making them adaptable and intelligent. The quality of this decision function directly determines agent performance - a well-designed agent function leads to effective, goal-oriented behavior, while a poor one results in inefficient or incorrect actions.</p>
                                 
                                 <div class="example-box">
                                     <h5>Example Calculation</h5>
-                                    <p><strong>Given:</strong> state = "User asked about weather", goal = "Provide accurate weather info", memory = "User prefers Celsius", tools = ["get_weather", "search_web"]</p>
-                                    <p><strong>Step 1:</strong> Agent analyzes state and goal → needs weather data</p>
-                                    <p><strong>Step 2:</strong> Agent checks memory → user prefers Celsius</p>
-                                    <p><strong>Step 3:</strong> Agent selects tool → get_weather</p>
-                                    <p><strong>Result:</strong> action = "call get_weather with location parameter"</p>
-                                    <p><strong>Interpretation:</strong> The agent decided to use the weather tool to fulfill the user's request, incorporating the preference for Celsius from memory.</p>
+                                    <p><strong>Given:</strong></p>
+                                    <ul>
+                                        <li>state = "User asked: 'What's the weather in New York?'"</li>
+                                        <li>goal = "Provide accurate weather information"</li>
+                                        <li>memory = {"user_preference": "Celsius", "last_location": "New York"}</li>
+                                        <li>tools = ["get_weather", "search_web", "calculate"]</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Agent analyzes state and goal → needs current weather data for New York</p>
+                                    <p><strong>Step 2:</strong> Agent checks memory → user prefers Celsius, last location was New York</p>
+                                    <p><strong>Step 3:</strong> Agent evaluates tools → get_weather is most appropriate</p>
+                                    <p><strong>Step 4:</strong> Agent selects action → "call get_weather(city='New York', unit='Celsius')"</p>
+                                    <p><strong>Result:</strong> action = "call get_weather with parameters: city='New York', unit='Celsius'"</p>
+                                    <p><strong>Interpretation:</strong> The agent decided to use the weather tool to fulfill the user's request, incorporating both the location from the query and the temperature preference from memory. This demonstrates how the agent function combines all inputs (state, goal, memory, tools) to make an informed decision.</p>
                                 </div>
                             </div>
                         </div>
@@ -403,41 +410,52 @@
                             
                             <div class="formula-explanation">
                                 <h4>What This Measures</h4>
-                                <p><strong>This function calculates the total utility (value) of taking a specific action.</strong> It combines immediate rewards, execution costs, and expected future value to determine which action will be most beneficial. The agent selects the action with the highest utility score.</p>
+                                <p><strong>This function calculates the total utility (value) of taking a specific action.</strong> It combines immediate rewards, execution costs, and expected future value to determine which action will be most beneficial. The agent selects the action with the highest utility score, enabling optimal decision-making that balances multiple factors.</p>
                                 
                                 <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>\(R(\text{state}, \text{action})\):</strong> Immediate benefit of action - the reward or value gained right now from taking this action (e.g., successfully answering user question, completing a subtask, making progress toward goal)</li>
-                                    <li><strong>\(C(\text{action})\):</strong> Cost of executing action - resources consumed (time, tokens, API calls, computational cost). This is subtracted because costs reduce utility</li>
-                                    <li><strong>\(V(\text{future\_state})\):</strong> Expected value of resulting state - the predicted long-term benefit of reaching the state that results from this action. This captures strategic thinking beyond immediate gains</li>
-                                    <li><strong>Agent chooses:</strong> \[\text{action}^* = \underset{\text{action}}{\arg\max} \, U(\text{action})\] - The agent selects the action that maximizes utility across all available options</li>
+                                    <li><strong>\(R(\text{state}, \text{action})\):</strong> Immediate benefit of action - the reward or value gained right now from taking this action. Examples include: successfully answering a user question (high reward), completing a subtask (moderate reward), making progress toward the goal (positive reward), or providing incorrect information (negative reward). This term captures the immediate impact of the action.</li>
+                                    <li><strong>\(C(\text{action})\):</strong> Cost of executing action - resources consumed including time (latency), tokens (API costs), API calls (rate limits, costs), and computational resources. This is subtracted because costs reduce utility - an expensive action must provide sufficient value to justify its cost.</li>
+                                    <li><strong>\(V(\text{future\_state})\):</strong> Expected value of resulting state - the predicted long-term benefit of reaching the state that results from this action. This captures strategic thinking beyond immediate gains. For example, an action that sets up the agent for easier future steps has high V, even if immediate reward is moderate.</li>
+                                    <li><strong>Agent chooses:</strong> \[\text{action}^* = \underset{\text{action}}{\arg\max} \, U(\text{action})\] - The agent evaluates utility for all possible actions and selects the one that maximizes U. This is the optimization step that makes agents intelligent rather than random.</li>
                                 </ul>
                                 
                                 <h4>Where This Is Used</h4>
-                                <p>This utility function is evaluated for every possible action the agent can take. In practice, agents use LLM reasoning to estimate these values, or use learned models to predict rewards and costs. This happens during the "Reason" step of the agent loop.</p>
+                                <p>This utility function is evaluated for every possible action the agent can take during the "Reason" step of the agent loop. In practice, agents use LLM reasoning to estimate these values (the LLM considers the context and predicts rewards/costs), or use learned models to predict rewards and costs based on historical data. The action with maximum utility is then executed in the "Act" step.</p>
                                 
                                 <h4>Why This Matters</h4>
-                                <p>This formula enables intelligent trade-offs. An action might have high immediate reward but also high cost, or it might lead to a better future state. By combining all factors, agents can make optimal decisions that balance short-term and long-term goals, efficiency and effectiveness.</p>
+                                <p>This formula enables intelligent trade-offs that humans make naturally. An action might have high immediate reward but also high cost, or it might lead to a better future state. By combining all factors (immediate reward, cost, future value), agents can make optimal decisions that balance short-term and long-term goals, efficiency and effectiveness. Without this utility function, agents would make decisions based on single factors (e.g., always choose cheapest or always choose highest reward), leading to suboptimal behavior.</p>
                                 
                                 <div class="example-box">
                                     <h5>Example Calculation</h5>
-                                    <p><strong>Given:</strong> Agent needs to answer "What's the weather?"</p>
-                                    <p><strong>Action 1:</strong> Call weather API</p>
+                                    <p><strong>Scenario:</strong> Agent needs to answer "What's the weather in New York?"</p>
+                                    
+                                    <p><strong>Action 1: Call weather API</strong></p>
                                     <ul>
-                                        <li>R = 0.9 (high immediate value - gets accurate answer)</li>
-                                        <li>C = 0.1 (low cost - one API call)</li>
-                                        <li>V = 0.2 (moderate future value - user satisfied)</li>
-                                        <li>U = 0.9 - 0.1 + 0.2 = 1.0</li>
+                                        <li>R(state, action) = 0.9 (high immediate value - gets accurate, real-time answer)</li>
+                                        <li>C(action) = 0.1 (low cost - one API call, ~$0.001, fast response)</li>
+                                        <li>V(future_state) = 0.2 (moderate future value - user satisfied, may ask follow-up questions)</li>
+                                        <li>U(action) = 0.9 - 0.1 + 0.2 = <strong>1.0</strong></li>
                                     </ul>
-                                    <p><strong>Action 2:</strong> Guess from memory</p>
+                                    
+                                    <p><strong>Action 2: Guess from memory</strong></p>
                                     <ul>
-                                        <li>R = 0.3 (low value - might be wrong)</li>
-                                        <li>C = 0.0 (no cost)</li>
-                                        <li>V = 0.1 (low future value - user might be unsatisfied)</li>
-                                        <li>U = 0.3 - 0.0 + 0.1 = 0.4</li>
+                                        <li>R(state, action) = 0.3 (low value - might be wrong, outdated, or incomplete)</li>
+                                        <li>C(action) = 0.0 (no cost - no API call needed)</li>
+                                        <li>V(future_state) = 0.1 (low future value - user might be unsatisfied if wrong, may not trust agent)</li>
+                                        <li>U(action) = 0.3 - 0.0 + 0.1 = <strong>0.4</strong></li>
                                     </ul>
-                                    <p><strong>Result:</strong> Agent chooses Action 1 (U = 1.0 > 0.4)</p>
-                                    <p><strong>Interpretation:</strong> Even though Action 2 has no cost, Action 1 provides much better immediate and future value, making it the optimal choice.</p>
+                                    
+                                    <p><strong>Action 3: Ask user for clarification</strong></p>
+                                    <ul>
+                                        <li>R(state, action) = 0.1 (very low - delays answer, user may be frustrated)</li>
+                                        <li>C(action) = 0.0 (no cost)</li>
+                                        <li>V(future_state) = 0.3 (moderate - gets correct info, but delays response)</li>
+                                        <li>U(action) = 0.1 - 0.0 + 0.3 = <strong>0.4</strong></li>
+                                    </ul>
+                                    
+                                    <p><strong>Result:</strong> Agent chooses Action 1 (U = 1.0 > 0.4 = Action 2 = Action 3)</p>
+                                    <p><strong>Interpretation:</strong> Even though Action 2 and Action 3 have no cost, Action 1 provides much better immediate reward (accurate answer) and future value (user satisfaction, trust). The small cost (0.1) is far outweighed by the benefits (0.9 + 0.2 = 1.1 total benefit vs 0.1 cost), making it the optimal choice. This demonstrates how the utility function enables intelligent cost-benefit analysis.</p>
                                 </div>
                             </div>
                             
@@ -455,33 +473,37 @@
                             
                             <div class="formula-explanation">
                                 <h4>What This Measures</h4>
-                                <p><strong>This function describes how the agent's internal state evolves over time.</strong> After taking an action and observing the result, the agent updates its understanding of the world, its progress toward the goal, and its knowledge base. This state evolution enables the agent to learn and adapt.</p>
+                                <p><strong>This function describes how the agent's internal state evolves over time.</strong> After taking an action and observing the result, the agent updates its understanding of the world, its progress toward the goal, and its knowledge base. This state evolution enables the agent to learn and adapt, making it capable of handling dynamic environments and improving over time.</p>
                                 
                                 <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>state_t:</strong> Current state at time t - the agent's complete understanding at this moment, including what it knows, what it's trying to do, what it has done, and the current environment</li>
-                                    <li><strong>action_t:</strong> Action taken at time t - the specific action the agent executed (e.g., called a tool, generated text, updated memory)</li>
-                                    <li><strong>observation_t:</strong> Result/observation from action - what happened as a result of the action (tool output, user response, error message, environmental change)</li>
-                                    <li><strong>state_{t+1}:</strong> Updated state after action - the new state incorporating the action and its result, ready for the next decision cycle</li>
+                                    <li><strong>state_t:</strong> Current state at time t - the agent's complete understanding at this moment, including what it knows (memory contents), what it's trying to do (current goal), what it has done (action history), and the current environment (observations, tool results, user input). This is the agent's "mental model" at time t.</li>
+                                    <li><strong>action_t:</strong> Action taken at time t - the specific action the agent executed (e.g., called a tool, generated text, updated memory, asked for clarification). This is the decision made by the agent function at time t.</li>
+                                    <li><strong>observation_t:</strong> Result/observation from action - what happened as a result of the action. This could be: tool output (successful result), error message (tool failure), user response (feedback), environmental change (external event), or no result (action had no observable effect). Observations provide feedback about the action's effectiveness.</li>
+                                    <li><strong>state_{t+1}:</strong> Updated state after action - the new state incorporating the action and its result. The Update function transforms state_t by: adding observation_t to memory, updating progress tracking, modifying beliefs/knowledge, adjusting goals if needed, and preparing for the next decision cycle. This becomes the new state_t for the next iteration.</li>
                                 </ul>
                                 
                                 <h4>Where This Is Used</h4>
-                                <p>This update happens after every action in the agent loop. The Update function typically: (1) adds the observation to memory, (2) updates progress tracking, (3) modifies beliefs/knowledge based on new information, (4) adjusts the goal or plan if needed, and (5) prepares the state for the next decision.</p>
+                                <p>This update happens after every action in the agent loop, specifically in the transition from "Act" to the next "Observe" step. The Update function typically: (1) adds the observation to memory (both short-term buffer and potentially long-term store if important), (2) updates progress tracking (how close are we to the goal?), (3) modifies beliefs/knowledge based on new information (what did we learn?), (4) adjusts the goal or plan if needed (is the goal still valid? should we change strategy?), and (5) prepares the state for the next decision (what information is most relevant now?).</p>
                                 
                                 <h4>Why This Matters</h4>
-                                <p>State updates enable agents to be adaptive and learn from experience. Without proper state updates, agents would make the same decisions repeatedly without learning. This function ensures agents incorporate new information, track progress, and evolve their understanding, which is essential for autonomous behavior.</p>
+                                <p>State updates enable agents to be adaptive and learn from experience. Without proper state updates, agents would make the same decisions repeatedly without learning, leading to ineffective behavior. This function ensures agents incorporate new information, track progress toward goals, evolve their understanding based on outcomes, and adapt their strategies. This is essential for autonomous behavior - an agent that doesn't update its state based on actions and observations cannot learn, adapt, or improve, making it no better than a static rule-based system.</p>
                                 
                                 <div class="example-box">
                                     <h5>Example Calculation</h5>
                                     <p><strong>Given:</strong></p>
-                                    <p>state_t = {"goal": "Get weather", "memory": ["User asked about weather"], "tools_used": []}</p>
-                                    <p>action_t = "call get_weather('New York')"</p>
-                                    <p>observation_t = {"temp": 72, "condition": "sunny"}</p>
-                                    <p><strong>Step 1:</strong> Add observation to memory</p>
-                                    <p><strong>Step 2:</strong> Mark tool as used</p>
-                                    <p><strong>Step 3:</strong> Update goal progress (weather obtained)</p>
-                                    <p><strong>Result:</strong> state_{t+1} = {"goal": "Get weather", "memory": ["User asked", "Weather: 72°F sunny"], "tools_used": ["get_weather"], "progress": "weather_obtained"}</p>
-                                    <p><strong>Interpretation:</strong> The agent's state now includes the weather information, knows it has used the weather tool, and recognizes it has made progress toward the goal. This updated state will inform the next decision (likely to generate a response).</p>
+                                    <ul>
+                                        <li>state_t = {"goal": "Get weather for New York", "memory": ["User asked: 'What's the weather?'"], "tools_used": [], "progress": "not_started"}</li>
+                                        <li>action_t = "call get_weather(city='New York', unit='Celsius')"</li>
+                                        <li>observation_t = {"success": true, "temp": 22, "condition": "sunny", "humidity": 65%}</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Add observation to memory → memory now includes weather data</p>
+                                    <p><strong>Step 2:</strong> Mark tool as used → tools_used = ["get_weather"]</p>
+                                    <p><strong>Step 3:</strong> Update goal progress → progress = "weather_obtained"</p>
+                                    <p><strong>Step 4:</strong> Update knowledge → learned that New York weather is currently 22°C and sunny</p>
+                                    <p><strong>Step 5:</strong> Prepare for next decision → state ready for generating response</p>
+                                    <p><strong>Result:</strong> state_{t+1} = {"goal": "Get weather for New York", "memory": ["User asked about weather", "Weather data: 22°C, sunny, 65% humidity"], "tools_used": ["get_weather"], "progress": "weather_obtained", "ready_for": "response_generation"}</p>
+                                    <p><strong>Interpretation:</strong> The agent's state has evolved from "not started" to "weather obtained". The memory now contains the weather information, the agent knows it has successfully used the weather tool, and it recognizes that the next step should be generating a response to the user. This updated state will inform the next decision (likely "generate response with weather data"). Without this state update, the agent wouldn't know it has the weather data and might try to get it again or fail to respond appropriately.</p>
                                 </div>
                             </div>
                         </div>

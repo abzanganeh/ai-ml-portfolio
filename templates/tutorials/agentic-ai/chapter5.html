@@ -154,14 +154,43 @@
                                 \[\text{System\_State} = \bigcup_{i=1}^{n} \text{Agent}_i.\text{state}\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula represents the complete state of a multi-agent system by combining the individual states of all agents.</strong> It aggregates all agent information (memories, current tasks, results, progress) into a unified system view. This enables system-level coordination, shared knowledge, and collective decision-making.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(\text{System\_State}\): Overall state of the multi-agent system</li>
-                                    <li>\(\text{Agent}_i.\text{state}\): Individual state of agent \(i\)</li>
-                                    <li>\(n\): Total number of agents in the system</li>
-                                    <li>\(\bigcup\): Union operation - combines all agent states</li>
+                                    <li><strong>System_State:</strong> Overall state of the multi-agent system - the complete picture of what all agents know, what they're doing, and what they've accomplished. This includes: shared knowledge base, global task status, agent availability, communication history, and system-level progress toward goals.</li>
+                                    <li><strong>Agent_i.state:</strong> Individual state of agent i - the private state of each agent including: its memory (what it knows), current task (what it's working on), results (what it has produced), progress (how far along it is), and status (available, busy, error). Each agent maintains its own state independently.</li>
+                                    <li><strong>n:</strong> Total number of agents in the system - the count of all agents participating (e.g., researcher agent, writer agent, reviewer agent in a research system). More agents means more complex state aggregation.</li>
+                                    <li><strong>\(\bigcup\) (Union):</strong> Union operation - combines all individual agent states into a single system state. The union includes: all agent memories (shared knowledge), all current tasks (system workload), all results (collective outputs), and all statuses (system health). Union ensures no information is lost when aggregating.</li>
                                 </ul>
-                                <p><strong>Interpretation:</strong> The system state is the union of all individual agent states. Each agent maintains its own state (memory, current task, results), and the system state aggregates these.</p>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This system state is used for: (1) orchestrating agent coordination (who should do what next?), (2) managing shared resources (what information is available to all agents?), (3) tracking system progress (how close are we to the goal?), (4) detecting conflicts (are agents working at cross-purposes?), and (5) making system-level decisions (should we add more agents? change strategy?). The system state is updated whenever any agent's state changes.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>A unified system state is essential for effective multi-agent coordination. Without it, agents work in isolation without awareness of what others are doing, leading to: duplicate work (multiple agents doing the same task), conflicts (agents making contradictory decisions), inefficiency (agents not leveraging each other's work), and poor coordination (no system-level view). The union operation ensures all agent information is accessible for coordination while maintaining individual agent autonomy.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> 3-agent research system</p>
+                                    <ul>
+                                        <li>Agent_1.state = {"task": "research quantum computing", "results": ["found 5 articles"], "status": "completed"}</li>
+                                        <li>Agent_2.state = {"task": "write summary", "results": [], "status": "in_progress"}</li>
+                                        <li>Agent_3.state = {"task": "review summary", "results": [], "status": "waiting"}</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Union all agent states</p>
+                                    <p><strong>Result:</strong> System_State = {</p>
+                                    <ul>
+                                        <li>"agent_1": {"task": "research", "results": ["5 articles"], "status": "completed"},</li>
+                                        <li>"agent_2": {"task": "write", "results": [], "status": "in_progress"},</li>
+                                        <li>"agent_3": {"task": "review", "results": [], "status": "waiting"},</li>
+                                        <li>"shared_knowledge": ["5 articles"],</li>
+                                        <li>"system_progress": "research_done, writing_in_progress"</li>
+                                    </ul>
+                                    <p>}</p>
+                                    <p><strong>Interpretation:</strong> The system state shows that Agent 1 completed research and found 5 articles (now in shared knowledge), Agent 2 is writing the summary (can use the articles), and Agent 3 is waiting to review. The orchestrator can see the full picture and coordinate: Agent 2 can proceed with writing, Agent 3 should wait for Agent 2 to finish. This demonstrates how system state enables coordination.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -171,14 +200,44 @@
                                 \[\text{Coordination}(\text{agents}) = f(\text{communication}, \text{shared\_goals}, \text{conflict\_resolution})\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function determines how effectively multiple agents work together in a multi-agent system.</strong> It combines three critical factors: communication mechanisms, shared objectives, and conflict resolution strategies. The coordination quality directly impacts system performance - good coordination leads to efficient collaboration, while poor coordination causes conflicts and inefficiency.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(\text{communication}\): Communication protocol and message passing mechanism</li>
-                                    <li>\(\text{shared\_goals}\): Common objectives all agents work towards</li>
-                                    <li>\(\text{conflict\_resolution}\): Strategy for handling agent conflicts</li>
-                                    <li>\(f\): Coordination function that determines how agents interact</li>
+                                    <li><strong>communication:</strong> Communication protocol and message passing mechanism - how agents exchange information. This includes: message formats (structured data, natural language), communication channels (direct messaging, shared memory, broadcast), protocols (request-response, publish-subscribe, event-driven), and timing (synchronous, asynchronous). Effective communication ensures agents can share information, coordinate actions, and share results.</li>
+                                    <li><strong>shared_goals:</strong> Common objectives all agents work towards - the unified purpose that aligns agent efforts. Shared goals can be: explicit (all agents know the system goal), hierarchical (sub-goals for each agent that contribute to main goal), or emergent (goals that arise from agent interactions). Without shared goals, agents work at cross-purposes.</li>
+                                    <li><strong>conflict_resolution:</strong> Strategy for handling agent conflicts - mechanisms to resolve when agents disagree, compete for resources, or produce contradictory results. Strategies include: priority-based (one agent's decision overrides), voting (majority decides), negotiation (agents reach agreement), or arbitration (orchestrator decides). Effective conflict resolution prevents deadlocks and ensures progress.</li>
+                                    <li><strong>f(...):</strong> Coordination function - the algorithm or mechanism that combines communication, shared goals, and conflict resolution to determine how agents interact. This function: routes messages between agents, assigns tasks based on goals, resolves conflicts when they arise, and manages agent interactions. The quality of f determines coordination effectiveness.</li>
                                 </ul>
-                                <p><strong>Interpretation:</strong> Coordination depends on how agents communicate, what goals they share, and how conflicts are resolved. Effective coordination requires all three components.</p>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This coordination function is used throughout multi-agent system operation. It's invoked: (1) when agents need to communicate (determines how messages are passed), (2) when tasks are allocated (ensures alignment with shared goals), (3) when conflicts arise (applies resolution strategy), and (4) when system-level decisions are needed (coordinates agent activities). The coordination function is typically implemented by an orchestrator or coordination layer that manages agent interactions.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Effective coordination is what makes multi-agent systems work. Without proper coordination, agents: work independently without collaboration, duplicate efforts, conflict with each other, and fail to achieve shared goals. The coordination function ensures: agents communicate effectively (information flows), work toward common objectives (aligned efforts), resolve conflicts gracefully (system stability), and collaborate efficiently (better than sum of parts). This is the difference between a chaotic collection of agents and a coordinated multi-agent system.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> 3-agent research system</p>
+                                    <ul>
+                                        <li>communication = "message_bus protocol with structured JSON messages"</li>
+                                        <li>shared_goals = "produce high-quality research summary on quantum computing"</li>
+                                        <li>conflict_resolution = "orchestrator decides based on agent expertise"</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Coordination function evaluates communication → agents can exchange messages via message bus</p>
+                                    <p><strong>Step 2:</strong> Coordination function checks shared goals → all agents aligned on research summary goal</p>
+                                    <p><strong>Step 3:</strong> Coordination function sets up conflict resolution → orchestrator will resolve any conflicts</p>
+                                    <p><strong>Result:</strong> Coordination(agents) = "high" (all components are well-defined)</p>
+                                    <p><strong>System Behavior:</strong></p>
+                                    <ul>
+                                        <li>Agent 1 (researcher) finds articles → sends to message bus</li>
+                                        <li>Agent 2 (writer) receives articles → writes summary → sends to message bus</li>
+                                        <li>Agent 3 (reviewer) receives summary → reviews → sends feedback</li>
+                                        <li>If conflict (e.g., writer and reviewer disagree), orchestrator decides based on expertise</li>
+                                    </ul>
+                                    <p><strong>Interpretation:</strong> The coordination function enabled smooth collaboration: communication allowed information sharing, shared goals kept agents aligned, and conflict resolution handled disagreements. This demonstrates how all three components work together to enable effective multi-agent coordination.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -188,14 +247,42 @@
                                 \[\text{Agent}(T_i) = \arg\max_{A_j \in \mathcal{A}} \text{score}(A_j, T_i)\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function determines which agent should be assigned to a specific task.</strong> It evaluates all available agents against the task requirements, calculates a capability score for each agent, and selects the agent with the highest score. This ensures tasks are assigned to the most capable agents, optimizing system performance.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(T_i\): Task \(i\) to be allocated</li>
-                                    <li>\(A_j\): Agent \(j\) from the set of available agents \(\mathcal{A}\)</li>
-                                    <li>\(\text{score}(A_j, T_i)\): Capability score of agent \(j\) for task \(i\)</li>
-                                    <li>\(\arg\max\): Selects the agent with highest score</li>
+                                    <li><strong>T_i:</strong> Task i to be allocated - a specific subtask or work item that needs to be completed (e.g., "research quantum computing", "write summary", "review document"). Each task has requirements (skills needed, tools required, complexity level) that determine which agents are suitable.</li>
+                                    <li><strong>A_j:</strong> Agent j from the set of available agents \(\mathcal{A}\) - one of the agents in the multi-agent system (e.g., researcher agent, writer agent, reviewer agent). The set \(\mathcal{A}\) includes all agents that are currently available (not busy, not in error state).</li>
+                                    <li><strong>score(A_j, T_i):</strong> Capability score of agent j for task i - a numerical value (typically 0-1) measuring how well-suited agent j is for task i. The score considers: agent's specialized skills (does it have the right expertise?), available tools (can it perform the required actions?), current workload (is it too busy?), past performance (has it done similar tasks well?), and task-agent match quality (how well does the task align with agent's purpose?). Higher scores indicate better matches.</li>
+                                    <li><strong>\(\arg\max\):</strong> Selects the agent with highest score - finds the agent j that maximizes score(A_j, T_i) across all available agents. This is the optimization step that ensures optimal task allocation.</li>
+                                    <li><strong>Agent(T_i):</strong> The selected agent - the agent assigned to task T_i. This agent will receive the task and execute it.</li>
                                 </ul>
-                                <p><strong>Interpretation:</strong> Each task is assigned to the agent best suited for it, based on a scoring function that evaluates agent capabilities against task requirements.</p>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This function is called by the orchestrator when a new task needs to be assigned. The process: (1) task T_i arrives (from task decomposition or user request), (2) orchestrator evaluates all available agents in \(\mathcal{A}\), (3) calculates score(A_j, T_i) for each agent, (4) selects agent with maximum score, (5) assigns task to that agent. This happens whenever new work needs to be distributed in the multi-agent system.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Optimal task allocation is crucial for multi-agent system efficiency. Assigning tasks to the wrong agents leads to: poor quality results (agent lacks required skills), slow completion (agent not optimized for task type), resource waste (capable agents idle while wrong agents struggle), and system inefficiency (tasks take longer, cost more). By selecting the best agent for each task, the system maximizes: quality (right expertise for each task), speed (agents work on tasks they're good at), efficiency (resources used optimally), and overall system performance (tasks completed faster and better).</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong></p>
+                                    <ul>
+                                        <li>T_i = "Write a 500-word summary of quantum computing research"</li>
+                                        <li>\(\mathcal{A}\) = {researcher_agent, writer_agent, reviewer_agent, calculator_agent}</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Calculate score(A_j, T_i) for each agent:</p>
+                                    <ul>
+                                        <li>score(researcher_agent, T_i) = 0.3 (can research but not specialized for writing)</li>
+                                        <li>score(writer_agent, T_i) = 0.95 (highly specialized for writing tasks)</li>
+                                        <li>score(reviewer_agent, T_i) = 0.4 (can review but not primary writer)</li>
+                                        <li>score(calculator_agent, T_i) = 0.05 (not relevant for writing task)</li>
+                                    </ul>
+                                    <p><strong>Step 2:</strong> Find maximum: max score = 0.95</p>
+                                    <p><strong>Result:</strong> Agent(T_i) = writer_agent (score = 0.95)</p>
+                                    <p><strong>Interpretation:</strong> The task allocation correctly identified writer_agent as the best choice for a writing task. The high score (0.95) reflects that this agent is specialized for writing, has the right tools (text generation, formatting), and is well-suited for the task. This demonstrates how optimal task allocation improves system efficiency by matching tasks to agent capabilities.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -205,14 +292,39 @@
                                 \[\text{Efficiency} = \frac{\text{Successful\_Communications}}{\text{Total\_Communications}} \times \frac{\text{Useful\_Information}}{\text{Total\_Information}}\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula calculates how efficiently agents communicate in a multi-agent system.</strong> It combines two factors: (1) delivery success rate (how many messages are successfully delivered and understood), and (2) information relevance (how much of the communicated information is actually useful for achieving goals). High efficiency means agents communicate effectively with minimal waste.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(\text{Successful\_Communications}\): Number of messages successfully delivered and understood</li>
-                                    <li>\(\text{Total\_Communications}\): Total number of messages sent</li>
-                                    <li>\(\text{Useful\_Information}\): Information that contributes to goal achievement</li>
-                                    <li>\(\text{Total\_Information}\): All information exchanged</li>
+                                    <li><strong>Successful_Communications:</strong> Number of messages successfully delivered and understood - messages that: reached their destination, were parsed correctly, were understood by the recipient agent, and led to appropriate actions. Failed communications include: lost messages, parsing errors, misunderstandings, or messages that were ignored.</li>
+                                    <li><strong>Total_Communications:</strong> Total number of messages sent - all communication attempts including both successful and failed ones. This is the denominator for delivery success rate.</li>
+                                    <li><strong>Useful_Information:</strong> Information that contributes to goal achievement - the portion of communicated data that: helps agents make better decisions, enables task completion, provides relevant context, or advances toward system goals. Useful information is actionable and relevant.</li>
+                                    <li><strong>Total_Information:</strong> All information exchanged - the complete content of all messages including both useful information and noise (irrelevant data, redundant information, errors, or unnecessary details). This is the denominator for information relevance.</li>
+                                    <li><strong>Efficiency:</strong> Combined efficiency score (0-1) - the product of delivery success rate and information relevance. Higher efficiency (closer to 1) means: most messages are delivered successfully, and most information is useful. Lower efficiency indicates: communication failures, or too much noise in messages.</li>
                                 </ul>
-                                <p><strong>Interpretation:</strong> Communication efficiency measures both delivery success and information relevance. High efficiency means agents communicate effectively with minimal noise.</p>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This efficiency metric is calculated periodically to monitor multi-agent system health. It's used to: (1) evaluate communication protocols (are messages getting through?), (2) optimize message content (reduce noise, increase relevance), (3) identify communication bottlenecks (low delivery rates indicate problems), (4) improve agent coordination (better communication = better coordination), and (5) system tuning (adjust protocols to improve efficiency). This is a key performance indicator for multi-agent systems.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Communication efficiency directly impacts multi-agent system performance. Inefficient communication leads to: wasted resources (agents sending useless messages), delays (failed messages need retries), confusion (agents don't get needed information), and poor coordination (agents can't collaborate effectively). High efficiency ensures: agents get the information they need quickly, system resources aren't wasted on noise, coordination happens smoothly, and the system performs optimally. This metric helps identify and fix communication problems before they impact system performance.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> Multi-agent system over 1 hour</p>
+                                    <ul>
+                                        <li>Total_Communications = 100 messages sent</li>
+                                        <li>Successful_Communications = 95 messages (5 failed due to network issues)</li>
+                                        <li>Total_Information = 50,000 tokens exchanged</li>
+                                        <li>Useful_Information = 40,000 tokens (10,000 tokens were redundant or irrelevant)</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Calculate delivery success rate = 95 / 100 = 0.95</p>
+                                    <p><strong>Step 2:</strong> Calculate information relevance = 40,000 / 50,000 = 0.80</p>
+                                    <p><strong>Step 3:</strong> Calculate efficiency = 0.95 × 0.80 = <strong>0.76</strong></p>
+                                    <p><strong>Result:</strong> Efficiency = 0.76 (76%)</p>
+                                    <p><strong>Interpretation:</strong> The system has good delivery success (95%) but could improve information relevance (80% useful). The overall efficiency of 76% indicates room for improvement - reducing redundant information could increase efficiency to 0.95 × 1.0 = 0.95 (95%). This demonstrates how the efficiency metric helps identify areas for optimization (in this case, reducing message noise).</p>
+                                </div>
                             </div>
                         </div>
 
@@ -222,14 +334,40 @@
                                 \[T_{\text{parallel}} = \max_{i=1}^{n} T_i + T_{\text{coordination}}\]
                             </div>
                             <div class="formula-explanation">
-                                <h5>Where:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula calculates the total time required for parallel agent execution.</strong> It shows that parallel execution time is determined by the slowest agent (the bottleneck) plus any coordination overhead. This helps understand the performance benefits and limitations of parallel multi-agent systems.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li>\(T_{\text{parallel}}\): Total time for parallel execution</li>
-                                    <li>\(T_i\): Time for agent \(i\) to complete its task</li>
-                                    <li>\(n\): Number of agents working in parallel</li>
-                                    <li>\(T_{\text{coordination}}\): Overhead time for coordination</li>
+                                    <li><strong>T_parallel:</strong> Total time for parallel execution - the wall-clock time from when parallel tasks start until all agents complete and results are coordinated. This is the actual time a user experiences when using a parallel multi-agent system.</li>
+                                    <li><strong>T_i:</strong> Time for agent i to complete its task - the execution time for each individual agent working in parallel (e.g., researcher takes 2 minutes, writer takes 3 minutes, reviewer takes 1 minute). Each agent works independently on its assigned task.</li>
+                                    <li><strong>max_{i=1}^{n} T_i:</strong> Maximum of all agent completion times - the time taken by the slowest agent. This is the bottleneck that determines minimum parallel execution time. Even if other agents finish faster, the system must wait for the slowest one.</li>
+                                    <li><strong>n:</strong> Number of agents working in parallel - the count of agents executing tasks simultaneously (e.g., 3 agents working on different parts of a research task). More agents can mean faster completion, but only if tasks are well-balanced.</li>
+                                    <li><strong>T_coordination:</strong> Overhead time for coordination - additional time spent on: task allocation, result aggregation, conflict resolution, state synchronization, and system management. This overhead is the "cost" of coordination - it adds time but enables parallel execution.</li>
                                 </ul>
-                                <p><strong>Interpretation:</strong> Parallel execution time is determined by the slowest agent plus coordination overhead. Effective parallelization requires balanced task distribution and efficient coordination.</p>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This formula is used to: (1) estimate system performance (how long will parallel execution take?), (2) identify bottlenecks (which agent is slowing things down?), (3) optimize task distribution (balance workloads to minimize max T_i), (4) evaluate coordination efficiency (minimize T_coordination overhead), and (5) compare parallel vs sequential execution (is parallelization worth it?). This helps system designers optimize multi-agent performance.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Understanding parallel performance is crucial for system design. The formula reveals that: (1) parallel speedup is limited by the slowest agent (can't go faster than the bottleneck), (2) coordination overhead reduces benefits (too much overhead negates parallelization gains), (3) task balancing is critical (uneven distribution wastes parallelization), and (4) there's a trade-off (more agents = more coordination overhead). This helps designers: balance workloads, minimize coordination overhead, choose optimal number of agents, and set realistic performance expectations. Without this understanding, systems may be over-engineered (too many agents) or under-optimized (poor task distribution).</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong> 3-agent parallel research system</p>
+                                    <ul>
+                                        <li>Agent 1 (researcher): T_1 = 2 minutes</li>
+                                        <li>Agent 2 (writer): T_2 = 3 minutes</li>
+                                        <li>Agent 3 (reviewer): T_3 = 1 minute</li>
+                                        <li>T_coordination = 0.5 minutes (task allocation, result aggregation)</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> Find maximum agent time: max(T_1, T_2, T_3) = max(2, 3, 1) = 3 minutes</p>
+                                    <p><strong>Step 2:</strong> Add coordination overhead: 3 + 0.5 = 3.5 minutes</p>
+                                    <p><strong>Result:</strong> T_parallel = 3.5 minutes</p>
+                                    <p><strong>Comparison:</strong> Sequential execution would take T_1 + T_2 + T_3 = 2 + 3 + 1 = 6 minutes</p>
+                                    <p><strong>Speedup:</strong> 6 / 3.5 = 1.71x faster with parallelization</p>
+                                    <p><strong>Interpretation:</strong> Parallel execution (3.5 min) is faster than sequential (6 min), but the speedup (1.71x) is less than ideal (3x) because Agent 2 is the bottleneck (3 min). The coordination overhead (0.5 min) is small relative to task times, so parallelization is beneficial. To improve further, could: balance workloads (give Agent 2 less work), optimize Agent 2's task, or reduce coordination overhead. This demonstrates how the formula helps identify optimization opportunities.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

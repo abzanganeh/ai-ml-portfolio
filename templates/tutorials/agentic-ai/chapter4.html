@@ -296,13 +296,42 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>ReAct loop transitions:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula describes how the ReAct (Reasoning + Acting) framework transitions from one step to the next.</strong> It shows how explicit reasoning thoughts, actions taken, and observations received evolve over time, with each observation informing the next reasoning step. This creates a transparent, adaptive decision-making loop.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>thought_t:</strong> Reasoning at step t</li>
-                                    <li><strong>action_t:</strong> Action taken at step t</li>
-                                    <li><strong>observation_t:</strong> Result observed at step t</li>
-                                    <li><strong>→:</strong> Next step uses observation to inform thought</li>
+                                    <li><strong>thought_t:</strong> Reasoning at step t - the explicit reasoning text the agent writes before taking action at step t. This is the agent's "thinking out loud" - it explains what it's considering, why it's choosing a particular action, and what it expects to learn. Thoughts are written in natural language and make the agent's reasoning transparent.</li>
+                                    <li><strong>action_t:</strong> Action taken at step t - the specific action the agent executes based on thought_t (e.g., "call get_weather(city='New York')", "search_web(query='quantum computing')", "Final Answer: ..."). Actions are concrete steps that move toward the goal.</li>
+                                    <li><strong>observation_t:</strong> Result observed at step t - what happened as a result of action_t (tool output, error message, environmental change). Observations provide feedback about whether the action was successful and what information was gained.</li>
+                                    <li><strong>→ (transition):</strong> The arrow represents the transition mechanism - observation_t is used to inform thought_{t+1}. The agent reads the observation, reasons about what it means, and uses it to decide the next action. This creates a feedback loop where actions inform future reasoning.</li>
+                                    <li><strong>thought_{t+1}:</strong> Reasoning at step t+1 - the next reasoning step that incorporates observation_t. The agent explicitly writes how the observation changes its understanding and what it will do next.</li>
+                                    <li><strong>action_{t+1}, observation_{t+1}:</strong> The cycle continues with the next action and observation, building on previous steps until the goal is achieved.</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This transition happens at every step of the ReAct loop. The agent: (1) writes a thought explaining its reasoning, (2) takes an action based on that thought, (3) observes the result, (4) uses the observation to inform the next thought, and (5) repeats until the goal is achieved or max_steps is reached. This creates a transparent, step-by-step reasoning process that's easy to understand and debug.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>The ReAct state transition enables transparent, adaptive reasoning. By explicitly writing thoughts, agents make their reasoning process visible and understandable. By using observations to inform next thoughts, agents can adapt their strategy based on what they learn. This is superior to "black box" agents that don't show reasoning - ReAct agents can explain their decisions, handle errors gracefully (by reasoning about what went wrong), and adapt their approach when initial actions don't work. The explicit thought-action-observation loop is what makes ReAct effective for complex, multi-step tasks.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Step t:</strong></p>
+                                    <ul>
+                                        <li>thought_t = "I need to find the weather for New York. I should use the get_weather tool."</li>
+                                        <li>action_t = "call get_weather(city='New York')"</li>
+                                        <li>observation_t = {"temp": 22, "condition": "sunny"}</li>
+                                    </ul>
+                                    <p><strong>Transition:</strong> observation_t informs next reasoning</p>
+                                    <p><strong>Step t+1:</strong></p>
+                                    <ul>
+                                        <li>thought_{t+1} = "I received the weather data: 22°C and sunny. The user asked about the weather, so I have enough information. I should provide a clear answer."</li>
+                                        <li>action_{t+1} = "Final Answer: The weather in New York is 22°C (72°F) and sunny."</li>
+                                        <li>observation_{t+1} = "Task complete"</li>
+                                    </ul>
+                                    <p><strong>Interpretation:</strong> The observation from step t (weather data) directly informed the thought at step t+1 (agent recognized it has enough info). The agent then took the final action (provided answer) and completed the task. This demonstrates how observations feed into reasoning, creating an adaptive loop that enables effective problem-solving.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -314,13 +343,48 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>LLM decides action based on:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This function determines what action the ReAct agent should take at step t.</strong> It uses the LLM to process the original question, current reasoning thought, history of previous steps, and available tools, then generates the next action. This is the decision-making core of the ReAct framework.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>question:</strong> Original user question</li>
-                                    <li><strong>thought_t:</strong> Current reasoning</li>
-                                    <li><strong>history_{&lt;t}:</strong> Previous thoughts, actions, observations</li>
-                                    <li><strong>available_tools:</strong> Tools the agent can use</li>
+                                    <li><strong>question:</strong> Original user question - the initial request or query that started the task (e.g., "What's the weather in New York?", "Research quantum computing"). This provides the goal and context that guides all decisions.</li>
+                                    <li><strong>thought_t:</strong> Current reasoning - the explicit reasoning text the agent wrote at step t, explaining what it's thinking and why it's considering certain actions. This makes the agent's reasoning process transparent and helps the LLM understand the current reasoning state.</li>
+                                    <li><strong>history_{<t}:</strong> Previous thoughts, actions, and observations - the complete sequence of (thought, action, observation) tuples from steps 1 through t-1. This history provides context about: what the agent has already tried, what it learned from previous steps, what worked and what didn't, and the progression of reasoning. History enables the agent to avoid repeating mistakes and build on previous insights.</li>
+                                    <li><strong>available_tools:</strong> Tools the agent can use - the set of functions, APIs, or capabilities available (e.g., ["get_weather", "search_web", "calculate"]). The LLM uses tool descriptions to determine which tool (if any) to use, or whether to provide a final answer.</li>
+                                    <li><strong>LLM(...):</strong> Language model processing - the LLM takes all inputs and generates the next action. The LLM: understands the question, processes the current thought, reviews the history to understand what's been tried, evaluates available tools, and decides the best next action (use a tool, provide final answer, or ask for clarification).</li>
+                                    <li><strong>action_t:</strong> Generated action - the output decision, which could be: a tool call with parameters, a "Final Answer" with the response, or a clarification question. The action is then executed, and its result becomes observation_t.</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This function is called at every step of the ReAct loop, specifically in the "Reason" phase. After writing thought_t, the agent uses this function to decide what action to take. The decision is based on: the original goal (question), current understanding (thought_t), past experience (history), and available capabilities (tools). This happens repeatedly until the agent decides to provide a final answer or reaches max_steps.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>This decision function is what makes ReAct effective. By considering the full history, the agent can: learn from previous steps (if a tool failed, try a different approach), build on previous insights (use information from earlier observations), avoid repetition (don't try the same failed action), and make informed decisions (understand the full context before acting). The explicit thought input makes reasoning transparent, and the history input enables adaptive behavior. Without this comprehensive decision-making, agents would make decisions in isolation without learning from experience.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Given:</strong></p>
+                                    <ul>
+                                        <li>question = "What's the weather in New York and should I bring an umbrella?"</li>
+                                        <li>thought_t = "I need to get weather data for New York first, then determine if an umbrella is needed based on rain probability."</li>
+                                        <li>history_{<t} = [] (first step, no history yet)</li>
+                                        <li>available_tools = ["get_weather", "search_web"]</li>
+                                    </ul>
+                                    <p><strong>Step 1:</strong> LLM processes inputs - understands it needs weather data</p>
+                                    <p><strong>Step 2:</strong> LLM evaluates tools - get_weather is most appropriate</p>
+                                    <p><strong>Step 3:</strong> LLM generates action</p>
+                                    <p><strong>Result:</strong> action_t = "call get_weather(city='New York')"</p>
+                                    <p><strong>After observation:</strong> observation_t = {"temp": 22, "condition": "sunny", "rain_prob": 10%}</p>
+                                    <p><strong>Next step (t+1):</strong></p>
+                                    <ul>
+                                        <li>thought_{t+1} = "I got the weather: 22°C, sunny, 10% rain probability. Since rain probability is only 10%, an umbrella is not needed."</li>
+                                        <li>history_{<t+1} = [(thought_t, action_t, observation_t)]</li>
+                                        <li>LLM processes: sees weather data, understands question about umbrella, has enough info</li>
+                                        <li>action_{t+1} = "Final Answer: The weather in New York is 22°C and sunny with only 10% chance of rain. You don't need an umbrella."</li>
+                                    </ul>
+                                    <p><strong>Interpretation:</strong> The decision function used the question, current thought, and available tools to select the weather tool. After receiving the observation, the next decision used the history (previous step's result) to determine it had enough information and could provide the final answer. This demonstrates how history enables the agent to build on previous steps and make informed decisions.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -328,15 +392,54 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             <h4>ReAct Termination Condition</h4>
                             
                             <div class="formula-display">
-                                \[\text{Terminate if: } \text{action}_t = \text{"Final Answer"} \text{ OR } \text{max\_steps} \text{ reached}\]
+                                \[\text{Terminate if: } \text{action}_t = \text{"Final Answer"} \text{ OR } t \geq \text{max\_steps}\]
                             </div>
                             
                             <div class="formula-explanation">
-                                <h5>ReAct loop ends when:</h5>
+                                <h4>What This Measures</h4>
+                                <p><strong>This formula defines when the ReAct loop should stop executing.</strong> It specifies two termination conditions: (1) the agent decides it has enough information and provides a final answer, or (2) a maximum step limit is reached to prevent infinite loops. This ensures the agent completes tasks efficiently while avoiding endless execution.</p>
+                                
+                                <h4>Breaking It Down</h4>
                                 <ul>
-                                    <li><strong>Final Answer:</strong> Agent decides it has enough information</li>
-                                    <li><strong>max_steps:</strong> Safety limit to prevent infinite loops</li>
+                                    <li><strong>action_t = "Final Answer":</strong> The agent explicitly decides to terminate by outputting "Final Answer" followed by the response. This happens when the agent's reasoning determines it has: gathered sufficient information to answer the question, completed all necessary steps, or reached a point where it cannot proceed further (and provides what it knows). The "Final Answer" action is a special action type that signals completion.</li>
+                                    <li><strong>t ≥ max_steps:</strong> A safety mechanism that terminates the loop if the number of steps (t) reaches or exceeds a maximum limit (max_steps, typically 10-20 steps). This prevents infinite loops that could occur if: the agent gets stuck in a cycle, cannot find a solution, or keeps trying actions that don't lead to completion. When max_steps is reached, the agent typically returns the best answer it has so far or indicates it couldn't complete the task.</li>
+                                    <li><strong>Terminate:</strong> When either condition is met, the ReAct loop stops, and the agent returns its final response (either the "Final Answer" content or a timeout message if max_steps was reached).</li>
                                 </ul>
+                                
+                                <h4>Where This Is Used</h4>
+                                <p>This termination condition is checked after every action in the ReAct loop. After executing action_t and receiving observation_t, the agent checks: (1) if action_t was "Final Answer" → terminate and return answer, (2) if t ≥ max_steps → terminate and return best answer or timeout message, (3) otherwise → continue to next step (t+1). This check happens in the loop control logic that manages ReAct execution.</p>
+                                
+                                <h4>Why This Matters</h4>
+                                <p>Proper termination is essential for agent efficiency and safety. Without termination conditions, agents could: run indefinitely (wasting resources), get stuck in loops (repeating the same actions), or never provide answers (always trying more actions). The "Final Answer" condition enables agents to recognize when they've completed the task and stop efficiently. The max_steps condition provides a safety net to prevent infinite execution, ensuring agents always complete (even if with a timeout message) rather than running forever. This is crucial for production systems where resource limits and user experience matter.</p>
+                                
+                                <div class="example-box">
+                                    <h5>Example Calculation</h5>
+                                    <p><strong>Scenario 1: Normal Termination</strong></p>
+                                    <ul>
+                                        <li>t = 2 (second step)</li>
+                                        <li>action_2 = "Final Answer: The weather in New York is 22°C and sunny. You don't need an umbrella."</li>
+                                        <li>max_steps = 10</li>
+                                        <li>Check: action_2 = "Final Answer" → <strong>Terminate</strong></li>
+                                        <li>Result: Loop stops, returns the final answer</li>
+                                    </ul>
+                                    <p><strong>Scenario 2: Max Steps Termination</strong></p>
+                                    <ul>
+                                        <li>t = 10</li>
+                                        <li>action_10 = "call search_web(query='...')" (still trying to find answer)</li>
+                                        <li>max_steps = 10</li>
+                                        <li>Check: t (10) ≥ max_steps (10) → <strong>Terminate</strong></li>
+                                        <li>Result: Loop stops, returns "Reached maximum steps. Best answer so far: [partial information]"</li>
+                                    </ul>
+                                    <p><strong>Scenario 3: Continue</strong></p>
+                                    <ul>
+                                        <li>t = 3</li>
+                                        <li>action_3 = "call get_weather(city='Boston')" (not Final Answer)</li>
+                                        <li>max_steps = 10</li>
+                                        <li>Check: action_3 ≠ "Final Answer" AND t (3) < max_steps (10) → <strong>Continue</strong></li>
+                                        <li>Result: Loop continues to step 4</li>
+                                    </ul>
+                                    <p><strong>Interpretation:</strong> Scenario 1 shows normal completion - the agent recognized it had enough information and provided a final answer. Scenario 2 shows safety termination - the agent reached the step limit and stopped to prevent infinite execution. Scenario 3 shows the loop continuing when neither termination condition is met. This demonstrates how termination conditions ensure efficient completion while preventing infinite loops.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
