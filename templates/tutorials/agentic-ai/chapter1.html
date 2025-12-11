@@ -364,10 +364,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function represents the core decision-making process of an AI agent.</strong> It takes the current environment state, the agent's goal, its memory of past experiences, and available tools, then outputs the action the agent should take next. This is the fundamental equation that drives autonomous agent behavior.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>state:</strong> Current environment state (observations) - what the agent perceives right now, including user input, tool results, and environmental conditions. This represents the agent's current understanding of its situation.</li>
                                     <li><strong>goal:</strong> Desired outcome or task - the objective the agent is trying to achieve, which guides all decision-making. The goal acts as a north star, directing the agent's actions toward a specific objective.</li>
@@ -376,10 +376,10 @@
                                     <li><strong>action:</strong> Selected action to take - the output decision, which could be using a tool, generating a response, asking for clarification, or updating memory. This is the agent's chosen next step.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called at every step of the agent's decision loop. Whenever the agent needs to decide what to do next (after observing the environment, after receiving tool results, after reasoning about the situation), this function is invoked to select the optimal action. It's the heart of the agent's autonomous decision-making capability.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>This formula encapsulates the essence of agent autonomy. Unlike traditional systems that follow fixed rules, agents use this function to dynamically decide actions based on context, making them adaptable and intelligent. The quality of this decision function directly determines agent performance - a well-designed agent function leads to effective, goal-oriented behavior, while a poor one results in inefficient or incorrect actions.</p>
                                 
                                 <div class="example-box">
@@ -409,10 +409,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function calculates the total utility (value) of taking a specific action.</strong> It combines immediate rewards, execution costs, and expected future value to determine which action will be most beneficial. The agent selects the action with the highest utility score, enabling optimal decision-making that balances multiple factors.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>\(R(\text{state}, \text{action})\):</strong> Immediate benefit of action - the reward or value gained right now from taking this action. Examples include: successfully answering a user question (high reward), completing a subtask (moderate reward), making progress toward the goal (positive reward), or providing incorrect information (negative reward). This term captures the immediate impact of the action.</li>
                                     <li><strong>\(C(\text{action})\):</strong> Cost of executing action - resources consumed including time (latency), tokens (API costs), API calls (rate limits, costs), and computational resources. This is subtracted because costs reduce utility - an expensive action must provide sufficient value to justify its cost.</li>
@@ -420,10 +420,10 @@
                                     <li><strong>Agent chooses:</strong> \[\text{action}^* = \underset{\text{action}}{\arg\max} \, U(\text{action})\] - The agent evaluates utility for all possible actions and selects the one that maximizes U. This is the optimization step that makes agents intelligent rather than random.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This utility function is evaluated for every possible action the agent can take during the "Reason" step of the agent loop. In practice, agents use LLM reasoning to estimate these values (the LLM considers the context and predicts rewards/costs), or use learned models to predict rewards and costs based on historical data. The action with maximum utility is then executed in the "Act" step.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>This formula enables intelligent trade-offs that humans make naturally. An action might have high immediate reward but also high cost, or it might lead to a better future state. By combining all factors (immediate reward, cost, future value), agents can make optimal decisions that balance short-term and long-term goals, efficiency and effectiveness. Without this utility function, agents would make decisions based on single factors (e.g., always choose cheapest or always choose highest reward), leading to suboptimal behavior.</p>
                                 
                                 <div class="example-box">
@@ -472,10 +472,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function describes how the agent's internal state evolves over time.</strong> After taking an action and observing the result, the agent updates its understanding of the world, its progress toward the goal, and its knowledge base. This state evolution enables the agent to learn and adapt, making it capable of handling dynamic environments and improving over time.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>state_t:</strong> Current state at time t - the agent's complete understanding at this moment, including what it knows (memory contents), what it's trying to do (current goal), what it has done (action history), and the current environment (observations, tool results, user input). This is the agent's "mental model" at time t.</li>
                                     <li><strong>action_t:</strong> Action taken at time t - the specific action the agent executed (e.g., called a tool, generated text, updated memory, asked for clarification). This is the decision made by the agent function at time t.</li>
@@ -483,10 +483,10 @@
                                     <li><strong>state_{t+1}:</strong> Updated state after action - the new state incorporating the action and its result. The Update function transforms state_t by: adding observation_t to memory, updating progress tracking, modifying beliefs/knowledge, adjusting goals if needed, and preparing for the next decision cycle. This becomes the new state_t for the next iteration.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This update happens after every action in the agent loop, specifically in the transition from "Act" to the next "Observe" step. The Update function typically: (1) adds the observation to memory (both short-term buffer and potentially long-term store if important), (2) updates progress tracking (how close are we to the goal?), (3) modifies beliefs/knowledge based on new information (what did we learn?), (4) adjusts the goal or plan if needed (is the goal still valid? should we change strategy?), and (5) prepares the state for the next decision (what information is most relevant now?).</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>State updates enable agents to be adaptive and learn from experience. Without proper state updates, agents would make the same decisions repeatedly without learning, leading to ineffective behavior. This function ensures agents incorporate new information, track progress toward goals, evolve their understanding based on outcomes, and adapt their strategies. This is essential for autonomous behavior - an agent that doesn't update its state based on actions and observations cannot learn, adapt, or improve, making it no better than a static rule-based system.</p>
                                 
                                 <div class="example-box">

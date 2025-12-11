@@ -328,10 +328,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This formula represents the complete internal state of an AI agent at any given moment.</strong> It captures all the information the agent needs to make decisions: what it remembers, what it can do, what it's trying to achieve, and what it has done. This state representation is the foundation for agent decision-making.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>M (Memory):</strong> Memory system containing both short-term (recent conversation turns, immediate context buffer) and long-term (persistent facts, learned patterns, user preferences stored in vector databases or knowledge graphs). Memory enables the agent to maintain context across interactions and learn from experience.</li>
                                     <li><strong>T (Tools):</strong> Available tools - the set of functions, APIs, or capabilities the agent can use to interact with external systems. This includes tool definitions, descriptions, parameters, and execution functions. Tools extend the agent's capabilities beyond text generation.</li>
@@ -339,10 +339,10 @@
                                     <li><strong>H (History):</strong> History of actions - a record of what the agent has done, including past actions, their results, and the sequence of decisions. History helps the agent avoid repeating mistakes, track progress, and understand the context of the current situation.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This state representation is used throughout the agent's operation. It's passed to the decision function to determine the next action, updated after each action based on observations, stored persistently for long-term memory, and used to track progress toward goals. The state is the agent's "memory" of its current situation and past experiences.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>A comprehensive state representation is essential for intelligent agent behavior. Without proper state tracking, agents cannot maintain context, learn from experience, or make informed decisions. This formula ensures all critical information (memory, capabilities, objectives, history) is captured and available for decision-making, enabling agents to operate autonomously and adaptively.</p>
                                 
                                 <div class="example-box">
@@ -368,10 +368,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function determines which tool the agent should use from its available toolset.</strong> It calculates the probability that each tool is appropriate given the current state and goal, then selects the tool with the highest probability. This enables intelligent tool selection based on context rather than random or fixed choices.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>T:</strong> Set of available tools - all functions, APIs, or capabilities the agent can use (e.g., ["get_weather", "search_web", "calculate", "send_email"]). The agent evaluates each tool in this set.</li>
                                     <li><strong>state:</strong> Current agent state - includes memory, history, current observations, and any relevant context. The state provides information about what the agent knows and what situation it's in.</li>
@@ -380,10 +380,10 @@
                                     <li><strong>t^*:</strong> Selected tool - the tool with maximum probability. This is the optimal tool choice that maximizes the likelihood of successfully completing the goal.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called during the "Reason" step of the agent loop when the agent determines it needs to use a tool. The agent evaluates all available tools, calculates their appropriateness probabilities, and selects the best one. This happens before tool execution, ensuring the agent uses the most suitable tool for the current situation.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Intelligent tool selection is crucial for agent effectiveness. Using the wrong tool wastes resources and fails to achieve goals, while using the right tool efficiently accomplishes tasks. This formula enables agents to make context-aware tool choices rather than random selection, dramatically improving success rates and efficiency. Without proper tool selection, agents would either use tools inappropriately or need to try multiple tools, leading to wasted resources and poor performance.</p>
                                 
                                 <div class="example-box">
@@ -416,10 +416,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function describes how the agent's memory system evolves over time.</strong> It takes the current memory, the action that was taken, the observation that resulted, and an importance score, then updates the memory accordingly. This enables agents to learn from experience and maintain relevant information for future decisions.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>M_t:</strong> Memory at time t - the current state of the agent's memory system, including short-term buffer (recent conversation turns, immediate context) and long-term store (persistent facts, learned patterns, important information). This is the agent's knowledge base before the update.</li>
                                     <li><strong>action_t:</strong> Action taken at time t - the specific action the agent executed (e.g., called a tool, generated text, asked a question). The action provides context about what the agent was trying to do.</li>
@@ -428,10 +428,10 @@
                                     <li><strong>M_{t+1}:</strong> Updated memory after incorporating the new information. The Update function: adds observation to short-term buffer, evaluates importance to decide if it should be stored long-term, updates existing memories if new information contradicts or enhances them, and manages memory capacity (may remove low-importance old information).</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This update happens after every action in the agent loop, specifically after observing the result of an action. The memory update is a critical step that ensures the agent learns from experience. It's used to: maintain conversation context (short-term), store important facts for future use (long-term), update beliefs when new information contradicts old information, and manage memory capacity by prioritizing important information.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Effective memory updates are essential for agent learning and adaptation. Without proper memory updates, agents cannot learn from experience, maintain context across conversations, or adapt their behavior based on outcomes. This function enables agents to: remember user preferences, learn from successful and failed actions, maintain conversation context, and build a knowledge base over time. This is what makes agents "intelligent" rather than just reactive - they learn and improve.</p>
                                 
                                 <div class="example-box">
@@ -461,10 +461,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function generates a sequence of actions (a plan) to achieve a goal.</strong> It takes the desired outcome, current state, and any constraints, then produces an ordered sequence of actions that, when executed, should accomplish the goal. This enables agents to handle complex, multi-step tasks by breaking them down into manageable steps.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>goal:</strong> Desired outcome - the objective the agent wants to achieve (e.g., "Research quantum computing and write a summary", "Help user book a flight"). The goal defines what success looks like and guides the planning process.</li>
                                     <li><strong>state:</strong> Current state - the agent's current understanding including memory, available tools, and current situation. The state tells the planner what resources and information are available, and what the starting point is.</li>
@@ -472,10 +472,10 @@
                                     <li><strong>plan:</strong> Sequence of actions [action_1, action_2, ..., action_n] - an ordered list of steps to execute. Each action in the sequence builds on previous actions, with later actions depending on results from earlier ones. The plan provides a roadmap from current state to goal.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called when the agent receives a complex goal that requires multiple steps. The planner analyzes the goal, evaluates the current state, considers constraints, and generates a step-by-step plan. The plan is then executed sequentially, with the agent following each step and adapting if needed. Planning typically happens at the start of a task, though plans can be revised if circumstances change.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Planning enables agents to handle complex tasks that require multiple coordinated actions. Without planning, agents would make decisions reactively, one step at a time, without considering the full path to the goal. This leads to inefficient behavior, missed dependencies, and failure on complex tasks. Planning allows agents to: break down complex goals into manageable steps, identify dependencies between actions, optimize the sequence of actions, and anticipate potential issues. This is what distinguishes planning agents from simple reactive agents.</p>
                                 
                                 <div class="example-box">

@@ -374,10 +374,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This formula calculates the probability that a specific tool is the right choice for a given user request.</strong> It uses semantic similarity between the request and tool descriptions to determine how well each tool matches the user's need, then converts similarity scores into probabilities using softmax. The tool with highest probability is selected.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>request:</strong> User's request - the natural language query or instruction from the user (e.g., "What's the weather in New York?", "Calculate 15 * 23", "Search for quantum computing articles"). This is what the agent needs to fulfill.</li>
                                     <li><strong>tool.description:</strong> Tool description - a text description of what each tool does, its purpose, and when to use it (e.g., "Get current weather for a city", "Perform mathematical calculations", "Search the web for information"). Descriptions are typically provided to the LLM to help it understand tool capabilities.</li>
@@ -386,10 +386,10 @@
                                     <li><strong>P(tool = t | ...):</strong> Final probability - the probability that tool t is the correct choice. The agent selects the tool with maximum probability.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This probability calculation happens during the "Reason" step when the agent determines it needs to use a tool. The agent: (1) embeds the user request and all tool descriptions, (2) calculates similarity scores between request and each tool, (3) applies softmax to get probabilities, (4) selects the tool with highest probability. This enables intelligent tool selection based on semantic understanding rather than keyword matching.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Semantic similarity-based tool selection is crucial for handling natural language requests. Users don't always use exact keywords that match tool names - they might say "weather" when the tool is called "get_weather", or "calculate" when the tool is "math_calculator". By using semantic similarity, agents can match user intent to tool capabilities even when wording differs. The softmax ensures probabilities are properly normalized and the selection is probabilistic (allowing for uncertainty handling), making tool selection robust and intelligent.</p>
                                 
                                 <div class="example-box">
@@ -428,10 +428,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function executes a tool with given parameters and returns either a successful result or an error message.</strong> It encapsulates the actual execution of tool functions, handling both success and failure cases. This is the mechanism by which agents interact with external systems and perform actions beyond text generation.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>tool:</strong> The tool function to execute - the actual function, API call, or capability that will be invoked (e.g., get_weather function, web search API, calculator function). This is the executable code that performs the action.</li>
                                     <li><strong>parameters:</strong> Input parameters for the tool - the arguments needed to execute the tool (e.g., {"city": "New York", "unit": "Celsius"} for weather tool, {"query": "quantum computing"} for search tool). Parameters are typically extracted from the user request by the LLM.</li>
@@ -440,10 +440,10 @@
                                     <li><strong>error case:</strong> If execution fails, the function returns an error message. Failures can occur due to: invalid parameters, API failures, network issues, rate limits, authentication problems, or tool-specific errors. Error messages help the agent understand what went wrong and decide how to proceed (retry, use alternative tool, ask for clarification).</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called during the "Act" step of the agent loop after the agent has selected a tool. The execution happens synchronously (waits for result) or asynchronously (handles result when ready), depending on the tool type. The result (success or error) is then observed by the agent, which uses it to update state and make the next decision.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Tool execution is what enables agents to take actions beyond text generation. Without this function, agents would be limited to generating text based on training data. Tool execution allows agents to: access real-time information (weather APIs, databases), perform computations (calculators, data processing), interact with systems (send emails, update databases), and affect the external world. The error handling is crucial - agents must gracefully handle failures, retry when appropriate, and adapt their behavior when tools don't work as expected. This robustness is essential for production agent systems.</p>
                                 
                                 <div class="example-box">
@@ -480,10 +480,10 @@
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function generates the agent's final response by combining the original user request, tool execution results, and conversation context.</strong> It takes the raw tool output and synthesizes it into a natural language response that addresses the user's question. This is how agents transform tool results into human-readable answers.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>request:</strong> Original user request - the initial question or instruction from the user (e.g., "What's the weather in New York?", "Calculate 15 * 23"). This provides the context of what the user wants to know.</li>
                                     <li><strong>tool_result:</strong> Result from tool execution - the output from the tool that was called (e.g., weather data {"temp": 22, "condition": "sunny"}, calculation result {"answer": 345}, search results [list of articles]). This is the raw data that needs to be interpreted and presented to the user.</li>
@@ -492,10 +492,10 @@
                                     <li><strong>response:</strong> Final generated response - the natural language answer that addresses the user's request using the tool result and context. The response should be: accurate (based on tool result), relevant (addresses the request), coherent (makes sense in context), and helpful (provides value to the user).</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called after tool execution succeeds, during the response generation phase of the agent loop. The agent: (1) receives the tool result, (2) retrieves relevant context from memory, (3) constructs a prompt with request, tool_result, and context, (4) calls the LLM to generate the response, (5) returns the response to the user. This happens in the final step before the agent completes its task.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Tool result integration is what makes agents useful to humans. Raw tool outputs (JSON data, API responses, calculation results) are not user-friendly - they need to be interpreted and presented in natural language. This function enables agents to: transform technical data into understandable responses, incorporate context to make answers relevant and personalized, handle edge cases (errors, missing data) gracefully, and provide explanations along with data. Without proper integration, tool results would be meaningless to users - this function bridges the gap between tool outputs and human understanding.</p>
                                 
                                 <div class="example-box">

@@ -296,10 +296,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This formula describes how the ReAct (Reasoning + Acting) framework transitions from one step to the next.</strong> It shows how explicit reasoning thoughts, actions taken, and observations received evolve over time, with each observation informing the next reasoning step. This creates a transparent, adaptive decision-making loop.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>thought_t:</strong> Reasoning at step t - the explicit reasoning text the agent writes before taking action at step t. This is the agent's "thinking out loud" - it explains what it's considering, why it's choosing a particular action, and what it expects to learn. Thoughts are written in natural language and make the agent's reasoning transparent.</li>
                                     <li><strong>action_t:</strong> Action taken at step t - the specific action the agent executes based on thought_t (e.g., "call get_weather(city='New York')", "search_web(query='quantum computing')", "Final Answer: ..."). Actions are concrete steps that move toward the goal.</li>
@@ -343,10 +343,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This function determines what action the ReAct agent should take at step t.</strong> It uses the LLM to process the original question, current reasoning thought, history of previous steps, and available tools, then generates the next action. This is the decision-making core of the ReAct framework.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>question:</strong> Original user question - the initial request or query that started the task (e.g., "What's the weather in New York?", "Research quantum computing"). This provides the goal and context that guides all decisions.</li>
                                     <li><strong>thought_t:</strong> Current reasoning - the explicit reasoning text the agent wrote at step t, explaining what it's thinking and why it's considering certain actions. This makes the agent's reasoning process transparent and helps the LLM understand the current reasoning state.</li>
@@ -396,10 +396,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                             </div>
                             
                             <div class="formula-explanation">
-                                <h4>What This Measures</h4>
+                                <h5>What This Measures</h5>
                                 <p><strong>This formula defines when the ReAct loop should stop executing.</strong> It specifies two termination conditions: (1) the agent decides it has enough information and provides a final answer, or (2) a maximum step limit is reached to prevent infinite loops. This ensures the agent completes tasks efficiently while avoiding endless execution.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>action_t = "Final Answer":</strong> The agent explicitly decides to terminate by outputting "Final Answer" followed by the response. This happens when the agent's reasoning determines it has: gathered sufficient information to answer the question, completed all necessary steps, or reached a point where it cannot proceed further (and provides what it knows). The "Final Answer" action is a special action type that signals completion.</li>
                                     <li><strong>t ≥ max_steps:</strong> A safety mechanism that terminates the loop if the number of steps (t) reaches or exceeds a maximum limit (max_steps, typically 10-20 steps). This prevents infinite loops that could occur if: the agent gets stuck in a cycle, cannot find a solution, or keeps trying actions that don't lead to completion. When max_steps is reached, the agent typically returns the best answer it has so far or indicates it couldn't complete the task.</li>
