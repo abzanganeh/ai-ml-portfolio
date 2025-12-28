@@ -309,10 +309,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                                     <li><strong>action_{t+1}, observation_{t+1}:</strong> The cycle continues with the next action and observation, building on previous steps until the goal is achieved.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This transition happens at every step of the ReAct loop. The agent: (1) writes a thought explaining its reasoning, (2) takes an action based on that thought, (3) observes the result, (4) uses the observation to inform the next thought, and (5) repeats until the goal is achieved or max_steps is reached. This creates a transparent, step-by-step reasoning process that's easy to understand and debug.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>The ReAct state transition enables transparent, adaptive reasoning. By explicitly writing thoughts, agents make their reasoning process visible and understandable. By using observations to inform next thoughts, agents can adapt their strategy based on what they learn. This is superior to "black box" agents that don't show reasoning - ReAct agents can explain their decisions, handle errors gracefully (by reasoning about what went wrong), and adapt their approach when initial actions don't work. The explicit thought-action-observation loop is what makes ReAct effective for complex, multi-step tasks.</p>
                                 
                                 <div class="example-box">
@@ -356,10 +356,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                                     <li><strong>action_t:</strong> Generated action - the output decision, which could be: a tool call with parameters, a "Final Answer" with the response, or a clarification question. The action is then executed, and its result becomes observation_t.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This function is called at every step of the ReAct loop, specifically in the "Reason" phase. After writing thought_t, the agent uses this function to decide what action to take. The decision is based on: the original goal (question), current understanding (thought_t), past experience (history), and available capabilities (tools). This happens repeatedly until the agent decides to provide a final answer or reaches max_steps.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>This decision function is what makes ReAct effective. By considering the full history, the agent can: learn from previous steps (if a tool failed, try a different approach), build on previous insights (use information from earlier observations), avoid repetition (don't try the same failed action), and make informed decisions (understand the full context before acting). The explicit thought input makes reasoning transparent, and the history input enables adaptive behavior. Without this comprehensive decision-making, agents would make decisions in isolation without learning from experience.</p>
                                 
                                 <div class="example-box">
@@ -406,10 +406,10 @@ Final Answer: The weather in New York is 72°F and sunny.</code></pre>
                                     <li><strong>Terminate:</strong> When either condition is met, the ReAct loop stops, and the agent returns its final response (either the "Final Answer" content or a timeout message if max_steps was reached).</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This termination condition is checked after every action in the ReAct loop. After executing action_t and receiving observation_t, the agent checks: (1) if action_t was "Final Answer" → terminate and return answer, (2) if t ≥ max_steps → terminate and return best answer or timeout message, (3) otherwise → continue to next step (t+1). This check happens in the loop control logic that manages ReAct execution.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Proper termination is essential for agent efficiency and safety. Without termination conditions, agents could: run indefinitely (wasting resources), get stuck in loops (repeating the same actions), or never provide answers (always trying more actions). The "Final Answer" condition enables agents to recognize when they've completed the task and stop efficiently. The max_steps condition provides a safety net to prevent infinite execution, ensuring agents always complete (even if with a timeout message) rather than running forever. This is crucial for production systems where resource limits and user experience matter.</p>
                                 
                                 <div class="example-box">
