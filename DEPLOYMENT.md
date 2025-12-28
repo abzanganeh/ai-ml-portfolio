@@ -121,11 +121,20 @@ When you update static files, increment the version number in templates.
 ## Server Access
 
 - **SSH:** `ssh ubuntu@your-lightsail-ip`
-- **Jenkins:** `http://your-lightsail-ip:8080` (or your Jenkins URL)
+- **GitHub Actions:** Repository → **Actions** tab
 - **Production URL:** `https://zanganehai.com`
+
+## Cache Busting
+
+Static files (CSS, JS) now include version parameters to prevent browser caching:
+- CSS: `?v=2` or `?v=3`
+- JS: `?v=2`
+
+When you update static files, increment the version number in templates. This forces browsers to fetch the new version instead of using cached files.
 
 ## Notes
 
-- The Jenkins pipeline automatically backs up the previous version before deploying
-- If deployment fails, the pipeline will attempt to rollback to the backup
-- Keep only the last 3 backups (older ones are automatically cleaned up)
+- GitHub Actions automatically runs on every push to `main` branch
+- The workflow includes automatic testing before deployment
+- If deployment fails, check the Actions tab for error details
+- Browser caching is the most common reason changes don't appear immediately

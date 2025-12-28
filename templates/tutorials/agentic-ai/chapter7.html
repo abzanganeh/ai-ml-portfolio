@@ -157,17 +157,17 @@
                                 <h5>What This Measures</h5>
                                 <p><strong>This formula calculates the percentage of tasks that are completed successfully by the agent system.</strong> It measures overall agent reliability and system effectiveness. A high success rate indicates that agents consistently complete tasks correctly, while a low rate suggests problems that need investigation.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>Successful Tasks:</strong> Number of tasks completed successfully - tasks where: the agent provided a correct answer, the task was completed as expected, the output met quality standards, and the user's goal was achieved. Failed tasks include: incorrect answers, incomplete tasks, errors that prevented completion, or outputs that don't meet requirements.</li>
                                     <li><strong>Total Tasks:</strong> Total number of tasks attempted - all tasks the system tried to complete, including both successful and failed ones. This is the denominator that provides context for the success rate.</li>
                                     <li><strong>Success Rate:</strong> Percentage (0-100%) - the fraction of tasks that succeeded, expressed as a percentage. Higher values (closer to 100%) indicate better reliability. Typical targets: 95%+ for production systems, 99%+ for critical applications.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This metric is calculated periodically (daily, weekly) to monitor agent system health. It's used to: (1) track system reliability over time (is success rate improving or degrading?), (2) identify problem areas (which task types have low success rates?), (3) set quality targets (what success rate should we aim for?), (4) evaluate improvements (did changes increase success rate?), and (5) alert on degradation (success rate dropping indicates problems). This is a key performance indicator for production agent systems.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Task success rate is a fundamental measure of agent system quality. Low success rates indicate: agents are making mistakes, tasks are too complex, system has bugs, or agents lack necessary capabilities. High success rates indicate: agents are reliable, system is well-designed, and users can trust the system. Monitoring success rate helps: identify issues early (catch problems before they impact many users), measure improvement (quantify impact of optimizations), set expectations (users know what to expect), and ensure quality (maintain standards). For production systems, maintaining high success rates (95%+) is essential for user trust and system adoption.</p>
                                 
                                 <div class="example-box">
@@ -196,7 +196,7 @@
                                 <h5>What This Measures</h5>
                                 <p><strong>This formula calculates the average time it takes for the agent system to complete tasks.</strong> It measures system responsiveness by averaging the completion times of all tasks. Lower average latency indicates faster system performance, which is crucial for user experience in production systems.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>N:</strong> Number of tasks - the total count of tasks included in the latency calculation (e.g., 1000 tasks over a day, all tasks in a time period). A larger N provides a more representative average, while a smaller N may be skewed by outliers.</li>
                                     <li><strong>T_i:</strong> Time to complete task i - the latency for each individual task, measured from when the task starts (user submits request) until it completes (agent provides final response). T_i includes: agent reasoning time, tool execution time, LLM generation time, and any coordination overhead. Each task may have different complexity, leading to different completion times.</li>
@@ -205,10 +205,10 @@
                                     <li><strong>Lower is better:</strong> Reduced average latency means faster responses, better user experience, and higher system throughput. Typical targets: <2 seconds for simple tasks, <10 seconds for complex tasks, <30 seconds for very complex multi-step tasks.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This metric is calculated continuously to monitor system performance. It's used to: (1) track system speed over time (is latency increasing or decreasing?), (2) identify performance issues (sudden latency spikes indicate problems), (3) evaluate optimizations (did changes reduce latency?), (4) set performance targets (what latency should we aim for?), and (5) compare system versions (is new version faster?). This is a critical metric for production systems where user experience depends on response speed.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Average latency directly impacts user experience and system adoption. High latency leads to: poor user experience (users wait too long), reduced throughput (system handles fewer requests), user abandonment (users give up waiting), and higher costs (longer-running tasks consume more resources). Low latency ensures: responsive user experience, high system throughput, user satisfaction, and efficient resource usage. Monitoring average latency helps: identify performance regressions, optimize slow components, set realistic expectations, and ensure system meets user needs. For production systems, maintaining low average latency (<5 seconds for most tasks) is essential for user satisfaction.</p>
                                 
                                 <div class="example-box">
@@ -238,7 +238,7 @@
                                 <h5>What This Measures</h5>
                                 <p><strong>This formula calculates the total cost of completing a task by summing the costs of all API calls made during task execution.</strong> It accounts for token usage across all LLM API calls (reasoning, generation, tool selection) and their respective pricing. This helps track and optimize operational costs for agent systems.</p>
                                 
-                                <h4>Breaking It Down</h4>
+                                <h5>Breaking It Down</h5>
                                 <ul>
                                     <li><strong>M:</strong> Number of API calls - the total count of LLM API invocations made during task execution. Each call might be: agent reasoning (deciding what to do), tool selection (choosing which tool to use), response generation (creating final answer), or intermediate steps (multi-step reasoning). More complex tasks typically require more API calls.</li>
                                     <li><strong>tokens_i:</strong> Tokens used in call i - the number of tokens consumed in API call i, including both input tokens (prompt, context) and output tokens (generated text). Token counts vary based on: prompt length, context size, response length, and model used. Different models have different tokenization, so token counts are model-specific.</li>
@@ -248,10 +248,10 @@
                                     <li><strong>Cost:</strong> Total cost per task - the complete cost of executing one task, including all reasoning, tool selection, and generation steps. This helps understand cost per user interaction and optimize for cost efficiency.</li>
                                 </ul>
                                 
-                                <h4>Where This Is Used</h4>
+                                <h5>Where This Is Used</h5>
                                 <p>This cost calculation is performed for each task to track operational expenses. It's used to: (1) monitor system costs (how much does each task cost?), (2) optimize agent behavior (reduce unnecessary API calls), (3) set pricing (if charging users, need to cover costs), (4) evaluate cost efficiency (compare costs across different agent designs), and (5) budget planning (estimate monthly/annual costs). This is essential for production systems where cost management is critical.</p>
                                 
-                                <h4>Why This Matters</h4>
+                                <h5>Why This Matters</h5>
                                 <p>Cost management is crucial for sustainable production agent systems. LLM API calls can be expensive, especially with high token usage. Understanding cost per task helps: identify expensive operations (which tasks cost most?), optimize agent efficiency (reduce unnecessary calls, use cheaper models when possible), set user pricing (ensure costs are covered), budget accurately (predict monthly costs), and make trade-offs (quality vs cost). Without cost tracking, systems can become uneconomical. Typical targets: <$0.01 per simple task, <$0.10 per complex task, optimize to reduce costs while maintaining quality.</p>
                                 
                                 <div class="example-box">
