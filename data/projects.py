@@ -2,98 +2,6 @@
 
 PROJECTS_DATA = [
     {
-        'name': 'titanic-survival',
-        'title': 'Titanic Survival Prediction',
-        'description': 'Machine learning project predicting passenger survival using ensemble methods and feature engineering techniques.',
-        'category': 'Machine Learning',
-        'technology_stack': ['Python', 'Scikit-learn', 'Pandas', 'NumPy', 'Matplotlib', 'Flask'],
-        'challenges': [
-            'Handling missing data in passenger records',
-            'Feature engineering from categorical variables',
-            'Balancing model complexity with interpretability',
-            'Creating an interactive web demonstration'
-        ],
-        'results': {
-            'accuracy': '84.2%',
-            'precision': '82.1%',
-            'recall': '78.9%',
-            'f1_score': '80.4%'
-        },
-        'github_url': 'https://github.com/abzanganeh/titanic-survival',
-        'demo_url': None,
-        'featured': True,
-        'image_url': '/static/images/projects/titanic-survival.png',
-        'has_dedicated_template': True,
-        'template_path': 'projects/titanic-survival/index.html',
-        'published': True
-    },
-    {
-        'name': 'satellite-signal-prediction',
-        'title': 'Satellite Signal Strength Prediction',
-        'description': 'Advanced regression pipeline predicting satellite signal quality from weather conditions using multiple ML algorithms and real-time API data.',
-        'category': 'Machine Learning',
-        'technology_stack': ['Python', 'Scikit-learn', 'XGBoost', 'Pandas', 'SHAP', 'OpenWeatherMap API', 'Matplotlib', 'Seaborn'],
-        'challenges': [
-            'Integrating real-time weather data from multiple APIs',
-            'Physics-based signal attenuation modeling',
-            'Feature engineering from temporal weather patterns',
-            'Model interpretability with SHAP analysis',
-            'Global data collection across diverse climates'
-        ],
-        'results': {
-            'r2_score': 'TBD',
-            'rmse': 'TBD dBm',
-            'best_model': 'TBD',
-            'global_locations': '10 cities',
-            'features_engineered': '15+'
-        },
-        'github_url': 'https://github.com/abzanganeh/signal_strength',
-        'demo_url': None,
-        'featured': True,
-        'image_url': '/static/images/projects/satellite-signal-prediction.png',
-        'has_dedicated_template': True,
-        'template_path': 'projects/satellite-signal-prediction/index.html',
-        'published': True
-    },
-    {
-        'name': 'churn-risk-intelligence',
-        'title': 'Churn Risk Intelligence',
-        'description': 'Production-ready machine learning solution for predicting customer churn with 84.77% ROC-AUC. Features 16 optimized models, SHAP interpretability, Optuna hyperparameter tuning, and comprehensive business insights.',
-        'category': 'Machine Learning',
-        'technology_stack': [
-            'Python', 'Scikit-learn', 'XGBoost', 'Optuna', 'SHAP', 'Pandas', 'NumPy', 
-            'Matplotlib', 'Seaborn', 'Plotly', 'imbalanced-learn', 'Jupyter', 'Joblib'
-        ],
-        'challenges': [
-            'Handling imbalanced customer churn dataset (26.5% churn rate)',
-            'Feature engineering from telecommunications data',
-            'Hyperparameter optimization with Optuna for 16 models',
-            'Class imbalance handling with SMOTE technique',
-            'Model interpretability with SHAP for actionable insights',
-            'Ensemble learning with Stacking and Voting classifiers',
-            'Production-ready pipeline development'
-        ],
-        'results': {
-            'best_roc_auc': '84.77%',
-            'best_accuracy': '80.62%',
-            'best_model_roc': 'XGBoost with Optuna',
-            'best_model_accuracy': 'Logistic Regression',
-            'best_precision': '66.78%',
-            'best_recall': '77.27%',
-            'total_models': '16',
-            'ensemble_roc_auc': '84.71%',
-            'business_value': 'Identifies high-risk customers for targeted retention campaigns with 84.77% ROC-AUC',
-            'dataset_size': '7,043 customers × 21 features'
-        },
-        'github_url': 'https://github.com/abzanganeh/churn_risk_intelligence',
-        'demo_url': None,
-        'featured': True,
-        'image_url': '/static/images/projects/churn-risk-intelligence.png',
-        'has_dedicated_template': True,
-        'template_path': 'projects/churn-risk-intelligence/index.html',
-        'published': True
-    },
-    {
         'name': 'bank-term-deposit-prediction',
         'title': 'Bank Term Deposit Prediction - Advanced ML Pipeline',
         'description': 'A comprehensive ML solution predicting customer term deposit subscriptions using 8+ algorithms with hyperparameter tuning, achieving 60% F1-Score improvement over baseline models.',
@@ -126,6 +34,98 @@ PROJECTS_DATA = [
         'image_url': '/static/images/projects/bank-term-deposit-prediction.png',
         'has_dedicated_template': True,
         'template_path': 'projects/bank-term-deposit-prediction/index.html',
+        'published': True
+    },
+    {
+        'name': 'churn-risk-intelligence',
+        'title': 'Churn Risk Intelligence',
+        'description': 'Production-ready machine learning solution for predicting customer churn with 84.77% ROC-AUC. Features 16 optimized models, SHAP interpretability, Optuna hyperparameter tuning, and comprehensive business insights.',
+        'category': 'Machine Learning',
+        'technology_stack': [
+            'Python', 'Scikit-learn', 'XGBoost', 'Optuna', 'SHAP', 'Pandas', 'NumPy', 
+            'Matplotlib', 'Seaborn', 'Plotly', 'imbalanced-learn', 'Jupyter', 'Joblib'
+        ],
+        'challenges': [
+            'Handling imbalanced customer churn dataset (26.5% churn rate)',
+            'Feature engineering from telecommunications data',
+            'Hyperparameter optimization with Optuna for 16 models',
+            'Class imbalance handling with SMOTE technique',
+            'Model interpretability with SHAP for actionable insights',
+            'Ensemble learning with Stacking and Voting classifiers',
+            'Production-ready pipeline development'
+        ],
+        'results': {
+            'best_roc_auc': '84.77%',
+            'best_accuracy': '80.62%',
+            'best_model_roc': 'XGBoost with Optuna',
+            'best_model_accuracy': 'Logistic Regression',
+            'best_precision': '66.78%',
+            'best_recall': '77.27%',
+            'total_models': '16',
+            'ensemble_roc_auc': '84.71%',
+            'business_value': 'Identifies high-risk customers for targeted retention campaigns with 84.77% ROC-AUC',
+            'dataset_size': '7,043 customers × 21 features'
+        },
+        'github_url': 'https://github.com/abzanganeh/churn-risk-intelligence',
+        'demo_url': None,
+        'featured': True,
+        'image_url': '/static/images/projects/churn-risk-intelligence.png',
+        'has_dedicated_template': True,
+        'template_path': 'projects/churn-risk-intelligence/index.html',
+        'published': True
+    },
+    {
+        'name': 'satellite-signal-prediction',
+        'title': 'Satellite Signal Strength Prediction',
+        'description': 'Advanced regression pipeline predicting satellite signal quality from weather conditions using multiple ML algorithms and real-time API data.',
+        'category': 'Machine Learning',
+        'technology_stack': ['Python', 'Scikit-learn', 'XGBoost', 'Pandas', 'SHAP', 'OpenWeatherMap API', 'Matplotlib', 'Seaborn'],
+        'challenges': [
+            'Integrating real-time weather data from multiple APIs',
+            'Physics-based signal attenuation modeling',
+            'Feature engineering from temporal weather patterns',
+            'Model interpretability with SHAP analysis',
+            'Global data collection across diverse climates'
+        ],
+        'results': {
+            'r2_score': 'TBD',
+            'rmse': 'TBD dBm',
+            'best_model': 'TBD',
+            'global_locations': '10 cities',
+            'features_engineered': '15+'
+        },
+        'github_url': 'https://github.com/abzanganeh/signal-strength',
+        'demo_url': None,
+        'featured': True,
+        'image_url': '/static/images/projects/satellite-signal-prediction.png',
+        'has_dedicated_template': True,
+        'template_path': 'projects/satellite-signal-prediction/index.html',
+        'published': True
+    },
+    {
+        'name': 'titanic-survival',
+        'title': 'Titanic Survival Prediction',
+        'description': 'Machine learning project predicting passenger survival using ensemble methods and feature engineering techniques.',
+        'category': 'Machine Learning',
+        'technology_stack': ['Python', 'Scikit-learn', 'Pandas', 'NumPy', 'Matplotlib', 'Flask'],
+        'challenges': [
+            'Handling missing data in passenger records',
+            'Feature engineering from categorical variables',
+            'Balancing model complexity with interpretability',
+            'Creating an interactive web demonstration'
+        ],
+        'results': {
+            'accuracy': '84.2%',
+            'precision': '82.1%',
+            'recall': '78.9%',
+            'f1_score': '80.4%'
+        },
+        'github_url': 'https://github.com/abzanganeh/titanic-survival',
+        'demo_url': None,
+        'featured': True,
+        'image_url': '/static/images/projects/titanic-survival.png',
+        'has_dedicated_template': True,
+        'template_path': 'projects/titanic-survival/index.html',
         'published': True
     }
 ]
