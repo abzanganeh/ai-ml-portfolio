@@ -2,6 +2,40 @@
 
 PROJECTS_DATA = [
     {
+        'name': 'movie-agent-demo',
+        'title': 'Movie Agent Demo',
+        'description': 'Flask web application providing REST API and interactive UI for intelligent movie agent service with chat, quizzes, poster analysis, and statistics. Features encrypted API key storage, session-based memory isolation, and automatic query classification.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Flask', 'Python', 'REST API', 'HTML/CSS', 'JavaScript', 
+            'Encrypted Storage', 'Session Management', 'Web UI'
+        ],
+        'challenges': [
+            'Building REST API for movie agent service integration',
+            'Implementing interactive web UI with chat interface',
+            'Encrypted API key storage with local configuration management',
+            'Session-based memory isolation for multi-user support',
+            'Automatic query classification and routing',
+            'Image upload and poster analysis integration',
+            'Statistics display and formatting in UI'
+        ],
+        'results': {
+            'api_endpoints': 'REST API for chat, poster analysis, and configuration',
+            'web_ui': 'Interactive chat interface with image upload support',
+            'security': 'Encrypted configuration storage for API keys',
+            'session_management': 'Flask sessions for state isolation',
+            'query_classification': 'Automatic routing of queries to appropriate tools',
+            'features': 'Chat, quizzes, poster analysis, and statistics display'
+        },
+        'github_url': 'https://github.com/abzanganeh/movie-agent-demo',
+        'demo_url': None,
+        'featured': True,
+        'image_url': '/static/images/projects/movie-agent-demo.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'published': True
+    },
+    {
         'name': 'movie-agent-service',
         'title': 'Movie Agent Service',
         'description': 'Core library for AI-powered movie discovery and analysis. Features RAG-based semantic search, tool-calling agents (LangChain), computer vision poster analysis (BLIP), interactive quizzes, and session-based memory management. Built with Python, OpenAI embeddings, and OOP principles.',
