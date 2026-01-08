@@ -151,7 +151,9 @@ def populate_projects():
                 published=project_data.get('published', True),
                 image_url=project_data.get('image_url'),
                 has_dedicated_template=project_data.get('has_dedicated_template', False),
-                template_path=project_data.get('template_path')
+                template_path=project_data.get('template_path'),
+                duration_months=project_data.get('duration_months', 3),
+                team_size=project_data.get('team_size', 1)
             )
             db.session.add(project)
         
