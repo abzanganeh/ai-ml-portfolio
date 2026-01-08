@@ -2,6 +2,40 @@
 
 PROJECTS_DATA = [
     {
+        'name': 'movie-agent-service',
+        'title': 'Movie Agent Service',
+        'description': 'Core library for AI-powered movie discovery and analysis. Features RAG-based semantic search, tool-calling agents (LangChain), computer vision poster analysis (BLIP), interactive quizzes, and session-based memory management. Built with Python, OpenAI embeddings, and OOP principles.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Python', 'LangChain', 'OpenAI', 'FAISS', 'BLIP', 'Transformers', 
+            'RAG', 'Vector Search', 'Embeddings', 'Tool-calling Agents'
+        ],
+        'challenges': [
+            'RAG-based semantic search implementation with FAISS vector store',
+            'Tool-calling agent architecture with LangChain',
+            'Computer vision poster analysis using BLIP model',
+            'Session-based memory management for conversational context',
+            'Interactive quiz generation with multiple question types',
+            'Designing production-grade tool-calling architecture over ReAct',
+            'OOP principles with dependency injection and factory patterns'
+        ],
+        'results': {
+            'architecture': 'Tool-calling agent architecture for production reliability',
+            'vector_store': 'FAISS-based semantic search for movie discovery',
+            'vision_model': 'BLIP for poster analysis and genre inference',
+            'memory_management': 'Session-based state management',
+            'quiz_system': 'Multiple quiz types with interactive questions',
+            'design_patterns': 'OOP with single responsibility, dependency inversion, factory pattern'
+        },
+        'github_url': 'https://github.com/abzanganeh/movie-agent-service',
+        'demo_url': None,
+        'featured': True,
+        'image_url': '/static/images/projects/movie-agent-service.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'published': True
+    },
+    {
         'name': 'bank-term-deposit-prediction',
         'title': 'Bank Term Deposit Prediction - Advanced ML Pipeline',
         'description': 'A comprehensive ML solution predicting customer term deposit subscriptions using 8+ algorithms with hyperparameter tuning, achieving 60% F1-Score improvement over baseline models.',
