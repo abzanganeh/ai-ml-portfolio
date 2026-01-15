@@ -143,7 +143,7 @@
                                     </tr>
                                     <tr>
                                         <td style="padding: 0.75rem; border: 1px solid #ddd;">Output signal (axon)</td>
-                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output y = f(Σwᵢxᵢ + b)</td>
+                                        <td style="padding: 0.75rem; border: 1px solid #ddd;">Output y = f(Σw_i x_i + b)</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -194,13 +194,13 @@
                             <p>Given inputs <strong>x = [x₁, x₂, ..., xₙ]</strong> and weights <strong>w = [w₁, w₂, ..., wₙ]</strong>, the perceptron computes:</p>
                             
                             <div class="formula-display">
-                                \[z = \sum_{i=1}^{n} w_i x_i + b\]
+                                \[z = \\sum_{i=1}^{n} w_i x_i + b\]
                             </div>
                             
                             <p>Where <strong>b</strong> is the bias term. Then the output is:</p>
                             
                             <div class="formula-display">
-                                \[y = f(z) = \begin{cases} 1 & \text{if } z \geq 0 \\ 0 & \text{if } z < 0 \end{cases}\]
+                                \[y = f(z) = \begin{cases} 1 & \text{if } z \ge 0 \\ 0 & \text{if } z < 0 \end{cases}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -221,7 +221,7 @@
                             <p>Using linear algebra, we can write this more compactly:</p>
                             
                             <div class="formula-display">
-                                <strong>z = wᵀx + b</strong>
+                                \[z = w^T x + b\]
                             </div>
                             
                             <p>Where:</p>
@@ -433,8 +433,9 @@ print("Bias:", perceptron.bias)</code></pre>
                             <p><strong>For each layer l = 1, 2, ..., L:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>z⁽ˡ⁾ = W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾</strong><br>
-                                <strong>a⁽ˡ⁾ = f⁽ˡ⁾(z⁽ˡ⁾)</strong>
+                                \[\begin{aligned}
+                                z^{(l)} &= W^{(l)} a^{(l-1)} + b^{(l)} \\n                                a^{(l)} &= f^{(l)}(z^{(l)})
+                                \end{aligned}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -596,9 +597,7 @@ mlp = MLP([2, 4, 1], activation='sigmoid')
                             <p><strong>For any continuous function f: [0,1]ⁿ → ℝ and any ε > 0,</strong> there exists a feedforward neural network with:</p>
                             
                             <div class="formula-display">
-                                <strong>• One hidden layer</strong><br>
-                                <strong>• Sufficiently many neurons</strong><br>
-                                <strong>• Appropriate activation function (e.g., sigmoid, ReLU)</strong>
+                                \[• One hidden layer  \\  • Sufficiently many neurons  \\  • Appropriate activation function (e.g., sigmoid, ReLU)\]
                             </div>
                             
                             <p>Such that the network approximates f with error less than ε.</p>
@@ -728,8 +727,8 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the mathematical representation of a neuron's output?</h3>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(y = f(\sum_{i=1}^{n} w_i x_i + b)\) where f is the activation function, w_i are weights, x_i are inputs, and b is bias</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(y = \sum w_i x_i\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(y = w \times x\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(y = Σ w_i x_i\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(y = w × x\)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(y = x + b\)</div>
                             </div>
                             
@@ -767,7 +766,7 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "How would you choose the number of neurons in a hidden layer?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Start with a rule of thumb (e.g., between input and output size, or 2/3 of input size), then use validation set to tune, balancing model capacity (too few = underfitting, too many = overfitting)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Start with a rule of thumb (e.g., between input\) and output size, or 2/3 of input size), then use validation set to tune, balancing model capacity (too few = underfitting, too many = overfitting)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use the same as input size</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use as many as possible</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use exactly 10 neurons</div>
@@ -811,6 +810,7 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
 <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         // Function to scroll to section navigation
@@ -820,27 +820,6 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                 sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-        
-        // Quiz function
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
             }
         }
         
@@ -874,3 +853,6 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
+</script>
+</body>
+</html>

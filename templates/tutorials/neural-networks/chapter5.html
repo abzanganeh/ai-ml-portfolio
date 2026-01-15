@@ -238,7 +238,7 @@
                             <p>For a 2D convolution:</p>
                             
                             <div class="formula-display">
-                                \[(I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\]
+                                \[(I * K)[i, j] = \\sum_{m} \\sum_{n} I[i+m, j+n] \\times K[m, n]\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -602,11 +602,11 @@ print("Convolution result:\n", result)</code></pre>
                             <p><strong>Takes the maximum value in each pooling window:</strong></p>
                             
                             <div class="formula-display">
-                                \[\text{Output}[i, j] = \max(\text{Input}[i \times s : i \times s + p, j \times s : j \times s + p])\]
+                                \[Output[i, j] = max(Input[i \\times s : i \\times s + p, j \\times s : j \\times s + p])\]
                             </div>
                             
                             <div class="formula-explanation">
-                                <p>Where \(s\) is stride and \(p\) is pool size</p>
+                                <p>Where s is stride and p is pool size</p>
                             </div>
                             
                             <div class="formula-explanation">
@@ -845,10 +845,10 @@ cnn = SimpleCNN()
                             <p><strong>For convolution layer:</strong></p>
                             
                             <div class="formula-display">
-                                \[\frac{\partial L}{\partial K} = I * \left(\frac{\partial L}{\partial O}\right)\]
+                                \[\\partialL/\\partialK = I * (\\partialL/\\partialO)\]
                             </div>
                             <div class="formula-display" style="margin-top: 1rem;">
-                                \[\frac{\partial L}{\partial I} = K * \left(\frac{\partial L}{\partial O}\right)\]
+                                <strong>∂L/∂I = K * (∂L/∂O)</strong>
                             </div>
                             <div class="formula-explanation">
                                 <p>First equation: convolved with input. Second equation: convolved with kernel (transposed).</p>
@@ -869,7 +869,7 @@ cnn = SimpleCNN()
                             <p><strong>For max pooling:</strong></p>
                             
                             <div class="formula-display">
-                                \[\frac{\partial L}{\partial \text{Input}[i,j]} = \begin{cases} \frac{\partial L}{\partial \text{Output}[i',j']} & \text{if } \text{Input}[i,j] = \max(\text{pool region}) \\ 0 & \text{otherwise} \end{cases}\]
+                                \[\\partialL/\\partialInput[i, j] = {  \\  \\partialL/\\partialOutput[i′, j′] if Input[i, j] = max(pool region)  \\  0 otherwise  \\  }\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -1018,7 +1018,7 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                                 <h3>Question 4: What is the mathematical formula for convolution operation?</h3>
                                 <div class="quiz-option" onclick="checkAnswer(this, true)">A) \((I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\) where I is input and K is kernel</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) \((I * K) = I + K\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \((I * K) = I \times K\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \((I * K) = I × K\)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) \((I * K) = I - K\)</div>
                             </div>
                             
@@ -1040,15 +1040,15 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the formula for max pooling?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(\text{Output}[i, j] = \max(\text{Input}[i \times s : i \times s + p, j \times s : j \times s + p])\) where s is stride and p is pool size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(\text{Output} = \text{Input} + 1\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(\text{Output} = \text{Input} \times 2\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(\text{Output} = \text{mean}(\text{Input})\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Output[i, j] = max(Input[i × s : i × s + p, j × s : j × s + p])\) where s is stride and p is pool size</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(Output = Input + 1\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(Output = Input × 2\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(Output = mean(Input)\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How does backpropagation work in convolutional layers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients are computed using convolution operations: \(\partial L/\partial K = I * (\partial L/\partial O)\) and \(\partial L/\partial I = K * (\partial L/\partial O)\) where the second uses a transposed convolution</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Gradients are computed using convolution operations: ∂L/∂K = I * (∂L/∂O) and ∂L/∂I = K * (∂L/∂O)\) where the second uses a transposed convolution</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) Same as fully connected layers</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) No gradients are computed</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only forward pass is used</div>
@@ -1064,10 +1064,10 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is the output size formula for convolution with padding and stride?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(\text{output\_size} = \frac{\text{input\_size} + 2 \times \text{padding} - \text{kernel\_size}}{\text{stride}} + 1\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(\text{output\_size} = \text{input\_size}\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(\text{output\_size} = \text{input\_size} \times 2\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(\text{output\_size} = \text{input\_size} - \text{kernel\_size}\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(output_size = (input_size + 2 × padding - kernel_size) / stride + 1\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(output_size = input_size\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(output_size = input_size × 2\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(output_size = input_size - kernel_size\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
@@ -1080,7 +1080,7 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the typical architecture progression in a CNN?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Early layers: small filters detecting edges/textures → Middle layers: larger filters detecting patterns/shapes → Late layers: detecting high-level features/objects → Fully connected layers: classification</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Early layers: small filters detecting edges/textures → Middle layers: larger filters detecting patterns/shapes → Late layers: detecting high-level features/objects → Fully connected layers: classification\)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) All layers are identical</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only convolution, no pooling</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only pooling, no convolution</div>
@@ -1108,6 +1108,7 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
 <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
@@ -1117,29 +1118,6 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
             }
         }
         
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -1169,3 +1147,6 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
+</script>
+</body>
+</html>
