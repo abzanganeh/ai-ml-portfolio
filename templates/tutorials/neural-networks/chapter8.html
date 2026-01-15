@@ -117,7 +117,7 @@
                             <h4>Learning Rate in Gradient Descent</h4>
                             
                             <div class="formula-display">
-                                <strong>W ← W - η × (∂L/∂W)</strong>
+                                \[W ← W - \\eta \\times (\\partialL/\\partialW)\]
                             </div>
                             
                             <p>Where <strong>η</strong> (eta) is the learning rate</p>
@@ -185,10 +185,7 @@ def find_learning_rate(model, train_data, start_lr=1e-8, end_lr=1.0, num_iterati
                             <h4>Dropout Formula</h4>
                             
                             <div class="formula-display">
-                                <strong>During Training:</strong><br>
-                                <strong>h_drop = h ⊙ mask / (1 - p)</strong><br><br>
-                                <strong>During Inference:</strong><br>
-                                <strong>h_drop = h × (1 - p)</strong>
+                                \[During Training:  \\  h_drop = h ⊙ mask / (1 - p)  \\   \\  During Inference:  \\  h_drop = h \\times (1 - p)\]
                             </div>
                             
                             <p>Where <strong>p</strong> is dropout probability and <strong>mask</strong> is random binary vector</p>
@@ -209,7 +206,7 @@ def find_learning_rate(model, train_data, start_lr=1e-8, end_lr=1.0, num_iterati
                             <h4>L2 Regularization</h4>
                             
                             <div class="formula-display">
-                                <strong>L_total = L_data + λ × Σ||W||²</strong>
+                                \[L_{\text{total}} = L_{\text{data}} + \lambda \times \sum ||W||^2\]
                             </div>
                             
                             <p>Where <strong>λ</strong> (lambda) is the regularization strength</p>
@@ -250,8 +247,7 @@ def find_learning_rate(model, train_data, start_lr=1e-8, end_lr=1.0, num_iterati
                             <h4>Momentum Update</h4>
                             
                             <div class="formula-display">
-                                <strong>v_t = β × v_{t-1} + (1 - β) × ∇L</strong><br>
-                                <strong>W ← W - η × v_t</strong>
+                                \[v_t = \\beta \\times v_{t-1} + (1 - \\beta) \\times \\nablaL  \\  W ← W - \\eta \\times v_t\]
                             </div>
                             
                             <p>Where <strong>β</strong> is momentum coefficient (typically 0.9)</p>
@@ -271,11 +267,13 @@ def find_learning_rate(model, train_data, start_lr=1e-8, end_lr=1.0, num_iterati
                             <h4>Adam Algorithm</h4>
                             
                             <div class="formula-display">
-                                <strong>m_t = β₁ × m_{t-1} + (1 - β₁) × ∇L</strong> (first moment)<br>
-                                <strong>v_t = β₂ × v_{t-1} + (1 - β₂) × (∇L)²</strong> (second moment)<br>
-                                <strong>m̂_t = m_t / (1 - β₁^t)</strong> (bias correction)<br>
-                                <strong>v̂_t = v_t / (1 - β₂^t)</strong> (bias correction)<br>
-                                <strong>W ← W - η × m̂_t / (√v̂_t + ε)</strong>
+                                \[\begin{aligned}
+ m_t &= \beta_1 m_{t-1} + (1 - \beta_1) \nabla L \quad (\text{first moment}) \\
+ v_t &= \beta_2 v_{t-1} + (1 - \beta_2) (\nabla L)^2 \quad (\text{second moment}) \\
+ \hat{m}_t &= \frac{m_t}{1 - \beta_1^t} \quad (\text{bias correction}) \\
+ \hat{v}_t &= \frac{v_t}{1 - \beta_2^t} \quad (\text{bias correction}) \\
+ W &\leftarrow W - \eta \times \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
+\end{aligned}\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -547,6 +545,7 @@ optimizer = AdamOptimizer(learning_rate=0.001)
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
 <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
@@ -556,29 +555,6 @@ optimizer = AdamOptimizer(learning_rate=0.001)
             }
         }
         
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -608,3 +584,6 @@ optimizer = AdamOptimizer(learning_rate=0.001)
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
+</script>
+</body>
+</html>

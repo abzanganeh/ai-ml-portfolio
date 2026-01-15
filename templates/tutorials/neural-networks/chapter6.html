@@ -262,10 +262,7 @@
                             <p><strong>At each time step t, the RNN performs two operations:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>Step 1: Update Hidden State</strong><br>
-                                <strong>h_t = tanh(W_hh × h_{t-1} + W_xh × x_t + b_h)</strong><br><br>
-                                <strong>Step 2: Compute Output</strong><br>
-                                <strong>y_t = W_hy × h_t + b_y</strong>
+                                \[Step 1: Update Hidden State  \\  h_t = tanh(W_hh \\times h_{t-1} + W_xh \\times x_t + b_h)  \\   \\  Step 2: Compute Output  \\  y_t = W_hy \\times h_t + b_y\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -484,7 +481,7 @@ x₀ → [RNN] → h₀ → [RNN] → h₁ → [RNN] → h₂
                             <p><strong>Gradient flows backward through time:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂h_t = ∂L/∂y_t × W_hy + ∂L/∂h_{t+1} × W_hh</strong>
+                                \[\\partialL/\\partialh_t = \\partialL/\\partialy_t \\times W_hy + \\partialL/\\partialh_{t+1} \\times W_hh\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -512,7 +509,7 @@ x₀ → [RNN] → h₀ → [RNN] → h₁ → [RNN] → h₂
                             <p><strong>Gradient at time t-k:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂h_{t-k} = ∂L/∂h_t × (W_hh)^k × tanh'(z_{t-k}) × ... × tanh'(z_t)</strong>
+                                \[\\partialL/\\partialh_{t-k} = \\partialL/\\partialh_t \\times (W_hh)^k \\times tanh'(z_{t-k}) \\times ... \\times tanh'(z_t)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -743,6 +740,7 @@ rnn = RNN(input_size=10, hidden_size=20, output_size=5)
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
     <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
@@ -752,29 +750,6 @@ rnn = RNN(input_size=10, hidden_size=20, output_size=5)
             }
         }
         
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -804,3 +779,6 @@ rnn = RNN(input_size=10, hidden_size=20, output_size=5)
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
+</script>
+</body>
+</html>

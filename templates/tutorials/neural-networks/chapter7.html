@@ -333,7 +333,7 @@
                             <p><strong>In RNNs, gradient at time t-k:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>∂L/∂h_{t-k} = ∂L/∂h_t × (W_hh)^k × tanh'(z_{t-k}) × ... × tanh'(z_t)</strong>
+                                \[\\partialL/\\partialh_{t-k} = \\partialL/\\partialh_t \\times (W_hh)^k \\times tanh'(z_{t-k}) \\times ... \\times tanh'(z_t)\]
                             </div>
                             
                             <p><strong>Problem:</strong> If W_hh < 1, (W_hh)^k → 0 as k increases</p>
@@ -362,7 +362,7 @@
                             <h4>Forget Gate Formula</h4>
                             
                             <div class="formula-display">
-                                <strong>f_t = σ(W_f × [h_{t-1}, x_t] + b_f)</strong>
+                                \[f_t = σ(W_f \\times [h_{t-1}, x_t] + b_f)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -380,8 +380,7 @@
                             <h4>Input Gate Formula</h4>
                             
                             <div class="formula-display">
-                                <strong>i_t = σ(W_i × [h_{t-1}, x_t] + b_i)</strong><br>
-                                <strong>C̃_t = tanh(W_C × [h_{t-1}, x_t] + b_C)</strong>
+                                \[i_t = σ(W_i \\times [h_{t-1}, x_t] + b_i)  \\  C̃_t = tanh(W_C \\times [h_{t-1}, x_t] + b_C)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -399,7 +398,7 @@
                             <h4>Output Gate Formula</h4>
                             
                             <div class="formula-display">
-                                <strong>o_t = σ(W_o × [h_{t-1}, x_t] + b_o)</strong>
+                                \[o_t = σ(W_o \\times [h_{t-1}, x_t] + b_o)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -429,7 +428,7 @@
                             <h4>Cell State Update</h4>
                             
                             <div class="formula-display">
-                                <strong>C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t</strong>
+                                \[C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -446,7 +445,7 @@
                             <h4>Hidden State Update</h4>
                             
                             <div class="formula-display">
-                                <strong>h_t = o_t ⊙ tanh(C_t)</strong>
+                                \[h_t = o_t ⊙ tanh(C_t)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -468,19 +467,7 @@
                             <p><strong>At each time step t:</strong></p>
                             
                             <div class="formula-display">
-                                <strong>Step 1: Compute Gates</strong><br>
-                                <strong>f_t = σ(W_f × [h_{t-1}, x_t] + b_f)</strong><br>
-                                <strong>i_t = σ(W_i × [h_{t-1}, x_t] + b_i)</strong><br>
-                                <strong>o_t = σ(W_o × [h_{t-1}, x_t] + b_o)</strong><br><br>
-                                
-                                <strong>Step 2: Candidate Values</strong><br>
-                                <strong>C̃_t = tanh(W_C × [h_{t-1}, x_t] + b_C)</strong><br><br>
-                                
-                                <strong>Step 3: Update Cell State</strong><br>
-                                <strong>C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t</strong><br><br>
-                                
-                                <strong>Step 4: Update Hidden State</strong><br>
-                                <strong>h_t = o_t ⊙ tanh(C_t)</strong>
+                                \[Step 1: Compute Gates  \\  f_t = σ(W_f \\times [h_{t-1}, x_t] + b_f)  \\  i_t = σ(W_i \\times [h_{t-1}, x_t] + b_i)  \\  o_t = σ(W_o \\times [h_{t-1}, x_t] + b_o)  \\   \\  Step 2: Candidate Values  \\  C̃_t = tanh(W_C \\times [h_{t-1}, x_t] + b_C)  \\   \\  Step 3: Update Cell State  \\  C_t = f_t ⊙ C_{t-1} + i_t ⊙ C̃_t  \\   \\  Step 4: Update Hidden State  \\  h_t = o_t ⊙ tanh(C_t)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -698,6 +685,7 @@ print(f"Processed {len(outputs)} time steps")</code></pre>
         <!-- KaTeX for math rendering -->
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
     <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
     <script>
         function scrollToSectionNav() {
@@ -707,29 +695,6 @@ print(f"Processed {len(outputs)} time steps")</code></pre>
             }
         }
         
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -759,3 +724,6 @@ print(f"Processed {len(outputs)} time steps")</code></pre>
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
+</script>
+</body>
+</html>
