@@ -262,10 +262,7 @@
                             <p>For each layer <strong>l = 1, 2, ..., L</strong>:</p>
                             
                             <div class="formula-display">
-                                \[\begin{aligned}
- z^{(l)} &= W^{(l)} a^{(l-1)} + b^{(l)} \\
- a^{(l)} &= f(z^{(l)})
-\end{aligned}\]
+                                \[Step 1: Compute Pre-activation (Weighted Sum) z⁽ˡ⁾ = W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾ Step 2: Apply Activation Function a⁽ˡ⁾ = f(z⁽ˡ⁾)\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -357,9 +354,7 @@ W⁽¹⁾ = [0.1  0.3]
                             <p>Understanding matrix dimensions is crucial:</p>
                             
                             <div class="formula-display">
-                                \[\begin{aligned}
- W^{(l)} &: (n^{(l)} \times n^{(l-1)}) \text{ matrix} \\n a^{(l-1)} &: (n^{(l-1)} \times m) \text{ matrix} \; (m = \text{batch size}) \\n b^{(l)} &: (n^{(l)} \times 1) \text{ vector} \\n z^{(l)} &: (n^{(l)} \times m) \text{ matrix} \\n a^{(l)} &: (n^{(l)} \times m) \text{ matrix}
-\end{aligned}\]
+                                \[For layer l: W⁽ˡ⁾: (n⁽ˡ⁾ \\times n⁽ˡ⁻¹⁾) matrix  \\  a⁽ˡ⁻¹⁾: (n⁽ˡ⁻¹⁾ \\times m) matrix (m = batch size)  \\  b⁽ˡ⁾: (n⁽ˡ⁾ \\times 1) vector  \\  z⁽ˡ⁾: (n⁽ˡ⁾ \\times m) matrix  \\  a⁽ˡ⁾: (n⁽ˡ⁾ \\times m) matrix\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -522,10 +517,7 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                             <p><strong>Designed for tanh and sigmoid activations:</strong></p>
                             
                             <div class="formula-display">
-                                \[\begin{aligned}
- W &\sim \mathcal{N}(0, \sigma^2), \quad \sigma^2 = \frac{1}{n_{\text{in}}} \\
- W &\sim \text{Uniform}\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)
-\end{aligned}\]
+                                \[W ~ Normal(0, σ^2) where σ^2 = 1 / n_in or W ~ Uniform(-\\sqrt(6 / (n_in + n_out)), \\sqrt(6 / (n_in + n_out)))\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -544,7 +536,7 @@ print("Output shape:", activations[-1].shape)  # (1, 4) - 1 output for each of 4
                             <p><strong>Designed specifically for ReLU activation:</strong></p>
                             
                             <div class="formula-display">
-                                \[W \sim \mathcal{N}(0, \sigma^2), \quad \sigma^2 = \frac{2}{n_{\text{in}}}\]
+                                \[W ~ Normal(0, σ^2) where σ^2 = 2 / n_in\]
                             </div>
                             
                             <div class="formula-explanation">
@@ -812,7 +804,7 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Interview question: "Explain the forward propagation process in a feedforward neural network."</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Input data flows forward through layers: each layer computes weighted sum (z = Wx + b), applies activation function (a = f(z)),\) and passes result as input to next layer. Process continues until output layer produces final prediction</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Input data flows forward through layers: each layer computes weighted sum (z = Wx + b), applies activation function (a = f(z)), and passes result as input to next layer. Process continues until output layer produces final prediction</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) Data flows backward through layers</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) All layers process simultaneously</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only the output layer processes data</div>
@@ -820,10 +812,10 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the mathematical formula for forward propagation in a single layer?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(a⁽ˡ⁾ = f(W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾)\) where f is activation, W is weights, a is activations, b is bias</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(a = Wx\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(a = x + b\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(a = W\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) a⁽ˡ⁾ = f(W⁽ˡ⁾a⁽ˡ⁻¹⁾ + b⁽ˡ⁾) where f is activation, W is weights, a is activations, b is bias</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) a = Wx</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) a = x + b</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) a = W</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
@@ -844,7 +836,7 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "How would you implement batch processing in forward propagation?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Process multiple samples simultaneously by stacking inputs into matrix (batch_size × features), perform matrix multiplication (W × X^T), add bias broadcasting, apply activation element-wise. This enables efficient GPU computation\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Process multiple samples simultaneously by stacking inputs into matrix (batch_size × features), perform matrix multiplication (W × X^T), add bias broadcasting, apply activation element-wise. This enables efficient GPU computation</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) Process one sample at a time</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">C) Process all samples sequentially</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) Randomly select samples</div>
@@ -860,9 +852,9 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "What is the computational complexity of forward propagation in a network with L layers?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(O(L × n²)\) where n is average layer size, as each layer performs matrix multiplication of O(n²) operations, repeated L times</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) O(L × n²) where n is average layer size, as each layer performs matrix multiplication of O(n²) operations, repeated L times</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">B) O(n)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(O(L × n)\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) O(L × n)</div>
                                 <div class="quiz-option" onclick="checkAnswer(this, false)">D) O(1)</div>
                             </div>
                             
@@ -908,7 +900,36 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
                 document.querySelector('.section-progress-fill').style.width = progress + '%';
             });
         });
-        // Initialize KaTeX rendering - ensure KaTeX is loaded first
+            }
+        }
+    </script>
+        <!-- KaTeX for math rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <!-- Footer Navigation -->
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/neural-networks/chapter3" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 3 →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+            
+// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -938,6 +959,7 @@ print(f"Output range: [{output.min():.3f}, {output.max():.3f}]")</code></pre>
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
-</script>
+        }
+    </script>
 </body>
 </html>
