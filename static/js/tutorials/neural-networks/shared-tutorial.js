@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize sections from page content
     initializeSections();
+
+    // Normalize any non-LaTeX formula blocks before KaTeX renders
+    normalizeFormulaBlocks();
     
     // Initialize section navigation
     initializeSectionNavigation();
@@ -115,6 +118,68 @@ function initializeProgressBars() {
     if (sections.length > 0) {
         updateSectionProgress(sections[0]);
     }
+}
+
+// Normalize formula-display blocks to KaTeX-friendly content
+function normalizeFormulaBlocks() {
+    const blocks = document.querySelectorAll('.formula-display');
+    if (!blocks.length) {
+        return;
+    }
+
+    blocks.forEach(block => {
+        const html = block.innerHTML;
+        if (html.includes('\\[') || html.includes('\\(')) {
+            return;
+        }
+
+        let latex = html;
+        latex = latex.replace(/<br\s*\/?>/gi, ' __BR__ ');
+        latex = latex.replace(/<\/p>\s*<p[^>]*>/gi, ' __BR__ ');
+        latex = latex.replace(/<\/?strong>/gi, '');
+        latex = latex.replace(/<sub>(.*?)<\/sub>/gi, '_{$1}');
+        latex = latex.replace(/<sup>(.*?)<\/sup>/gi, '^{$1}');
+        latex = latex.replace(/<[^>]+>/g, '');
+
+        const replacements = [
+            ['Σ', '\\sum'],
+            ['×', '\\times'],
+            ['≥', '\\ge'],
+            ['≤', '\\le'],
+            ['→', '\\rightarrow'],
+            ['…', '\\ldots'],
+            ['∂', '\\partial'],
+            ['δ', '\\delta'],
+            ['λ', '\\lambda'],
+            ['β', '\\beta'],
+            ['η', '\\eta'],
+            ['∇', '\\nabla'],
+            ['√', '\\sqrt'],
+            ['⊙', '\\odot'],
+            ['ᵀ', '^T'],
+            ['²', '^2'],
+            ['ᵢ', '_i'],
+            ['₀', '_0'],
+            ['₁', '_1'],
+            ['₂', '_2'],
+            ['₃', '_3'],
+            ['₄', '_4'],
+            ['₅', '_5'],
+            ['₆', '_6'],
+            ['₇', '_7'],
+            ['₈', '_8'],
+            ['₉', '_9']
+        ];
+
+        replacements.forEach(([from, to]) => {
+            latex = latex.split(from).join(to);
+        });
+
+        latex = latex.replace(/\s+/g, ' ').trim();
+        latex = latex.replace(/__BR__/g, ' \\\\ ');
+
+        block.innerHTML = `\\[${latex}\\]`;
+    });
 }
 
 // Scroll to Section Navigation
