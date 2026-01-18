@@ -176,6 +176,7 @@ function normalizeFormulaBlocks() {
         });
 
         latex = latex.replace(/\s+/g, ' ').trim();
+        latex = latex.replace(/\\n/g, ' \\\\ ');
         latex = latex.replace(/__BR__/g, ' \\\\ ');
 
         block.innerHTML = `\\[${latex}\\]`;
