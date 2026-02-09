@@ -144,7 +144,8 @@
                             <h4>Chain Rule for Single Variable</h4>
                             
                             <div class="formula-display">
-                                \[If y = f(g(x)), then: dy/dx = (df/dg) \\times (dg/dx)\]
+                                <p><strong>If y = f(g(x)), then:</strong></p>
+                                <strong>dy/dx = (df/dg) × (dg/dx)</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -176,7 +177,8 @@
                             <p><strong>For neural networks, we need the multivariable chain rule:</strong></p>
                             
                             <div class="formula-display">
-                                \[If z = f(x, y) where x = g(t) and y = h(t), then: dz/dt = (\\partialf/\\partialx)(dx/dt) + (\\partialf/\\partialy)(dy/dt)\]
+                                <p><strong>If z = f(x, y) where x = g(t) and y = h(t), then:</strong></p>
+                                <strong>dz/dt = (∂f/∂x)(dx/dt) + (∂f/∂y)(dy/dt)</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -241,7 +243,7 @@ print(f"dy/dx = {dy_dx}")
                             <h4>1. Mean Squared Error (MSE) - For Regression</h4>
                             
                             <div class="formula-display">
-                                \[L = \frac{1}{n} \sum_{i=1}^{n} (y_{\text{pred}} - y_{\text{true}})^2\]
+                                <strong>L = (1/n) Σ<sub>i=1</sub><sup>n</sup> (y_pred - y_true)²</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -259,10 +261,133 @@ print(f"dy/dx = {dy_dx}")
                             <h4>2. Cross-Entropy Loss - For Classification</h4>
                             
                             <div class="formula-display">
-                                \[\begin{aligned}
-\frac{\partial L}{\partial W^{(L)}} &= \frac{\partial L}{\partial z^{(L)}} \times (a^{(L-1)})^T \\
-\frac{\partial L}{\partial b^{(L)}} &= \sum \frac{\partial L}{\partial z^{(L)}}
-\end{aligned}\]
+                                <p><strong>Binary Cross-Entropy:</strong></p>
+                                <strong>L = -(1/n) Σ<sub>i=1</sub><sup>n</sup> [ y_true log(y_pred) + (1 - y_true) log(1 - y_pred) ]</strong>
+                                
+                                <p style="margin-top: 1rem;"><strong>Multi-class Cross-Entropy:</strong></p>
+                                <strong>L = -(1/n) Σ<sub>i=1</sub><sup>n</sup> Σ<sub>c=1</sub><sup>C</sup> y_true,c log(y_pred,c)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Why Cross-Entropy?</h5>
+                                <ul>
+                                    <li><strong>Works with probabilities:</strong> Designed for classification</li>
+                                    <li><strong>Large penalty for confident wrong predictions:</strong> If y_pred ≈ 0 but y_true = 1, loss → ∞</li>
+                                    <li><strong>Small penalty for correct predictions:</strong> If y_pred ≈ y_true, loss → 0</li>
+                                    <li><strong>Best for:</strong> Classification tasks</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="code-box">
+                            <h4>Loss Function Implementation</h4>
+                            <pre><code class="language-python">import numpy as np
+
+def mse_loss(y_pred, y_true):
+    """
+    Mean Squared Error
+    
+    Parameters:
+    y_pred: Predicted values (n_samples,)
+    y_true: True values (n_samples,)
+    """
+    return np.mean((y_pred - y_true)**2)
+
+def mse_loss_derivative(y_pred, y_true):
+    """Derivative of MSE with respect to y_pred"""
+    return 2 * (y_pred - y_true) / len(y_pred)
+
+def binary_cross_entropy(y_pred, y_true, epsilon=1e-15):
+    """
+    Binary Cross-Entropy Loss
+    
+    Parameters:
+    y_pred: Predicted probabilities (n_samples,)
+    y_true: True labels (0 or 1) (n_samples,)
+    epsilon: Small value to prevent log(0)
+    """
+    # Clip to prevent log(0)
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+def binary_cross_entropy_derivative(y_pred, y_true, epsilon=1e-15):
+    """Derivative of BCE with respect to y_pred"""
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -(y_true / y_pred - (1 - y_true) / (1 - y_pred)) / len(y_pred)
+
+def cross_entropy(y_pred, y_true, epsilon=1e-15):
+    """
+    Multi-class Cross-Entropy Loss
+    
+    Parameters:
+    y_pred: Predicted probabilities (n_samples, n_classes)
+    y_true: True labels (one-hot encoded) (n_samples, n_classes)
+    """
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(np.sum(y_true * np.log(y_pred), axis=1))
+
+# Example usage
+y_pred_reg = np.array([2.1, 3.5, 1.8])
+y_true_reg = np.array([2.0, 3.0, 2.0])
+print(f"MSE: {mse_loss(y_pred_reg, y_true_reg):.4f}")
+
+y_pred_cls = np.array([0.9, 0.1, 0.8])
+y_true_cls = np.array([1, 0, 1])
+print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
+                        </div>
+                    </div>
+
+                    <div id="backward" class="content-section">
+                        <h2>The Backward Pass: Computing Gradients</h2>
+                        
+                        <div class="explanation-box">
+                            <h3>⬅️ Working Backward Through Layers</h3>
+                            <p><strong>The backward pass computes gradients starting from the output layer and moving backward to the input layer.</strong> We use the chain rule to propagate errors through each layer.</p>
+                        </div>
+
+                        <h3>Step-by-Step Backward Pass</h3>
+                        
+                        <div class="formula-box">
+                            <h4>1. Output Layer Gradient</h4>
+                            <p><strong>Start with the loss gradient at the output:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂a⁽L⁾ = derivative of loss with respect to output</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>For MSE Loss:</h5>
+                                <ul>
+                                    <li>L = (1/2)(y_pred - y_true)²</li>
+                                    <li>∂L/∂y_pred = y_pred - y_true (error signal!)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>2. Gradient Through Activation</h4>
+                            <p><strong>Apply chain rule through activation function:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂z⁽L⁾ = (∂L/∂a⁽L⁾) × f′(z⁽L⁾)</strong>
+                            </div>
+                            
+                            <div class="formula-explanation">
+                                <h5>Example with Sigmoid:</h5>
+                                <ul>
+                                    <li>If a = σ(z), then ∂a/∂z = σ(z)(1 - σ(z))</li>
+                                    <li>∂L/∂z = (∂L/∂a) × σ(z)(1 - σ(z))</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="formula-box">
+                            <h4>3. Gradient for Weights and Biases</h4>
+                            <p><strong>Compute gradients for parameters:</strong></p>
+                            
+                            <div class="formula-display">
+                                <strong>∂L/∂W⁽L⁾ = (∂L/∂z⁽L⁾) × (a⁽L⁻¹⁾)ᵀ</strong><br>
+                                <strong>∂L/∂b⁽L⁾ = Σ ∂L/∂z⁽L⁾</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -279,7 +404,7 @@ print(f"dy/dx = {dy_dx}")
                             <p><strong>Compute error for previous layer:</strong></p>
                             
                             <div class="formula-display">
-                                \[\frac{\partial L}{\partial a^{(L-1)}} = (W^{(L)})^T \times \frac{\partial L}{\partial z^{(L)}}\]
+                                <strong>∂L/∂a⁽L⁻¹⁾ = (W⁽L⁾)ᵀ × (∂L/∂z⁽L⁾)</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -328,23 +453,23 @@ print(f"dy/dx = {dy_dx}")
                             
                             <p><strong>Output Layer (L):</strong></p>
                             <div class="formula-display">
-                                \[\delta^{(L)} = \frac{\partial L}{\partial a^{(L)}} \odot f^{'(L)}(z^{(L)})\]
+                                <strong>δ⁽L⁾ = (∂L/∂a⁽L⁾) ⊙ f′⁽L⁾(z⁽L⁾)</strong>
                             </div>
                             <p>Where ⊙ is element-wise multiplication</p>
                             
                             <p><strong>Hidden Layers (l = L-1, L-2, ..., 1):</strong></p>
                             <div class="formula-display">
-                                \[\delta^{(l)} = ((W^{(l+1)})^T \times \delta^{(l+1)}) \odot f\'^{(l)}(z^{(l)})\]
+                                <strong>δ⁽ˡ⁾ = ((W⁽ˡ⁺¹⁾)ᵀ × δ⁽ˡ⁺¹⁾) ⊙ f′⁽ˡ⁾(z⁽ˡ⁾)</strong>
                             </div>
                             
                             <p><strong>Weight Gradients:</strong></p>
                             <div class="formula-display">
-                                \[\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)} \times (a^{(l-1)})^T\]
+                                <strong>∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ × (a⁽ˡ⁻¹⁾)ᵀ</strong>
                             </div>
                             
                             <p><strong>Bias Gradients:</strong></p>
                             <div class="formula-display">
-                                \[\frac{\partial L}{\partial b^{(l)}} = \delta^{(l)} \quad (\text{sum over batch dimension})\]
+                                <strong>∂L/∂b⁽ˡ⁾ = δ⁽ˡ⁾ (sum over batch dimension)</strong>
                             </div>
                             
                             <div class="formula-explanation">
@@ -483,10 +608,8 @@ for epoch in range(100):
                             <h4>Gradient Descent Update Rule</h4>
                             
                             <div class="formula-display">
-                                \[\begin{aligned}
-W &\leftarrow W - \eta \times \frac{\partial L}{\partial W} \\
-b &\leftarrow b - \eta \times \frac{\partial L}{\partial b}
-\end{aligned}\]
+                                <strong>W ← W - η × (∂L/∂W)</strong><br>
+                                <strong>b ← b - η × (∂L/∂b)</strong>
                             </div>
                             
                             <p>Where <strong>η</strong> (eta) is the learning rate</p>
@@ -741,10 +864,10 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the formula for updating weights using gradient descent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(W_new = W_old - α(∂L/∂W)\) where α is learning rate and L is loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(W_new = W_old + α\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(W_new = α × W_old\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(W_new = W_old × (∂L/∂W)\)</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) W_new = W_old - α(∂L/∂W) where α is learning rate and L is loss</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) W_new = W_old + α</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) W_new = α × W_old</div>
+                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) W_new = W_old × (∂L/∂W)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
@@ -807,6 +930,55 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
             });
         });
 
+        function checkAnswer(element, isCorrect) {
+            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+            });
+            if (isCorrect) {
+                element.classList.add('correct');
+                element.textContent += ' ✓ Correct!';
+            } else {
+                element.classList.add('incorrect');
+                element.textContent += ' ✗ Incorrect';
+                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
+                    .find(opt => {
+                        const onclick = opt.getAttribute('onclick') || '';
+                        return onclick.includes('true');
+                    });
+                if (correctOption && !correctOption.classList.contains('incorrect')) {
+                    correctOption.classList.add('correct');
+                    correctOption.textContent += ' ✓ Correct Answer';
+                }
+            }
+        }
+    </script>
+        <!-- KaTeX for math rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+    <!-- Footer Navigation -->
+    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
+        <div class="azbn-container" style="text-align: center;">
+            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
+                ↑ Back to Section Navigation
+            </button>
+            <div style="margin-top: 1.5rem;">
+                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
+                <a href="/tutorials/neural-networks/chapter5" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 5 →</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        function scrollToSectionNav() {
+            const sectionNav = document.querySelector('.section-nav');
+            if (sectionNav) {
+                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+// Initialize KaTeX rendering - ensure KaTeX is loaded first
         function initKaTeX() {
             if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
@@ -836,6 +1008,7 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
         } else {
             // DOM already loaded, wait for KaTeX
             initKaTeX();
-</script>
+        }
+    </script>
 </body>
 </html>
