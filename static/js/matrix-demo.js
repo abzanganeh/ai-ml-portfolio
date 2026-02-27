@@ -477,6 +477,17 @@ class VectorWorldDemo {
                 this.ctx.fillText('1.5 × [2, 3] = [3, 4.5]', 30, 40);
                 this.ctx.fillText('Vector grows by factor of 1.5', 30, 65);
                 break;
+            case 3:
+                // Final result — keep showing both vectors with full calculation
+                this.drawVector(this.centerX, this.centerY, originalEndX, originalEndY, '#666', 'v=[2,3]');
+                this.drawVector(this.centerX, this.centerY, scaledEndX, scaledEndY, v.color, '1.5×v=[3,4.5]');
+                
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = '18px Arial';
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText('1.5 × [2, 3] = [3, 4.5]', 30, 40);
+                this.ctx.fillText('Same direction, scaled magnitude', 30, 65);
+                break;
         }
     }
     
