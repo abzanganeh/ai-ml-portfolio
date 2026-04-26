@@ -5,8 +5,15 @@ import os
 
 # Database imports
 from flask_sqlalchemy import SQLAlchemy
+from jinja2 import TemplateNotFound
 from models.tutorial import db, Tutorial
 from models.project import Project  
+from data.tutorial_chapters import build_chapter_context, build_chapter_template_path
+from data.tutorial_pages import (
+    build_course_index_context,
+    build_single_page_context,
+    is_chaptered_tutorial,
+)
 from data.tutorials import TUTORIALS_DATA
 from data.projects import PROJECTS_DATA
 
@@ -265,9 +272,25 @@ def tutorial_dedicated(slug):
         # Redirect to generic tutorial route
         return redirect(url_for('tutorial_detail', slug=slug))
     
+    template_context = {"tutorial": tutorial}
+    if is_chaptered_tutorial(slug):
+        course_index = build_course_index_context(slug)
+        if course_index is None:
+            abort(404)
+        template_context["course_index"] = course_index
+    else:
+        tutorial_page = build_single_page_context(slug)
+        if tutorial_page is None:
+            abort(404)
+        template_context["tutorial_page"] = tutorial_page
+        template_context["single_page_needs_prism"] = slug in {
+            "complete-eda-leetcode",
+            "naive-bayes",
+        }
+
     # Render the dedicated template
     try:
-        return render_template(tutorial.template_path, tutorial=tutorial)
+        return render_template(tutorial.template_path, **template_context)
     except:
         # Fallback to generic template if dedicated template not found
         return redirect(url_for('tutorial_detail', slug=slug))
@@ -282,6 +305,20 @@ def tutorial_detail(slug):
     
     # Use generic tutorial template
     return render_template('tutorial_detail.html', tutorial=tutorial)
+
+
+def render_tutorial_chapter(slug: str, chapter_num: int) -> str:
+    """Render a chapter through the canonical tutorial shell metadata contract."""
+    template_path = build_chapter_template_path(slug, chapter_num)
+    context = build_chapter_context(slug, chapter_num)
+
+    if template_path is None or context is None:
+        abort(404)
+
+    try:
+        return render_template(template_path, **context)
+    except TemplateNotFound:
+        abort(404)
 
 @app.route('/tutorials/category/<category>/')
 def tutorials_by_category(category):
@@ -302,32 +339,23 @@ def tutorials_by_category(category):
 @app.route('/tutorials/ml-fundamentals/chapter1')
 def ml_fundamentals_chapter1():
     """ML Fundamentals Chapter 1: Introduction to Machine Learning"""
-    return render_template('tutorials/ml_fundamentals/chapter1.html')
+    return render_tutorial_chapter('ml-fundamentals', 1)
 
 @app.route('/tutorials/ml-fundamentals/chapter2')
 def ml_fundamentals_chapter2():
     """ML Fundamentals Chapter 2: Supervised Learning"""
-    return render_template('tutorials/ml_fundamentals/chapter2.html')
+    return render_tutorial_chapter('ml-fundamentals', 2)
 
 @app.route('/tutorials/ml-fundamentals/chapter3')
 def ml_fundamentals_chapter3():
     """ML Fundamentals Chapter 3: Unsupervised Learning"""
-    return render_template('tutorials/ml_fundamentals/chapter3.html')
+    return render_tutorial_chapter('ml-fundamentals', 3)
 
 # ML Model Relationships tutorial chapter routes
 @app.route('/tutorials/ml-model-relationships/chapter<int:chapter_num>')
 def ml_relationships_chapter(chapter_num):
     """ML Model Relationships tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 8:
-        abort(404)
-    
-    template_path = f'tutorials/ml-model-relationships/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('ml-model-relationships', chapter_num)
 
 # Clustering Course tutorial chapter routes
 @app.route('/tutorials/clustering-course/chapter<int:chapter_num>')
@@ -342,117 +370,49 @@ def clustering_course_chapter(chapter_num):
 @app.route('/tutorials/clustering/chapter<int:chapter_num>')
 def clustering_chapter(chapter_num):
     """New Clustering tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 15:
-        abort(404)
-    
-    template_path = f'tutorials/clustering/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('clustering', chapter_num)
 
 # Decision Trees tutorial chapter routes
 @app.route('/tutorials/decision-trees/chapter<int:chapter_num>')
 def decision_trees_chapter(chapter_num):
     """Decision Trees tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 5:
-        abort(404)
-    
-    template_path = f'tutorials/decision_trees/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('decision-trees', chapter_num)
 
 # Coding Interview Algorithms tutorial chapter routes
 @app.route('/tutorials/coding-interview-algorithms/chapter<int:chapter_num>')
 def coding_algorithms_chapter(chapter_num):
     """Coding Interview Algorithms tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 10:
-        abort(404)
-    
-    template_path = f'tutorials/coding-interview-algorithms/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('coding-interview-algorithms', chapter_num)
 
 # Neural Networks tutorial chapter routes
 @app.route('/tutorials/neural-networks/chapter<int:chapter_num>')
 def neural_networks_chapter(chapter_num):
     """Neural Networks tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 8:
-        abort(404)
-    
-    template_path = f'tutorials/neural-networks/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('neural-networks', chapter_num)
 
 # Transformers tutorial chapter routes
 @app.route('/tutorials/transformers/chapter<int:chapter_num>')
 def transformers_chapter(chapter_num):
     """Transformer Architecture tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 10:
-        abort(404)
-    
-    template_path = f'tutorials/transformers/chapter{chapter_num}.html'
-    
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('transformers', chapter_num)
 
 # LLMs tutorial chapter routes
 @app.route('/tutorials/llms/chapter<int:chapter_num>')
 def llms_chapter(chapter_num):
     """Large Language Models tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 8:
-        abort(404)
-    
-    template_path = f'tutorials/llms/chapter{chapter_num}.html'
-    
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('llms', chapter_num)
 
 # RAG tutorial chapter routes
 @app.route('/tutorials/rag/chapter<int:chapter_num>')
 def rag_chapter(chapter_num):
     """RAG & Retrieval Systems tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 7:
-        abort(404)
-    
-    template_path = f'tutorials/rag/chapter{chapter_num}.html'
-    
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('rag', chapter_num)
 
 # Agentic AI tutorial chapter routes
 @app.route('/tutorials/agentic-ai/chapter<int:chapter_num>')
 def agentic_ai_chapter(chapter_num):
     """Agentic AI & LLM Agents tutorial chapters"""
-    if chapter_num < 1 or chapter_num > 8:
-        abort(404)
-    
-    template_path = f'tutorials/agentic-ai/chapter{chapter_num}.html'
-    
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+    return render_tutorial_chapter('agentic-ai', chapter_num)
 
 
 @app.route('/blog')

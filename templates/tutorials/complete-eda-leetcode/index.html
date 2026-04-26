@@ -1,41 +1,12 @@
+{% extends "tutorials/shared/single_page.html" %}
 
+{% block legacy_single_page_title %}Complete Exploratory Data Analysis: LeetCode Dataset{% endblock %}
 
+{% block tutorial_extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/complete-eda-leetcode/eda-tutorial.css') }}">
+{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Exploratory Data Analysis: LeetCode Dataset</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/complete-eda-leetcode/eda-tutorial.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@3.0.0/dist/chartjs-chart-matrix.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/complete-eda-leetcode" class="course-link">
-                    <span>Complete EDA Tutorial</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
+{% block tutorial_content %}
     <main class="main-content">
     <div class="azbn-container">
         <div class="tutorial-header">
@@ -1389,37 +1360,37 @@ print(f"Ready for advanced analysis and modeling!")</code></pre>
     </div>
 
     </main>
+{% endblock %}
 
-    <script src="{{ url_for('static', filename='js/tutorials/complete-eda-leetcode.js') }}"></script>
-    
-    <script>
-        // Initialize Prism.js syntax highlighting
-        document.addEventListener('DOMContentLoaded', function() {
-            // Re-run Prism highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-            
-            // Add copy buttons to code blocks
-            const codeBlocks = document.querySelectorAll('.code-block');
-            codeBlocks.forEach(function(block) {
-                const copyBtn = document.createElement('button');
-                copyBtn.className = 'copy-btn';
-                copyBtn.textContent = 'Copy';
-                copyBtn.onclick = function() {
-                    const code = block.querySelector('code');
-                    if (code) {
-                        navigator.clipboard.writeText(code.textContent).then(function() {
-                            copyBtn.textContent = 'Copied!';
-                            setTimeout(function() {
-                                copyBtn.textContent = 'Copy';
-                            }, 2000);
-                        });
-                    }
-                };
-                block.appendChild(copyBtn);
-            });
+{% block tutorial_extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@3.0.0/dist/chartjs-chart-matrix.min.js"></script>
+<script src="{{ url_for('static', filename='js/tutorials/complete-eda-leetcode.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+
+        const codeBlocks = document.querySelectorAll('.code-block');
+        codeBlocks.forEach(function(block) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.onclick = function() {
+                const code = block.querySelector('code');
+                if (code) {
+                    navigator.clipboard.writeText(code.textContent).then(function() {
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(function() {
+                            copyBtn.textContent = 'Copy';
+                        }, 2000);
+                    });
+                }
+            };
+            block.appendChild(copyBtn);
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}
