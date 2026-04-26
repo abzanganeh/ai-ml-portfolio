@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from data.tutorials import TUTORIALS_DATA
+
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 @dataclass(frozen=True)
@@ -47,6 +52,14 @@ CANONICAL_CHAPTER_SECTIONS: tuple[dict[str, str], ...] = (
     {"id": "learning-objectives", "label": "Objectives"},
     {"id": "chapter-content", "label": "Chapter Content"},
 )
+
+CHAPTER_OBJECTIVE_OVERRIDES: dict[tuple[str, int], tuple[str, str, str]] = {
+    ("clustering", 14): (
+        "Compare internal, external, relative, statistical, and stability-based clustering validation methods.",
+        "Interpret major evaluation metrics such as silhouette, Davies-Bouldin, Calinski-Harabasz, ARI, NMI, and Hopkins statistic.",
+        "Choose evaluation evidence that fits the available labels, data shape, and practical decision being made.",
+    ),
+}
 
 
 COURSE_OBJECTIVE_TEMPLATES: dict[str, tuple[str, str, str]] = {
@@ -284,8 +297,8 @@ def build_chapter_context(slug: str, chapter_number: int) -> dict[str, Any] | No
         difficulty=str(tutorial["difficulty"]),
         duration=str(tutorial["duration"]),
         progress=round((chapter_number / len(config.chapter_titles)) * 100),
-        sections=CANONICAL_CHAPTER_SECTIONS,
-        objectives=_build_objectives(slug, chapter_title),
+        sections=_extract_chapter_sections(config, chapter_number),
+        objectives=_build_objectives(slug, chapter_number, chapter_title),
         previous_url=_chapter_url(slug, chapter_number - 1) if chapter_number > 1 else None,
         previous_label=_chapter_label(config, chapter_number - 1) if chapter_number > 1 else None,
         next_url=_chapter_url(slug, chapter_number + 1)
@@ -322,7 +335,10 @@ def _build_chapter_nav(config: ChapterCourseConfig) -> tuple[ChapterNavItem, ...
     )
 
 
-def _build_objectives(slug: str, chapter_title: str) -> tuple[str, ...]:
+def _build_objectives(slug: str, chapter_number: int, chapter_title: str) -> tuple[str, ...]:
+    if (slug, chapter_number) in CHAPTER_OBJECTIVE_OVERRIDES:
+        return CHAPTER_OBJECTIVE_OVERRIDES[(slug, chapter_number)]
+
     templates = COURSE_OBJECTIVE_TEMPLATES.get(
         slug,
         (
@@ -333,6 +349,40 @@ def _build_objectives(slug: str, chapter_title: str) -> tuple[str, ...]:
     )
 
     return tuple(template.format(chapter_title=chapter_title) for template in templates)
+
+
+def _extract_chapter_sections(
+    config: ChapterCourseConfig, chapter_number: int
+) -> tuple[dict[str, str], ...]:
+    template_path = ROOT_DIR / "templates" / "tutorials" / config.template_dir / f"chapter{chapter_number}.html"
+    if not template_path.exists():
+        return CANONICAL_CHAPTER_SECTIONS
+
+    html = template_path.read_text(encoding="utf-8")
+    sections = [{"id": "learning-objectives", "label": "Objectives"}]
+    seen_ids = {"learning-objectives"}
+
+    for section_id, label in re.findall(
+        r'data-section=["\']([^"\']+)["\'][^>]*>(.*?)</button>',
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    ):
+        cleaned_label = re.sub(r"<[^>]+>", "", label).strip()
+        if section_id not in seen_ids and cleaned_label:
+            sections.append({"id": section_id, "label": cleaned_label})
+            seen_ids.add(section_id)
+
+    if len(sections) == 1:
+        for section_id in re.findall(
+            r'id=["\']([^"\']+)["\'][^>]*class=["\'][^"\']*content-section',
+            html,
+            flags=re.IGNORECASE,
+        ):
+            if section_id not in seen_ids:
+                sections.append({"id": section_id, "label": section_id.replace("-", " ").title()})
+                seen_ids.add(section_id)
+
+    return tuple(sections) if len(sections) > 1 else CANONICAL_CHAPTER_SECTIONS
 
 
 def _chapter_url(slug: str, chapter_number: int) -> str:

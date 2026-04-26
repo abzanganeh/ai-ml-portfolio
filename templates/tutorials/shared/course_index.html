@@ -3,7 +3,7 @@
 
 {% set index_data = course_index %}
 
-{% block title %}{{ index_data.title }} - {{ site_title|default("AI/ML Portfolio") }}{% endblock %}
+{% block title %}{% block legacy_course_index_title %}{{ index_data.title }} - {{ site_title|default("AI/ML Portfolio") }}{% endblock %}{% endblock %}
 
 {% block meta_description %}{{ index_data.description }}{% endblock %}
 
@@ -12,6 +12,7 @@
 {% block extra_css %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/chapter-template.css') }}">
+{% block legacy_course_index_css %}{% endblock %}
 {% endblock %}
 
 {% block content %}
@@ -82,6 +83,8 @@
                 </p>
                 {% endif %}
             </section>
+
+            {% block legacy_course_index_content %}{% endblock %}
         </main>
     </div>
 </article>

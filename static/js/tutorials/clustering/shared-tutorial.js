@@ -246,6 +246,10 @@ function initializeQuiz() {
     const quizOptions = document.querySelectorAll('.enhanced-quiz-option');
     
     quizOptions.forEach(option => {
+        if (option.dataset.correct !== undefined) {
+            return;
+        }
+
         option.addEventListener('click', function() {
             const question = this.closest('.enhanced-quiz-question');
             const allOptions = question.querySelectorAll('.enhanced-quiz-option');
