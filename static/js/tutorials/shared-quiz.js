@@ -1,10 +1,15 @@
 /**
  * Universal Quiz Handler for All Tutorials
- * Works with both legacy onclick="checkAnswer(this, true/false)" and data-correct="true/false" patterns.
+ * Works with legacy radio quizzes, onclick="checkAnswer(this, true/false)", and data-correct patterns.
  */
 
 // Universal checkAnswer function - works with onclick pattern
 function checkAnswer(element, isCorrect) {
+    if (!isElementLike(element)) {
+        checkLegacyRadioAnswer(element, isCorrect);
+        return;
+    }
+
     if (!element) {
         console.error('checkAnswer: element is null');
         return;
@@ -74,6 +79,34 @@ function checkAnswer(element, isCorrect) {
     if (explanation) {
         explanation.classList.add('show');
         explanation.style.display = 'block';
+    }
+}
+
+function isElementLike(value) {
+    return value && typeof value.closest === 'function';
+}
+
+function checkLegacyRadioAnswer(questionNum, correctAnswer) {
+    const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
+    const resultDiv = document.getElementById(`q${questionNum}-result`) || document.getElementById(`feedback${questionNum}`);
+
+    if (!resultDiv) {
+        console.error(`Quiz result container not found for question ${questionNum}`);
+        return;
+    }
+
+    if (!selectedAnswer) {
+        resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
+        return;
+    }
+
+    const isCorrect = selectedAnswer.value === correctAnswer;
+    resultDiv.innerHTML = isCorrect
+        ? '<p style="color: green;">Correct!</p>'
+        : '<p style="color: red;">Incorrect. Try again!</p>';
+
+    if (typeof window.updateQuizScore === 'function') {
+        window.updateQuizScore();
     }
 }
 
@@ -185,5 +218,6 @@ if (document.readyState === 'loading') {
 window.QuizUtils = {
     checkAnswer,
     handleQuizAnswer,
-    initializeQuizzes
+    initializeQuizzes,
+    checkLegacyRadioAnswer
 };

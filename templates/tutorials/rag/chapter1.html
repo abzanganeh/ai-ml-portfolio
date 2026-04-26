@@ -314,21 +314,21 @@
                         <div class="formula-box">
                             <h4>RAG Generation Process</h4>
                             <div class="formula-display">
-                                \[P(y | q) = P(y | q, \text{Retrieve}(q, D))\]
+                                \[P_{\text{RAG}}(y \mid q, D) = P_{\text{LLM}}(y \mid q, R(q, D))\]
                             </div>
                             <div class="formula-explanation">
                                 <h5>What This Formula Means:</h5>
-                                <p>This formula represents the core principle of RAG: the probability of generating answer \(y\) given query \(q\) is equal to the probability of generating \(y\) given both the query \(q\) and the retrieved documents from the knowledge base.</p>
+                                <p>This formula represents the core principle of RAG: generation is conditioned on both the user query \(q\) and the retrieved evidence \(R(q, D)\). It is not the same distribution as a model answering from the query alone.</p>
                                 
                                 <h5>Breaking It Down:</h5>
                                 <ul>
-                                    <li><strong>\(P(y | q)\)</strong>: Traditional LLM approach - probability of answer \(y\) given only the query \(q\). This relies solely on the model's training data.</li>
-                                    <li><strong>\(P(y | q, \text{Retrieve}(q, D))\)</strong>: RAG approach - probability of answer \(y\) given both the query \(q\) AND the retrieved context from knowledge base \(D\).</li>
-                                    <li><strong>\(\text{Retrieve}(q, D)\)</strong>: Function that searches knowledge base \(D\) and returns the most relevant documents for query \(q\).</li>
+                                    <li><strong>\(P_{\text{RAG}}(y \mid q, D)\)</strong>: RAG answer distribution for answer \(y\), query \(q\), and knowledge base \(D\).</li>
+                                    <li><strong>\(P_{\text{LLM}}(y \mid q, R(q, D))\)</strong>: LLM generation conditioned on the query and retrieved context.</li>
+                                    <li><strong>\(R(q, D)\)</strong>: Retrieval function that searches knowledge base \(D\) and returns the most relevant documents for query \(q\).</li>
                                 </ul>
                                 
                                 <h5>Key Insight:</h5>
-                                <p>The formula shows that RAG <strong>augments</strong> the generation process by conditioning on retrieved documents. Instead of generating from memory alone, the LLM generates based on both the query and the retrieved factual context, leading to more accurate and up-to-date responses.</p>
+                                <p>The formula shows that RAG <strong>changes the conditioning context</strong> for generation. Instead of generating from model memory alone, the LLM generates based on both the query and retrieved factual context, which can improve freshness, grounding, and source traceability.</p>
                                 
                                 <h5>Example:</h5>
                                 <p>If a user asks "What happened in Q4 2024?", the traditional model might say "I don't have information about that" (because its training data cuts off earlier). But with RAG, \(\text{Retrieve}(q, D)\) finds the Q4 2024 report in the knowledge base, and the model generates an answer based on that actual document.</p>
@@ -806,7 +806,7 @@ if __name__ == "__main__":
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
-                                <h3>Question 3: In the RAG formula \(P(y \mid q) = P(y \mid q, \text{Retrieve}(q, D))\), what does \(\text{Retrieve}(q, D)\) represent?</h3>
+                                <h3>Question 3: In the RAG formula \(P_{\text{RAG}}(y \mid q, D) = P_{\text{LLM}}(y \mid q, R(q, D))\), what does \(R(q, D)\) represent?</h3>
                                 <div class="quiz-option" data-correct="false">A) The generated answer</div>
                                 <div class="quiz-option" data-correct="false">B) The query embedding</div>
                                 <div class="quiz-option" data-correct="true">C) The retrieved relevant documents from knowledge base D for query q</div>

@@ -33,6 +33,18 @@ The tutorials contain strong raw material, especially the matrix-vector visualiz
 
 The highest-impact cleanup should start with content correctness and learning quality, then standardize page structure. RAG needs the most urgent content pass because it includes a placeholder generation example and repeated weak quiz distractors. Clustering needs visual placeholders replaced with real visuals or clearly marked planned assets. Naive Bayes needs formula rendering and a numeric audit. LLM and agentic AI chapters need boilerplate removal and more chapter-specific teaching.
 
+## Implementation Status
+
+The first cleanup pass has addressed several items from this review:
+
+- RAG chapter 6 no longer presents a fake generated answer as if it were a complete generation step.
+- RAG quiz distractors in the reviewed chapters were replaced with more plausible incorrect options.
+- The Naive Bayes worked example was recalculated with Laplace smoothing and converted to KaTeX-style formulas.
+- Chapter pages were moved behind shared tutorial shells to reduce duplicated HTML scaffolding.
+- Tutorial quality tests now cover published routes, chapter inventory, internal links, static assets, and shared shell usage.
+
+Remaining work still includes deeper content review, fully implemented visualizations/labs, broader formula audits, presentation mode, and manual browser QA.
+
 ## Current Format Findings
 
 ### Template Structure
