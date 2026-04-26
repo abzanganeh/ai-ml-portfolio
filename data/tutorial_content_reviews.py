@@ -19,8 +19,19 @@ class TutorialContentReview:
     blocking_issues: tuple[str, ...] = ()
 
     @property
-    def is_complete(self) -> bool:
+    def has_no_blocking_issues(self) -> bool:
         return bool(self.reviewed_scope and self.findings) and not self.blocking_issues
+
+    @property
+    def is_quality_complete(self) -> bool:
+        return self.has_no_blocking_issues and all(
+            status == "pass"
+            for status in (
+                self.conceptual_correctness,
+                self.message_quality,
+                self.explanation_depth,
+            )
+        )
 
 
 TUTORIAL_CONTENT_REVIEWS: dict[str, TutorialContentReview] = {
