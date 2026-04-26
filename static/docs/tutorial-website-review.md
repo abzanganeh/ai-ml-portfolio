@@ -45,6 +45,25 @@ The first cleanup pass has addressed several items from this review:
 
 Remaining work still includes deeper content review, fully implemented visualizations/labs, broader formula audits, presentation mode, and manual browser QA.
 
+## Concept Correctness Pass
+
+Status: completed for the 14 published tutorials on 2026-04-26.
+
+The review now has a structured source of truth in `data/tutorial_content_reviews.py`. Each published tutorial has been checked across three gates:
+
+- Conceptual correctness: no blocking factual or mathematical issue remains in the published tutorial path.
+- Message quality: the learner-facing promise is specific enough to avoid generic boilerplate or misleading production claims.
+- Explanation depth: the tutorial has enough mental model, example, or caveat coverage to migrate without hiding a known content gap.
+
+The pass did not mark all future polish complete. It separates blockers from follow-up quality work:
+
+- Clear to migrate: NLP, ML model relationships, Complete EDA, matrix-vector multiplication, and coding-interview algorithms.
+- Correct with depth follow-ups: Naive Bayes, ML fundamentals, decision trees, neural networks, transformers, LLMs, RAG, agentic AI, and clustering.
+- No blocking issue remains from the earlier RAG generation placeholder or Naive Bayes arithmetic findings.
+- Legacy chapter-level objective boxes were removed from routable chapter templates so the canonical shell is the only source of learner objectives.
+
+The focused test suite now fails if a published tutorial is missing a completed content review or if routable chapter templates reintroduce legacy objective boxes.
+
 ## Execution Workflow
 
 Each major tutorial cleanup slice should run on its own branch, with commits and pushes made as soon as the slice is coherent and tested.

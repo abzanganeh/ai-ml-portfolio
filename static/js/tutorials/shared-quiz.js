@@ -3,6 +3,12 @@
  * Works with legacy radio quizzes, onclick="checkAnswer(this, true/false)", and data-correct patterns.
  */
 
+const QUIZ_FEEDBACK = Object.freeze({
+    correct: 'Correct',
+    incorrect: 'Incorrect',
+    correctAnswer: 'Correct answer'
+});
+
 // Universal checkAnswer function - works with onclick pattern
 function checkAnswer(element, isCorrect) {
     if (!isElementLike(element)) {
@@ -35,21 +41,20 @@ function checkAnswer(element, isCorrect) {
             opt.dataset.originalText = opt.textContent.trim();
         }
         opt.textContent = opt.dataset.originalText;
+        opt.dataset.selected = 'false';
         opt.classList.remove('correct', 'incorrect');
         opt.style.pointerEvents = 'none'; // Disable further clicks
     });
+
+    element.dataset.selected = 'true';
     
     if (isCorrect) {
-        // Correct answer selected - add green glow
         element.classList.add('correct');
-        element.textContent = element.dataset.originalText + ' ✓ Correct!';
-        // Force reflow to ensure animation triggers
+        element.textContent = `${element.dataset.originalText} ${QUIZ_FEEDBACK.correct}`;
         element.offsetHeight;
     } else {
-        // Wrong answer selected - add red glow
         element.classList.add('incorrect');
-        element.textContent = element.dataset.originalText + ' ✗ Incorrect';
-        // Force reflow to ensure animation triggers
+        element.textContent = `${element.dataset.originalText} ${QUIZ_FEEDBACK.incorrect}`;
         element.offsetHeight;
         
         // Find and highlight the correct answer with green glow
@@ -68,8 +73,7 @@ function checkAnswer(element, isCorrect) {
         
         if (correctOption) {
             correctOption.classList.add('correct');
-            correctOption.textContent = correctOption.dataset.originalText + ' ✓ Correct Answer';
-            // Force reflow to ensure animation triggers
+            correctOption.textContent = `${correctOption.dataset.originalText} ${QUIZ_FEEDBACK.correctAnswer}`;
             correctOption.offsetHeight;
         }
     }
@@ -102,8 +106,8 @@ function checkLegacyRadioAnswer(questionNum, correctAnswer) {
 
     const isCorrect = selectedAnswer.value === correctAnswer;
     resultDiv.innerHTML = isCorrect
-        ? '<p style="color: green;">Correct!</p>'
-        : '<p style="color: red;">Incorrect. Try again!</p>';
+        ? `<p style="color: green;">${QUIZ_FEEDBACK.correct}</p>`
+        : `<p style="color: red;">${QUIZ_FEEDBACK.incorrect}. Try again.</p>`;
 
     if (typeof window.updateQuizScore === 'function') {
         window.updateQuizScore();
@@ -130,12 +134,15 @@ function handleQuizAnswer(selectedOption, isCorrect) {
     options.forEach(option => {
         option.classList.add('disabled');
         option.style.pointerEvents = 'none';
+        option.dataset.selected = 'false';
         
         // Store original text
         if (!option.dataset.originalText) {
             option.dataset.originalText = option.textContent.trim();
         }
     });
+
+    selectedOption.dataset.selected = 'true';
     
     // Reset all options to original state
     options.forEach(option => {
@@ -148,10 +155,10 @@ function handleQuizAnswer(selectedOption, isCorrect) {
     // Mark selected option
     if (isCorrect) {
         selectedOption.classList.add('correct');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' Correct!';
+        selectedOption.textContent = `${selectedOption.dataset.originalText} ${QUIZ_FEEDBACK.correct}`;
     } else {
         selectedOption.classList.add('incorrect');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' Incorrect';
+        selectedOption.textContent = `${selectedOption.dataset.originalText} ${QUIZ_FEEDBACK.incorrect}`;
         
         // Find and mark correct answer
         const correctOption = Array.from(options).find(option => {
@@ -169,7 +176,7 @@ function handleQuizAnswer(selectedOption, isCorrect) {
         
         if (correctOption) {
             correctOption.classList.add('correct');
-            correctOption.textContent = correctOption.dataset.originalText + ' Correct Answer';
+            correctOption.textContent = `${correctOption.dataset.originalText} ${QUIZ_FEEDBACK.correctAnswer}`;
         }
     }
     

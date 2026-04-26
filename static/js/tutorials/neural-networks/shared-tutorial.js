@@ -120,9 +120,9 @@ function initializeProgressBars() {
     }
 }
 
-// Normalize formula-display blocks to KaTeX-friendly content
+// Normalize formula display blocks to KaTeX-friendly content
 function normalizeFormulaBlocks() {
-    const blocks = document.querySelectorAll('.formula-display');
+    const blocks = document.querySelectorAll('.tutorial-template-formula__display');
     if (!blocks.length) {
         return;
     }
