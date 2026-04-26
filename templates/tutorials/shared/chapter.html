@@ -28,7 +28,11 @@
 {% block extra_css %}
 {{ super() }}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/chapter-template.css') }}">
+{% if legacy_chapter_needs_prism|default(false) %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+{% endif %}
 {% block tutorial_extra_css %}{% endblock %}
+{% block legacy_chapter_css %}{% endblock %}
 {% endblock %}
 
 {% block content %}
@@ -81,6 +85,7 @@
             {% block tutorial_lab %}{% endblock %}
             {% block tutorial_quiz %}{% endblock %}
             {% block tutorial_summary %}{% endblock %}
+            {% block legacy_chapter_content %}{% endblock %}
 
             {{ tutorial_components.previous_next(
                 chapter_data.previous_url|default(none),
@@ -96,6 +101,20 @@
 {% block extra_js %}
 {{ super() }}
 <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}"></script>
+{% if legacy_chapter_needs_prism|default(false) %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof Prism !== "undefined") {
+            Prism.highlightAll();
+        }
+    });
+</script>
+{% endif %}
 <script src="{{ url_for('static', filename='js/tutorials/chapter-template.js') }}"></script>
 {% block tutorial_extra_js %}{% endblock %}
+{% block legacy_chapter_js %}{% endblock %}
 {% endblock %}

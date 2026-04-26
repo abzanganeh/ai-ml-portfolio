@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% import "tutorials/shared/_components.html" as tutorial_components %}
+
+{% set page_data = tutorial_page %}
+
+{% block title %}{{ page_data.title }} - {{ site_title|default("AI/ML Portfolio") }}{% endblock %}
+
+{% block meta_description %}{{ page_data.description }}{% endblock %}
+
+{% block body_class %}tutorial-template-page {{ super() }}{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/chapter-template.css') }}">
+{% if single_page_needs_prism|default(false) %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+{% endif %}
+{% block tutorial_extra_head %}{% endblock %}
+{% block tutorial_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<article class="tutorial-template-shell tutorial-single-page-shell" data-course-slug="{{ page_data.slug }}">
+    <header class="tutorial-template-hero">
+        <div class="tutorial-template-container">
+            <nav class="tutorial-template-breadcrumb" aria-label="Breadcrumb">
+                <a href="{{ url_for('tutorials') }}">Tutorials</a>
+                <span aria-hidden="true">/</span>
+                <span>{{ page_data.title }}</span>
+            </nav>
+
+            {{ tutorial_components.meta_badges([
+                {"label": "Category", "value": page_data.category},
+                {"label": "Format", "value": "Interactive Tutorial"},
+                {"label": "Difficulty", "value": page_data.difficulty},
+                {"label": "Estimated Time", "value": page_data.duration}
+            ]) }}
+
+            <h1>{{ page_data.title }}</h1>
+            <p class="tutorial-template-hero__subtitle">{{ page_data.description }}</p>
+        </div>
+    </header>
+
+    <div class="tutorial-template-container tutorial-template-layout">
+        <aside class="tutorial-template-sidebar" aria-label="Tutorial navigation">
+            {{ tutorial_components.section_nav(page_data.sections) }}
+        </aside>
+
+        <main class="tutorial-template-main" id="tutorial-content">
+            {{ tutorial_components.objectives(page_data.objectives) }}
+
+            <section class="tutorial-template-card tutorial-single-page-content">
+                {% block tutorial_content %}{% endblock %}
+            </section>
+        </main>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}"></script>
+{% if single_page_needs_prism|default(false) %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% endif %}
+<script src="{{ url_for('static', filename='js/tutorials/chapter-template.js') }}"></script>
+{% block tutorial_extra_js %}{% endblock %}
+{% endblock %}
