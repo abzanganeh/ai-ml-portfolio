@@ -22,7 +22,7 @@ function checkAnswer(element, isCorrect) {
     }
     
     // Store original text for all options before modifying
-    const questionContainer = element.closest('.enhanced-quiz-container') || element.closest('.quiz-question') || element.closest('.quiz-container');
+    const questionContainer = getQuizQuestionScope(element);
     if (!questionContainer) {
         console.error('Quiz question container not found for element:', element);
         return;
@@ -90,6 +90,15 @@ function isElementLike(value) {
     return value && typeof value.closest === 'function';
 }
 
+function getQuizQuestionScope(element) {
+    return (
+        element.closest('.enhanced-quiz-question')
+        || element.closest('.enhanced-quiz-container')
+        || element.closest('.quiz-question')
+        || element.closest('.quiz-container')
+    );
+}
+
 function checkLegacyRadioAnswer(questionNum, correctAnswer) {
     const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
     const resultDiv = document.getElementById(`q${questionNum}-result`) || document.getElementById(`feedback${questionNum}`);
@@ -121,7 +130,7 @@ function handleQuizAnswer(selectedOption, isCorrect) {
         isCorrect = selectedOption.dataset.correct === 'true';
     }
     
-    const quizContainer = selectedOption.closest('.enhanced-quiz-container') || selectedOption.closest('.quiz-question') || selectedOption.closest('.quiz-container');
+    const quizContainer = getQuizQuestionScope(selectedOption);
     if (!quizContainer) {
         console.error('Quiz container not found');
         return;
@@ -226,5 +235,6 @@ window.QuizUtils = {
     checkAnswer,
     handleQuizAnswer,
     initializeQuizzes,
-    checkLegacyRadioAnswer
+    checkLegacyRadioAnswer,
+    getQuizQuestionScope
 };

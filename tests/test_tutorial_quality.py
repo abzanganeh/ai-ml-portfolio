@@ -284,11 +284,22 @@ def test_published_tutorial_content_reviews_are_complete() -> None:
         review = get_tutorial_content_review(slug)
         assert review is not None
         assert review.slug == slug
-        assert review.is_complete
+        assert review.has_no_blocking_issues
         assert review.conceptual_correctness in {"pass", "watch"}
         assert review.message_quality in {"pass", "watch"}
         assert review.explanation_depth in {"pass", "watch"}
         assert not review.blocking_issues
+
+
+def test_tutorial_content_reviews_track_quality_followups() -> None:
+    reviews_with_followups = [
+        review
+        for review in TUTORIAL_CONTENT_REVIEWS.values()
+        if not review.is_quality_complete
+    ]
+
+    assert reviews_with_followups
+    assert all(review.follow_ups for review in reviews_with_followups)
 
 
 def test_shared_component_library_keeps_required_macros() -> None:
