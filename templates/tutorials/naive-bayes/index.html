@@ -22,19 +22,37 @@
     <p>Bayes' theorem forms the core of this algorithm:</p>
     
     <div class="formula">
-        P(A|B) = P(B|A) × P(A) / P(B)
+        \[
+        P(A \mid B) = \frac{P(B \mid A)P(A)}{P(B)}
+        \]
+        <div class="formula-notes">
+            <p><strong>Definitions:</strong> \(P(A \mid B)\) is the probability of hypothesis \(A\) after observing evidence \(B\), \(P(B \mid A)\) is the likelihood, \(P(A)\) is the prior, and \(P(B)\) normalizes the result.</p>
+            <p><strong>Interpretation:</strong> update what you believed before seeing the evidence by measuring how likely that evidence is under the hypothesis.</p>
+        </div>
     </div>
     
     <p>For classification, this becomes:</p>
     
     <div class="formula">
-        P(class|features) = P(features|class) × P(class) / P(features)
+        \[
+        P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y)P(y)}{P(\mathbf{x})}
+        \]
+        <div class="formula-notes">
+            <p><strong>Definitions:</strong> \(y\) is a class label and \(\mathbf{x}\) is the feature vector for one example.</p>
+            <p><strong>Assumption:</strong> for choosing the winning class, \(P(\mathbf{x})\) is the same for every class, so we compare proportional scores instead of calculating the denominator.</p>
+        </div>
     </div>
     
     <p>The "naive" assumption means we assume all features are independent:</p>
     
     <div class="formula">
-        P(x₁,x₂,...,xₙ|class) = P(x₁|class) × P(x₂|class) × ... × P(xₙ|class)
+        \[
+        P(\mathbf{x} \mid y) = \prod_{i=1}^{n} P(x_i \mid y)
+        \]
+        <div class="formula-notes">
+            <p><strong>Definitions:</strong> \(x_i\) is one feature value and \(n\) is the number of features.</p>
+            <p><strong>Common mistake:</strong> the features rarely are truly independent; the assumption is a useful simplification, not a claim about the real world.</p>
+        </div>
     </div>
     
     <h2>📊 Simple Example: Weather Prediction</h2>
@@ -71,29 +89,39 @@
     
     <div class="example-box">
         <h4><span class="step-number">1</span>Prior Probabilities:</h4>
-        <p>P(Play=Yes) = 9/14 = <span class="highlight">0.643</span></p>
-        <p>P(Play=No) = 5/14 = <span class="highlight">0.357</span></p>
+        <p>\(P(\text{Yes}) = 9/14 =\) <span class="highlight">0.6429</span></p>
+        <p>\(P(\text{No}) = 5/14 =\) <span class="highlight">0.3571</span></p>
         
         <h4><span class="step-number">2</span>Likelihood Calculations:</h4>
+        <p>Use Laplace smoothing with \(\alpha = 1\):</p>
+        <div class="formula compact-formula">
+            \[
+            P(x_i = v \mid y) = \frac{\operatorname{count}(x_i = v, y) + \alpha}{\operatorname{count}(y) + \alpha k_i}
+            \]
+            <div class="formula-notes">
+                <p>Here, \(k_i\) is the number of possible values for the feature. Outlook and temperature have 3 values; humidity and wind have 2 values.</p>
+            </div>
+        </div>
         <p><strong>For Play=Yes:</strong></p>
         <ul>
-            <li>P(Outlook=Sunny|Yes) = 2/9 = 0.222</li>
-            <li>P(Temperature=Cool|Yes) = 3/9 = 0.333</li>
-            <li>P(Humidity=High|Yes) = 3/9 = 0.333</li>
-            <li>P(Wind=Strong|Yes) = 3/9 = 0.333</li>
+            <li>\(P(\text{Sunny} \mid \text{Yes}) = (2 + 1)/(9 + 3) = 0.2500\)</li>
+            <li>\(P(\text{Cool} \mid \text{Yes}) = (3 + 1)/(9 + 3) = 0.3333\)</li>
+            <li>\(P(\text{High} \mid \text{Yes}) = (3 + 1)/(9 + 2) = 0.3636\)</li>
+            <li>\(P(\text{Strong} \mid \text{Yes}) = (3 + 1)/(9 + 2) = 0.3636\)</li>
         </ul>
         
         <p><strong>For Play=No:</strong></p>
         <ul>
-            <li>P(Outlook=Sunny|No) = 3/5 = 0.600</li>
-            <li>P(Temperature=Cool|No) = 1/5 = 0.200</li>
-            <li>P(Humidity=High|No) = 4/5 = 0.800</li>
-            <li>P(Wind=Strong|No) = 3/5 = 0.600</li>
+            <li>\(P(\text{Sunny} \mid \text{No}) = (3 + 1)/(5 + 3) = 0.5000\)</li>
+            <li>\(P(\text{Cool} \mid \text{No}) = (1 + 1)/(5 + 3) = 0.2500\)</li>
+            <li>\(P(\text{High} \mid \text{No}) = (4 + 1)/(5 + 2) = 0.7143\)</li>
+            <li>\(P(\text{Strong} \mid \text{No}) = (3 + 1)/(5 + 2) = 0.5714\)</li>
         </ul>
         
         <h4><span class="step-number">3</span>Final Calculation:</h4>
-        <p>P(Yes|features) ∝ 0.643 × 0.222 × 0.333 × 0.333 × 0.333 = <span class="highlight">0.0063</span></p>
-        <p>P(No|features) ∝ 0.357 × 0.600 × 0.200 × 0.800 × 0.600 = <span class="highlight">0.0206</span></p>
+        <p>\(P(\text{Yes} \mid \mathbf{x}) \propto 0.6429 \times 0.2500 \times 0.3333 \times 0.3636 \times 0.3636 =\) <span class="highlight">0.0071</span></p>
+        <p>\(P(\text{No} \mid \mathbf{x}) \propto 0.3571 \times 0.5000 \times 0.2500 \times 0.7143 \times 0.5714 =\) <span class="highlight">0.0182</span></p>
+        <p>After normalization: \(P(\text{Yes} \mid \mathbf{x}) = 28.0\%\) and \(P(\text{No} \mid \mathbf{x}) = 72.0\%\).</p>
         
         <p><strong>Prediction: <span class="highlight">No (Don't play tennis)</span></strong></p>
     </div>
@@ -236,7 +264,12 @@ nb.fit(X, y)
             <h3>1. Gaussian Naive Bayes</h3>
             <p>Used for continuous features that follow a normal distribution.</p>
             <div class="formula">
-                P(xᵢ|y) = (1/√(2πσ²)) × exp(-(xᵢ-μ)²/(2σ²))
+                \[
+                P(x_i \mid y) = \frac{1}{\sqrt{2\pi\sigma_y^2}}\exp\left(-\frac{(x_i-\mu_y)^2}{2\sigma_y^2}\right)
+                \]
+                <div class="formula-notes">
+                    <p>\(\mu_y\) and \(\sigma_y^2\) are estimated from the training samples in class \(y\).</p>
+                </div>
             </div>
         </div>
         
@@ -244,7 +277,12 @@ nb.fit(X, y)
             <h3>2. Multinomial Naive Bayes</h3>
             <p>Used for discrete counts (e.g., word counts in text classification).</p>
             <div class="formula">
-                P(xᵢ|y) = (Nᵧᵢ + α) / (Nᵧ + α×n)
+                \[
+                P(x_i \mid y) = \frac{N_{yi} + \alpha}{N_y + \alpha n}
+                \]
+                <div class="formula-notes">
+                    <p>\(N_{yi}\) is the count of feature \(i\) in class \(y\), \(N_y\) is the total count for class \(y\), \(n\) is the vocabulary size, and \(\alpha\) controls smoothing.</p>
+                </div>
             </div>
         </div>
         
@@ -252,7 +290,12 @@ nb.fit(X, y)
             <h3>3. Bernoulli Naive Bayes</h3>
             <p>Used for binary/boolean features.</p>
             <div class="formula">
-                P(xᵢ|y) = P(i|y)×xᵢ + (1-P(i|y))×(1-xᵢ)
+                \[
+                P(x_i \mid y) = p_{iy}^{x_i}(1 - p_{iy})^{1 - x_i}
+                \]
+                <div class="formula-notes">
+                    <p>\(x_i\) is 0 or 1, and \(p_{iy}\) is the probability that feature \(i\) is present in class \(y\).</p>
+                </div>
             </div>
         </div>
     </div>

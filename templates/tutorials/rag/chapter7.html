@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 7: Production RAG Systems - RAG & Retrieval Systems</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 7: Production RAG Systems - RAG & Retrieval Systems' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/rag" class="course-link">
-                    <span>RAG & Retrieval Systems</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 7: Production RAG Systems</h1>
@@ -1120,87 +1091,87 @@ class ProductionRAG:
                         <div class="quiz-container">
                         <div class="quiz-question">
                                 <h3>Question 1: Interview question: "What are the key considerations for production RAG systems?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Scalability (millions of docs, high traffic), monitoring (retrieval/answer quality), error handling (fallbacks, retries), performance optimization (caching, async), and reliability (99.9%+ uptime)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production RAG systems don't require special considerations beyond basic setup - the same approach works for all environments</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only speed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Production RAG systems need extensive considerations beyond basic setup, including horizontal scaling, comprehensive monitoring, graceful error handling, caching strategies, and reliability measures to handle real-world usage patterns</div>
+                                <div class="quiz-option" data-correct="true">A) Scalability (millions of docs, high traffic), monitoring (retrieval/answer quality), error handling (fallbacks, retries), performance optimization (caching, async), and reliability (99.9%+ uptime)</div>
+                                <div class="quiz-option" data-correct="false">B) Once a prototype retrieves correct answers, production work is mainly copying it behind an API endpoint</div>
+                                <div class="quiz-option" data-correct="false">C) Focus only on average response time, because quality and failure modes can be checked manually later</div>
+                                <div class="quiz-option" data-correct="false">D) Production RAG should prioritize longer answers over retrieval quality because users can judge accuracy themselves</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is retrieval precision@k and how is it calculated?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Sequential search</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The main retrieval strategies involve only using keyword matching without any semantic understanding, which works well for exact term searches</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) \(\frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{k}\) - fraction of retrieved top-k documents that are actually relevant</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Although semantic search alone provides good results for many queries, combining it with keyword-based methods like BM25 creates hybrid retrieval that captures both semantic meaning and exact term matches, which is more effective than either method alone</div>
+                                <div class="quiz-option" data-correct="false">A) The fraction of all relevant documents in the corpus that were found anywhere in the top-k set</div>
+                                <div class="quiz-option" data-correct="false">B) The fraction of generated answer sentences that contain citations, regardless of whether the retrieved documents are relevant</div>
+                                <div class="quiz-option" data-correct="true">C) \(\frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{k}\) - fraction of retrieved top-k documents that are actually relevant</div>
+                                <div class="quiz-option" data-correct="false">D) The average number of tokens in the retrieved chunks, divided by the model context window size</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: Interview question: "How do you monitor RAG system quality in production?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) The main consideration for production is minimizing costs by using the cheapest models and infrastructure, which is sufficient for all use cases</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Track retrieval metrics (precision@k, recall@k), answer quality (faithfulness, relevance), log queries/responses, set up alerts for quality degradation, and use A/B testing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Cost optimization is valuable, but production systems must also address scalability, monitoring, error handling, and reliability to ensure 99.9%+ uptime and consistent quality, not just minimize expenses</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only model selection</div>
+                                <div class="quiz-option" data-correct="false">A) The main consideration for production is minimizing costs by using the cheapest models and infrastructure, which is sufficient for all use cases</div>
+                                <div class="quiz-option" data-correct="true">B) Track retrieval metrics (precision@k, recall@k), answer quality (faithfulness, relevance), log queries/responses, set up alerts for quality degradation, and use A/B testing</div>
+                                <div class="quiz-option" data-correct="false">C) Track only monthly API spend and assume quality is stable if costs stay flat</div>
+                                <div class="quiz-option" data-correct="false">D) Monitor only the LLM model version, because retrieval metrics are stable once the index is built</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is answer faithfulness and why is it important?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Fraction of answer claims supported by retrieved context. Measures grounding quality - ensures answers are based on documents, not hallucinated</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This is incorrect</div>
+                                <div class="quiz-option" data-correct="false">A) Whether users like the wording of the answer, independent of whether the context supports it</div>
+                                <div class="quiz-option" data-correct="true">B) Fraction of answer claims supported by retrieved context. Measures grounding quality - ensures answers are based on documents, not hallucinated</div>
+                                <div class="quiz-option" data-correct="false">C) A measure of how many documents were retrieved, regardless of whether answer claims use them</div>
+                                <div class="quiz-option" data-correct="false">D) The semantic similarity between the user query and the generated answer</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Interview question: "How would you scale a RAG system to handle millions of documents?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This doesn't work</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Use distributed vector databases, implement sharding, use efficient indexing (HNSW), implement caching, use approximate search (ANN), and optimize embedding storage</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't work well in practice</div>
+                                <div class="quiz-option" data-correct="false">A) Put every embedding on one larger machine and keep exact brute-force search for all queries</div>
+                                <div class="quiz-option" data-correct="false">B) Increase chunk size until the number of vectors is small enough to scan linearly</div>
+                                <div class="quiz-option" data-correct="true">C) Use distributed vector databases, implement sharding, use efficient indexing (HNSW), implement caching, use approximate search (ANN), and optimize embedding storage</div>
+                                <div class="quiz-option" data-correct="false">D) Store only document titles in the vector index and fetch full text after generation</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the difference between precision@k and recall@k?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While speed is important, production RAG systems require comprehensive considerations including scalability for millions of documents, monitoring for quality degradation, error handling for reliability, and performance optimization beyond just response time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production optimization is primarily about selecting the best language model, which automatically handles all other aspects of the system</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Precision@k: fraction of retrieved docs that are relevant. Recall@k: fraction of relevant docs that were retrieved. Precision measures quality, recall measures coverage</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No special considerations</div>
+                                <div class="quiz-option" data-correct="false">A) Precision@k counts how many total relevant documents exist in the corpus, while recall@k counts latency at k results</div>
+                                <div class="quiz-option" data-correct="false">B) Production optimization is primarily about selecting the best language model, which automatically handles all other aspects of the system</div>
+                                <div class="quiz-option" data-correct="true">C) Precision@k: fraction of retrieved docs that are relevant. Recall@k: fraction of relevant docs that were retrieved. Precision measures quality, recall measures coverage</div>
+                                <div class="quiz-option" data-correct="false">D) Precision and recall are both latency metrics, so they improve only when queries run faster</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: Interview question: "How do you handle errors in production RAG systems?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Production RAG systems don't require special considerations beyond basic setup - the same approach works for all environments</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only speed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While speed is important, production RAG systems require comprehensive considerations including scalability for millions of documents, monitoring for quality degradation, error handling for reliability, and performance optimization beyond just response time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Implement graceful fallbacks (return "no relevant info found"), retry mechanisms for transient failures, validate retrieved context quality, log errors for debugging, and use circuit breakers for downstream services</div>
+                                <div class="quiz-option" data-correct="false">A) Return the LLM's best guess whenever retrieval fails so users still receive a fluent answer</div>
+                                <div class="quiz-option" data-correct="false">B) Retry every failed request forever so transient errors eventually disappear</div>
+                                <div class="quiz-option" data-correct="false">C) Suppress retrieval and generation errors from logs to avoid exposing sensitive implementation details</div>
+                                <div class="quiz-option" data-correct="true">D) Implement graceful fallbacks (return "no relevant info found"), retry mechanisms for transient failures, validate retrieved context quality, log errors for debugging, and use circuit breakers for downstream services</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What is answer relevance and how is it measured?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Semantic similarity between query and answer embeddings. Measures how well the answer addresses the query. Higher similarity = more relevant</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not applicable</div>
+                                <div class="quiz-option" data-correct="false">A) The number of retrieved chunks attached to an answer, regardless of whether they address the query</div>
+                                <div class="quiz-option" data-correct="false">B) Whether the answer repeats exact words from the prompt, even if it misses the user's intent</div>
+                                <div class="quiz-option" data-correct="true">C) Semantic similarity between query and answer embeddings. Measures how well the answer addresses the query. Higher similarity = more relevant</div>
+                                <div class="quiz-option" data-correct="false">D) A database uptime metric that measures whether the vector index is online</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: Interview question: "How do you optimize RAG system performance?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Cache embeddings and retrieval results, use batch processing, implement async operations, optimize model selection (balance quality/latency), use approximate search, and implement connection pooling</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't work well in practice</div>
+                                <div class="quiz-option" data-correct="false">A) Increase top-k and use the largest LLM for every request, even if latency and cost become unpredictable</div>
+                                <div class="quiz-option" data-correct="true">B) Cache embeddings and retrieval results, use batch processing, implement async operations, optimize model selection (balance quality/latency), use approximate search, and implement connection pooling</div>
+                                <div class="quiz-option" data-correct="false">C) Disable caching to make sure every answer is freshly generated from scratch</div>
+                                <div class="quiz-option" data-correct="false">D) Use only exact nearest-neighbor search in production, even for very large indexes</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is the formula for retrieval recall@k?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While keyword-only search is fast and effective for exact term matching, RAG systems benefit from combining it with semantic search to handle synonyms and paraphrasing, making pure keyword search insufficient for comprehensive retrieval</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Sequential search</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) \(\frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{|\{\text{relevant docs}\}|}\) - fraction of all relevant documents that were retrieved in top-k</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The primary retrieval approach is to randomly select documents from the knowledge base, which ensures fair distribution of results</div>
+                                <div class="quiz-option" data-correct="false">A) \(\frac{k}{|\{\text{all indexed docs}\}|}\) - percentage of the corpus returned for the query</div>
+                                <div class="quiz-option" data-correct="false">B) \(\frac{|\{\text{retrieved top-k}\}|}{|\{\text{all documents}\}|}\) - fraction of the corpus returned by the retriever</div>
+                                <div class="quiz-option" data-correct="true">C) \(\frac{|\{\text{relevant docs}\} \cap \{\text{retrieved top-k}\}|}{|\{\text{relevant docs}\}|}\) - fraction of all relevant documents that were retrieved in top-k</div>
+                                <div class="quiz-option" data-correct="false">D) \(\frac{|\{\text{retrieved top-k}\}|}{|\{\text{all indexed docs}\}|}\) - fraction of the whole corpus returned by the query</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Interview question: "How do you ensure RAG system reliability in production?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only cost</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production RAG systems only need to focus on response speed, as faster answers are always better regardless of accuracy or reliability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Production RAG systems need extensive considerations beyond basic setup, including horizontal scaling, comprehensive monitoring, graceful error handling, caching strategies, and reliability measures to handle real-world usage patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Implement comprehensive error handling, fallback mechanisms, retry logic with exponential backoff, health checks, monitoring/alerting, graceful degradation, and redundancy for critical components</div>
+                                <div class="quiz-option" data-correct="false">A) Choose the cheapest model and vector database, because lower cost usually means fewer production failures</div>
+                                <div class="quiz-option" data-correct="false">B) Production RAG systems only need to focus on response speed, as faster answers are always better regardless of accuracy or reliability</div>
+                                <div class="quiz-option" data-correct="false">C) Rely on manual restarts during incidents instead of health checks and automated recovery paths</div>
+                                <div class="quiz-option" data-correct="true">D) Implement comprehensive error handling, fallback mechanisms, retry logic with exponential backoff, health checks, monitoring/alerting, graceful degradation, and redundancy for critical components</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: Interview question: "What metrics would you track for a production RAG system?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Retrieval metrics (precision@k, recall@k, MRR), answer quality (faithfulness, relevance, completeness), latency (retrieval time, generation time), cost (API calls, tokens), error rates, and user satisfaction</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production RAG systems don't require special considerations beyond basic setup - the same approach works for all environments</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only speed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cost optimization is valuable, but production systems must also address scalability, monitoring, error handling, and reliability to ensure 99.9%+ uptime and consistent quality, not just minimize expenses</div>
+                                <div class="quiz-option" data-correct="true">A) Retrieval metrics (precision@k, recall@k, MRR), answer quality (faithfulness, relevance, completeness), latency (retrieval time, generation time), cost (API calls, tokens), error rates, and user satisfaction</div>
+                                <div class="quiz-option" data-correct="false">B) Track only whether each request returns HTTP 200, because answer quality cannot be monitored automatically</div>
+                                <div class="quiz-option" data-correct="false">C) Average response speed and uptime only, because retrieval quality can be inferred from low latency</div>
+                                <div class="quiz-option" data-correct="false">D) Track only infrastructure CPU and memory, because retrieval and answer metrics are application details</div>
                             </div>
                         </div>
                         </div>
@@ -1208,55 +1179,10 @@ class ProductionRAG:
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/rag" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/rag/chapter6" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 6</a>
-                
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/rag/shared-tutorial.js') }}?v=2"></script>
-    <script>
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% endblock %}

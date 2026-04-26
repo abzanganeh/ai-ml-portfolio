@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 6: Advanced RAG Techniques - RAG & Retrieval Systems</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 6: Advanced RAG Techniques - RAG & Retrieval Systems' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/rag" class="course-link">
-                    <span>RAG & Retrieval Systems</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 6: Advanced RAG Techniques</h1>
@@ -964,9 +935,11 @@ Question: {user_query}
 
 Answer based on the context above:"""
         
-        # In production, use actual LLM API
-        answer = f"Generated answer for: {user_query}"  # Placeholder
-        return answer
+        if hasattr(self.llm, "generate"):
+            return self.llm.generate(prompt)
+        if callable(self.llm):
+            return self.llm(prompt)
+        raise TypeError("llm must expose generate(prompt) or be callable")
 
 # Example usage
 # advanced_rag = AdvancedRAG(hybrid_retriever, llm)
@@ -985,12 +958,12 @@ Answer based on the context above:"""
                         <h2>Real-World Applications</h2>
                         
                         <div class="explanation-box">
-                            <h3>Where This Is Used</h3>
                             <h3>Generation Strategies</h3>
-                            <p><strong>Stuff:</strong> Put all context in single prompt. Simple but limited by context window.</p>
-                            <p><strong>Map-reduce:</strong> Generate answer for each document, then combine. Handles large contexts.</p>
-                            <p><strong>Refine:</strong> Iteratively refine answer with each document. Most accurate but slowest.</p>
-                            <p><strong>Map-rerank:</strong> Generate and score answers, return best. Good balance.</p>
+                            <p>Advanced RAG systems usually choose a generation strategy based on context size, latency budget, and grounding requirements.</p>
+                            <p><strong>Stuff:</strong> Put all selected context in one prompt. This is simple and transparent, but it is limited by the model context window.</p>
+                            <p><strong>Map-reduce:</strong> Generate partial answers from document groups, then combine them. This handles large contexts but can lose detail during aggregation.</p>
+                            <p><strong>Refine:</strong> Start with an initial answer and update it as more evidence is reviewed. This can improve completeness, but it is slower and more expensive.</p>
+                            <p><strong>Map-rerank:</strong> Generate candidate answers and score them for relevance or faithfulness, then return the best one. This is useful when answer quality matters more than raw speed.</p>
                         </div>
                         
                         <div class="explanation-box">
@@ -1008,87 +981,87 @@ Answer based on the context above:"""
                         <div class="quiz-container">
                         <div class="quiz-question">
                                 <h3>Question 1: What are advanced RAG techniques?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only fine-tuning models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Methods to improve RAG performance: query expansion, multi-query retrieval, parent-child chunking, context compression, iterative retrieval, and metadata filtering</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Adding more data helps, but advanced techniques like parent-child chunking, iterative retrieval, and metadata filtering can dramatically improve results even with the same knowledge base, showing that data volume isn't the only factor</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Advanced RAG improvements come mainly from fine-tuning the language model on domain-specific data, which is the primary optimization method</div>
+                                <div class="quiz-option" data-correct="false">A) Training a domain-specific LLM and leaving retrieval, chunking, reranking, and context handling unchanged</div>
+                                <div class="quiz-option" data-correct="true">B) Methods to improve RAG performance: query expansion, multi-query retrieval, parent-child chunking, context compression, iterative retrieval, and metadata filtering</div>
+                                <div class="quiz-option" data-correct="false">C) Increasing the number of stored documents without changing retrieval, chunking, filtering, or answer generation</div>
+                                <div class="quiz-option" data-correct="false">D) Advanced RAG improvements come mainly from fine-tuning the language model on domain-specific data, which is the primary optimization method</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: Interview question: "What is query expansion and why is it useful?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Advanced RAG techniques primarily involve using larger and more powerful language models, which automatically improves all aspects of the system without other modifications</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Rewriting or expanding queries with synonyms, related terms, or context to improve retrieval. Helps find relevant documents that use different terminology than the query</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While using better models can improve performance, advanced RAG techniques like query expansion, multi-query retrieval, and context compression provide significant improvements independent of model choice, making model selection only one part of optimization</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only using more data</div>
+                                <div class="quiz-option" data-correct="false">A) Replacing retrieval with a larger LLM so query wording no longer affects document matching</div>
+                                <div class="quiz-option" data-correct="true">B) Rewriting or expanding queries with synonyms, related terms, or context to improve retrieval. Helps find relevant documents that use different terminology than the query</div>
+                                <div class="quiz-option" data-correct="false">C) Expanding every query into many unrelated domain keywords to maximize the number of retrieved chunks</div>
+                                <div class="quiz-option" data-correct="false">D) Appending the same keyword list to every query, which can dilute intent and retrieve off-topic documents</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is parent-child chunking?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Document chunking is mainly about formatting and styling text for better presentation, which is useful but not critical for retrieval</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Store small chunks for precise retrieval, but include parent document context when generating answers. Balances retrieval precision with generation context</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce file size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While chunking can help with storage optimization and file organization, the primary reason in RAG systems is actually to enable efficient embedding generation and retrieval, not just to make documents smaller or reduce storage costs</div>
+                                <div class="quiz-option" data-correct="false">A) Creating one parent summary for each document and retrieving only those summaries at query time</div>
+                                <div class="quiz-option" data-correct="true">B) Store small chunks for precise retrieval, but include parent document context when generating answers. Balances retrieval precision with generation context</div>
+                                <div class="quiz-option" data-correct="false">C) Store only large parent chunks for retrieval, which keeps context but often reduces retrieval precision</div>
+                                <div class="quiz-option" data-correct="false">D) Linking unrelated chunks from different documents so the retriever can return more diverse context</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Interview question: "How do you handle context window limitations in RAG?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Use context compression (summarize chunks, extract relevant sentences), prioritize most relevant chunks, use parent-child chunking, or implement iterative retrieval for complex queries</div>
+                                <div class="quiz-option" data-correct="false">A) Increase top-k indefinitely so every possible chunk is sent to the model, regardless of token budget</div>
+                                <div class="quiz-option" data-correct="false">B) Drop retrieval entirely and rely on the model's training data when the context is too large</div>
+                                <div class="quiz-option" data-correct="false">C) Truncate the prompt from the beginning, which can remove the question or the most relevant retrieved evidence</div>
+                                <div class="quiz-option" data-correct="true">D) Use context compression (summarize chunks, extract relevant sentences), prioritize most relevant chunks, use parent-child chunking, or implement iterative retrieval for complex queries</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is multi-query retrieval?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) The primary retrieval approach is to randomly select documents from the knowledge base, which ensures fair distribution of results</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While keyword-only search is fast and effective for exact term matching, RAG systems benefit from combining it with semantic search to handle synonyms and paraphrasing, making pure keyword search insufficient for comprehensive retrieval</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Generating multiple query variations, retrieving documents for each, and combining results to improve coverage and find more relevant information</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sequential search</div>
+                                <div class="quiz-option" data-correct="false">A) Sending the same query to the same retriever multiple times and averaging identical result lists</div>
+                                <div class="quiz-option" data-correct="false">B) Splitting one user query into individual words and retrieving documents for each word without deduplication or relevance scoring</div>
+                                <div class="quiz-option" data-correct="true">C) Generating multiple query variations, retrieving documents for each, and combining results to improve coverage and find more relevant information</div>
+                                <div class="quiz-option" data-correct="false">D) Running one exact keyword search and returning the first matching document without semantic retrieval or deduplication</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Interview question: "What is iterative retrieval and when would you use it?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Retrieval strategies focus on sequential scanning of all documents in order, which guarantees comprehensive coverage of the knowledge base</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Sequential search</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Multi-hop retrieval where if initial answer is incomplete, generate follow-up queries and retrieve more context. Repeat until complete. Useful for complex, multi-part questions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random or sequential document selection might seem straightforward, but effective RAG retrieval requires similarity-based ranking using embeddings or keyword scores to find the most relevant documents, not arbitrary selection methods</div>
+                                <div class="quiz-option" data-correct="false">A) One-pass retrieval where the first returned chunks are always accepted as complete context</div>
+                                <div class="quiz-option" data-correct="false">B) Repeating the same initial retrieval call several times and averaging the duplicate scores</div>
+                                <div class="quiz-option" data-correct="true">C) Multi-hop retrieval where if initial answer is incomplete, generate follow-up queries and retrieve more context. Repeat until complete. Useful for complex, multi-part questions</div>
+                                <div class="quiz-option" data-correct="false">D) Expanding the original query once, then stopping even if the generated answer lacks evidence for part of the question</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: In the context window constraint \(|\text{query}| + |\text{context}| + |\text{answer}| \leq \text{max\_context\_length}\), what does this mean?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This doesn't work</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Total tokens (query + context + answer) must fit within LLM's context window, limiting how much retrieved context can be included</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While this might seem reasonable, it's not the correct approach</div>
+                                <div class="quiz-option" data-correct="false">A) The model can always accept unlimited retrieved context as long as the answer is short</div>
+                                <div class="quiz-option" data-correct="true">B) Total tokens (query + context + answer) must fit within LLM's context window, limiting how much retrieved context can be included</div>
+                                <div class="quiz-option" data-correct="false">C) The answer length is the only token count that matters; query and context tokens are ignored</div>
+                                <div class="quiz-option" data-correct="false">D) The constraint applies only during embedding generation, not during final answer generation</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "What is Self-RAG and how does it differ from standard RAG?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Self-RAG is an autonomous system where the model decides when to retrieve, when to generate, and when to stop. More flexible than fixed retrieval-then-generate pipeline</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While this might seem reasonable, it's not the correct approach</div>
+                                <div class="quiz-option" data-correct="false">A) Self-RAG means replacing retrieval with a larger model that never checks external documents</div>
+                                <div class="quiz-option" data-correct="true">B) Self-RAG is an autonomous system where the model decides when to retrieve, when to generate, and when to stop. More flexible than fixed retrieval-then-generate pipeline</div>
+                                <div class="quiz-option" data-correct="false">C) Self-RAG is a database feature that automatically reorders vectors without model involvement</div>
+                                <div class="quiz-option" data-correct="false">D) Self-RAG only changes chunk size; retrieval and generation still follow a fixed one-pass pipeline</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the answer quality score formula measuring?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Not applicable</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Combined score of relevance (addresses query), faithfulness (grounded in context), and completeness (comprehensive answer) with weighting factors</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't work well in practice</div>
+                                <div class="quiz-option" data-correct="false">A) Only the speed of vector search, ignoring whether the answer is grounded or complete</div>
+                                <div class="quiz-option" data-correct="false">B) The number of chunks stored in the vector database, weighted by embedding dimension</div>
+                                <div class="quiz-option" data-correct="true">C) Combined score of relevance (addresses query), faithfulness (grounded in context), and completeness (comprehensive answer) with weighting factors</div>
+                                <div class="quiz-option" data-correct="false">D) The cost of each generated token, without evaluating answer content</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "How do you implement metadata filtering in RAG?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Store document metadata (date, type, source) with embeddings, filter by metadata before or after similarity search, use vector database metadata filters, and combine with semantic search</div>
+                                <div class="quiz-option" data-correct="false">A) Store metadata only in a separate spreadsheet and manually inspect it after retrieval</div>
+                                <div class="quiz-option" data-correct="false">B) Filter generated answers by metadata after the LLM has already seen all retrieved chunks</div>
+                                <div class="quiz-option" data-correct="false">C) Encode metadata into the document text only, with no structured fields available to the vector database</div>
+                                <div class="quiz-option" data-correct="true">D) Store document metadata (date, type, source) with embeddings, filter by metadata before or after similarity search, use vector database metadata filters, and combine with semantic search</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is context compression and why is it needed?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While using better models can improve performance, advanced RAG techniques like query expansion, multi-query retrieval, and context compression provide significant improvements independent of model choice, making model selection only one part of optimization</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Advanced RAG techniques primarily involve using larger and more powerful language models, which automatically improves all aspects of the system without other modifications</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Reducing retrieved context size (summarize, extract relevant parts) to fit in LLM context window while preserving important information. Needed when retrieved chunks exceed context limits</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only using more data</div>
+                                <div class="quiz-option" data-correct="false">A) Removing citations and source metadata from retrieved chunks to save prompt space</div>
+                                <div class="quiz-option" data-correct="false">B) Increasing top-k until every possibly relevant chunk is included, even if the context window is exceeded</div>
+                                <div class="quiz-option" data-correct="true">C) Reducing retrieved context size (summarize, extract relevant parts) to fit in LLM context window while preserving important information. Needed when retrieved chunks exceed context limits</div>
+                                <div class="quiz-option" data-correct="false">D) Deleting lower-ranked retrieved chunks without checking whether they contain unique evidence</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: Interview question: "How would you optimize RAG for better answer quality?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Improve retrieval (better embeddings, hybrid search, reranking), use query expansion, implement parent-child chunking, add context compression, use iterative retrieval for complex queries, and evaluate with quality metrics</div>
+                                <div class="quiz-option" data-correct="false">A) Increase chunk size for every document and skip evaluation because larger chunks always improve grounding</div>
+                                <div class="quiz-option" data-correct="false">B) Optimize only the generation prompt while leaving retrieval quality, reranking, and chunking unchanged</div>
+                                <div class="quiz-option" data-correct="false">C) Remove citations and source checks so the model can answer more freely</div>
+                                <div class="quiz-option" data-correct="true">D) Improve retrieval (better embeddings, hybrid search, reranking), use query expansion, implement parent-child chunking, add context compression, use iterative retrieval for complex queries, and evaluate with quality metrics</div>
                             </div>
                         </div>
                         </div>
@@ -1096,55 +1069,10 @@ Answer based on the context above:"""
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/rag" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/rag/chapter5" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 5</a>
-                <a href="/tutorials/rag/chapter7" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 7 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/rag/shared-tutorial.js') }}?v=2"></script>
-    <script>
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% endblock %}
