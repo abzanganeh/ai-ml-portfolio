@@ -332,17 +332,11 @@ def ml_relationships_chapter(chapter_num):
 # Clustering Course tutorial chapter routes
 @app.route('/tutorials/clustering-course/chapter<int:chapter_num>')
 def clustering_course_chapter(chapter_num):
-    """Clustering Course tutorial chapters"""
+    """Redirect legacy clustering course chapter URLs to current routes"""
     if chapter_num < 1 or chapter_num > 15:
         abort(404)
-    
-    template_path = f'tutorials/clustering-course/chapter{chapter_num}.html'
-    
-    # Check if template exists, otherwise 404
-    try:
-        return render_template(template_path)
-    except:
-        abort(404)
+
+    return redirect(url_for('clustering_chapter', chapter_num=chapter_num), code=301)
 
 # New Clustering tutorial chapter routes
 @app.route('/tutorials/clustering/chapter<int:chapter_num>')

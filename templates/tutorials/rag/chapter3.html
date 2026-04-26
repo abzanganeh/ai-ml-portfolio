@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 3: Document Processing & Chunking - RAG & Retrieval Systems</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=2">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 3: Document Processing & Chunking - RAG & Retrieval Systems' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/rag/rag.css') }}?v=3">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/rag" class="course-link">
-                    <span>RAG & Retrieval Systems</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 3: Document Processing & Chunking</h1>
@@ -1335,87 +1306,87 @@ nltk.download('punkt')</code></pre>
                         <div class="quiz-container">
                         <div class="quiz-question">
                                 <h3>Question 1: Why is document chunking important in RAG systems?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LLMs have context limits, chunking breaks documents into manageable pieces that fit in context windows while preserving semantic meaning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking helps reduce network bandwidth by sending smaller pieces of data, which improves transmission speed but isn't the core reason in RAG</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While chunking can help with storage optimization and file organization, the primary reason in RAG systems is actually to enable efficient embedding generation and retrieval, not just to make documents smaller or reduce storage costs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To speed up processing</div>
+                                <div class="quiz-option" data-correct="true">A) LLMs have context limits, chunking breaks documents into manageable pieces that fit in context windows while preserving semantic meaning</div>
+                                <div class="quiz-option" data-correct="false">B) Chunking is mainly a compression step that reduces storage size before indexing</div>
+                                <div class="quiz-option" data-correct="false">C) Chunking is only needed when documents contain images or tables</div>
+                                <div class="quiz-option" data-correct="false">D) To avoid creating embeddings by sending entire source documents directly to the vector database</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: Interview question: "What are the different chunking strategies and when would you use each?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Chunking serves multiple purposes including document organization and storage efficiency, but in RAG systems the critical function is breaking documents into semantically meaningful units that can be effectively embedded and retrieved, not just reducing document size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Fixed-size: Simple, fast, good for uniform text. Semantic: Preserves meaning, better for varied content. Recursive: Handles nested structures. Use fixed-size for speed, semantic for quality, recursive for structured documents</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To speed up processing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Document chunking is mainly about formatting and styling text for better presentation, which is useful but not critical for retrieval</div>
+                                <div class="quiz-option" data-correct="false">A) Always use sentence-level chunks because smaller chunks are guaranteed to improve answer quality</div>
+                                <div class="quiz-option" data-correct="true">B) Fixed-size: Simple, fast, good for uniform text. Semantic: Preserves meaning, better for varied content. Recursive: Handles nested structures. Use fixed-size for speed, semantic for quality, recursive for structured documents</div>
+                                <div class="quiz-option" data-correct="false">C) Use the same fixed token size for every document type because consistent length matters more than document structure</div>
+                                <div class="quiz-option" data-correct="false">D) Use page boundaries for every format because page numbers preserve semantic meaning better than headings</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is chunk overlap and why is it used?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Chunking helps reduce network bandwidth by sending smaller pieces of data, which improves transmission speed but isn't the core reason in RAG</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While chunking can help with storage optimization and file organization, the primary reason in RAG systems is actually to enable efficient embedding generation and retrieval, not just to make documents smaller or reduce storage costs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Overlapping chunks share some content to preserve context at boundaries, preventing information loss when sentences/paragraphs are split</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To reduce file size</div>
+                                <div class="quiz-option" data-correct="false">A) Overlap is used to increase vector diversity by adding unrelated text between chunks</div>
+                                <div class="quiz-option" data-correct="false">B) Overlap removes duplicate facts from neighboring chunks before embedding</div>
+                                <div class="quiz-option" data-correct="true">C) Overlapping chunks share some content to preserve context at boundaries, preventing information loss when sentences/paragraphs are split</div>
+                                <div class="quiz-option" data-correct="false">D) It duplicates every chunk completely so retrieval can always return identical neighboring chunks</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Interview question: "How do you determine optimal chunk size?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) The main purpose of chunking is to organize documents into categories and folders for better file management in storage systems</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Balance LLM context window, retrieval precision (smaller = more precise), and semantic completeness (larger = more context). Common: 200-1000 tokens. Test on your data and downstream task</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To speed up processing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking serves multiple purposes including document organization and storage efficiency, but in RAG systems the critical function is breaking documents into semantically meaningful units that can be effectively embedded and retrieved, not just reducing document size</div>
+                                <div class="quiz-option" data-correct="false">A) The main purpose of chunking is to organize documents into categories and folders for better file management in storage systems</div>
+                                <div class="quiz-option" data-correct="true">B) Balance LLM context window, retrieval precision (smaller = more precise), and semantic completeness (larger = more context). Common: 200-1000 tokens. Test on your data and downstream task</div>
+                                <div class="quiz-option" data-correct="false">C) Pick the largest chunk that fits the embedding model and reuse it for every query type</div>
+                                <div class="quiz-option" data-correct="false">D) Match chunk size only to the storage engine's maximum field length</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is semantic chunking?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Chunking serves multiple purposes including document organization and storage efficiency, but in RAG systems the critical function is breaking documents into semantically meaningful units that can be effectively embedded and retrieved, not just reducing document size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Document chunking is mainly about formatting and styling text for better presentation, which is useful but not critical for retrieval</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Chunking based on semantic boundaries (sentences, paragraphs, topics) rather than fixed sizes, preserving meaning and context</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To organize files better</div>
+                                <div class="quiz-option" data-correct="false">A) Chunking by fixed character count without considering sentences or topic changes</div>
+                                <div class="quiz-option" data-correct="false">B) Chunking by file size so each embedded record uses the same amount of disk space</div>
+                                <div class="quiz-option" data-correct="true">C) Chunking based on semantic boundaries (sentences, paragraphs, topics) rather than fixed sizes, preserving meaning and context</div>
+                                <div class="quiz-option" data-correct="false">D) Sorting chunks alphabetically by heading before embedding so similar titles appear together</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Interview question: "How do you handle different document types (PDF, HTML, Markdown) in RAG?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) This comprehensive approach has been considered but doesn't work well in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This doesn't work</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Use appropriate parsers (PyPDF2, BeautifulSoup, markdown), extract text while preserving structure, handle metadata, and apply document-type-specific chunking strategies</div>
+                                <div class="quiz-option" data-correct="false">A) Convert every file to plain text with no metadata, then use identical fixed-size chunks for all formats</div>
+                                <div class="quiz-option" data-correct="false">B) Index only file names and headings, because full content extraction is too expensive for retrieval</div>
+                                <div class="quiz-option" data-correct="false">C) Treat PDFs, HTML, and Markdown as raw byte streams and chunk them before text extraction</div>
+                                <div class="quiz-option" data-correct="true">D) Use appropriate parsers (PyPDF2, BeautifulSoup, markdown), extract text while preserving structure, handle metadata, and apply document-type-specific chunking strategies</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is metadata extraction in document processing?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Chunking helps reduce network bandwidth by sending smaller pieces of data, which improves transmission speed but isn't the core reason in RAG</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To reduce file size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Extracting document properties (title, author, date, source, section) to enable filtering and better retrieval in vector databases</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking serves multiple purposes including document organization and storage efficiency, but in RAG systems the critical function is breaking documents into semantically meaningful units that can be effectively embedded and retrieved, not just reducing document size</div>
+                                <div class="quiz-option" data-correct="false">A) Creating new titles for chunks with an LLM after retrieval</div>
+                                <div class="quiz-option" data-correct="false">B) Removing all document properties so each chunk has only the embedded text</div>
+                                <div class="quiz-option" data-correct="true">C) Extracting document properties (title, author, date, source, section) to enable filtering and better retrieval in vector databases</div>
+                                <div class="quiz-option" data-correct="false">D) Removing source, date, and section fields so the vector search depends only on cosine similarity</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "How do you preserve context when chunking documents?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To organize files better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Although chunking does result in smaller document pieces, the main purpose in RAG is to ensure that retrieved content fits within LLM context windows while maintaining semantic coherence, rather than simply reducing file sizes or storage requirements</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The main purpose of chunking is to organize documents into categories and folders for better file management in storage systems</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Use chunk overlap, preserve sentence/paragraph boundaries, include surrounding context in metadata, and use semantic chunking to keep related content together</div>
+                                <div class="quiz-option" data-correct="false">A) Sort chunks by vector ID before retrieval so adjacent IDs are always shown together</div>
+                                <div class="quiz-option" data-correct="false">B) Although chunking does result in smaller document pieces, the main purpose in RAG is to ensure that retrieved content fits within LLM context windows while maintaining semantic coherence, rather than simply reducing file sizes or storage requirements</div>
+                                <div class="quiz-option" data-correct="false">C) The main purpose of chunking is to organize documents into categories and folders for better file management in storage systems</div>
+                                <div class="quiz-option" data-correct="true">D) Use chunk overlap, preserve sentence/paragraph boundaries, include surrounding context in metadata, and use semantic chunking to keep related content together</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What are the trade-offs between small and large chunk sizes?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To reduce file size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking is primarily used to reduce storage costs by compressing document content, though this doesn't address the main RAG requirements</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Small chunks: More precise retrieval but may lose context. Large chunks: More context but less precise retrieval. Balance based on query type and document structure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While chunking can help with storage optimization and file organization, the primary reason in RAG systems is actually to enable efficient embedding generation and retrieval, not just to make documents smaller or reduce storage costs</div>
+                                <div class="quiz-option" data-correct="false">A) Small chunks always improve both precision and context, so there is no meaningful trade-off</div>
+                                <div class="quiz-option" data-correct="false">B) Chunking is primarily used to reduce storage costs by compressing document content, though this doesn't address the main RAG requirements</div>
+                                <div class="quiz-option" data-correct="true">C) Small chunks: More precise retrieval but may lose context. Large chunks: More context but less precise retrieval. Balance based on query type and document structure</div>
+                                <div class="quiz-option" data-correct="false">D) Large chunks are always better because they include more text, even when the query asks for a narrow fact</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "How would you handle very long documents (e.g., books) in RAG?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use hierarchical chunking (chapters → sections → paragraphs), maintain document structure in metadata, use multi-level retrieval, and consider document summarization for overview</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) While this might seem reasonable, it's not the correct approach</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) This is incorrect</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) This comprehensive approach has been considered but doesn't work well in practice</div>
+                                <div class="quiz-option" data-correct="true">A) Use hierarchical chunking (chapters → sections → paragraphs), maintain document structure in metadata, use multi-level retrieval, and consider document summarization for overview</div>
+                                <div class="quiz-option" data-correct="false">B) Split the book into one chunk per page and ignore chapters, headings, and cross-page context</div>
+                                <div class="quiz-option" data-correct="false">C) Embed only the table of contents and rely on the LLM to infer details from chapter titles</div>
+                                <div class="quiz-option" data-correct="false">D) Use one giant chunk for the whole book so no information is separated during retrieval</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is recursive chunking?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Chunking serves multiple purposes including document organization and storage efficiency, but in RAG systems the critical function is breaking documents into semantically meaningful units that can be effectively embedded and retrieved, not just reducing document size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To organize files better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Chunking that tries multiple strategies in order (e.g., paragraphs → sentences → characters) until chunks fit size requirements, handling nested document structures</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Chunking is primarily used to reduce storage costs by compressing document content, though this doesn't address the main RAG requirements</div>
+                                <div class="quiz-option" data-correct="false">A) Chunking that recursively summarizes text until only one document-level embedding remains</div>
+                                <div class="quiz-option" data-correct="false">B) Chunking by repeatedly splitting text at random offsets until the desired count is reached</div>
+                                <div class="quiz-option" data-correct="true">C) Chunking that tries multiple strategies in order (e.g., paragraphs → sentences → characters) until chunks fit size requirements, handling nested document structures</div>
+                                <div class="quiz-option" data-correct="false">D) Chunking is primarily used to reduce storage costs by compressing document content, though this doesn't address the main RAG requirements</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: Interview question: "How do you evaluate chunking quality?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To speed up processing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Chunking helps reduce network bandwidth by sending smaller pieces of data, which improves transmission speed but isn't the core reason in RAG</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">C) Measure retrieval performance (precision@k, recall@k), test downstream RAG quality, check if relevant information is preserved, and evaluate chunk coherence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) While chunking can help with storage optimization and file organization, the primary reason in RAG systems is actually to enable efficient embedding generation and retrieval, not just to make documents smaller or reduce storage costs</div>
+                                <div class="quiz-option" data-correct="false">A) Count only how quickly chunks are generated, because retrieval quality is independent of chunk boundaries</div>
+                                <div class="quiz-option" data-correct="false">B) Check only that all chunks are the same length, because uniformity guarantees good retrieval</div>
+                                <div class="quiz-option" data-correct="true">C) Measure retrieval performance (precision@k, recall@k), test downstream RAG quality, check if relevant information is preserved, and evaluate chunk coherence</div>
+                                <div class="quiz-option" data-correct="false">D) Evaluate only storage savings from smaller chunks, not answer faithfulness or retrieval recall</div>
                             </div>
                         </div>
                         </div>
@@ -1423,58 +1394,10 @@ nltk.download('punkt')</code></pre>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/rag" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/rag/chapter2" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 2</a>
-                <a href="/tutorials/rag/chapter4" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 4 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/rag/shared-tutorial.js') }}?v=2"></script>
-    <script>
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-    </script>
-</body>
-</html>
+{% endblock %}
