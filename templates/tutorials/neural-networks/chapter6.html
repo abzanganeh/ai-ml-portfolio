@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 6: Recurrent Neural Networks (RNNs) - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 6: Recurrent Neural Networks (RNNs) - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 6: Recurrent Neural Networks (RNNs)</h1>
@@ -624,161 +595,108 @@ rnn = RNN(input_size=10, hidden_size=20, output_size=5)
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the main advantage of RNNs over feedforward networks?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They are faster to train</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) They can process sequences and maintain memory of previous inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They require fewer parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They always give better accuracy</div>
+                                <div class="quiz-option" data-correct="false">A) They are faster to train</div>
+                                <div class="quiz-option" data-correct="true">B) They can process sequences and maintain memory of previous inputs</div>
+                                <div class="quiz-option" data-correct="false">C) They require fewer parameters</div>
+                                <div class="quiz-option" data-correct="false">D) They always give better accuracy</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is the vanishing gradient problem in RNNs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients become exponentially small when propagating backward through time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) RNNs forget previous inputs too quickly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) RNNs require too much memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) RNNs can't process sequences</div>
+                                <div class="quiz-option" data-correct="true">A) Gradients become exponentially small when propagating backward through time</div>
+                                <div class="quiz-option" data-correct="false">B) RNNs forget previous inputs too quickly</div>
+                                <div class="quiz-option" data-correct="false">C) RNNs require too much memory</div>
+                                <div class="quiz-option" data-correct="false">D) RNNs can't process sequences</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What does BPTT stand for?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Backpropagation Through Training</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Backpropagation Through Time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Backward Propagation Through Time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Best Performance Through Training</div>
+                                <div class="quiz-option" data-correct="false">A) Backpropagation Through Training</div>
+                                <div class="quiz-option" data-correct="true">B) Backpropagation Through Time</div>
+                                <div class="quiz-option" data-correct="false">C) Backward Propagation Through Time</div>
+                                <div class="quiz-option" data-correct="false">D) Best Performance Through Training</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: How does an RNN maintain memory of previous inputs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) RNNs use a hidden state that gets updated at each time step, carrying information from previous steps forward through the sequence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) By storing all previous inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By using separate networks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They don't maintain memory</div>
+                                <div class="quiz-option" data-correct="true">A) RNNs use a hidden state that gets updated at each time step, carrying information from previous steps forward through the sequence</div>
+                                <div class="quiz-option" data-correct="false">B) By storing all previous inputs</div>
+                                <div class="quiz-option" data-correct="false">C) By using separate networks</div>
+                                <div class="quiz-option" data-correct="false">D) They don't maintain memory</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the mathematical formula for RNN hidden state update?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(h_t = f(W_h h_{t-1} + W_x x_t + b)\) where f is activation, W_h and W_x are weight matrices, h is hidden state, x is input</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(h_t = x_t\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(h_t = W \times x_t\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(h_t = h_{t-1}\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(h_t = f(W_h h_{t-1} + W_x x_t + b)\) where f is activation, W_h and W_x are weight matrices, h is hidden state, x is input</div>
+                                <div class="quiz-option" data-correct="false">B) \(h_t = x_t\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(h_t = W \times x_t\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(h_t = h_{t-1}\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Why do RNNs struggle with long sequences?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Vanishing and exploding gradients make it hard to learn long-term dependencies, and the simple hidden state update struggles to retain information over many steps</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're too fast</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They use too many parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They can't process sequences</div>
+                                <div class="quiz-option" data-correct="true">A) Vanishing and exploding gradients make it hard to learn long-term dependencies, and the simple hidden state update struggles to retain information over many steps</div>
+                                <div class="quiz-option" data-correct="false">B) They're too fast</div>
+                                <div class="quiz-option" data-correct="false">C) They use too many parameters</div>
+                                <div class="quiz-option" data-correct="false">D) They can't process sequences</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What are the different RNN architectures for sequence tasks?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Many-to-one (sequence to single output like classification), one-to-many (single input to sequence like generation), many-to-many (sequence to sequence like translation), with different input/output patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only many-to-one</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only one-to-many</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) All are the same</div>
+                                <div class="quiz-option" data-correct="true">A) Many-to-one (sequence to single output like classification), one-to-many (single input to sequence like generation), many-to-many (sequence to sequence like translation), with different input/output patterns</div>
+                                <div class="quiz-option" data-correct="false">B) Only many-to-one</div>
+                                <div class="quiz-option" data-correct="false">C) Only one-to-many</div>
+                                <div class="quiz-option" data-correct="false">D) All are the same</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How does backpropagation through time work in RNNs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients are computed at each time step and propagated backward through the unrolled network, with gradients accumulating across time steps, requiring careful handling of the shared weights</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only backward through one step</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No backpropagation needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only forward pass</div>
+                                <div class="quiz-option" data-correct="true">A) Gradients are computed at each time step and propagated backward through the unrolled network, with gradients accumulating across time steps, requiring careful handling of the shared weights</div>
+                                <div class="quiz-option" data-correct="false">B) Only backward through one step</div>
+                                <div class="quiz-option" data-correct="false">C) No backpropagation needed</div>
+                                <div class="quiz-option" data-correct="false">D) Only forward pass</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the difference between unidirectional and bidirectional RNNs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Unidirectional processes sequence left-to-right only, while bidirectional processes both directions simultaneously, allowing the network to use both past and future context</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Unidirectional uses both directions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Bidirectional is one-way only</div>
+                                <div class="quiz-option" data-correct="true">A) Unidirectional processes sequence left-to-right only, while bidirectional processes both directions simultaneously, allowing the network to use both past and future context</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Unidirectional uses both directions</div>
+                                <div class="quiz-option" data-correct="false">D) Bidirectional is one-way only</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: When would you use an RNN versus a feedforward network?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use RNNs for sequential data where order matters (text, time series, speech), and feedforward networks for fixed-size inputs where order doesn't matter (images, tabular data)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use RNNs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use feedforward</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're interchangeable</div>
+                                <div class="quiz-option" data-correct="true">A) Use RNNs for sequential data where order matters (text, time series, speech), and feedforward networks for fixed-size inputs where order doesn't matter (images, tabular data)</div>
+                                <div class="quiz-option" data-correct="false">B) Always use RNNs</div>
+                                <div class="quiz-option" data-correct="false">C) Always use feedforward</div>
+                                <div class="quiz-option" data-correct="false">D) They're interchangeable</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What causes exploding gradients in RNNs and how do you fix it?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) When gradients grow exponentially through time steps, often due to large weights. Fix with gradient clipping (cap gradient magnitude), careful weight initialization, or use LSTM/GRU architectures</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Can't be fixed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Increase learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use more layers</div>
+                                <div class="quiz-option" data-correct="true">A) When gradients grow exponentially through time steps, often due to large weights. Fix with gradient clipping (cap gradient magnitude), careful weight initialization, or use LSTM/GRU architectures</div>
+                                <div class="quiz-option" data-correct="false">B) Can't be fixed</div>
+                                <div class="quiz-option" data-correct="false">C) Increase learning rate</div>
+                                <div class="quiz-option" data-correct="false">D) Use more layers</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: How would you implement a simple RNN from scratch?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Initialize weight matrices for input-to-hidden, hidden-to-hidden, and hidden-to-output. For each time step, compute hidden state using previous hidden state and current input, apply activation, compute output. During training, unroll the network and use backpropagation through time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use a feedforward network</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only forward pass needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No implementation needed</div>
+                                <div class="quiz-option" data-correct="true">A) Initialize weight matrices for input-to-hidden, hidden-to-hidden, and hidden-to-output. For each time step, compute hidden state using previous hidden state and current input, apply activation, compute output. During training, unroll the network and use backpropagation through time</div>
+                                <div class="quiz-option" data-correct="false">B) Just use a feedforward network</div>
+                                <div class="quiz-option" data-correct="false">C) Only forward pass needed</div>
+                                <div class="quiz-option" data-correct="false">D) No implementation needed</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter5" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 5</a>
-                <a href="/tutorials/neural-networks/chapter7" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 7: LSTMs →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-</script>
-</body>
-</html>
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+{% endblock %}

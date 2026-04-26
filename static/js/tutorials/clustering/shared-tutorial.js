@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize interactive demos
     initializeInteractiveDemos();
+
+    // Upgrade unfinished visualization notes into reusable labs
+    initializeDynamicLabs();
     
     console.log('Clustering Tutorial: Initialization complete');
 });
@@ -1316,4 +1319,379 @@ function initializeDemoControls(config) {
             }
         }, autoGenerate.delay);
     }
+}
+
+class ClusteringDynamicLab {
+    constructor(container, index) {
+        this.container = container;
+        this.index = index;
+        this.title = this.extractTitle();
+        this.description = this.extractDescription();
+        this.profile = this.resolveProfile();
+        this.controlIds = {
+            dataset: `dynamic-lab-${index}-dataset`,
+            density: `dynamic-lab-${index}-density`,
+            separation: `dynamic-lab-${index}-separation`,
+            noise: `dynamic-lab-${index}-noise`,
+            output: `dynamic-lab-${index}-output`,
+            clusterMetric: `dynamic-lab-${index}-clusters`,
+            noiseMetric: `dynamic-lab-${index}-noise-count`,
+            qualityMetric: `dynamic-lab-${index}-quality`,
+        };
+    }
+
+    initialize() {
+        if (this.container.dataset.dynamicLabEnhanced === 'true') {
+            return;
+        }
+
+        this.container.dataset.dynamicLabEnhanced = 'true';
+        this.container.classList.add('clustering-dynamic-lab');
+        this.container.innerHTML = this.renderTemplate();
+        this.bindControls();
+        this.update();
+    }
+
+    extractTitle() {
+        const titleElement = this.container.querySelector('h4, h5, strong');
+        return titleElement ? titleElement.textContent.trim() : 'Interactive Clustering Lab';
+    }
+
+    extractDescription() {
+        const paragraph = this.container.querySelector('p');
+        const fallback = 'Adjust the controls to see how clustering behavior changes.';
+        return paragraph ? paragraph.textContent.trim() : fallback;
+    }
+
+    resolveProfile() {
+        const text = `${this.title} ${this.description}`.toLowerCase();
+
+        if (text.includes('dbscan') || text.includes('density') || text.includes('epsilon')) {
+            return {
+                dataset: 'moons',
+                modelLabel: 'DBSCAN',
+                prompt: 'Increase density strictness until sparse edge points become noise, then lower it until the two dense regions reconnect.',
+                expected: 'Higher density requirements create more noise. Lower requirements merge nearby dense regions and can hide outliers.',
+            };
+        }
+
+        if (text.includes('gmm') || text.includes('gaussian') || text.includes('probability')) {
+            return {
+                dataset: 'blobs',
+                modelLabel: 'Gaussian mixture',
+                prompt: 'Raise separation and compare how soft component regions become easier to distinguish.',
+                expected: 'Separated clusters produce clearer assignments. Overlap lowers confidence even when the number of components is correct.',
+            };
+        }
+
+        if (text.includes('hierarchical') || text.includes('dendrogram') || text.includes('linkage')) {
+            return {
+                dataset: 'nested',
+                modelLabel: 'Hierarchical clustering',
+                prompt: 'Lower separation and watch where a single linkage-style chain would begin to connect nearby groups.',
+                expected: 'Hierarchical methods expose merge order. Small bridges can connect clusters earlier than a centroid-based method would.',
+            };
+        }
+
+        if (text.includes('metric') || text.includes('evaluation') || text.includes('silhouette')) {
+            return {
+                dataset: 'blobs',
+                modelLabel: 'Evaluation view',
+                prompt: 'Add noise and compare how the quality score reacts before the visual clusters look completely broken.',
+                expected: 'Evaluation metrics usually degrade before the chart looks unusable, which makes them useful monitoring signals.',
+            };
+        }
+
+        if (text.includes('scalable') || text.includes('complexity') || text.includes('large')) {
+            return {
+                dataset: 'grid',
+                modelLabel: 'Scalability view',
+                prompt: 'Increase noise and density strictness together to see why indexing and pruning matter at larger sizes.',
+                expected: 'More candidate neighborhoods increase work. Efficient indexes reduce unnecessary distance checks.',
+            };
+        }
+
+        return {
+            dataset: 'blobs',
+            modelLabel: 'Clustering model',
+            prompt: 'Change one control at a time and explain whether the model is separating structure or overfitting noise.',
+            expected: 'Good settings preserve stable groups while leaving ambiguous or isolated observations unforced.',
+        };
+    }
+
+    renderTemplate() {
+        return `
+            <div class="clustering-dynamic-lab__header">
+                <div>
+                    <p class="clustering-dynamic-lab__eyebrow">Dynamic Lab</p>
+                    <h4>${this.escapeHtml(this.title)}</h4>
+                </div>
+                <span class="clustering-dynamic-lab__badge">${this.escapeHtml(this.profile.modelLabel)}</span>
+            </div>
+            <p>${this.escapeHtml(this.description)}</p>
+            <div class="clustering-dynamic-lab__body">
+                <div class="clustering-dynamic-lab__controls">
+                    <label>
+                        Dataset
+                        <select id="${this.controlIds.dataset}">
+                            ${this.renderDatasetOptions()}
+                        </select>
+                    </label>
+                    <label>
+                        Density strictness
+                        <input id="${this.controlIds.density}" type="range" min="1" max="9" value="5">
+                    </label>
+                    <label>
+                        Cluster separation
+                        <input id="${this.controlIds.separation}" type="range" min="1" max="9" value="6">
+                    </label>
+                    <label>
+                        Noise level
+                        <input id="${this.controlIds.noise}" type="range" min="0" max="8" value="2">
+                    </label>
+                    <button class="azbn-btn demo-button clustering-dynamic-lab__reset" type="button">Reset Lab</button>
+                </div>
+                <div class="clustering-dynamic-lab__visual">
+                    <div id="${this.controlIds.output}" aria-label="${this.escapeHtml(this.title)} visualization"></div>
+                    <div class="clustering-dynamic-lab__metrics" aria-live="polite">
+                        <span><strong id="${this.controlIds.clusterMetric}">0</strong> clusters</span>
+                        <span><strong id="${this.controlIds.noiseMetric}">0</strong> noise points</span>
+                        <span><strong id="${this.controlIds.qualityMetric}">0.00</strong> quality</span>
+                    </div>
+                </div>
+            </div>
+            <div class="clustering-dynamic-lab__prompt">
+                <strong>Learner task:</strong> ${this.escapeHtml(this.profile.prompt)}
+            </div>
+            <div class="clustering-dynamic-lab__expected">
+                <strong>Expected observation:</strong> ${this.escapeHtml(this.profile.expected)}
+            </div>
+            <div class="presentation-training-block">
+                <p class="presentation-training-block__label">Presentation Block</p>
+                <p><strong>Teach-back prompt:</strong> Ask learners which control changed the clustering result most and what tradeoff it introduced.</p>
+                <p><strong>Facilitator note:</strong> Pause on the metric panel after each change so the visual pattern and the quantitative signal are connected.</p>
+            </div>
+        `;
+    }
+
+    renderDatasetOptions() {
+        const options = [
+            ['blobs', 'Separated blobs'],
+            ['moons', 'Curved manifolds'],
+            ['nested', 'Nested groups'],
+            ['grid', 'Large grid sample'],
+        ];
+
+        return options
+            .map(([value, label]) => {
+                const selected = value === this.profile.dataset ? ' selected' : '';
+                return `<option value="${value}"${selected}>${label}</option>`;
+            })
+            .join('');
+    }
+
+    bindControls() {
+        this.getControlElements().forEach((field) => {
+            field.addEventListener('input', () => this.update());
+            field.addEventListener('change', () => this.update());
+        });
+
+        const resetButton = this.container.querySelector('.clustering-dynamic-lab__reset');
+        if (resetButton) {
+            resetButton.addEventListener('click', () => {
+                this.getControlElements().forEach((field) => {
+                    field.value = field.defaultValue;
+                });
+                this.update();
+            });
+        }
+    }
+
+    update() {
+        const dataset = document.getElementById(this.controlIds.dataset).value;
+        const density = Number(document.getElementById(this.controlIds.density).value);
+        const separation = Number(document.getElementById(this.controlIds.separation).value);
+        const noise = Number(document.getElementById(this.controlIds.noise).value);
+        const points = this.generatePoints(dataset, separation, noise);
+        const assignments = this.assignClusters(points, density, separation, noise);
+
+        this.renderSvg(points, assignments);
+        this.updateMetrics(assignments, density, separation, noise);
+    }
+
+    getControlElements() {
+        return [
+            document.getElementById(this.controlIds.dataset),
+            document.getElementById(this.controlIds.density),
+            document.getElementById(this.controlIds.separation),
+            document.getElementById(this.controlIds.noise),
+        ].filter(Boolean);
+    }
+
+    generatePoints(dataset, separation, noise) {
+        const points = [];
+        const count = dataset === 'grid' ? 96 : 72;
+        const spread = 18 - separation;
+
+        for (let index = 0; index < count; index++) {
+            const cluster = index % 3;
+            const phase = index * 1.618;
+            const jitterX = Math.sin(phase) * spread + Math.cos(index * 0.71) * noise;
+            const jitterY = Math.cos(phase) * spread + Math.sin(index * 0.53) * noise;
+
+            if (dataset === 'moons') {
+                const half = index < count / 2 ? 0 : 1;
+                const angle = (index % (count / 2)) / (count / 2) * Math.PI;
+                const x = half === 0 ? 120 + Math.cos(angle) * 72 : 245 - Math.cos(angle) * 72;
+                const y = half === 0 ? 155 - Math.sin(angle) * 48 : 155 + Math.sin(angle) * 48;
+                points.push({ x: x + jitterX, y: y + jitterY, cluster: half });
+                continue;
+            }
+
+            if (dataset === 'nested') {
+                const angle = index / count * Math.PI * 2;
+                const radius = cluster === 0 ? 34 : cluster === 1 ? 68 : 102;
+                points.push({
+                    x: 200 + Math.cos(angle) * radius + jitterX,
+                    y: 150 + Math.sin(angle) * radius * 0.72 + jitterY,
+                    cluster,
+                });
+                continue;
+            }
+
+            if (dataset === 'grid') {
+                const col = index % 12;
+                const row = Math.floor(index / 12);
+                points.push({
+                    x: 54 + col * 27 + jitterX * 0.45,
+                    y: 56 + row * 28 + jitterY * 0.45,
+                    cluster: Math.floor(col / 4),
+                });
+                continue;
+            }
+
+            const centers = [
+                [112 - separation * 2, 105],
+                [278 + separation * 2, 112],
+                [200, 220 + separation],
+            ];
+            const center = centers[cluster];
+            points.push({ x: center[0] + jitterX, y: center[1] + jitterY, cluster });
+        }
+
+        return points;
+    }
+
+    assignClusters(points, density, separation, noise) {
+        const noiseThreshold = Math.max(0.08, (noise + density - separation) / 20);
+
+        return points.map((point, index) => {
+            const signal = Math.abs(Math.sin((index + 1) * 2.31));
+            const isNoise = signal < noiseThreshold;
+            const type = isNoise ? 'noise' : density > 6 && index % 5 === 0 ? 'border' : 'core';
+            return { cluster: isNoise ? -1 : point.cluster, type };
+        });
+    }
+
+    renderSvg(points, assignments) {
+        const output = document.getElementById(this.controlIds.output);
+        if (!output) {
+            return;
+        }
+
+        const colors = ['#2563eb', '#16a34a', '#d97706', '#7c3aed'];
+        const pointsMarkup = points.map((point, index) => {
+            const assignment = assignments[index];
+            const fill = assignment.type === 'noise' ? '#dc2626' : colors[assignment.cluster % colors.length];
+            const radius = assignment.type === 'core' ? 5.5 : assignment.type === 'border' ? 4.25 : 3.25;
+            const stroke = assignment.type === 'border' ? '#111827' : '#ffffff';
+            return `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${radius}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" opacity="0.88"></circle>`;
+        }).join('');
+
+        const hulls = [0, 1, 2].map((cluster) => {
+            const clusterPoints = points.filter((point, index) => assignments[index].cluster === cluster);
+            if (clusterPoints.length === 0) {
+                return '';
+            }
+            const meanX = clusterPoints.reduce((sum, point) => sum + point.x, 0) / clusterPoints.length;
+            const meanY = clusterPoints.reduce((sum, point) => sum + point.y, 0) / clusterPoints.length;
+            return `<ellipse cx="${meanX.toFixed(1)}" cy="${meanY.toFixed(1)}" rx="58" ry="38" fill="${colors[cluster]}" opacity="0.08" stroke="${colors[cluster]}" stroke-width="2"></ellipse>`;
+        }).join('');
+
+        output.innerHTML = `
+            <svg class="clustering-dynamic-lab__svg" viewBox="0 0 400 300" role="img">
+                <rect x="0" y="0" width="400" height="300" rx="14" fill="#f8fafc"></rect>
+                <g>${hulls}</g>
+                <g>${pointsMarkup}</g>
+                <line x1="28" y1="270" x2="372" y2="270" stroke="#cbd5e1" stroke-width="1"></line>
+                <line x1="28" y1="30" x2="28" y2="270" stroke="#cbd5e1" stroke-width="1"></line>
+            </svg>
+        `;
+    }
+
+    updateMetrics(assignments, density, separation, noise) {
+        const clusterCount = new Set(assignments.filter((item) => item.cluster >= 0).map((item) => item.cluster)).size;
+        const noiseCount = assignments.filter((item) => item.type === 'noise').length;
+        const quality = Math.max(0.12, Math.min(0.96, 0.52 + separation * 0.045 - noise * 0.035 - Math.abs(density - 5) * 0.025));
+
+        document.getElementById(this.controlIds.clusterMetric).textContent = clusterCount;
+        document.getElementById(this.controlIds.noiseMetric).textContent = noiseCount;
+        document.getElementById(this.controlIds.qualityMetric).textContent = quality.toFixed(2);
+    }
+
+    escapeHtml(value) {
+        const escapeElement = document.createElement('span');
+        escapeElement.textContent = value;
+        return escapeElement.innerHTML;
+    }
+}
+
+class ClusteringPresentationMode {
+    constructor(documentRoot = document) {
+        this.documentRoot = documentRoot;
+        this.storageKey = 'clusteringPresentationMode';
+    }
+
+    initialize() {
+        if (!this.documentRoot.querySelector('.presentation-training-block')) {
+            return;
+        }
+
+        this.renderToggle();
+        const enabled = window.localStorage.getItem(this.storageKey) === 'enabled';
+        this.setEnabled(enabled);
+    }
+
+    renderToggle() {
+        const toggle = this.documentRoot.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'azbn-btn presentation-mode-toggle';
+        toggle.textContent = 'Presentation mode';
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.addEventListener('click', () => {
+            const enabled = !document.body.classList.contains('presentation-mode-enabled');
+            this.setEnabled(enabled);
+            window.localStorage.setItem(this.storageKey, enabled ? 'enabled' : 'disabled');
+        });
+
+        this.documentRoot.body.appendChild(toggle);
+    }
+
+    setEnabled(enabled) {
+        document.body.classList.toggle('presentation-mode-enabled', enabled);
+        const toggle = this.documentRoot.querySelector('.presentation-mode-toggle');
+        if (toggle) {
+            toggle.setAttribute('aria-pressed', String(enabled));
+        }
+    }
+}
+
+function initializeDynamicLabs() {
+    const placeholders = Array.from(document.querySelectorAll('.visualization-placeholder'));
+
+    placeholders.forEach((placeholder, index) => {
+        new ClusteringDynamicLab(placeholder, index + 1).initialize();
+    });
+
+    new ClusteringPresentationMode().initialize();
 }

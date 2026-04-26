@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 8: Training Tips & Best Practices - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 8: Training Tips & Best Practices - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 8: Training Tips & Best Practices</h1>
@@ -430,160 +401,108 @@ optimizer = AdamOptimizer(learning_rate=0.001)
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the most critical hyperparameter in neural network training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Number of layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Batch size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Activation function</div>
+                                <div class="quiz-option" data-correct="true">A) Learning rate</div>
+                                <div class="quiz-option" data-correct="false">B) Number of layers</div>
+                                <div class="quiz-option" data-correct="false">C) Batch size</div>
+                                <div class="quiz-option" data-correct="false">D) Activation function</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What does dropout do during training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Randomly sets some neurons to zero to prevent overfitting</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Removes layers from the network</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Increases learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Stops training early</div>
+                                <div class="quiz-option" data-correct="true">A) Randomly sets some neurons to zero to prevent overfitting</div>
+                                <div class="quiz-option" data-correct="false">B) Removes layers from the network</div>
+                                <div class="quiz-option" data-correct="false">C) Increases learning rate</div>
+                                <div class="quiz-option" data-correct="false">D) Stops training early</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is early stopping?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Stopping training when loss reaches zero</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Stopping training when validation loss stops improving</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Using a smaller learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Removing regularization</div>
+                                <div class="quiz-option" data-correct="false">A) Stopping training when loss reaches zero</div>
+                                <div class="quiz-option" data-correct="true">B) Stopping training when validation loss stops improving</div>
+                                <div class="quiz-option" data-correct="false">C) Using a smaller learning rate</div>
+                                <div class="quiz-option" data-correct="false">D) Removing regularization</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: How do you choose the right learning rate?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Start with a reasonable value (like 0.001), monitor loss curve, if loss decreases slowly increase it, if loss oscillates or increases decrease it. Use learning rate scheduling or adaptive optimizers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use 0.1</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use the largest possible</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random value</div>
+                                <div class="quiz-option" data-correct="true">A) Start with a reasonable value (like 0.001), monitor loss curve, if loss decreases slowly increase it, if loss oscillates or increases decrease it. Use learning rate scheduling or adaptive optimizers</div>
+                                <div class="quiz-option" data-correct="false">B) Always use 0.1</div>
+                                <div class="quiz-option" data-correct="false">C) Use the largest possible</div>
+                                <div class="quiz-option" data-correct="false">D) Random value</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the purpose of batch normalization?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Batch normalization normalizes layer inputs by subtracting mean and dividing by standard deviation, stabilizing training, allowing higher learning rates, and reducing internal covariate shift</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase batch size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To decrease computation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To add noise</div>
+                                <div class="quiz-option" data-correct="true">A) Batch normalization normalizes layer inputs by subtracting mean and dividing by standard deviation, stabilizing training, allowing higher learning rates, and reducing internal covariate shift</div>
+                                <div class="quiz-option" data-correct="false">B) To increase batch size</div>
+                                <div class="quiz-option" data-correct="false">C) To decrease computation</div>
+                                <div class="quiz-option" data-correct="false">D) To add noise</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: How does dropout prevent overfitting?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Dropout randomly sets some neurons to zero during training, preventing the network from relying too heavily on specific neurons and forcing it to learn more robust features</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) By removing layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By using less data</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) By increasing parameters</div>
+                                <div class="quiz-option" data-correct="true">A) Dropout randomly sets some neurons to zero during training, preventing the network from relying too heavily on specific neurons and forcing it to learn more robust features</div>
+                                <div class="quiz-option" data-correct="false">B) By removing layers</div>
+                                <div class="quiz-option" data-correct="false">C) By using less data</div>
+                                <div class="quiz-option" data-correct="false">D) By increasing parameters</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the difference between training loss and validation loss?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Training loss measures error on data used for training, validation loss measures error on held-out data. Large gap indicates overfitting, both high indicates underfitting</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're always the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Validation is always lower</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                                <div class="quiz-option" data-correct="true">A) Training loss measures error on data used for training, validation loss measures error on held-out data. Large gap indicates overfitting, both high indicates underfitting</div>
+                                <div class="quiz-option" data-correct="false">B) They're always the same</div>
+                                <div class="quiz-option" data-correct="false">C) Validation is always lower</div>
+                                <div class="quiz-option" data-correct="false">D) No difference</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How do you debug a network that's not learning?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Check gradient flow (should not be zero), verify data preprocessing, check loss function, inspect weight initialization, verify learning rate, check for bugs in forward/backward pass, ensure data is being fed correctly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just wait longer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Add more layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use more data</div>
+                                <div class="quiz-option" data-correct="true">A) Check gradient flow (should not be zero), verify data preprocessing, check loss function, inspect weight initialization, verify learning rate, check for bugs in forward/backward pass, ensure data is being fed correctly</div>
+                                <div class="quiz-option" data-correct="false">B) Just wait longer</div>
+                                <div class="quiz-option" data-correct="false">C) Add more layers</div>
+                                <div class="quiz-option" data-correct="false">D) Use more data</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is gradient clipping and when do you use it?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradient clipping caps gradient magnitude to prevent exploding gradients, especially useful in RNNs and deep networks where gradients can grow exponentially</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To remove gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not needed</div>
+                                <div class="quiz-option" data-correct="true">A) Gradient clipping caps gradient magnitude to prevent exploding gradients, especially useful in RNNs and deep networks where gradients can grow exponentially</div>
+                                <div class="quiz-option" data-correct="false">B) To increase gradients</div>
+                                <div class="quiz-option" data-correct="false">C) To remove gradients</div>
+                                <div class="quiz-option" data-correct="false">D) Not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: How do you choose the right optimizer?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Adam is a good default (adaptive learning rate, works well for most cases). SGD with momentum for fine-tuning. RMSprop for RNNs. Try different optimizers and compare validation performance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use SGD</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random choice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're all the same</div>
+                                <div class="quiz-option" data-correct="true">A) Adam is a good default (adaptive learning rate, works well for most cases). SGD with momentum for fine-tuning. RMSprop for RNNs. Try different optimizers and compare validation performance</div>
+                                <div class="quiz-option" data-correct="false">B) Always use SGD</div>
+                                <div class="quiz-option" data-correct="false">C) Random choice</div>
+                                <div class="quiz-option" data-correct="false">D) They're all the same</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is the purpose of a validation set?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Validation set is used to tune hyperparameters and monitor training progress without touching the test set, helping detect overfitting and guide model selection</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) For final testing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) For training</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not needed</div>
+                                <div class="quiz-option" data-correct="true">A) Validation set is used to tune hyperparameters and monitor training progress without touching the test set, helping detect overfitting and guide model selection</div>
+                                <div class="quiz-option" data-correct="false">B) For final testing</div>
+                                <div class="quiz-option" data-correct="false">C) For training</div>
+                                <div class="quiz-option" data-correct="false">D) Not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: How would you improve a network that's overfitting?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Add dropout, use more data or data augmentation, reduce model capacity, add regularization (L1/L2), use early stopping, simplify architecture, reduce training time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Add more layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Increase learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use less data</div>
+                                <div class="quiz-option" data-correct="true">A) Add dropout, use more data or data augmentation, reduce model capacity, add regularization (L1/L2), use early stopping, simplify architecture, reduce training time</div>
+                                <div class="quiz-option" data-correct="false">B) Add more layers</div>
+                                <div class="quiz-option" data-correct="false">C) Increase learning rate</div>
+                                <div class="quiz-option" data-correct="false">D) Use less data</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter7" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 7</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-</script>
-</body>
-</html>
+{% endblock %}

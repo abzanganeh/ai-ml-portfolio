@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 5: Feed-Forward Networks - Transformer Architecture Deep Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 5: Feed-Forward Networks - Transformer Architecture Deep Dive' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/transformers" class="course-link">
-                    <span>Transformer Architecture Deep Dive</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 5: Feed-Forward Networks</h1>
@@ -568,180 +539,108 @@ def transformer_layer(x, attention_output, W1, b1, W2, b2):
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the typical expansion factor for FFN hidden dimension?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) 2×</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) 4×</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) 8×</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same as input</div>
+                                <div class="quiz-option" data-correct="false">A) 2×</div>
+                                <div class="quiz-option" data-correct="true">B) 4×</div>
+                                <div class="quiz-option" data-correct="false">C) 8×</div>
+                                <div class="quiz-option" data-correct="false">D) Same as input</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is the purpose of the second linear layer in FFN?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To expand dimensions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To project back to original dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add non-linearity</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To gather information</div>
+                                <div class="quiz-option" data-correct="false">A) To expand dimensions</div>
+                                <div class="quiz-option" data-correct="true">B) To project back to original dimension</div>
+                                <div class="quiz-option" data-correct="false">C) To add non-linearity</div>
+                                <div class="quiz-option" data-correct="false">D) To gather information</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: How does FFN differ from attention in transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) FFN processes each position independently, attention mixes between positions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) FFN mixes between positions, attention processes independently</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They are the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) FFN is not used in transformers</div>
+                                <div class="quiz-option" data-correct="true">A) FFN processes each position independently, attention mixes between positions</div>
+                                <div class="quiz-option" data-correct="false">B) FFN mixes between positions, attention processes independently</div>
+                                <div class="quiz-option" data-correct="false">C) They are the same</div>
+                                <div class="quiz-option" data-correct="false">D) FFN is not used in transformers</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the formula for a feed-forward network in transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(FFN(x) = ReLU(xW_1 + b_1)W_2 + b_2\) where W_1 expands dimensions, W_2 projects back, and ReLU adds non-linearity</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(FFN(x) = x\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(FFN(x) = xW\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(FFN(x) = W\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(FFN(x) = ReLU(xW_1 + b_1)W_2 + b_2\) where W_1 expands dimensions, W_2 projects back, and ReLU adds non-linearity</div>
+                                <div class="quiz-option" data-correct="false">B) \(FFN(x) = x\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(FFN(x) = xW\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(FFN(x) = W\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Why does FFN use ReLU activation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) ReLU introduces non-linearity, is computationally efficient, helps with gradient flow, and allows the network to learn complex patterns by activating different neurons for different inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's the only option</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It's faster than other activations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No reason</div>
+                                <div class="quiz-option" data-correct="true">A) ReLU introduces non-linearity, is computationally efficient, helps with gradient flow, and allows the network to learn complex patterns by activating different neurons for different inputs</div>
+                                <div class="quiz-option" data-correct="false">B) It's the only option</div>
+                                <div class="quiz-option" data-correct="false">C) It's faster than other activations</div>
+                                <div class="quiz-option" data-correct="false">D) No reason</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the typical size of FFN hidden layer in transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Usually 4× the embedding dimension (d_ff = 4 × d_model), so for d_model=768, hidden size is 3072</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Same as embedding</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Half of embedding</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Always 1024</div>
+                                <div class="quiz-option" data-correct="true">A) Usually 4× the embedding dimension (d_ff = 4 × d_model), so for d_model=768, hidden size is 3072</div>
+                                <div class="quiz-option" data-correct="false">B) Same as embedding</div>
+                                <div class="quiz-option" data-correct="false">C) Half of embedding</div>
+                                <div class="quiz-option" data-correct="false">D) Always 1024</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: Why does FFN come after attention in transformer layers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Attention gathers relevant information from other positions, then FFN processes and transforms that information, allowing the model to learn complex feature combinations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Order doesn't matter</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) FFN should come first</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're parallel</div>
+                                <div class="quiz-option" data-correct="true">A) Attention gathers relevant information from other positions, then FFN processes and transforms that information, allowing the model to learn complex feature combinations</div>
+                                <div class="quiz-option" data-correct="false">B) Order doesn't matter</div>
+                                <div class="quiz-option" data-correct="false">C) FFN should come first</div>
+                                <div class="quiz-option" data-correct="false">D) They're parallel</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How would you implement FFN from scratch?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Define weight matrices W1 (d_model × d_ff) and W2 (d_ff × d_model), biases b1 and b2. Compute: hidden = ReLU(xW1 + b1), output = hiddenW2 + b2. Apply layer norm and residual connection</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just return input</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only W1</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                                <div class="quiz-option" data-correct="true">A) Define weight matrices W1 (d_model × d_ff) and W2 (d_ff × d_model), biases b1 and b2. Compute: hidden = ReLU(xW1 + b1), output = hiddenW2 + b2. Apply layer norm and residual connection</div>
+                                <div class="quiz-option" data-correct="false">B) Just return input</div>
+                                <div class="quiz-option" data-correct="false">C) Use only W1</div>
+                                <div class="quiz-option" data-correct="false">D) Random operations</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What happens if you remove FFN from transformer layers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The model loses capacity to learn complex transformations, becomes essentially just attention operations, and performance degrades significantly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Nothing changes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It improves</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It becomes faster</div>
+                                <div class="quiz-option" data-correct="true">A) The model loses capacity to learn complex transformations, becomes essentially just attention operations, and performance degrades significantly</div>
+                                <div class="quiz-option" data-correct="false">B) Nothing changes</div>
+                                <div class="quiz-option" data-correct="false">C) It improves</div>
+                                <div class="quiz-option" data-correct="false">D) It becomes faster</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: How does FFN contribute to transformer model capacity?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) FFN contains most of the parameters in transformers (often 2/3 of total), providing the model with capacity to learn complex non-linear transformations and feature combinations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It has no parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It has few parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same as attention</div>
+                                <div class="quiz-option" data-correct="true">A) FFN contains most of the parameters in transformers (often 2/3 of total), providing the model with capacity to learn complex non-linear transformations and feature combinations</div>
+                                <div class="quiz-option" data-correct="false">B) It has no parameters</div>
+                                <div class="quiz-option" data-correct="false">C) It has few parameters</div>
+                                <div class="quiz-option" data-correct="false">D) Same as attention</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Why is the FFN pattern "expand then contract" (wide hidden layer)?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The wide hidden layer creates a bottleneck-free transformation space, allowing the model to learn complex patterns without information loss, then projects back to original dimension for next layer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To reduce computation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To save memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No reason</div>
+                                <div class="quiz-option" data-correct="true">A) The wide hidden layer creates a bottleneck-free transformation space, allowing the model to learn complex patterns without information loss, then projects back to original dimension for next layer</div>
+                                <div class="quiz-option" data-correct="false">B) To reduce computation</div>
+                                <div class="quiz-option" data-correct="false">C) To save memory</div>
+                                <div class="quiz-option" data-correct="false">D) No reason</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the purpose of the expansion in FFN?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To increase model capacity and allow learning complex transformations by providing more parameters and a wider representation space</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To reduce parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To make it faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To reduce memory</div>
+                                <div class="quiz-option" data-correct="true">A) To increase model capacity and allow learning complex transformations by providing more parameters and a wider representation space</div>
+                                <div class="quiz-option" data-correct="false">B) To reduce parameters</div>
+                                <div class="quiz-option" data-correct="false">C) To make it faster</div>
+                                <div class="quiz-option" data-correct="false">D) To reduce memory</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/transformers/chapter4" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 4</a>
-                <a href="/tutorials/transformers/chapter6" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 6 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+{% endblock %}

@@ -1,51 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 3: Activation Functions - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 3: Activation Functions - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 3: Activation Functions</h1>
                 <p class="chapter-subtitle">Non-linearity and Network Capacity - Understanding how activation functions enable neural networks to learn complex patterns</p>
-                
+
                 <div class="chapter-progress">
                     <div class="chapter-progress-fill" data-progress="37.5"></div>
                 </div>
-                
+
                 <div class="chapter-navigation">
                     <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
                     <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
@@ -56,11 +27,11 @@
                     <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
                     <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
                 </div>
-                
+
                 <div class="section-progress">
                     <div class="section-progress-fill" data-progress="14.3"></div>
                 </div>
-                
+
                 <div class="section-nav">
                     <button class="section-nav-btn azbn-btn active" data-section="why">Why Activation?</button>
                     <button class="section-nav-btn azbn-btn" data-section="sigmoid">Sigmoid</button>
@@ -90,11 +61,11 @@
                 <main class="chapter-main-content">
                     <div id="why" class="content-section active">
                         <h2>Why Do We Need Activation Functions?</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>🔑 The Key to Non-Linearity</h3>
                             <p><strong>Without activation functions, neural networks would just be linear transformations!</strong> No matter how many layers you stack, a network without activations can only learn linear relationships. Activation functions introduce non-linearity, enabling networks to learn complex, non-linear patterns.</p>
-                            
+
                             <p><strong>Mathematical Proof:</strong></p>
                             <p>Consider a network without activations:</p>
                             <ul>
@@ -108,12 +79,12 @@
                         <div class="formula-box">
                             <h4>Without Activation Functions</h4>
                             <p>For L layers without activation:</p>
-                            
+
                             <div class="formula-display">
                                 <strong>y = W<sub>L</sub>W<sub>L-1</sub> … W<sub>1</sub>x + (bias terms)</strong><br>
                                 <strong>= W′x + b′ (single linear transformation)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>What This Means:</h5>
                                 <ul>
@@ -127,7 +98,7 @@
                         <div class="formula-box">
                             <h4>With Activation Functions</h4>
                             <p>For L layers with activation f(·):</p>
-                            
+
                             <div class="formula-display">
                                 \[\begin{aligned}
                                 a_1 &= f(W_1 x + b_1) \\
@@ -136,7 +107,7 @@
                                 y &= f(W_L a_{L-1} + b_L)
                                 \end{aligned}\]
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>What This Enables:</h5>
                                 <ul>
@@ -158,7 +129,7 @@
                         </div>
 
                         <h3>Properties of Good Activation Functions</h3>
-                        
+
                         <div class="explanation-box">
                             <p><strong>An ideal activation function should have:</strong></p>
                             <ul>
@@ -173,7 +144,7 @@
 
                     <div id="sigmoid" class="content-section">
                         <h2>Sigmoid Activation Function</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>📈 The Classic Choice</h3>
                             <p><strong>The sigmoid function was one of the first activation functions used in neural networks.</strong> It squashes any input into a range between 0 and 1, making it perfect for binary classification and probability outputs.</p>
@@ -181,11 +152,11 @@
 
                         <div class="formula-box">
                             <h4>Sigmoid Function</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>σ(x) = 1 / (1 + e^(-x))</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Properties:</h5>
                                 <ul>
@@ -201,11 +172,11 @@
                         <div class="formula-box">
                             <h4>Sigmoid Derivative</h4>
                             <p><strong>Critical for backpropagation:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <strong>σ'(x) = σ(x)(1 - σ(x))</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Key Insight:</h5>
                                 <ul>
@@ -270,10 +241,10 @@ import matplotlib.pyplot as plt
 def sigmoid(x):
     """
     Sigmoid activation function
-    
+
     Parameters:
     x: Input (can be scalar, vector, or matrix)
-    
+
     Returns:
     Sigmoid of x, clipped to prevent overflow
     """
@@ -284,7 +255,7 @@ def sigmoid(x):
 def sigmoid_derivative(x):
     """
     Derivative of sigmoid function
-    
+
     Uses the identity: σ'(x) = σ(x)(1 - σ(x))
     """
     s = sigmoid(x)
@@ -313,7 +284,7 @@ print(f"Max derivative = {sigmoid_derivative(0):.4f}")</code></pre>
 
                     <div id="tanh" class="content-section">
                         <h2>Hyperbolic Tangent (Tanh)</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>Zero-Centered Alternative</h3>
                             <p><strong>Tanh is similar to sigmoid but outputs values between -1 and 1.</strong> This zero-centered property makes it often perform better than sigmoid in practice, especially in hidden layers.</p>
@@ -321,12 +292,12 @@ print(f"Max derivative = {sigmoid_derivative(0):.4f}")</code></pre>
 
                         <div class="formula-box">
                             <h4>Tanh Function</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>tanh(x) = (e^x - e^(-x)) / (e^x + e^(-x))</strong><br>
                                 <strong>= 2σ(2x) - 1</strong> (related to sigmoid)
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Properties:</h5>
                                 <ul>
@@ -340,11 +311,11 @@ print(f"Max derivative = {sigmoid_derivative(0):.4f}")</code></pre>
 
                         <div class="formula-box">
                             <h4>Tanh Derivative</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>tanh'(x) = 1 - tanh²(x)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Comparison with Sigmoid:</h5>
                                 <ul>
@@ -416,7 +387,7 @@ print("\nNote: Tanh is zero-centered, sigmoid is not!")</code></pre>
 
                     <div id="relu" class="content-section">
                         <h2>ReLU (Rectified Linear Unit)</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>The Modern Standard</h3>
                             <p><strong>ReLU is the most popular activation function for deep neural networks today.</strong> It's simple, fast, and solves the vanishing gradient problem for positive inputs. Almost all modern deep learning architectures use ReLU or its variants.</p>
@@ -424,12 +395,12 @@ print("\nNote: Tanh is zero-centered, sigmoid is not!")</code></pre>
 
                         <div class="formula-box">
                             <h4>ReLU Function</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>ReLU(x) = max(0, x) = { x  if x > 0<br>
                                                               0  if x ≤ 0 }</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Properties:</h5>
                                 <ul>
@@ -444,12 +415,12 @@ print("\nNote: Tanh is zero-centered, sigmoid is not!")</code></pre>
 
                         <div class="formula-box">
                             <h4>ReLU Derivative</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>ReLU'(x) = { 1  if x > 0<br>
                                                     0  if x ≤ 0 }</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Key Advantages:</h5>
                                 <ul>
@@ -553,7 +524,7 @@ print(f"where() time:   {time2:.6f}s")</code></pre>
                                 <li><strong>Sparsity:</strong> Creates sparse representations (many zeros)</li>
                                 <li><strong>Biological Plausibility:</strong> Mimics neuron firing (threshold behavior)</li>
                             </ul>
-                            
+
                             <h4>⚠️ Disadvantages of ReLU</h4>
                             <ul>
                                 <li><strong>Dead ReLU Problem:</strong> Neurons with negative inputs never activate</li>
@@ -565,24 +536,24 @@ print(f"where() time:   {time2:.6f}s")</code></pre>
 
                     <div id="variants" class="content-section">
                         <h2>ReLU Variants</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>Solving ReLU's Problems</h3>
                             <p><strong>Several variants of ReLU have been developed to address its limitations,</strong> particularly the "dead ReLU" problem where neurons with negative inputs never activate.</p>
                         </div>
 
                         <h3>1. Leaky ReLU</h3>
-                        
+
                         <div class="formula-box">
                             <h4>Leaky ReLU Formula</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>LeakyReLU(x) = { x      if x > 0<br>
                                                       αx     if x ≤ 0 }</strong>
                             </div>
-                            
+
                             <p>Where <strong>α</strong> is a small positive constant (typically 0.01)</p>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Key Improvement:</h5>
                                 <ul>
@@ -615,17 +586,17 @@ print("Gradient LReLU:", leaky_relu_derivative(x))</code></pre>
                         </div>
 
                         <h3>2. ELU (Exponential Linear Unit)</h3>
-                        
+
                         <div class="formula-box">
                             <h4>ELU Formula</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>ELU(x) = { x           if x > 0<br>
                                                  α(e^x - 1)  if x ≤ 0 }</strong>
                             </div>
-                            
+
                             <p>Where <strong>α</strong> is typically 1.0</p>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Advantages:</h5>
                                 <ul>
@@ -638,14 +609,14 @@ print("Gradient LReLU:", leaky_relu_derivative(x))</code></pre>
                         </div>
 
                         <h3>3. Swish (Self-Gated Activation)</h3>
-                        
+
                         <div class="formula-box">
                             <h4>Swish Function</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>Swish(x) = x · σ(x) = x / (1 + e^(-x))</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Properties:</h5>
                                 <ul>
@@ -752,23 +723,23 @@ print(f"Swish:      {swish(-2):.4f}")</code></pre>
 
                     <div id="choosing" class="content-section">
                         <h2>Choosing the Right Activation Function</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>Decision Guide</h3>
                             <p><strong>There's no one-size-fits-all activation function.</strong> The choice depends on your network architecture, task, and layer position.</p>
                         </div>
 
                         <h3>By Layer Type</h3>
-                        
+
                         <div class="example-box">
                             <h4>Layer-Specific Recommendations</h4>
-                            
+
                             <p><strong>Input Layer:</strong></p>
                             <ul>
                                 <li>Usually no activation (just passes data through)</li>
                                 <li>Sometimes normalization instead</li>
                             </ul>
-                            
+
                             <p><strong>Hidden Layers:</strong></p>
                             <ul>
                                 <li><strong>ReLU:</strong> Default choice for most deep networks</li>
@@ -777,7 +748,7 @@ print(f"Swish:      {swish(-2):.4f}")</code></pre>
                                 <li><strong>Swish:</strong> For modern architectures (often better than ReLU)</li>
                                 <li><strong>Tanh:</strong> For RNNs and LSTMs</li>
                             </ul>
-                            
+
                             <p><strong>Output Layer:</strong></p>
                             <ul>
                                 <li><strong>Binary Classification:</strong> Sigmoid (outputs probability)</li>
@@ -787,7 +758,7 @@ print(f"Swish:      {swish(-2):.4f}")</code></pre>
                         </div>
 
                         <h3>By Task Type</h3>
-                        
+
                         <div class="example-box">
                             <h4>Task-Specific Guidelines</h4>
                             <table style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
@@ -829,7 +800,7 @@ print(f"Swish:      {swish(-2):.4f}")</code></pre>
 
 class ActivationFunction:
     """Factory for activation functions"""
-    
+
     @staticmethod
     def get(name):
         """Get activation function by name"""
@@ -843,33 +814,33 @@ class ActivationFunction:
             'linear': ActivationFunction.linear
         }
         return activations.get(name, ActivationFunction.relu)
-    
+
     @staticmethod
     def sigmoid(x):
         x = np.clip(x, -250, 250)
         return 1 / (1 + np.exp(-x))
-    
+
     @staticmethod
     def tanh(x):
         return np.tanh(x)
-    
+
     @staticmethod
     def relu(x):
         return np.maximum(0, x)
-    
+
     @staticmethod
     def leaky_relu(x, alpha=0.01):
         return np.where(x > 0, x, alpha * x)
-    
+
     @staticmethod
     def elu(x, alpha=1.0):
         return np.where(x > 0, x, alpha * (np.exp(x) - 1))
-    
+
     @staticmethod
     def swish(x):
         sigmoid_x = 1 / (1 + np.exp(-np.clip(x, -250, 250)))
         return x * sigmoid_x
-    
+
     @staticmethod
     def linear(x):
         return x
@@ -883,111 +854,122 @@ print(activation(x))</code></pre>
 
                     <div id="quiz" class="content-section">
                         <h2>Test Your Understanding</h2>
-                        
+
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: Why do we need activation functions in neural networks?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To make computation faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To introduce non-linearity and enable learning complex patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory usage</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                                <div class="quiz-option" data-correct="false">A) To make computation faster</div>
+                                <div class="quiz-option" data-correct="true">B) To introduce non-linearity and enable learning complex patterns</div>
+                                <div class="quiz-option" data-correct="false">C) To reduce memory usage</div>
+                                <div class="quiz-option" data-correct="false">D) To prevent overfitting</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is the main problem with sigmoid activation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) It's too slow</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Vanishing gradients for large inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It outputs negative values</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not differentiable</div>
+                                <div class="quiz-option" data-correct="false">A) It's too slow</div>
+                                <div class="quiz-option" data-correct="true">B) Vanishing gradients for large inputs</div>
+                                <div class="quiz-option" data-correct="false">C) It outputs negative values</div>
+                                <div class="quiz-option" data-correct="false">D) It's not differentiable</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is the "dead ReLU" problem?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Neurons with negative inputs never activate and stop learning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) ReLU is too slow</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) ReLU outputs are always zero</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) ReLU causes overfitting</div>
+                                <div class="quiz-option" data-correct="true">A) Neurons with negative inputs never activate and stop learning</div>
+                                <div class="quiz-option" data-correct="false">B) ReLU is too slow</div>
+                                <div class="quiz-option" data-correct="false">C) ReLU outputs are always zero</div>
+                                <div class="quiz-option" data-correct="false">D) ReLU causes overfitting</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Interview question: "Compare ReLU, Leaky ReLU, and ELU activation functions."</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) ReLU: simple, fast, but has dead neuron problem. Leaky ReLU: fixes dead neurons with small negative slope. ELU: smooth, negative values, better gradient flow but computationally more expensive</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are all the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) ReLU is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) ELU is always faster</div>
+                                <div class="quiz-option" data-correct="true">A) ReLU: simple, fast, but has dead neuron problem. Leaky ReLU: fixes dead neurons with small negative slope. ELU: smooth, negative values, better gradient flow but computationally more expensive</div>
+                                <div class="quiz-option" data-correct="false">B) They are all the same</div>
+                                <div class="quiz-option" data-correct="false">C) ReLU is always better</div>
+                                <div class="quiz-option" data-correct="false">D) ELU is always faster</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the mathematical formula for the sigmoid activation function?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) σ(x) = 1 / (1 + e<sup>-x</sup>)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) σ(x) = x</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) σ(x) = e<sup>x</sup></div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) σ(x) = max(0, x)</div>
+                                <div class="quiz-option" data-correct="true">A) σ(x) = 1 / (1 + e<sup>-x</sup>)</div>
+                                <div class="quiz-option" data-correct="false">B) σ(x) = x</div>
+                                <div class="quiz-option" data-correct="false">C) σ(x) = e<sup>x</sup></div>
+                                <div class="quiz-option" data-correct="false">D) σ(x) = max(0, x)</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Interview question: "When would you use sigmoid vs softmax in the output layer?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Sigmoid for binary classification (single output probability), softmax for multi-class classification (probability distribution over multiple classes that sums to 1)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are interchangeable</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Sigmoid for multi-class, softmax for binary</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use sigmoid always</div>
+                                <div class="quiz-option" data-correct="true">A) Sigmoid for binary classification (single output probability), softmax for multi-class classification (probability distribution over multiple classes that sums to 1)</div>
+                                <div class="quiz-option" data-correct="false">B) They are interchangeable</div>
+                                <div class="quiz-option" data-correct="false">C) Sigmoid for multi-class, softmax for binary</div>
+                                <div class="quiz-option" data-correct="false">D) Use sigmoid always</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the gradient of ReLU at x = 0?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Technically undefined, but typically set to 0 or 1 in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always 1</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always 0</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Always 0.5</div>
+                                <div class="quiz-option" data-correct="true">A) Technically undefined, but typically set to 0 or 1 in practice</div>
+                                <div class="quiz-option" data-correct="false">B) Always 1</div>
+                                <div class="quiz-option" data-correct="false">C) Always 0</div>
+                                <div class="quiz-option" data-correct="false">D) Always 0.5</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "How do you choose an activation function for hidden layers?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) ReLU is default for most cases (fast, simple). Use Leaky ReLU/ELU if dead neurons are a problem. Use tanh for RNNs. Consider Swish for modern architectures. Test multiple and choose based on validation performance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use sigmoid</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random selection</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use the same as output layer</div>
+                                <div class="quiz-option" data-correct="true">A) ReLU is default for most cases (fast, simple). Use Leaky ReLU/ELU if dead neurons are a problem. Use tanh for RNNs. Consider Swish for modern architectures. Test multiple and choose based on validation performance</div>
+                                <div class="quiz-option" data-correct="false">B) Always use sigmoid</div>
+                                <div class="quiz-option" data-correct="false">C) Random selection</div>
+                                <div class="quiz-option" data-correct="false">D) Use the same as output layer</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the main advantage of Swish over ReLU?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Swish is smooth and non-monotonic, often providing better performance, especially in deeper networks, without the dead neuron problem</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Swish is faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Swish uses less memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Swish prevents overfitting</div>
+                                <div class="quiz-option" data-correct="true">A) Swish is smooth and non-monotonic, often providing better performance, especially in deeper networks, without the dead neuron problem</div>
+                                <div class="quiz-option" data-correct="false">B) Swish is faster</div>
+                                <div class="quiz-option" data-correct="false">C) Swish uses less memory</div>
+                                <div class="quiz-option" data-correct="false">D) Swish prevents overfitting</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "Explain the vanishing gradient problem and how activation functions relate to it."</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Vanishing gradients occur when gradients become extremely small during backpropagation. Sigmoid/tanh saturate (derivative → 0) for large inputs, causing gradients to vanish. ReLU and variants help by having constant gradient (1) for positive inputs, allowing gradients to flow better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only affects ReLU</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Not related to activation functions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only happens with linear activation</div>
+                                <div class="quiz-option" data-correct="true">A) Vanishing gradients occur when gradients become extremely small during backpropagation. Sigmoid/tanh saturate (derivative → 0) for large inputs, causing gradients to vanish. ReLU and variants help by having constant gradient (1) for positive inputs, allowing gradients to flow better</div>
+                                <div class="quiz-option" data-correct="false">B) Only affects ReLU</div>
+                                <div class="quiz-option" data-correct="false">C) Not related to activation functions</div>
+                                <div class="quiz-option" data-correct="false">D) Only happens with linear activation</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is the range of the tanh activation function?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) (-1, 1)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) (0, 1)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) [0, ∞)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) (-∞, ∞)</div>
+                                <div class="quiz-option" data-correct="true">A) (-1, 1)</div>
+                                <div class="quiz-option" data-correct="false">B) (0, 1)</div>
+                                <div class="quiz-option" data-correct="false">C) [0, ∞)</div>
+                                <div class="quiz-option" data-correct="false">D) (-∞, ∞)</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: Interview question: "How would you implement a custom activation function and integrate it into a neural network?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Define forward function f(x), backward function f'(x) for gradient computation, ensure differentiability, test on small network, integrate into framework (PyTorch/TensorFlow) by subclassing activation module or using lambda functions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use any function</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only forward function needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cannot be done</div>
+                                <div class="quiz-option" data-correct="true">A) Define forward function f(x), backward function f'(x) for gradient computation, ensure differentiability, test on small network, integrate into framework (PyTorch/TensorFlow) by subclassing activation module or using lambda functions</div>
+                                <div class="quiz-option" data-correct="false">B) Just use any function</div>
+                                <div class="quiz-option" data-correct="false">C) Only forward function needed</div>
+                                <div class="quiz-option" data-correct="false">D) Cannot be done</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
 
-    <script>
+
+        <!-- KaTeX for math rendering -->
+
+
+
+
+    <!-- Footer Navigation -->
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+<script>
         // Section navigation
         document.querySelectorAll('.section-nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1002,85 +984,5 @@ print(activation(x))</code></pre>
             });
         });
 
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-    </script>
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
-<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <!-- Footer Navigation -->
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter4" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 4 →</a>
-            </div>
-        </div>
-    </footer>
-    
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-        }
-    </script>
-</body>
-</html>
+            </script>
+{% endblock %}
