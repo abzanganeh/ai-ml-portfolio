@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 1: The Attention Mechanism - Transformer Architecture Deep Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 1: The Attention Mechanism - Transformer Architecture Deep Dive' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/transformers" class="course-link">
-                    <span>Transformer Architecture Deep Dive</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 1: The Attention Mechanism</h1>
@@ -695,182 +666,108 @@ print(f"Attention weights shape: {weights.shape}")  # (5, 10)</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What problem does attention solve in sequence-to-sequence models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The information bottleneck where all input is compressed into one vector</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Slow computation speed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Memory limitations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Overfitting</div>
+                                <div class="quiz-option" data-correct="true">A) The information bottleneck where all input is compressed into one vector</div>
+                                <div class="quiz-option" data-correct="false">B) Slow computation speed</div>
+                                <div class="quiz-option" data-correct="false">C) Memory limitations</div>
+                                <div class="quiz-option" data-correct="false">D) Overfitting</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What does the Query (Q) represent in attention?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) What we're looking for</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The input data</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The output data</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The weights</div>
+                                <div class="quiz-option" data-correct="true">A) What we're looking for</div>
+                                <div class="quiz-option" data-correct="false">B) The input data</div>
+                                <div class="quiz-option" data-correct="false">C) The output data</div>
+                                <div class="quiz-option" data-correct="false">D) The weights</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: Explain the attention mechanism in your own words.</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Attention lets a model focus on relevant parts of the input when producing each output. It computes how much each input position should influence the current output by comparing queries with keys and using those scores to weight the values</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It processes all inputs equally</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It only looks at the first input</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It ignores inputs</div>
+                                <div class="quiz-option" data-correct="true">A) Attention lets a model focus on relevant parts of the input when producing each output. It computes how much each input position should influence the current output by comparing queries with keys and using those scores to weight the values</div>
+                                <div class="quiz-option" data-correct="false">B) It processes all inputs equally</div>
+                                <div class="quiz-option" data-correct="false">C) It only looks at the first input</div>
+                                <div class="quiz-option" data-correct="false">D) It ignores inputs</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the mathematical formula for attention scores?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V\) where d_k is the dimension of keys</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(Attention = Q + K\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(Attention = Q \times K\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(Attention = V\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(Attention(Q, K, V) = softmax(\frac{QK^T}{\sqrt{d_k}})V\) where d_k is the dimension of keys</div>
+                                <div class="quiz-option" data-correct="false">B) \(Attention = Q + K\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(Attention = Q \times K\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(Attention = V\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Why do we divide by sqrt(d_k) in the attention formula?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To prevent the dot products from growing too large, which would push softmax into regions with extremely small gradients, making training unstable</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To make computation faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not needed</div>
+                                <div class="quiz-option" data-correct="true">A) To prevent the dot products from growing too large, which would push softmax into regions with extremely small gradients, making training unstable</div>
+                                <div class="quiz-option" data-correct="false">B) To make computation faster</div>
+                                <div class="quiz-option" data-correct="false">C) To reduce memory</div>
+                                <div class="quiz-option" data-correct="false">D) It's not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the difference between Key (K) and Value (V) in attention?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Keys are used to compute attention scores (how relevant each position is), while values contain the actual information that gets weighted and summed to produce the output</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Keys are outputs, values are inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                                <div class="quiz-option" data-correct="true">A) Keys are used to compute attention scores (how relevant each position is), while values contain the actual information that gets weighted and summed to produce the output</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Keys are outputs, values are inputs</div>
+                                <div class="quiz-option" data-correct="false">D) No difference</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: How does attention solve the information bottleneck in sequence-to-sequence models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Instead of compressing all input into a single fixed-size vector, attention allows the decoder to directly access all encoder states, dynamically focusing on relevant parts for each output step</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) By using larger vectors</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) By processing faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) By using less memory</div>
+                                <div class="quiz-option" data-correct="true">A) Instead of compressing all input into a single fixed-size vector, attention allows the decoder to directly access all encoder states, dynamically focusing on relevant parts for each output step</div>
+                                <div class="quiz-option" data-correct="false">B) By using larger vectors</div>
+                                <div class="quiz-option" data-correct="false">C) By processing faster</div>
+                                <div class="quiz-option" data-correct="false">D) By using less memory</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What happens after computing attention scores?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Scores are passed through softmax to get attention weights (probabilities), then these weights are used to compute a weighted sum of the values</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Scores are used directly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Scores are discarded</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only maximum score is used</div>
+                                <div class="quiz-option" data-correct="true">A) Scores are passed through softmax to get attention weights (probabilities), then these weights are used to compute a weighted sum of the values</div>
+                                <div class="quiz-option" data-correct="false">B) Scores are used directly</div>
+                                <div class="quiz-option" data-correct="false">C) Scores are discarded</div>
+                                <div class="quiz-option" data-correct="false">D) Only maximum score is used</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: Why is attention better than fixed-size encoding for long sequences?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Fixed encoding loses information as sequence length increases, while attention maintains access to all positions and can focus on the most relevant parts regardless of sequence length</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It uses less memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                                <div class="quiz-option" data-correct="true">A) Fixed encoding loses information as sequence length increases, while attention maintains access to all positions and can focus on the most relevant parts regardless of sequence length</div>
+                                <div class="quiz-option" data-correct="false">B) It's faster</div>
+                                <div class="quiz-option" data-correct="false">C) It uses less memory</div>
+                                <div class="quiz-option" data-correct="false">D) No difference</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: How would you implement attention from scratch?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Create Q, K, V matrices from input, compute scores as Q times K transpose, scale by sqrt(d_k), apply softmax, multiply by V to get weighted sum. Each step uses matrix operations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just add Q and K</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only V</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                                <div class="quiz-option" data-correct="true">A) Create Q, K, V matrices from input, compute scores as Q times K transpose, scale by sqrt(d_k), apply softmax, multiply by V to get weighted sum. Each step uses matrix operations</div>
+                                <div class="quiz-option" data-correct="false">B) Just add Q and K</div>
+                                <div class="quiz-option" data-correct="false">C) Use only V</div>
+                                <div class="quiz-option" data-correct="false">D) Random operations</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is the computational complexity of attention?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) O(n²) where n is sequence length, because we compute attention scores between every pair of positions (each query attends to all keys)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) O(n)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) O(1)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) O(log n)</div>
+                                <div class="quiz-option" data-correct="true">A) O(n²) where n is sequence length, because we compute attention scores between every pair of positions (each query attends to all keys)</div>
+                                <div class="quiz-option" data-correct="false">B) O(n)</div>
+                                <div class="quiz-option" data-correct="false">C) O(1)</div>
+                                <div class="quiz-option" data-correct="false">D) O(log n)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: How does attention differ from RNN-based sequence modeling?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) RNNs process sequentially and struggle with long dependencies, while attention processes all positions in parallel and can directly model relationships between any positions regardless of distance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) RNNs are always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Attention is sequential</div>
+                                <div class="quiz-option" data-correct="true">A) RNNs process sequentially and struggle with long dependencies, while attention processes all positions in parallel and can directly model relationships between any positions regardless of distance</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) RNNs are always better</div>
+                                <div class="quiz-option" data-correct="false">D) Attention is sequential</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/transformers/chapter2" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 2: Self-Attention →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-    </script>
-</body>
-</html>
+{% endblock %}

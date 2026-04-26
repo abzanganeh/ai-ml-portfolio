@@ -135,68 +135,6 @@ function updateProgress() {
     }
 }
 
-// ===== ENHANCED QUIZ SYSTEM =====
-function initializeEnhancedQuizzes() {
-    document.querySelectorAll('.enhanced-quiz-option').forEach(option => {
-        if (!option.dataset.originalText) {
-            option.dataset.originalText = option.textContent.trim();
-        }
-        
-        option.addEventListener('click', function() {
-            const isCorrect = this.dataset.correct === 'true';
-            handleQuizAnswer(this, isCorrect);
-        });
-    });
-}
-
-function handleQuizAnswer(selectedOption, isCorrect) {
-    const quizContainer = selectedOption.closest('.enhanced-quiz-container');
-    const options = quizContainer.querySelectorAll('.enhanced-quiz-option');
-    const explanation = quizContainer.querySelector('.enhanced-quiz-explanation');
-    
-    // Disable all options
-    options.forEach(option => {
-        option.classList.add('disabled');
-        option.style.pointerEvents = 'none';
-    });
-    
-    // Reset all options to original state
-    options.forEach(option => {
-        option.classList.remove('correct', 'incorrect');
-        if (option.dataset.originalText) {
-            option.textContent = option.dataset.originalText;
-        }
-    });
-    
-    // Mark selected option
-    if (isCorrect) {
-        selectedOption.classList.add('correct');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' ✅ Correct!';
-    } else {
-        selectedOption.classList.add('incorrect');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' ❌ Incorrect';
-        
-        // Find and mark correct answer
-        const correctOption = Array.from(options).find(option => 
-            option.dataset.correct === 'true'
-        );
-        if (correctOption) {
-            correctOption.classList.add('correct');
-            correctOption.textContent = correctOption.dataset.originalText + ' ✅ Correct Answer';
-        }
-    }
-    
-    // Show explanation
-    if (explanation) {
-        explanation.classList.add('show');
-        explanation.style.display = 'block';
-    }
-    
-    // Store quiz completion
-    const quizId = quizContainer.dataset.quizId || 'default';
-    localStorage.setItem(`quiz_completed_${quizId}`, 'true');
-}
-
 // ===== INTERACTIVE DEMO FUNCTIONS =====
 
 // Assessment functionality
@@ -353,9 +291,6 @@ function updateModelRecommendation() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Shared tutorial system loaded');
     
-    // Initialize enhanced quizzes
-    initializeEnhancedQuizzes();
-    
     // Initialize section navigation if elements exist
     if (document.querySelector('.section-nav')) {
         // Set first section as active by default
@@ -401,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.TutorialUtils = {
     showSection,
     showChapter,
-    handleQuizAnswer,
+    handleQuizAnswer: window.QuizUtils?.handleQuizAnswer,
     updateAssessment,
     generateRecommendations,
     explainHierarchy,

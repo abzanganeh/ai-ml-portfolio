@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 4: GPT Architecture - Large Language Models (LLMs)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/llms/llms.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 4: GPT Architecture - Large Language Models (LLMs)' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/llms/llms.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/llms" class="course-link">
-                    <span>Large Language Models (LLMs)</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 4: GPT Architecture</h1>
@@ -384,180 +355,108 @@ output = masked_attention(Q, K, V, mask)</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the key architectural characteristic of GPT models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) GPT uses decoder-only transformer layers with causal (unidirectional) attention, enabling autoregressive text generation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) GPT uses encoder-only layers with bidirectional attention</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) GPT uses both encoder and decoder layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) GPT uses only feedforward layers</div>
+                                <div class="quiz-option" data-correct="true">A) GPT uses decoder-only transformer layers with causal (unidirectional) attention, enabling autoregressive text generation</div>
+                                <div class="quiz-option" data-correct="false">B) GPT uses encoder-only layers with bidirectional attention</div>
+                                <div class="quiz-option" data-correct="false">C) GPT uses both encoder and decoder layers</div>
+                                <div class="quiz-option" data-correct="false">D) GPT uses only feedforward layers</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is causal masking in GPT?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A mechanism that prevents tokens from attending to future tokens, ensuring each position can only see previous positions (j ≤ i)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A method to hide model parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) A technique to mask input tokens randomly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) A way to reduce model size</div>
+                                <div class="quiz-option" data-correct="true">A) A mechanism that prevents tokens from attending to future tokens, ensuring each position can only see previous positions (j ≤ i)</div>
+                                <div class="quiz-option" data-correct="false">B) A method to hide model parameters</div>
+                                <div class="quiz-option" data-correct="false">C) A technique to mask input tokens randomly</div>
+                                <div class="quiz-option" data-correct="false">D) A way to reduce model size</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: How does GPT generate text?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Autoregressively, one token at a time, where each new token is predicted based on all previous tokens, and the process continues until a stop condition</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All tokens are generated simultaneously</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Tokens are generated from right to left</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Tokens are generated randomly</div>
+                                <div class="quiz-option" data-correct="true">A) Autoregressively, one token at a time, where each new token is predicted based on all previous tokens, and the process continues until a stop condition</div>
+                                <div class="quiz-option" data-correct="false">B) All tokens are generated simultaneously</div>
+                                <div class="quiz-option" data-correct="false">C) Tokens are generated from right to left</div>
+                                <div class="quiz-option" data-correct="false">D) Tokens are generated randomly</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the mathematical formulation for autoregressive generation in GPT?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(P(x_1, \ldots, x_n) = \prod_{t=1}^{n} P(x_t | x_1, \ldots, x_{t-1})\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(P(x_1, \ldots, x_n) = \sum_{t=1}^{n} P(x_t)\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(P(x_1, \ldots, x_n) = \max_t P(x_t)\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(P(x_1, \ldots, x_n) = \frac{1}{n} \sum_{t=1}^{n} P(x_t)\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(P(x_1, \ldots, x_n) = \prod_{t=1}^{n} P(x_t | x_1, \ldots, x_{t-1})\)</div>
+                                <div class="quiz-option" data-correct="false">B) \(P(x_1, \ldots, x_n) = \sum_{t=1}^{n} P(x_t)\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(P(x_1, \ldots, x_n) = \max_t P(x_t)\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(P(x_1, \ldots, x_n) = \frac{1}{n} \sum_{t=1}^{n} P(x_t)\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: How has GPT scaled from GPT-1 to GPT-4?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) From 117M parameters (GPT-1) to an estimated 1T+ parameters (GPT-4), with dramatic improvements in capabilities and emergent abilities</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The model size has remained constant</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) GPT models have gotten smaller over time</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only the training data has changed, not the model size</div>
+                                <div class="quiz-option" data-correct="true">A) From 117M parameters (GPT-1) to an estimated 1T+ parameters (GPT-4), with dramatic improvements in capabilities and emergent abilities</div>
+                                <div class="quiz-option" data-correct="false">B) The model size has remained constant</div>
+                                <div class="quiz-option" data-correct="false">C) GPT models have gotten smaller over time</div>
+                                <div class="quiz-option" data-correct="false">D) Only the training data has changed, not the model size</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the primary advantage of GPT's autoregressive architecture?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) It enables natural text generation where each token is coherently built upon previous context, making it ideal for creative writing, code generation, and conversational AI</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It allows bidirectional understanding</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It processes all tokens simultaneously</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It requires less memory</div>
+                                <div class="quiz-option" data-correct="true">A) It enables natural text generation where each token is coherently built upon previous context, making it ideal for creative writing, code generation, and conversational AI</div>
+                                <div class="quiz-option" data-correct="false">B) It allows bidirectional understanding</div>
+                                <div class="quiz-option" data-correct="false">C) It processes all tokens simultaneously</div>
+                                <div class="quiz-option" data-correct="false">D) It requires less memory</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What happens during GPT's forward pass for text generation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The prompt is processed through transformer layers, producing a probability distribution over the vocabulary for the next token, which is then sampled and appended to the sequence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All possible sequences are generated simultaneously</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only the first token is generated</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Tokens are generated in reverse order</div>
+                                <div class="quiz-option" data-correct="true">A) The prompt is processed through transformer layers, producing a probability distribution over the vocabulary for the next token, which is then sampled and appended to the sequence</div>
+                                <div class="quiz-option" data-correct="false">B) All possible sequences are generated simultaneously</div>
+                                <div class="quiz-option" data-correct="false">C) Only the first token is generated</div>
+                                <div class="quiz-option" data-correct="false">D) Tokens are generated in reverse order</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What is the key difference between GPT and BERT in terms of their training objectives?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) GPT is trained on next token prediction (autoregressive), while BERT is trained on masked token prediction (bidirectional)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They use identical training objectives</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) GPT is trained on classification while BERT is trained on generation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) GPT uses masked language modeling while BERT uses next token prediction</div>
+                                <div class="quiz-option" data-correct="true">A) GPT is trained on next token prediction (autoregressive), while BERT is trained on masked token prediction (bidirectional)</div>
+                                <div class="quiz-option" data-correct="false">B) They use identical training objectives</div>
+                                <div class="quiz-option" data-correct="false">C) GPT is trained on classification while BERT is trained on generation</div>
+                                <div class="quiz-option" data-correct="false">D) GPT uses masked language modeling while BERT uses next token prediction</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What are some key applications of GPT models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Chatbots and conversational AI, content creation, code generation (like GitHub Copilot), text summarization, and creative writing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only image classification</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only speech recognition</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only data analysis</div>
+                                <div class="quiz-option" data-correct="true">A) Chatbots and conversational AI, content creation, code generation (like GitHub Copilot), text summarization, and creative writing</div>
+                                <div class="quiz-option" data-correct="false">B) Only image classification</div>
+                                <div class="quiz-option" data-correct="false">C) Only speech recognition</div>
+                                <div class="quiz-option" data-correct="false">D) Only data analysis</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What does the causal attention mask ensure during GPT training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) That the model cannot see future tokens during training, which matches the inference scenario where only previous tokens are available</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) That all tokens can see all other tokens</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) That tokens are randomly masked</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) That only the first token is visible</div>
+                                <div class="quiz-option" data-correct="true">A) That the model cannot see future tokens during training, which matches the inference scenario where only previous tokens are available</div>
+                                <div class="quiz-option" data-correct="false">B) That all tokens can see all other tokens</div>
+                                <div class="quiz-option" data-correct="false">C) That tokens are randomly masked</div>
+                                <div class="quiz-option" data-correct="false">D) That only the first token is visible</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is the mathematical expression for the probability of the next token in GPT?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(P(x_{t+1} | x_1, \ldots, x_t) = \text{softmax}(W \cdot h_t)\) where \(h_t\) is the hidden state from the transformer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(P(x_{t+1}) = \text{random()}\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(P(x_{t+1} | x_1, \ldots, x_t) = \text{constant}\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(P(x_{t+1}) = \frac{1}{\text{vocab\_size}}\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(P(x_{t+1} | x_1, \ldots, x_t) = \text{softmax}(W \cdot h_t)\) where \(h_t\) is the hidden state from the transformer</div>
+                                <div class="quiz-option" data-correct="false">B) \(P(x_{t+1}) = \text{random()}\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(P(x_{t+1} | x_1, \ldots, x_t) = \text{constant}\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(P(x_{t+1}) = \frac{1}{\text{vocab\_size}}\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What are some emergent capabilities that appear in larger GPT models like GPT-3 and GPT-4?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Few-shot learning, chain-of-thought reasoning, instruction following, code understanding, and improved generalization to new tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only text generation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only classification tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No new capabilities emerge with scale</div>
+                                <div class="quiz-option" data-correct="true">A) Few-shot learning, chain-of-thought reasoning, instruction following, code understanding, and improved generalization to new tasks</div>
+                                <div class="quiz-option" data-correct="false">B) Only text generation</div>
+                                <div class="quiz-option" data-correct="false">C) Only classification tasks</div>
+                                <div class="quiz-option" data-correct="false">D) No new capabilities emerge with scale</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/llms" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/llms/chapter3" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 3</a>
-                <a href="/tutorials/llms/chapter5" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 5 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/llms/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% endblock %}

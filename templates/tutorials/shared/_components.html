@@ -1,0 +1,231 @@
+{% macro meta_badges(items) -%}
+    {% if items %}
+    <div class="tutorial-template-meta" aria-label="Tutorial metadata">
+        {% for item in items %}
+            {% if item.label and item.value %}
+            <span class="tutorial-template-meta__item">
+                <span class="tutorial-template-meta__label">{{ item.label }}</span>
+                <span class="tutorial-template-meta__value">{{ item.value }}</span>
+            </span>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro chapter_nav(chapters, current_number) -%}
+    {% if chapters %}
+    <nav class="tutorial-template-chapter-nav" aria-label="Chapter navigation">
+        <ol class="tutorial-template-chapter-nav__list">
+            {% for nav_chapter in chapters %}
+            <li>
+                <a
+                    class="tutorial-template-chapter-nav__link{% if nav_chapter.number == current_number %} is-active{% endif %}"
+                    href="{{ nav_chapter.url }}"
+                    {% if nav_chapter.number == current_number %}aria-current="page"{% endif %}
+                >
+                    <span class="tutorial-template-chapter-nav__number">Chapter {{ nav_chapter.number }}</span>
+                    <span class="tutorial-template-chapter-nav__title">{{ nav_chapter.title }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ol>
+    </nav>
+    {% endif %}
+{%- endmacro %}
+
+{% macro section_nav(sections) -%}
+    {% if sections %}
+    <nav class="tutorial-template-section-nav" aria-label="Section navigation">
+        {% for section in sections %}
+        <a class="tutorial-template-section-nav__link" href="#{{ section.id }}">{{ section.label }}</a>
+        {% endfor %}
+    </nav>
+    {% endif %}
+{%- endmacro %}
+
+{% macro objectives(items) -%}
+    {% if items %}
+    <section class="tutorial-template-card tutorial-template-objectives" id="learning-objectives">
+        <p class="tutorial-template-eyebrow">Learning Objectives</p>
+        <h2>By the end of this chapter, you will be able to:</h2>
+        <ul class="tutorial-template-objectives__list">
+            {% for item in items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+{%- endmacro %}
+
+{% macro content_section(section_id, eyebrow, title) -%}
+    <section class="tutorial-template-card tutorial-template-content-section" id="{{ section_id }}">
+        {% if eyebrow %}<p class="tutorial-template-eyebrow">{{ eyebrow }}</p>{% endif %}
+        <h2>{{ title }}</h2>
+        {{ caller() }}
+    </section>
+{%- endmacro %}
+
+{% macro formula_card(title, formula, variables=None, assumptions=None, example=None, interpretation=None, mistakes=None) -%}
+    <section class="tutorial-template-card tutorial-template-formula" id="{{ title|lower|replace(' ', '-') }}">
+        <p class="tutorial-template-eyebrow">Formula</p>
+        <h2>{{ title }}</h2>
+        <div class="tutorial-template-formula__display">
+            \[
+            {{ formula }}
+            \]
+        </div>
+
+        {% if variables %}
+        <div class="tutorial-template-formula__group">
+            <h3>Variables</h3>
+            <dl class="tutorial-template-definition-list">
+                {% for variable in variables %}
+                <div>
+                    <dt>{{ variable.symbol }}</dt>
+                    <dd>{{ variable.meaning }}</dd>
+                </div>
+                {% endfor %}
+            </dl>
+        </div>
+        {% endif %}
+
+        {% if assumptions %}
+        <div class="tutorial-template-formula__group">
+            <h3>Assumptions</h3>
+            <ul>
+                {% for assumption in assumptions %}
+                <li>{{ assumption }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if example %}
+        <div class="tutorial-template-formula__group">
+            <h3>Worked Example</h3>
+            {{ example }}
+        </div>
+        {% endif %}
+
+        {% if interpretation %}
+        <div class="tutorial-template-callout">
+            <strong>Interpretation:</strong> {{ interpretation }}
+        </div>
+        {% endif %}
+
+        {% if mistakes %}
+        <div class="tutorial-template-formula__group">
+            <h3>Common Mistakes</h3>
+            <ul>
+                {% for mistake in mistakes %}
+                <li>{{ mistake }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </section>
+{%- endmacro %}
+
+{% macro lab_card(title, prompt=None, expected_observation=None) -%}
+    <section class="tutorial-template-card tutorial-template-lab">
+        <p class="tutorial-template-eyebrow">Interactive Lab</p>
+        <h2>{{ title }}</h2>
+        {{ caller() }}
+        {% if prompt %}
+        <div class="tutorial-template-lab__prompt">
+            <h3>Learner Prompt</h3>
+            <p>{{ prompt }}</p>
+        </div>
+        {% endif %}
+        {% if expected_observation %}
+        <div class="tutorial-template-lab__expected">
+            <h3>Expected Observation</h3>
+            <p>{{ expected_observation }}</p>
+        </div>
+        {% endif %}
+    </section>
+{%- endmacro %}
+
+{% macro quiz(questions) -%}
+    {% if questions %}
+    <section class="tutorial-template-card tutorial-template-quiz" id="chapter-quiz">
+        <p class="tutorial-template-eyebrow">Knowledge Check</p>
+        <h2>Chapter Quiz</h2>
+        {% for question in questions %}
+        <div class="enhanced-quiz-container" data-quiz-id="{{ question.id|default(loop.index) }}">
+            <p class="enhanced-quiz-question">{{ loop.index }}. {{ question.prompt }}</p>
+            {% for option in question.options %}
+            <button
+                class="enhanced-quiz-option"
+                type="button"
+                data-correct="{{ 'true' if option.correct else 'false' }}"
+            >
+                {{ option.label }}
+            </button>
+            {% endfor %}
+            {% if question.explanation %}
+            <div class="enhanced-quiz-explanation">
+                {{ question.explanation }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+{%- endmacro %}
+
+{% macro summary(takeaways=None, use_when=None, avoid_when=None) -%}
+    <section class="tutorial-template-card tutorial-template-summary" id="chapter-summary">
+        <p class="tutorial-template-eyebrow">Summary</p>
+        <h2>Key Takeaways</h2>
+        {% if takeaways %}
+        <ul>
+            {% for takeaway in takeaways %}
+            <li>{{ takeaway }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="tutorial-template-summary__grid">
+            {% if use_when %}
+            <div>
+                <h3>Use When</h3>
+                <ul>
+                    {% for item in use_when %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if avoid_when %}
+            <div>
+                <h3>Avoid When</h3>
+                <ul>
+                    {% for item in avoid_when %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+{%- endmacro %}
+
+{% macro previous_next(previous_url=None, previous_label=None, next_url=None, next_label=None) -%}
+    <nav class="tutorial-template-prev-next" aria-label="Chapter pagination">
+        {% if previous_url %}
+        <a class="tutorial-template-prev-next__link" href="{{ previous_url }}">
+            <span>Previous</span>
+            <strong>{{ previous_label|default('Previous chapter', true) }}</strong>
+        </a>
+        {% else %}
+        <span></span>
+        {% endif %}
+        {% if next_url %}
+        <a class="tutorial-template-prev-next__link is-next" href="{{ next_url }}">
+            <span>Next</span>
+            <strong>{{ next_label|default('Next chapter', true) }}</strong>
+        </a>
+        {% endif %}
+    </nav>
+{%- endmacro %}

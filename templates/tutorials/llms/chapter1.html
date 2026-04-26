@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 1: Introduction to Large Language Models - Large Language Models (LLMs)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/llms/llms.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 1: Introduction to Large Language Models - Large Language Models (LLMs)' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/llms/llms.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/llms" class="course-link">
-                    <span>Large Language Models (LLMs)</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 1: Introduction to Large Language Models</h1>
@@ -387,179 +358,108 @@ print(f"Sentiment: {sentiment}")  # Output: "Neutral"</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is a Large Language Model (LLM)?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A neural network with billions of parameters trained on massive text corpora to understand and generate human-like text, capable of performing various language tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) A small model with few parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only for classification</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not trained on text</div>
+                                <div class="quiz-option" data-correct="true">A) A neural network with billions of parameters trained on massive text corpora to understand and generate human-like text, capable of performing various language tasks</div>
+                                <div class="quiz-option" data-correct="false">B) A small model with few parameters</div>
+                                <div class="quiz-option" data-correct="false">C) Only for classification</div>
+                                <div class="quiz-option" data-correct="false">D) Not trained on text</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What are the key characteristics of LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Large scale (billions of parameters), trained on massive datasets, transformer architecture, capable of few-shot learning, emergent abilities at scale, and general-purpose language understanding</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Small scale only</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only for one task</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Limited capabilities</div>
+                                <div class="quiz-option" data-correct="true">A) Large scale (billions of parameters), trained on massive datasets, transformer architecture, capable of few-shot learning, emergent abilities at scale, and general-purpose language understanding</div>
+                                <div class="quiz-option" data-correct="false">B) Small scale only</div>
+                                <div class="quiz-option" data-correct="false">C) Only for one task</div>
+                                <div class="quiz-option" data-correct="false">D) Limited capabilities</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: How do LLMs differ from traditional NLP models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) LLMs are pre-trained on general text and can be adapted to many tasks, while traditional models are task-specific and require labeled data for each task. LLMs show emergent abilities and can perform tasks they weren't explicitly trained on</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Traditional models are larger</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No difference</div>
+                                <div class="quiz-option" data-correct="true">A) LLMs are pre-trained on general text and can be adapted to many tasks, while traditional models are task-specific and require labeled data for each task. LLMs show emergent abilities and can perform tasks they weren't explicitly trained on</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Traditional models are larger</div>
+                                <div class="quiz-option" data-correct="false">D) No difference</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the scaling hypothesis in LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The idea that increasing model size, data size, and compute leads to predictable improvements in performance, with larger models showing emergent capabilities not present in smaller ones</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Smaller is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Size doesn't matter</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only data matters</div>
+                                <div class="quiz-option" data-correct="true">A) The idea that increasing model size, data size, and compute leads to predictable improvements in performance, with larger models showing emergent capabilities not present in smaller ones</div>
+                                <div class="quiz-option" data-correct="false">B) Smaller is always better</div>
+                                <div class="quiz-option" data-correct="false">C) Size doesn't matter</div>
+                                <div class="quiz-option" data-correct="false">D) Only data matters</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What are some examples of prominent LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) GPT series (GPT-3, GPT-4), BERT, T5, PaLM, LLaMA, Claude, and many others, each with different architectures and training approaches</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only GPT</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only BERT</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No examples</div>
+                                <div class="quiz-option" data-correct="true">A) GPT series (GPT-3, GPT-4), BERT, T5, PaLM, LLaMA, Claude, and many others, each with different architectures and training approaches</div>
+                                <div class="quiz-option" data-correct="false">B) Only GPT</div>
+                                <div class="quiz-option" data-correct="false">C) Only BERT</div>
+                                <div class="quiz-option" data-correct="false">D) No examples</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is few-shot learning in LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The ability to perform a task after seeing just a few examples in the prompt, without fine-tuning, demonstrating the model's learned understanding of language patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Requires many examples</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Requires fine-tuning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not possible</div>
+                                <div class="quiz-option" data-correct="true">A) The ability to perform a task after seeing just a few examples in the prompt, without fine-tuning, demonstrating the model's learned understanding of language patterns</div>
+                                <div class="quiz-option" data-correct="false">B) Requires many examples</div>
+                                <div class="quiz-option" data-correct="false">C) Requires fine-tuning</div>
+                                <div class="quiz-option" data-correct="false">D) Not possible</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the difference between pre-training and fine-tuning in LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-training learns general language patterns from large unlabeled text, while fine-tuning adapts the model to specific tasks using labeled data, typically with smaller learning rates</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Fine-tuning comes first</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No pre-training needed</div>
+                                <div class="quiz-option" data-correct="true">A) Pre-training learns general language patterns from large unlabeled text, while fine-tuning adapts the model to specific tasks using labeled data, typically with smaller learning rates</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Fine-tuning comes first</div>
+                                <div class="quiz-option" data-correct="false">D) No pre-training needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What are emergent abilities in LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Capabilities that appear only in larger models, such as reasoning, following instructions, and performing complex tasks, which smaller models cannot do despite similar training</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Present in all models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only in small models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not real</div>
+                                <div class="quiz-option" data-correct="true">A) Capabilities that appear only in larger models, such as reasoning, following instructions, and performing complex tasks, which smaller models cannot do despite similar training</div>
+                                <div class="quiz-option" data-correct="false">B) Present in all models</div>
+                                <div class="quiz-option" data-correct="false">C) Only in small models</div>
+                                <div class="quiz-option" data-correct="false">D) Not real</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What challenges come with training LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Massive computational requirements, need for large high-quality datasets, long training times, high costs, managing model size and memory, and ensuring data quality and diversity</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No challenges</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only small datasets needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Very fast training</div>
+                                <div class="quiz-option" data-correct="true">A) Massive computational requirements, need for large high-quality datasets, long training times, high costs, managing model size and memory, and ensuring data quality and diversity</div>
+                                <div class="quiz-option" data-correct="false">B) No challenges</div>
+                                <div class="quiz-option" data-correct="false">C) Only small datasets needed</div>
+                                <div class="quiz-option" data-correct="false">D) Very fast training</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: How do LLMs generate text?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Autoregressively, predicting the next token based on previous tokens, using probability distributions over vocabulary, often with sampling strategies like temperature and top-k sampling</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All at once</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Randomly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only first token</div>
+                                <div class="quiz-option" data-correct="true">A) Autoregressively, predicting the next token based on previous tokens, using probability distributions over vocabulary, often with sampling strategies like temperature and top-k sampling</div>
+                                <div class="quiz-option" data-correct="false">B) All at once</div>
+                                <div class="quiz-option" data-correct="false">C) Randomly</div>
+                                <div class="quiz-option" data-correct="false">D) Only first token</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is the relationship between LLMs and transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Most modern LLMs use transformer architecture as their backbone, leveraging attention mechanisms and the scalability of transformers to process and generate text effectively</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're unrelated</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) LLMs don't use transformers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Transformers are LLMs</div>
+                                <div class="quiz-option" data-correct="true">A) Most modern LLMs use transformer architecture as their backbone, leveraging attention mechanisms and the scalability of transformers to process and generate text effectively</div>
+                                <div class="quiz-option" data-correct="false">B) They're unrelated</div>
+                                <div class="quiz-option" data-correct="false">C) LLMs don't use transformers</div>
+                                <div class="quiz-option" data-correct="false">D) Transformers are LLMs</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What are some applications of LLMs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Text generation, chatbots, code generation, translation, summarization, question answering, content creation, language understanding, and many other NLP tasks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only classification</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Limited applications</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only generation</div>
+                                <div class="quiz-option" data-correct="true">A) Text generation, chatbots, code generation, translation, summarization, question answering, content creation, language understanding, and many other NLP tasks</div>
+                                <div class="quiz-option" data-correct="false">B) Only classification</div>
+                                <div class="quiz-option" data-correct="false">C) Limited applications</div>
+                                <div class="quiz-option" data-correct="false">D) Only generation</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/llms" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/llms/chapter2" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 2 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/llms/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/llms/shared-tutorial.js') }}"></script>
+{% endblock %}

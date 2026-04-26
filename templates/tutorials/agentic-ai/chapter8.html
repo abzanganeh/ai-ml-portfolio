@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 8: Building Production Agents - Agentic AI & LLM Agents</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/agentic-ai/agentic-ai.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 8: Building Production Agents - Agentic AI & LLM Agents' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/agentic-ai/agentic-ai.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/agentic-ai" class="course-link">
-                    <span>Agentic AI & LLM Agents</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 8: Building Production Agents</h1>
@@ -452,87 +423,87 @@ if __name__ == '__main__':
                         <div class="quiz-container">
                         <div class="quiz-question">
                                 <h3>Question 1: What makes an agent "production-ready"?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Reliable error handling, comprehensive monitoring, scalability, security, testing, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only speed matters</div>
+                                <div class="quiz-option" data-correct="true">A) Reliable error handling, comprehensive monitoring, scalability, security, testing, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="false">B) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="false">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">D) Only speed matters</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: In the formula \(\text{Availability} = \frac{\text{Uptime}}{\text{Uptime} + \text{Downtime}} \times 100\%\), what does this measure?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) While agents can process text faster in some scenarios, speed is not the fundamental difference between agents and traditional LLMs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) System reliability - percentage of time system is operational (target: 99.9%+ for production)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While processing speed and model size can vary between implementations, the fundamental distinction between agents and traditional LLMs is their ability to autonomously use tools, access real-time data, make decisions, and take actions that affect the environment, not just generate text responses</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Agents have more parameters</div>
+                                <div class="quiz-option" data-correct="false">A) While agents can process text faster in some scenarios, speed is not the fundamental difference between agents and traditional LLMs</div>
+                                <div class="quiz-option" data-correct="true">B) System reliability - percentage of time system is operational (target: 99.9%+ for production)</div>
+                                <div class="quiz-option" data-correct="false">C) While processing speed and model size can vary between implementations, the fundamental distinction between agents and traditional LLMs is their ability to autonomously use tools, access real-time data, make decisions, and take actions that affect the environment, not just generate text responses</div>
+                                <div class="quiz-option" data-correct="false">D) Agents have more parameters</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: Interview question: "How would you handle errors in a production agent system?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Implement retry logic with exponential backoff, use fallback mechanisms, graceful error messages, comprehensive logging, circuit breakers, and alerting</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only speed matters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="true">B) Implement retry logic with exponential backoff, use fallback mechanisms, graceful error messages, comprehensive logging, circuit breakers, and alerting</div>
+                                <div class="quiz-option" data-correct="false">C) Only speed matters</div>
+                                <div class="quiz-option" data-correct="false">D) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is throughput in production systems?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Tasks processed per unit time - higher throughput means better scalability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No special considerations</div>
+                                <div class="quiz-option" data-correct="false">A) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="true">B) Tasks processed per unit time - higher throughput means better scalability</div>
+                                <div class="quiz-option" data-correct="false">C) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="false">D) No special considerations</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the error rate formula \(\text{Error Rate} = \frac{\text{Failed Requests}}{\text{Total Requests}} \times 100\%\) used for?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Measuring percentage of requests that fail - lower is better, target <1% for production</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Measuring speed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Measuring cost</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Measuring availability</div>
+                                <div class="quiz-option" data-correct="true">A) Measuring percentage of requests that fail - lower is better, target <1% for production</div>
+                                <div class="quiz-option" data-correct="false">B) Measuring speed</div>
+                                <div class="quiz-option" data-correct="false">C) Measuring cost</div>
+                                <div class="quiz-option" data-correct="false">D) Measuring availability</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Interview question: "How would you scale a production agent system?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Use load balancers, horizontal scaling with multiple instances, auto-scaling based on demand, caching, database optimization, and async processing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only cost matters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="false">A) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="true">B) Use load balancers, horizontal scaling with multiple instances, auto-scaling based on demand, caching, database optimization, and async processing</div>
+                                <div class="quiz-option" data-correct="false">C) Only cost matters</div>
+                                <div class="quiz-option" data-correct="false">D) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What are the key components of production agent infrastructure?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) API Gateway, Load Balancer, Agent Instances, Database, Monitoring System, and Caching Layer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only speed matters</div>
+                                <div class="quiz-option" data-correct="false">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="true">B) API Gateway, Load Balancer, Agent Instances, Database, Monitoring System, and Caching Layer</div>
+                                <div class="quiz-option" data-correct="false">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">D) Only speed matters</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "How do you optimize costs in production agent systems?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only speed matters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While speed is important, production agents require comprehensive considerations including reliability, monitoring, error handling, and scalability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Cache frequent queries, use cheaper models when possible, batch processing, optimize prompts to reduce tokens, implement rate limiting, and monitor usage</div>
+                                <div class="quiz-option" data-correct="false">A) Only speed matters</div>
+                                <div class="quiz-option" data-correct="false">B) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">C) While speed is important, production agents require comprehensive considerations including reliability, monitoring, error handling, and scalability</div>
+                                <div class="quiz-option" data-correct="true">D) Cache frequent queries, use cheaper models when possible, batch processing, optimize prompts to reduce tokens, implement rate limiting, and monitor usage</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is observability in production agents?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) No special considerations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) While speed is important, production agents require comprehensive considerations including reliability, monitoring, error handling, and scalability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">D) Comprehensive logging, metrics tracking, distributed tracing, and alerting to understand system behavior and diagnose issues</div>
+                                <div class="quiz-option" data-correct="false">A) No special considerations</div>
+                                <div class="quiz-option" data-correct="false">B) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">C) While speed is important, production agents require comprehensive considerations including reliability, monitoring, error handling, and scalability</div>
+                                <div class="quiz-option" data-correct="true">D) Comprehensive logging, metrics tracking, distributed tracing, and alerting to understand system behavior and diagnose issues</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is the deployment strategy for production agents?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Use containerization (Docker), CI/CD pipelines, staging environments, gradual rollouts, versioning, and rollback capabilities</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No special considerations</div>
+                                <div class="quiz-option" data-correct="false">A) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="true">B) Use containerization (Docker), CI/CD pipelines, staging environments, gradual rollouts, versioning, and rollback capabilities</div>
+                                <div class="quiz-option" data-correct="false">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">D) No special considerations</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Interview question: "How do you ensure security in production agent systems?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Only speed matters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Input validation and sanitization, authentication/authorization, rate limiting, API key management, secure data storage, and audit logging</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">A) Only speed matters</div>
+                                <div class="quiz-option" data-correct="true">B) Input validation and sanitization, authentication/authorization, rate limiting, API key management, secure data storage, and audit logging</div>
+                                <div class="quiz-option" data-correct="false">C) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="false">D) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
                             </div>
                         <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What are the best practices for production agent systems?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Comprehensive monitoring, automated testing (unit, integration, e2e), thorough documentation, versioning with rollback support, and gradual rollouts</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No special considerations</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
+                                <div class="quiz-option" data-correct="true">A) Comprehensive monitoring, automated testing (unit, integration, e2e), thorough documentation, versioning with rollback support, and gradual rollouts</div>
+                                <div class="quiz-option" data-correct="false">B) No special considerations</div>
+                                <div class="quiz-option" data-correct="false">C) Production agent systems require comprehensive considerations beyond just speed or cost: reliable error handling with retry mechanisms and fallbacks, comprehensive monitoring for performance and quality, scalability to handle varying loads, security measures to protect data and systems, proper testing frameworks, and robust deployment infrastructure to ensure 99.9%+ uptime</div>
+                                <div class="quiz-option" data-correct="false">D) Cost optimization is valuable, but production systems must also address reliability, monitoring, security, and proper deployment infrastructure</div>
                             </div>
                         </div>
                             </div>
@@ -545,63 +516,10 @@ if __name__ == '__main__':
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/agentic-ai" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/agentic-ai/chapter7" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 7</a>
-                
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/agentic-ai/shared-tutorial.js') }}"></script>
+{% endblock %}
