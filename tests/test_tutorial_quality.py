@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from flask.testing import FlaskClient
 
 from app import app as flask_app
+from data.tutorial_chapters import CHAPTER_COURSES, build_chapter_context
 from data.tutorials import TUTORIALS_DATA
 
 
@@ -31,7 +32,7 @@ TEMPLATE_DEPENDENCY_SUFFIXES = {
     ".webp",
 }
 TEMPLATE_EXTENDS_PATTERN = re.compile(
-    r'{%\s*extends\s+["\'](?:base\.html|tutorials/shared/(?:chapter|legacy_chapter_shell)\.html)["\']\s*%}'
+    r'{%\s*extends\s+["\']tutorials/shared/chapter\.html["\']\s*%}'
 )
 STATIC_URL_FOR_PATTERN = re.compile(
     r"url_for\(\s*['\"]static['\"]\s*,\s*filename\s*=\s*['\"]([^'\"]+)['\"]"
@@ -60,17 +61,13 @@ class TutorialCourseSpec:
         ]
 
 
-CHAPTERED_TUTORIALS = (
-    TutorialCourseSpec("ml-fundamentals", "ml_fundamentals", 3),
-    TutorialCourseSpec("ml-model-relationships", "ml-model-relationships", 8),
-    TutorialCourseSpec("clustering", "clustering", 15),
-    TutorialCourseSpec("decision-trees", "decision_trees", 5),
-    TutorialCourseSpec("coding-interview-algorithms", "coding-interview-algorithms", 10),
-    TutorialCourseSpec("neural-networks", "neural-networks", 8),
-    TutorialCourseSpec("transformers", "transformers", 10),
-    TutorialCourseSpec("llms", "llms", 8),
-    TutorialCourseSpec("rag", "rag", 7),
-    TutorialCourseSpec("agentic-ai", "agentic-ai", 8),
+CHAPTERED_TUTORIALS = tuple(
+    TutorialCourseSpec(
+        config.slug,
+        config.template_dir,
+        len(config.chapter_titles),
+    )
+    for config in CHAPTER_COURSES.values()
 )
 
 
@@ -190,6 +187,44 @@ def test_published_tutorial_metadata_is_complete() -> None:
             assert template_path.exists(), f"Missing template for {slug}: {template_path}"
 
 
+@pytest.mark.parametrize("spec", CHAPTERED_TUTORIALS, ids=lambda spec: spec.slug)
+def test_chapter_metadata_contract_is_complete(spec: TutorialCourseSpec) -> None:
+    for chapter_number in range(1, spec.chapter_count + 1):
+        context = build_chapter_context(spec.slug, chapter_number)
+        assert context is not None, f"Missing chapter context for {spec.slug} {chapter_number}"
+
+        course = context["course"]
+        chapter = context["chapter"]
+
+        assert course.slug == spec.slug
+        assert course.title
+        assert len(course.chapters) == spec.chapter_count
+        assert chapter.number == chapter_number
+        assert chapter.title
+        assert chapter.description
+        assert chapter.difficulty in VALID_DIFFICULTIES
+        assert chapter.duration
+        assert 0 < chapter.progress <= 100
+        assert len(chapter.sections) >= 2
+        assert all(section["id"] and section["label"] for section in chapter.sections)
+        assert len(chapter.objectives) >= 3
+        assert all(objective.strip() for objective in chapter.objectives)
+
+        if chapter_number == 1:
+            assert chapter.previous_url is None
+            assert chapter.previous_label is None
+        else:
+            assert chapter.previous_url == f"/tutorials/{spec.slug}/chapter{chapter_number - 1}"
+            assert chapter.previous_label
+
+        if chapter_number == spec.chapter_count:
+            assert chapter.next_url is None
+            assert chapter.next_label is None
+        else:
+            assert chapter.next_url == f"/tutorials/{spec.slug}/chapter{chapter_number + 1}"
+            assert chapter.next_label
+
+
 @pytest.mark.parametrize("tutorial", published_tutorials(), ids=lambda tutorial: str(tutorial["slug"]))
 def test_published_tutorial_routes_render(
     client: FlaskClient, tutorial: dict[str, object]
@@ -208,7 +243,20 @@ def test_chapter_routes_match_template_inventory(
         assert template_path.exists(), f"Missing chapter template: {template_path}"
 
     for url in spec.chapter_urls:
-        assert_route_is_available(client, url)
+        response = client.get(url)
+        assert response.status_code == 200, f"{url} returned {response.status_code}"
+
+        soup = BeautifulSoup(response.get_data(as_text=True), "html.parser")
+        shell = soup.select_one(".tutorial-template-shell")
+        assert shell is not None, f"{url} did not render the canonical chapter shell"
+        assert shell.get("data-course-slug") == spec.slug
+
+        chapter_number = int(url.rsplit("chapter", maxsplit=1)[1])
+        assert shell.get("data-chapter-number") == str(chapter_number)
+        assert soup.select_one(".tutorial-template-meta") is not None
+        assert soup.select_one(".tutorial-template-chapter-nav") is not None
+        assert soup.select_one(".tutorial-template-section-nav") is not None
+        assert soup.select_one(".tutorial-template-objectives") is not None
 
     missing_chapter_response = client.get(f"/tutorials/{spec.slug}/chapter{spec.chapter_count + 1}")
     assert missing_chapter_response.status_code == 404
@@ -240,6 +288,47 @@ def test_published_tutorial_static_assets_exist(template_path: Path) -> None:
     assert not missing_assets, f"{template_path.relative_to(ROOT_DIR)} references {missing_assets}"
 
 
+@pytest.mark.parametrize("tutorial", published_tutorials(), ids=lambda tutorial: str(tutorial["slug"]))
+def test_dedicated_tutorial_routes_use_shared_visual_system(
+    client: FlaskClient, tutorial: dict[str, object]
+) -> None:
+    if not tutorial.get("has_dedicated_template"):
+        pytest.skip("Generic tutorial route does not use a dedicated tutorial template")
+
+    slug = str(tutorial["slug"])
+    response = client.get(f"/tutorials/{slug}/")
+    assert response.status_code == 200, f"/tutorials/{slug}/ returned {response.status_code}"
+
+    soup = BeautifulSoup(response.get_data(as_text=True), "html.parser")
+    shell = soup.select_one(".tutorial-template-shell")
+    assert shell is not None, f"{slug} did not render the shared tutorial shell"
+
+    if slug in CHAPTER_COURSES:
+        assert soup.select_one(".tutorial-index-shell") is not None
+        assert soup.select_one(".tutorial-index-chapters") is not None
+    else:
+        assert soup.select_one(".tutorial-single-page-shell") is not None
+        assert soup.select_one(".tutorial-single-page-content") is not None
+
+
+@pytest.mark.parametrize(
+    "template_path",
+    [
+        TEMPLATES_DIR / str(tutorial["template_path"])
+        for tutorial in published_tutorials()
+        if tutorial.get("has_dedicated_template") and tutorial.get("template_path")
+    ],
+    ids=lambda path: str(path.relative_to(ROOT_DIR)),
+)
+def test_dedicated_tutorial_templates_are_not_standalone_documents(template_path: Path) -> None:
+    html = template_path.read_text(encoding="utf-8")
+
+    assert "<!DOCTYPE html" not in html
+    assert "<html" not in html
+    assert "<head" not in html
+    assert "<body" not in html
+
+
 @pytest.mark.parametrize(
     "template_path",
     [path for spec in CHAPTERED_TUTORIALS for path in spec.chapter_template_paths],
@@ -249,7 +338,7 @@ def test_routable_chapter_templates_use_shared_shell(template_path: Path) -> Non
     html = template_path.read_text(encoding="utf-8")
 
     assert TEMPLATE_EXTENDS_PATTERN.search(html), (
-        f"{template_path.relative_to(ROOT_DIR)} must extend base.html or a shared tutorial shell"
+        f"{template_path.relative_to(ROOT_DIR)} must extend tutorials/shared/chapter.html"
     )
     assert "<!DOCTYPE html" not in html
     assert "<html" not in html

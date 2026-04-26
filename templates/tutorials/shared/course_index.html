@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% import "tutorials/shared/_components.html" as tutorial_components %}
+
+{% set index_data = course_index %}
+
+{% block title %}{{ index_data.title }} - {{ site_title|default("AI/ML Portfolio") }}{% endblock %}
+
+{% block meta_description %}{{ index_data.description }}{% endblock %}
+
+{% block body_class %}tutorial-template-page {{ super() }}{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/chapter-template.css') }}">
+{% endblock %}
+
+{% block content %}
+<article class="tutorial-template-shell tutorial-index-shell" data-course-slug="{{ index_data.slug }}">
+    <header class="tutorial-template-hero">
+        <div class="tutorial-template-container">
+            <nav class="tutorial-template-breadcrumb" aria-label="Breadcrumb">
+                <a href="{{ url_for('tutorials') }}">Tutorials</a>
+                <span aria-hidden="true">/</span>
+                <span>{{ index_data.title }}</span>
+            </nav>
+
+            {{ tutorial_components.meta_badges([
+                {"label": "Category", "value": index_data.category},
+                {"label": "Chapters", "value": index_data.chapter_count},
+                {"label": "Difficulty", "value": index_data.difficulty},
+                {"label": "Estimated Time", "value": index_data.duration}
+            ]) }}
+
+            <h1>{{ index_data.title }}</h1>
+            <p class="tutorial-template-hero__subtitle">{{ index_data.description }}</p>
+        </div>
+    </header>
+
+    <div class="tutorial-template-container tutorial-template-layout tutorial-index-layout">
+        <aside class="tutorial-template-sidebar" aria-label="Course navigation">
+            {{ tutorial_components.section_nav(index_data.sections) }}
+        </aside>
+
+        <main class="tutorial-template-main" id="course-content">
+            <section class="tutorial-template-card tutorial-template-objectives" id="course-overview">
+                <p class="tutorial-template-eyebrow">Course Overview</p>
+                <h2>What You Will Build Toward</h2>
+                <ul class="tutorial-template-objectives__list">
+                    {% for objective in index_data.objectives %}
+                    <li>{{ objective }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="tutorial-template-card tutorial-index-chapters" id="course-chapters">
+                <p class="tutorial-template-eyebrow">Chapter Path</p>
+                <h2>Start With Any Chapter</h2>
+                <div class="tutorial-index-chapters__grid">
+                    {% for chapter in index_data.chapters %}
+                    <a class="tutorial-index-chapter-card" href="{{ chapter.url }}">
+                        <span class="tutorial-index-chapter-card__number">Chapter {{ chapter.number }}</span>
+                        <strong>{{ chapter.title }}</strong>
+                        <span>Open chapter</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="tutorial-template-card" id="course-prerequisites">
+                <p class="tutorial-template-eyebrow">Before You Start</p>
+                <h2>Recommended Background</h2>
+                <ul>
+                    {% for prerequisite in index_data.prerequisites %}
+                    <li>{{ prerequisite }}</li>
+                    {% endfor %}
+                </ul>
+                {% if index_data.chapters %}
+                <p>
+                    <a class="tutorial-template-button" href="{{ index_data.chapters[0].url }}">
+                        Start Chapter 1
+                    </a>
+                </p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/tutorials/chapter-template.js') }}"></script>
+{% endblock %}
