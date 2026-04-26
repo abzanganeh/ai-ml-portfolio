@@ -25,7 +25,7 @@ window.updateKernelDemo = function() {
     const description = `Kernel: ${kernelType.value}, Bandwidth: ${bw}. ` +
         `Smoothness: ${(effect.smoothness * bw).toFixed(2)}, Peak: ${(effect.peak / bw).toFixed(2)}`;
     
-    const vizElement = document.querySelector('#kernel-demo .visualization-placeholder p');
+    const vizElement = document.querySelector('#kernel-demo .tutorial-template-lab__planned p');
     if (vizElement) {
         vizElement.textContent = description;
     }

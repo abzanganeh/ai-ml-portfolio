@@ -11,7 +11,7 @@
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 9: Linkage Criteria Methods</h1>
-                <p class="chapter-subtitle">Master the mathematical foundations and practical implications of different linkage criteria: single, complete, average, Ward's method, and their impact on cluster formation</p>
+                <p class="chapter-subtitle">Compare single, complete, average, and Ward linkage by the cluster shapes and trade-offs they create</p>
                 
                 <!-- Chapter Progress Bar (4/15) -->
                 <div class="chapter-progress">
@@ -60,20 +60,6 @@
         <section class="azbn-section">
             <div class="azbn-container">
                 <!-- Learning Objectives -->
-                <div class="learning-objectives-box">
-                    <h2>Learning Objectives</h2>
-                    <ul>
-                        <li>Understand mathematical formulations of all major linkage criteria</li>
-                        <li>Analyze the computational complexity of each linkage method</li>
-                        <li>Master single linkage and its connection to minimum spanning trees</li>
-                        <li>Learn complete linkage and its compactness properties</li>
-                        <li>Explore average linkage and UPGMA statistical foundations</li>
-                        <li>Deep dive into Ward's method and variance minimization</li>
-                        <li>Compare linkage methods and understand when to use each</li>
-                        <li>Implement efficient algorithms for linkage computation</li>
-                    </ul>
-                </div>
-
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
                     <!-- Introduction Section -->
@@ -112,14 +98,14 @@
                             
                             <h5>Basic Setup:</h5>
                             <p>Given two clusters A and B, define the inter-cluster distance as:</p>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <strong>D(A, B) = f({d(a, b) : a ∈ A, b ∈ B})</strong>
                             </div>
                             <p>Where d(a, b) is the pairwise distance between points a and b, and f is an aggregation function.</p>
                             
                             <h5>Lance-Williams Formula:</h5>
                             <p>Most linkage criteria can be expressed using the recursive Lance-Williams formula:</p>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <strong>D(A∪B, C) = αₐD(A,C) + αᵦD(B,C) + βD(A,B) + γ|D(A,C) - D(B,C)|</strong>
                             </div>
                             <p>Where αₐ, αᵦ, β, γ are parameters that define the specific linkage method.</p>
@@ -269,14 +255,14 @@
                             <h4>Single Linkage Mathematical Framework</h4>
                             
                             <h5>Basic Definition:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For clusters A and B, the single linkage distance is:</p>
                                 <strong>D_single(A, B) = min{d(a, b) : a ∈ A, b ∈ B}</strong>
                                 <p>Where d(a, b) is the distance between individual points a and b.</p>
                             </div>
                             
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
                                     <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting of both clusters</li>
@@ -288,7 +274,7 @@
                             </div>
                             
                             <h5>Equivalent Formulation:</h5>
-                                <div class="formula-display">
+                                <div class="tutorial-template-formula__display">
                                 <p>The Lance-Williams formula simplifies to:</p>
                                 <strong>D(A∪B, C) = min{D(A,C), D(B,C)}</strong>
                                 <p>This shows that single linkage always takes the minimum distance.</p>
@@ -302,7 +288,7 @@
                             <h4>MST-Single Linkage Equivalence Theorem</h4>
                             
                             <h5>Main Result:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p><strong>Theorem:</strong> Single linkage hierarchical clustering is equivalent to finding the minimum spanning tree of the complete graph and removing edges in decreasing order of weight.</p>
                         </div>
                             
@@ -348,7 +334,7 @@
                             </ul>
                         </div>
 
-                        <div class="visualization-placeholder">
+                        <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Single Linkage Behavior</h4>
                             <p><strong>Image Description:</strong> A 2x2 grid demonstrating single linkage characteristics. Top-left: Two well-separated circular clusters with a few noise points creating a bridge between them. Top-right: Single linkage dendrogram showing these getting merged at a low height due to the bridge. Bottom-left: Elongated crescent-shaped clusters that naturally chain together. Bottom-right: Single linkage successfully identifying the crescent structure where other methods might fail. Each visualization includes merge order annotations and distance measurements.</p>
                             <p><em>This shows both the strength (handling irregular shapes) and weakness (chaining effect) of single linkage</em></p>
@@ -357,7 +343,7 @@
                         <div class="model-box">
                             <h4>Random Initialization Algorithm</h4>
                             
-                            <div class="formula-box">
+                            <div class="tutorial-template-card tutorial-template-formula">
                                 <h5><strong>Basic Random Selection:</strong></h5>
                                 <div class="code-box">
 <strong>function</strong> random_init(X, k):
@@ -401,7 +387,7 @@
                         <div class="model-box">
                             <h4>Furthest-First Initialization</h4>
                             
-                            <div class="formula-box">
+                            <div class="tutorial-template-card tutorial-template-formula">
                                 <div class="code-box">
 <strong>function</strong> furthest_first_init(X, k):
     n, d = X.shape
@@ -461,14 +447,14 @@
                             <h4>Complete Linkage Mathematical Framework</h4>
                             
                             <h5>Basic Definition:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For clusters A and B, the complete linkage distance is:</p>
                                 <strong>D_complete(A, B) = max{d(a, b) : a ∈ A, b ∈ B}</strong>
                                 <p>Where d(a, b) is the distance between individual points a and b.</p>
                             </div>
                             
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
                                     <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting of both clusters</li>
@@ -480,7 +466,7 @@
                             </div>
                             
                             <h5>Equivalent Formulation:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>The Lance-Williams formula simplifies to:</p>
                                 <strong>D(A∪B, C) = max{D(A,C), D(B,C)}</strong>
                                 <p>This shows that complete linkage always takes the maximum distance.</p>
@@ -513,7 +499,7 @@
                             </ul>
                         </div>
 
-                        <div class="visualization-placeholder">
+                        <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Complete Linkage Behavior</h4>
                             <p><strong>Image Description:</strong> A 2x2 grid demonstrating complete linkage characteristics. Top-left: Three well-separated circular clusters with some noise points. Top-right: Complete linkage dendrogram showing clear separation between clusters with high merge heights. Bottom-left: Comparison showing how complete linkage creates compact clusters while single linkage would chain them together. Bottom-right: Cluster boundaries showing tight, spherical formations with clear separation.</p>
                             <p><em>This demonstrates complete linkage's strength in creating compact, well-separated clusters</em></p>
@@ -522,7 +508,7 @@
                         <div class="model-box">
                             <h4>K-means++ Initialization Algorithm</h4>
                             
-                            <div class="formula-box">
+                            <div class="tutorial-template-card tutorial-template-formula">
                                 <div class="code-box">
 <strong>function</strong> kmeans_plus_plus(X, k):
     n, d = X.shape
@@ -554,9 +540,9 @@
                             <p>The probability of selecting a point as the next centroid is proportional to its squared distance from the nearest existing centroid. This creates a bias toward points that are far from current centroids, promoting good spatial distribution.</p>
                             
                             <h5>Mathematical Formulation:</h5>
-                            <div class="formula-box">
+                            <div class="tutorial-template-card tutorial-template-formula">
                                 <p>For selecting the (j+1)-th centroid, given j existing centroids C = {c₁, c₂, ..., cⱼ}:</p>
-                                <div class="formula-display">
+                                <div class="tutorial-template-formula__display">
                                     <strong>P(xᵢ) = D²(xᵢ) / Σₖ D²(xₖ)</strong>
                                 </div>
                                 <p>Where D²(xᵢ) = min_{c∈C} ||xᵢ - c||² is the squared distance to the nearest centroid.</p>
@@ -570,7 +556,7 @@
                             <h4>K-means++ Approximation Guarantee</h4>
                             
                             <h5>Main Theorem (Arthur & Vassilvitskii, 2007):</h5>
-                            <div class="formula-box">
+                            <div class="tutorial-template-card tutorial-template-formula">
                                 <p><strong>Theorem:</strong> K-means++ initialization followed by Lloyd's algorithm produces a solution with expected cost at most O(log k) times the optimal k-means cost.</p>
                                 
                                 <p><strong>Formally:</strong> E[cost(K-means++ solution)] ≤ 8(ln k + 2) × OPT</p>
@@ -631,14 +617,14 @@
                             <h4>Average Linkage Mathematical Framework</h4>
                             
                             <h5>Basic Definition:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For clusters A and B, the average linkage distance is:</p>
                                 <strong>D_average(A, B) = (1/|A||B|) Σ_{a∈A} Σ_{b∈B} d(a, b)</strong>
                                 <p>Where |A| and |B| are the sizes of clusters A and B, and d(a, b) is the distance between points a and b.</p>
                         </div>
 
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
                                     <li><strong>αₐ = |A|/(|A|+|B|):</strong> Proportional to cluster A size</li>
@@ -651,7 +637,7 @@
                             </div>
                             
                             <h5>Weighted Average Interpretation:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>The update formula shows that average linkage uses a weighted average where larger clusters have more influence on the resulting distance.</p>
                             </div>
                         </div>
@@ -681,7 +667,7 @@
                             </ul>
                         </div>
 
-                        <div class="visualization-placeholder">
+                        <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Average Linkage Behavior</h4>
                             <p><strong>Image Description:</strong> A 2x2 grid demonstrating average linkage characteristics. Top-left: Mixed cluster shapes with varying densities. Top-right: Average linkage dendrogram showing moderate merge heights between single and complete linkage. Bottom-left: Comparison of cluster boundaries showing balanced compactness. Bottom-right: Phylogenetic tree example showing UPGMA application to genetic data with equal branch lengths from root.</p>
                             <p><em>This demonstrates average linkage's balanced approach and its phylogenetic applications</em></p>
@@ -694,7 +680,7 @@
                             <h4>Complexity Analysis</h4>
                             
                             <h5>Time Complexity:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p><strong>O(n² log n):</strong> For n data points</p>
                                 <ul>
                                     <li>Initial distance matrix: O(n²)</li>
@@ -704,7 +690,7 @@
                             </div>
                             
                             <h5>Space Complexity:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p><strong>O(n²):</strong> For storing the distance matrix</p>
                         </div>
 
@@ -764,21 +750,21 @@
                             <h4>Ward's Method Mathematical Framework</h4>
                             
                             <h5>Objective Function:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>Ward's method minimizes the increase in within-cluster sum of squares:</p>
                                 <strong>ΔWSS(A,B) = WSS(A∪B) - WSS(A) - WSS(B)</strong>
                                 <p>Where WSS(C) = Σ_{x∈C} ||x - μ_C||² is the within-cluster sum of squares for cluster C.</p>
                         </div>
 
                             <h5>Simplified Formula:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>The increase in WSS can be simplified to:</p>
                                 <strong>ΔWSS(A,B) = (|A|·|B|)/(|A|+|B|) · ||μ_A - μ_B||²</strong>
                                 <p>Where |A| and |B| are cluster sizes, and μ_A, μ_B are cluster centroids.</p>
                         </div>
 
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For updating distances when merging clusters A and B:</p>
                                 <ul>
                                     <li><strong>αₐ = (|A|+|C|)/(|A|+|B|+|C|):</strong> Size-weighted coefficient</li>
@@ -834,7 +820,7 @@
                             </ul>
                         </div>
 
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Ward's Method Behavior</h4>
                             <p><strong>Image Description:</strong> A 2x2 grid demonstrating Ward's method characteristics. Top-left: Well-separated spherical clusters of similar sizes. Top-right: Ward's method dendrogram showing gradual increase in merge heights with compact cluster formation. Bottom-left: Comparison showing how Ward's method creates more balanced clusters than other linkage methods. Bottom-right: Variance plot showing how within-cluster variance increases minimally with each merge.</p>
                             <p><em>This demonstrates Ward's method's strength in creating compact, balanced clusters</em></p>
@@ -866,14 +852,14 @@
                             <h4>Centroid Linkage Characteristics</h4>
                             
                             <h5>Mathematical Definition:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For clusters A and B with centroids μ_A and μ_B:</p>
                                 <strong>D_centroid(A, B) = ||μ_A - μ_B||</strong>
                                 <p>Where ||·|| is the Euclidean distance between centroids.</p>
                         </div>
 
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <ul>
                                     <li><strong>αₐ = |A|/(|A|+|B|):</strong> Size-weighted coefficient</li>
                                     <li><strong>αᵦ = |B|/(|A|+|B|):</strong> Size-weighted coefficient</li>
@@ -897,14 +883,14 @@
                             <h4>Median Linkage Characteristics</h4>
                             
                             <h5>Mathematical Definition:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For clusters A and B, the median linkage distance is:</p>
                                 <strong>D_median(A, B) = (1/2) · [D(A,C) + D(B,C)]</strong>
                                 <p>This is a simple average of the distances to cluster C.</p>
                                 </div>
                                 
                             <h5>Lance-Williams Parameters:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <ul>
                                     <li><strong>αₐ = αᵦ = 0.5:</strong> Equal weighting for both clusters</li>
                                     <li><strong>β = 0:</strong> No dependency on distance between merged clusters</li>
@@ -927,7 +913,7 @@
                             <h4>Flexible Linkage Framework</h4>
                             
                             <h5>General Formula:</h5>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>Flexible linkage uses the Lance-Williams formula with:</p>
                                 <strong>αₐ = αᵦ = (1-β)/2, γ = 0</strong>
                                 <p>Where β is a parameter controlling the linkage behavior.</p>
@@ -949,7 +935,7 @@
                             </ul>
                             </div>
                             
-                        <div class="visualization-placeholder">
+                        <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Other Linkage Methods</h4>
                             <p><strong>Image Description:</strong> A 2x2 grid comparing different linkage methods. Top-left: Centroid linkage showing non-monotonic dendrogram with inversions. Top-right: Median linkage showing balanced clustering behavior. Bottom-left: Flexible linkage with different β values showing tunable behavior. Bottom-right: Comparison table showing properties of all linkage methods.</p>
                             <p><em>This demonstrates the variety and flexibility of linkage methods</em></p>
@@ -1107,7 +1093,7 @@
                             </div>
                         </div>
 
-                        <div class="visualization-placeholder">
+                        <div class="tutorial-template-lab__planned">
                             <h4>Visualization: Method Comparison</h4>
                             <p><strong>Image Description:</strong> A 2x3 grid showing the same dataset clustered with different linkage methods. Top row: Single linkage (elongated clusters), Complete linkage (compact clusters), Average linkage (balanced clusters). Bottom row: Ward's method (spherical clusters), Centroid linkage (size-aware clusters), and a comparison dendrogram showing different merge patterns.</p>
                             <p><em>This demonstrates how different linkage methods produce different clustering results on the same data</em></p>

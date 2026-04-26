@@ -139,9 +139,13 @@ function checkQuizAnswers() {
     for (let i = 1; i <= 5; i++) {
         const questionName = 'q' + i;
         const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-        if (selectedOption) {
-            userAnswers[questionName] = selectedOption.value;
-            if (selectedOption.value === correctAnswers[questionName]) {
+        const selectedSharedOption = document.querySelector(
+            `.enhanced-quiz-question:nth-of-type(${i}) .enhanced-quiz-option[data-selected="true"]`
+        );
+        const selectedAnswer = selectedOption ? selectedOption.value : selectedSharedOption?.dataset.answer;
+        if (selectedAnswer) {
+            userAnswers[questionName] = selectedAnswer;
+            if (selectedAnswer === correctAnswers[questionName]) {
                 score++;
             }
         }

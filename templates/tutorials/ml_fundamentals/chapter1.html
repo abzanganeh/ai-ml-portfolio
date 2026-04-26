@@ -428,7 +428,11 @@ sns.regplot(x='feature', y='target', data=df)</code></pre>
 
 {% block legacy_chapter_js %}
 <script>
-        let quizAnswers = {};
+        const quizAnswerKey = {
+            q1: 'b',
+            q2: 'd',
+            q3: 'b'
+        };
 
         function showSection(sectionName) {
             // Hide all sections
@@ -584,36 +588,21 @@ plt.show()</code></pre>
             `;
         }
 
-        function checkAnswer(questionNum, correctAnswer) {
-            const selectedAnswer = document.querySelector(`input[name="q${questionNum}"]:checked`);
-            const resultDiv = document.getElementById(`q${questionNum}-result`);
-            
-            if (!selectedAnswer) {
-                resultDiv.innerHTML = '<p style="color: orange;">Please select an answer first.</p>';
-                return;
-            }
-            
-            const isCorrect = selectedAnswer.value === correctAnswer;
-            quizAnswers[questionNum] = isCorrect;
-            
-            if (isCorrect) {
-                resultDiv.innerHTML = '<p style="color: green;">✅ Correct!</p>';
-            } else {
-                resultDiv.innerHTML = '<p style="color: red;">❌ Incorrect. Try again!</p>';
-            }
-        }
-
         function submitQuiz() {
-            const totalQuestions = 3;
-            const correctAnswers = Object.values(quizAnswers).filter(answer => answer).length;
+            const entries = Object.entries(quizAnswerKey);
+            const totalQuestions = entries.length;
+            const correctAnswers = entries.filter(([questionName, correctAnswer]) => {
+                const selectedAnswer = document.querySelector(`input[name="${questionName}"]:checked`);
+                return selectedAnswer && selectedAnswer.value === correctAnswer;
+            }).length;
             const score = Math.round((correctAnswers / totalQuestions) * 100);
             
             const scoreDiv = document.getElementById('quiz-score');
             scoreDiv.innerHTML = `
                 <h3>Quiz Results</h3>
                 <p>Score: ${correctAnswers}/${totalQuestions} (${score}%)</p>
-                ${score >= 80 ? '<p style="color: green;">🎉 Great job! You\'re ready for Chapter 2!</p>' : 
-                               '<p style="color: orange;">📚 Review the material and try again!</p>'}
+                ${score >= 80 ? '<p style="color: green;">Great job. You are ready for Chapter 2.</p>' :
+                               '<p style="color: orange;">Review the material and try again.</p>'}
             `;
         }
 
