@@ -64,7 +64,7 @@
                             <h3>Why Vector Databases are Essential for RAG</h3>
                             <p>Once you've created embeddings for your documents, you need to store them somewhere and search through them efficiently. A traditional database (like PostgreSQL or MySQL) is designed for exact matches and structured queries, not for finding "similar" vectors. <strong>Vector databases</strong> are specialized databases optimized for storing and searching high-dimensional vectors using similarity metrics like cosine similarity.</p>
                             
-                            <p><strong>The scale problem:</strong> In production RAG systems, you might have millions or billions of document chunks, each with a 384-1536 dimensional embedding vector. Searching through all of them to find the most similar to a query vector would take hours using brute-force methods. Vector databases use sophisticated indexing algorithms (like HNSW, IVF, or LSH) to enable <strong>sub-millisecond</strong> similarity search even across billions of vectors.</p>
+                            <p><strong>The scale problem:</strong> In production RAG systems, you might have millions of document chunks, each with a 384-1536 dimensional embedding vector. Brute-force search scans every vector and becomes expensive as the corpus grows. Vector databases use indexing algorithms such as HNSW, IVF, or LSH to make top-k similarity search practical, often returning results in milliseconds to hundreds of milliseconds depending on index settings, hardware, filters, and recall targets.</p>
                             
                             <h4>What Vector Databases Provide</h4>
                             <ul>
@@ -79,9 +79,9 @@
                                 <h5>Performance Comparison:</h5>
                                 <p><strong>Brute-force search (NumPy):</strong> To find top-5 most similar vectors among 1 million documents:</p>
                                 <ul>
-                                    <li>❌ Compute 1 million cosine similarities: ~16 minutes</li>
-                                    <li>❌ Sort results: Additional time</li>
-                                    <li>❌ Total: ~16+ minutes per query (completely impractical)</li>
+                                    <li>❌ Compute 1 million cosine similarities for every query: expensive and scales linearly with corpus size</li>
+                                    <li>❌ Sort or select top-k results: additional CPU and memory work</li>
+                                    <li>❌ Total latency depends heavily on hardware, vector dimension, and implementation, but it is usually impractical for high-traffic RAG without indexing</li>
                                 </ul>
                                 <p><strong>Vector database (HNSW index):</strong> Same task:</p>
                                 <ul>
@@ -128,9 +128,9 @@
                             
                             <p><strong>Advantages:</strong></p>
                             <ul>
-                                <li>✅ <strong>Very fast:</strong> Sub-millisecond search times even for millions of vectors</li>
+                                <li>✅ <strong>Very fast:</strong> Millisecond-level search times are achievable for many million-vector indexes with appropriate hardware and recall settings</li>
                                 <li>✅ <strong>High accuracy:</strong> Can achieve 95%+ recall (finds 95% of true nearest neighbors)</li>
-                                <li>✅ <strong>Scalable:</strong> Works well with billions of vectors</li>
+                                <li>✅ <strong>Scalable:</strong> Works well for large indexes when memory, sharding, and recall settings are tuned carefully</li>
                                 <li>✅ <strong>Used by major databases:</strong> Pinecone, Weaviate, Qdrant all use HNSW variants</li>
                             </ul>
                             
@@ -165,7 +165,7 @@
                                 <li>⚠️ <strong>Requires tuning:</strong> Number of clusters needs careful selection</li>
                             </ul>
                             
-                            <p><strong>When to use:</strong> For very large datasets (billions of vectors) where memory is a constraint, or when using FAISS.</p>
+                            <p><strong>When to use:</strong> For very large datasets where memory is a constraint, or when using FAISS-style indexes that combine clustering and compression.</p>
                             
                             <h4>3. Product Quantization (PQ)</h4>
                             <p><strong>What it is:</strong> A compression technique that reduces vector storage by quantizing (discretizing) vector components into a smaller number of values.</p>
@@ -300,7 +300,7 @@
                             <p><strong>Performance considerations:</strong></p>
                             <ul>
                                 <li>✅ <strong>Very fast:</strong> Sub-100ms for millions of vectors with good indexes</li>
-                                <li>✅ <strong>Scalable:</strong> Query time grows slowly with dataset size (logarithmic for HNSW)</li>
+                                <li>✅ <strong>Scalable:</strong> Query time usually grows much more slowly than brute-force scan when the index is tuned well</li>
                                 <li>⚠️ <strong>First query slower:</strong> May need to load index into memory</li>
                             </ul>
                             
@@ -326,7 +326,7 @@
                         
                         <div class="explanation-box">
                             <h3>Vector Database Performance Metrics</h3>
-                            <p>Vector databases use sophisticated indexing algorithms to enable fast similarity search. Understanding the mathematical foundations helps you choose the right database, configure indexes, and optimize performance. These formulas describe how vector databases achieve sub-millisecond search times even with millions of vectors.</p>
+                            <p>Vector databases use indexing algorithms to enable fast similarity search. Understanding the mathematical foundations helps you choose the right database, configure indexes, and optimize performance. These formulas are useful mental models, but real latency depends on hardware, vector count, dimensionality, filtering, recall targets, and implementation details.</p>
                         </div>
                         
                         <div class="formula-box">
@@ -336,7 +336,7 @@
                             </div>
                             <div class="formula-explanation">
                                 <h5>What This Represents:</h5>
-                                <p>HNSW (Hierarchical Navigable Small World) achieves logarithmic search time complexity, meaning search time grows very slowly as the number of vectors increases. This is why it can search millions of vectors in milliseconds.</p>
+                                <p>HNSW (Hierarchical Navigable Small World) is a graph-based approximate nearest-neighbor method. Its search behavior is often described as logarithmic-like in practice, but exact complexity depends on graph parameters such as \(M\), \(efConstruction\), and \(efSearch\). This is why it can search large vector indexes quickly while trading recall, memory, and latency.</p>
                                 
                                 <h5>Breaking It Down:</h5>
                                 <ul>
@@ -355,7 +355,7 @@
                                 
                                 <h5>Comparison to Brute-Force:</h5>
                                 <p><strong>Brute-force:</strong> \(O(N)\) - linear time. To search 1M vectors, you must compare query with all 1M vectors.</p>
-                                <p><strong>HNSW:</strong> \(O(\log N)\) - logarithmic time. To search 1M vectors, you only need ~20 comparisons by navigating the graph structure.</p>
+                                <p><strong>HNSW:</strong> often much faster than linear scan by navigating a layered graph. It still evaluates many candidate vectors controlled by \(efSearch\), so comparisons are not simply \(\log N\).</p>
                                 
                                 <h5>Why HNSW is Fast:</h5>
                                 <p>HNSW builds a multi-layer graph where each layer has fewer nodes. Search starts at the top (few nodes), finds approximate location, then refines in lower layers. This hierarchical approach dramatically reduces comparisons needed.</p>
@@ -598,9 +598,9 @@
                             
                             <p><strong>1,000,000 Documents:</strong></p>
                             <ul>
-                                <li><strong>Brute-force:</strong> 1,000,000 comparisons = ~16 seconds (unacceptable!)</li>
-                                <li><strong>HNSW:</strong> ~20 comparisons = ~50ms</li>
-                                <li><strong>Speedup:</strong> 320x faster!</li>
+                                    <li><strong>Brute-force:</strong> 1,000,000 comparisons for every query, with latency tied directly to corpus size and vector dimension</li>
+                                    <li><strong>HNSW:</strong> evaluates a much smaller candidate set through graph traversal, often returning results in tens of milliseconds for well-tuned indexes</li>
+                                    <li><strong>Trade-off:</strong> faster retrieval comes from approximate search and requires tuning recall, latency, and memory</li>
                             </ul>
                             
                             <p><strong>10,000,000 Documents:</strong></p>

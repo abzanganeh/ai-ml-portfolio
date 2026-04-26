@@ -20,7 +20,16 @@ STATIC_DIR = ROOT_DIR / "static"
 
 VALID_DIFFICULTIES = {"beginner", "intermediate", "advanced"}
 SUCCESS_OR_REDIRECT_STATUSES = {200, 301, 302, 308}
-TEMPLATE_DEPENDENCY_SUFFIXES = {".css", ".js"}
+TEMPLATE_DEPENDENCY_SUFFIXES = {
+    ".css",
+    ".gif",
+    ".jpeg",
+    ".jpg",
+    ".js",
+    ".png",
+    ".svg",
+    ".webp",
+}
 TEMPLATE_EXTENDS_PATTERN = re.compile(
     r'{%\s*extends\s+["\'](?:base\.html|tutorials/shared/(?:chapter|legacy_chapter_shell)\.html)["\']\s*%}'
 )
