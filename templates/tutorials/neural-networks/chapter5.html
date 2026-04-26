@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 5: Convolutional Neural Networks (CNNs) - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 5: Convolutional Neural Networks (CNNs) - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 5: Convolutional Neural Networks (CNNs)</h1>
@@ -992,161 +963,108 @@ print(f"Output shape: {output.shape}")  # (1, 16, 7, 7)</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the main advantage of CNNs over fully connected networks for images?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) They are faster to train</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Parameter sharing and spatial feature learning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They require less memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They always give better accuracy</div>
+                                <div class="quiz-option" data-correct="false">A) They are faster to train</div>
+                                <div class="quiz-option" data-correct="true">B) Parameter sharing and spatial feature learning</div>
+                                <div class="quiz-option" data-correct="false">C) They require less memory</div>
+                                <div class="quiz-option" data-correct="false">D) They always give better accuracy</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What does max pooling do?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Increases image resolution</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Reduces spatial dimensions and provides translation invariance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Applies filters to images</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Adds noise to prevent overfitting</div>
+                                <div class="quiz-option" data-correct="false">A) Increases image resolution</div>
+                                <div class="quiz-option" data-correct="true">B) Reduces spatial dimensions and provides translation invariance</div>
+                                <div class="quiz-option" data-correct="false">C) Applies filters to images</div>
+                                <div class="quiz-option" data-correct="false">D) Adds noise to prevent overfitting</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: In a CNN, what do early convolutional layers typically learn?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Low-level features like edges and textures</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) High-level object recognition</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Classification decisions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only color information</div>
+                                <div class="quiz-option" data-correct="true">A) Low-level features like edges and textures</div>
+                                <div class="quiz-option" data-correct="false">B) High-level object recognition</div>
+                                <div class="quiz-option" data-correct="false">C) Classification decisions</div>
+                                <div class="quiz-option" data-correct="false">D) Only color information</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the mathematical formula for convolution operation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \((I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\) where I is input and K is kernel</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \((I * K) = I + K\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \((I * K) = I × K\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \((I * K) = I - K\)</div>
+                                <div class="quiz-option" data-correct="true">A) \((I * K)[i, j] = \sum_m \sum_n I[i+m, j+n] \times K[m, n]\) where I is input and K is kernel</div>
+                                <div class="quiz-option" data-correct="false">B) \((I * K) = I + K\)</div>
+                                <div class="quiz-option" data-correct="false">C) \((I * K) = I × K\)</div>
+                                <div class="quiz-option" data-correct="false">D) \((I * K) = I - K\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is parameter sharing in CNNs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The same filter weights are used at every spatial location, dramatically reducing the number of parameters compared to fully connected layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All layers share the same parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Parameters are randomly shared</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No parameters are used</div>
+                                <div class="quiz-option" data-correct="true">A) The same filter weights are used at every spatial location, dramatically reducing the number of parameters compared to fully connected layers</div>
+                                <div class="quiz-option" data-correct="false">B) All layers share the same parameters</div>
+                                <div class="quiz-option" data-correct="false">C) Parameters are randomly shared</div>
+                                <div class="quiz-option" data-correct="false">D) No parameters are used</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the purpose of pooling layers in CNNs?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) To reduce spatial dimensions, decrease computational cost, and provide translation invariance by downsampling feature maps</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase image resolution</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add more parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To remove all features</div>
+                                <div class="quiz-option" data-correct="true">A) To reduce spatial dimensions, decrease computational cost, and provide translation invariance by downsampling feature maps</div>
+                                <div class="quiz-option" data-correct="false">B) To increase image resolution</div>
+                                <div class="quiz-option" data-correct="false">C) To add more parameters</div>
+                                <div class="quiz-option" data-correct="false">D) To remove all features</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the formula for max pooling?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Output[i, j] = max(Input[i × s : i × s + p, j × s : j × s + p])\) where s is stride and p is pool size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(Output = Input + 1\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(Output = Input × 2\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(Output = mean(Input)\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(Output[i, j] = max(Input[i × s : i × s + p, j × s : j × s + p])\) where s is stride and p is pool size</div>
+                                <div class="quiz-option" data-correct="false">B) \(Output = Input + 1\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(Output = Input × 2\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(Output = mean(Input)\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How does backpropagation work in convolutional layers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Gradients are computed using convolution operations: ∂L/∂K = I * (∂L/∂O) and ∂L/∂I = K * (∂L/∂O)\) where the second uses a transposed convolution</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Same as fully connected layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No gradients are computed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only forward pass is used</div>
+                                <div class="quiz-option" data-correct="true">A) \(Gradients are computed using convolution operations: ∂L/∂K = I * (∂L/∂O) and ∂L/∂I = K * (∂L/∂O)\) where the second uses a transposed convolution</div>
+                                <div class="quiz-option" data-correct="false">B) Same as fully connected layers</div>
+                                <div class="quiz-option" data-correct="false">C) No gradients are computed</div>
+                                <div class="quiz-option" data-correct="false">D) Only forward pass is used</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the difference between valid and same padding in convolution?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Valid padding uses no padding, output size is smaller than input. Same padding adds zeros to maintain output size equal to input size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're identical</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Valid padding is larger</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same padding reduces size</div>
+                                <div class="quiz-option" data-correct="true">A) Valid padding uses no padding, output size is smaller than input. Same padding adds zeros to maintain output size equal to input size</div>
+                                <div class="quiz-option" data-correct="false">B) They're identical</div>
+                                <div class="quiz-option" data-correct="false">C) Valid padding is larger</div>
+                                <div class="quiz-option" data-correct="false">D) Same padding reduces size</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is the output size formula for convolution with padding and stride?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(output_size = (input_size + 2 × padding - kernel_size) / stride + 1\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(output_size = input_size\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(output_size = input_size × 2\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(output_size = input_size - kernel_size\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(output_size = (input_size + 2 × padding - kernel_size) / stride + 1\)</div>
+                                <div class="quiz-option" data-correct="false">B) \(output_size = input_size\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(output_size = input_size × 2\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(output_size = input_size - kernel_size\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: Why are CNNs translation invariant?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Because the same filters scan the entire image, and pooling layers reduce sensitivity to exact positions, allowing the network to recognize patterns regardless of their location</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're not translation invariant</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only because of pooling</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only because of convolution</div>
+                                <div class="quiz-option" data-correct="true">A) Because the same filters scan the entire image, and pooling layers reduce sensitivity to exact positions, allowing the network to recognize patterns regardless of their location</div>
+                                <div class="quiz-option" data-correct="false">B) They're not translation invariant</div>
+                                <div class="quiz-option" data-correct="false">C) Only because of pooling</div>
+                                <div class="quiz-option" data-correct="false">D) Only because of convolution</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the typical architecture progression in a CNN?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(Early layers: small filters detecting edges/textures → Middle layers: larger filters detecting patterns/shapes → Late layers: detecting high-level features/objects → Fully connected layers: classification\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All layers are identical</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only convolution, no pooling</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only pooling, no convolution</div>
+                                <div class="quiz-option" data-correct="true">A) \(Early layers: small filters detecting edges/textures → Middle layers: larger filters detecting patterns/shapes → Late layers: detecting high-level features/objects → Fully connected layers: classification\)</div>
+                                <div class="quiz-option" data-correct="false">B) All layers are identical</div>
+                                <div class="quiz-option" data-correct="false">C) Only convolution, no pooling</div>
+                                <div class="quiz-option" data-correct="false">D) Only pooling, no convolution</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter4" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 4</a>
-                <a href="/tutorials/neural-networks/chapter6" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 6: RNNs →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-</script>
-</body>
-</html>
+{% endblock %}

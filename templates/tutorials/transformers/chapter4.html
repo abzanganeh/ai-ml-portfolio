@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 4: Positional Encoding - Transformer Architecture Deep Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 4: Positional Encoding - Transformer Architecture Deep Dive' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/transformers" class="course-link">
-                    <span>Transformer Architecture Deep Dive</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 4: Positional Encoding</h1>
@@ -529,183 +500,108 @@ print(f"Output shape: {output.shape}")  # (2, 10, 768)</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: Why do transformers need positional encoding?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Attention mechanisms are permutation-invariant and don't naturally understand word order, so positional encoding adds information about token positions in the sequence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To make computation faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not needed</div>
+                                <div class="quiz-option" data-correct="true">A) Attention mechanisms are permutation-invariant and don't naturally understand word order, so positional encoding adds information about token positions in the sequence</div>
+                                <div class="quiz-option" data-correct="false">B) To make computation faster</div>
+                                <div class="quiz-option" data-correct="false">C) To reduce memory</div>
+                                <div class="quiz-option" data-correct="false">D) It's not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is the formula for sinusoidal positional encoding?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(PE_{(pos, 2i)} = sin(pos / 10000^{2i/d_{model}})\) and \(PE_{(pos, 2i+1)} = cos(pos / 10000^{2i/d_{model}})\) where pos is position and i is dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(PE = pos\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(PE = sin(pos)\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(PE = random\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(PE_{(pos, 2i)} = sin(pos / 10000^{2i/d_{model}})\) and \(PE_{(pos, 2i+1)} = cos(pos / 10000^{2i/d_{model}})\) where pos is position and i is dimension</div>
+                                <div class="quiz-option" data-correct="false">B) \(PE = pos\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(PE = sin(pos)\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(PE = random\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: How do you add positional encoding to token embeddings?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Element-wise addition: final_embedding = token_embedding + positional_encoding, where both have the same dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Concatenate them</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Multiply them</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use only positional encoding</div>
+                                <div class="quiz-option" data-correct="true">A) Element-wise addition: final_embedding = token_embedding + positional_encoding, where both have the same dimension</div>
+                                <div class="quiz-option" data-correct="false">B) Concatenate them</div>
+                                <div class="quiz-option" data-correct="false">C) Multiply them</div>
+                                <div class="quiz-option" data-correct="false">D) Use only positional encoding</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Why use sinusoidal encoding instead of learned positional embeddings?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Sinusoidal encoding can extrapolate to longer sequences than seen during training, while learned embeddings are fixed to training sequence length. However, learned embeddings often work better in practice</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Sinusoidal is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Learned is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're the same</div>
+                                <div class="quiz-option" data-correct="true">A) Sinusoidal encoding can extrapolate to longer sequences than seen during training, while learned embeddings are fixed to training sequence length. However, learned embeddings often work better in practice</div>
+                                <div class="quiz-option" data-correct="false">B) Sinusoidal is always better</div>
+                                <div class="quiz-option" data-correct="false">C) Learned is always better</div>
+                                <div class="quiz-option" data-correct="false">D) They're the same</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What happens if you don't use positional encoding in a transformer?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The model treats "cat sat mat" and "mat sat cat" as identical, losing all word order information, which is crucial for understanding language</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Nothing changes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It works better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It becomes faster</div>
+                                <div class="quiz-option" data-correct="true">A) The model treats "cat sat mat" and "mat sat cat" as identical, losing all word order information, which is crucial for understanding language</div>
+                                <div class="quiz-option" data-correct="false">B) Nothing changes</div>
+                                <div class="quiz-option" data-correct="false">C) It works better</div>
+                                <div class="quiz-option" data-correct="false">D) It becomes faster</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: How does positional encoding help with relative positions?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The sinusoidal patterns create unique encodings for each position, and the model can learn to compute relative positions from these encodings through attention mechanisms</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It doesn't help</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only absolute positions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random positions</div>
+                                <div class="quiz-option" data-correct="true">A) The sinusoidal patterns create unique encodings for each position, and the model can learn to compute relative positions from these encodings through attention mechanisms</div>
+                                <div class="quiz-option" data-correct="false">B) It doesn't help</div>
+                                <div class="quiz-option" data-correct="false">C) Only absolute positions</div>
+                                <div class="quiz-option" data-correct="false">D) Random positions</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the difference between absolute and relative positional encoding?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Absolute encoding adds position information directly to embeddings, while relative encoding modifies attention scores to encode distances between positions. Relative encoding can be more flexible</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Absolute is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Relative is always better</div>
+                                <div class="quiz-option" data-correct="true">A) Absolute encoding adds position information directly to embeddings, while relative encoding modifies attention scores to encode distances between positions. Relative encoding can be more flexible</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Absolute is always better</div>
+                                <div class="quiz-option" data-correct="false">D) Relative is always better</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: How would you implement positional encoding from scratch?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) For each position pos and dimension i, compute sin and cos values using the formula, create a matrix of shape (max_len, d_model), then add this to token embeddings during forward pass</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use random values</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use only position numbers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No implementation needed</div>
+                                <div class="quiz-option" data-correct="true">A) For each position pos and dimension i, compute sin and cos values using the formula, create a matrix of shape (max_len, d_model), then add this to token embeddings during forward pass</div>
+                                <div class="quiz-option" data-correct="false">B) Just use random values</div>
+                                <div class="quiz-option" data-correct="false">C) Use only position numbers</div>
+                                <div class="quiz-option" data-correct="false">D) No implementation needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: Why do different frequency components in sinusoidal encoding matter?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Different frequencies (via the 10000^{2i/d} term) create unique patterns for each position. Lower frequencies capture coarse position, higher frequencies capture fine-grained position differences</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They don't matter</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only one frequency needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random frequencies</div>
+                                <div class="quiz-option" data-correct="true">A) Different frequencies (via the 10000^{2i/d} term) create unique patterns for each position. Lower frequencies capture coarse position, higher frequencies capture fine-grained position differences</div>
+                                <div class="quiz-option" data-correct="false">B) They don't matter</div>
+                                <div class="quiz-option" data-correct="false">C) Only one frequency needed</div>
+                                <div class="quiz-option" data-correct="false">D) Random frequencies</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What happens to positional encoding in different transformer architectures?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) BERT uses learned positional embeddings, GPT uses learned, original Transformer used sinusoidal. Some newer models use relative positional encoding or rotary position encoding (RoPE)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) All use the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) None use it</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only sinusoidal</div>
+                                <div class="quiz-option" data-correct="true">A) BERT uses learned positional embeddings, GPT uses learned, original Transformer used sinusoidal. Some newer models use relative positional encoding or rotary position encoding (RoPE)</div>
+                                <div class="quiz-option" data-correct="false">B) All use the same</div>
+                                <div class="quiz-option" data-correct="false">C) None use it</div>
+                                <div class="quiz-option" data-correct="false">D) Only sinusoidal</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: How does positional encoding scale to very long sequences?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Sinusoidal encoding can theoretically handle any length, but in practice models are trained on fixed max lengths. For longer sequences, you may need to extend learned embeddings or use relative encoding</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It doesn't scale</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always works perfectly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for short sequences</div>
+                                <div class="quiz-option" data-correct="true">A) Sinusoidal encoding can theoretically handle any length, but in practice models are trained on fixed max lengths. For longer sequences, you may need to extend learned embeddings or use relative encoding</div>
+                                <div class="quiz-option" data-correct="false">B) It doesn't scale</div>
+                                <div class="quiz-option" data-correct="false">C) Always works perfectly</div>
+                                <div class="quiz-option" data-correct="false">D) Only for short sequences</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: How would you debug issues related to positional encoding?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Verify encoding values are in reasonable range, check that encoding is actually added to embeddings, test if model performance degrades when positions are shuffled, visualize positional encoding patterns, ensure encoding dimension matches embedding dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just ignore it</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Remove it</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use random values</div>
+                                <div class="quiz-option" data-correct="true">A) Verify encoding values are in reasonable range, check that encoding is actually added to embeddings, test if model performance degrades when positions are shuffled, visualize positional encoding patterns, ensure encoding dimension matches embedding dimension</div>
+                                <div class="quiz-option" data-correct="false">B) Just ignore it</div>
+                                <div class="quiz-option" data-correct="false">C) Remove it</div>
+                                <div class="quiz-option" data-correct="false">D) Use random values</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/transformers/chapter3" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 3</a>
-                <a href="/tutorials/transformers/chapter5" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 5 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-    </script>
-</body>
-</html>
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+{% endblock %}

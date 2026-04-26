@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% import "tutorials/shared/_components.html" as tutorial_components %}
+
+{% set tutorial_data = tutorial|default({}) %}
+{% set course_data = course|default({}) %}
+{% set chapter_data = chapter|default({}) %}
+{% set course_title = course_data.title|default(tutorial_data.title|default("Tutorial")) %}
+{% set course_slug = course_data.slug|default(tutorial_data.slug|default("")) %}
+{% set chapter_title = chapter_data.title|default("Tutorial Chapter") %}
+{% set chapter_number = chapter_data.number|default(1) %}
+{% set chapter_description = chapter_data.description|default(tutorial_data.description|default("")) %}
+{% set chapter_sections = chapter_data.sections|default([]) %}
+{% set chapter_objectives = chapter_data.objectives|default([]) %}
+{% set chapter_progress = chapter_data.progress|default(none) %}
+{% set metadata_items = [
+    {"label": "Course", "value": course_title},
+    {"label": "Chapter", "value": chapter_number},
+    {"label": "Difficulty", "value": chapter_data.difficulty|default(tutorial_data.difficulty|default(""))},
+    {"label": "Estimated Time", "value": chapter_data.duration|default(tutorial_data.duration|default(""))}
+] %}
+
+{% block title %}{{ chapter_title }} - {{ course_title }}{% endblock %}
+
+{% block meta_description %}{{ chapter_description }}{% endblock %}
+
+{% block body_class %}tutorial-template-page {{ super() }}{% endblock %}
+
+{% block extra_css %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/chapter-template.css') }}">
+{% block tutorial_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<article class="tutorial-template-shell" data-course-slug="{{ course_slug }}" data-chapter-number="{{ chapter_number }}">
+    <header class="tutorial-template-hero">
+        <div class="tutorial-template-container">
+            <nav class="tutorial-template-breadcrumb" aria-label="Breadcrumb">
+                <a href="{{ url_for('tutorials') }}">Tutorials</a>
+                {% if course_slug %}
+                <span aria-hidden="true">/</span>
+                <a href="{{ url_for('tutorial_dedicated', slug=course_slug) }}">{{ course_title }}</a>
+                {% endif %}
+            </nav>
+
+            {{ tutorial_components.meta_badges(metadata_items) }}
+
+            <h1>{{ chapter_title }}</h1>
+            {% if chapter_data.subtitle %}
+            <p class="tutorial-template-hero__subtitle">{{ chapter_data.subtitle }}</p>
+            {% elif chapter_description %}
+            <p class="tutorial-template-hero__subtitle">{{ chapter_description }}</p>
+            {% endif %}
+
+            {% if chapter_progress is not none %}
+            <div class="tutorial-template-progress" aria-label="Chapter progress">
+                <span class="tutorial-template-progress__label">{{ chapter_progress }}% complete</span>
+                <div class="tutorial-template-progress__track">
+                    <div class="tutorial-template-progress__fill" style="width: {{ chapter_progress }}%;"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="tutorial-template-container tutorial-template-layout">
+        <aside class="tutorial-template-sidebar" aria-label="Tutorial navigation">
+            {{ tutorial_components.chapter_nav(course_data.chapters|default([]), chapter_number) }}
+            {{ tutorial_components.section_nav(chapter_sections) }}
+        </aside>
+
+        <main class="tutorial-template-main" id="chapter-content">
+            {% block tutorial_before_objectives %}{% endblock %}
+
+            {{ tutorial_components.objectives(chapter_objectives) }}
+
+            {% block tutorial_intro %}{% endblock %}
+            {% block tutorial_concept %}{% endblock %}
+            {% block tutorial_formula %}{% endblock %}
+            {% block tutorial_implementation %}{% endblock %}
+            {% block tutorial_lab %}{% endblock %}
+            {% block tutorial_quiz %}{% endblock %}
+            {% block tutorial_summary %}{% endblock %}
+
+            {{ tutorial_components.previous_next(
+                chapter_data.previous_url|default(none),
+                chapter_data.previous_label|default(none),
+                chapter_data.next_url|default(none),
+                chapter_data.next_label|default(none)
+            ) }}
+        </main>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tutorials/chapter-template.js') }}"></script>
+{% block tutorial_extra_js %}{% endblock %}
+{% endblock %}

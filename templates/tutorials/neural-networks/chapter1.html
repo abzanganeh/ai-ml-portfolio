@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 1: Introduction to Neural Networks - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 1: Introduction to Neural Networks - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <!-- Tutorial Header -->
         <div class="tutorial-header">
             <div class="azbn-container">
@@ -698,187 +669,110 @@ print(f"Prediction: {'Positive' if output > 0.5 else 'Negative'}")</code></pre>
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the main limitation of a single-layer perceptron?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) It can only learn linearly separable patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It's too slow</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It requires too much memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It can't handle numerical data</div>
+                                <div class="quiz-option" data-correct="true">A) It can only learn linearly separable patterns</div>
+                                <div class="quiz-option" data-correct="false">B) It's too slow</div>
+                                <div class="quiz-option" data-correct="false">C) It requires too much memory</div>
+                                <div class="quiz-option" data-correct="false">D) It can't handle numerical data</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What does the Universal Approximation Theorem tell us?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Neural networks always find the best solution</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) A neural network can approximate any continuous function with sufficient neurons</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Neural networks are faster than other methods</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Neural networks don't need training</div>
+                                <div class="quiz-option" data-correct="false">A) Neural networks always find the best solution</div>
+                                <div class="quiz-option" data-correct="true">B) A neural network can approximate any continuous function with sufficient neurons</div>
+                                <div class="quiz-option" data-correct="false">C) Neural networks are faster than other methods</div>
+                                <div class="quiz-option" data-correct="false">D) Neural networks don't need training</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: What is the purpose of activation functions in neural networks?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To make computation faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To introduce non-linearity and enable learning complex patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To reduce memory usage</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                                <div class="quiz-option" data-correct="false">A) To make computation faster</div>
+                                <div class="quiz-option" data-correct="true">B) To introduce non-linearity and enable learning complex patterns</div>
+                                <div class="quiz-option" data-correct="false">C) To reduce memory usage</div>
+                                <div class="quiz-option" data-correct="false">D) To prevent overfitting</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Interview question: "Explain the difference between a perceptron and a multi-layer perceptron (MLP)."</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A perceptron is a single-layer network that can only learn linearly separable patterns, while an MLP has multiple layers with activation functions that can learn non-linear, complex patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They are the same thing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Perceptron is faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) MLP uses less memory</div>
+                                <div class="quiz-option" data-correct="true">A) A perceptron is a single-layer network that can only learn linearly separable patterns, while an MLP has multiple layers with activation functions that can learn non-linear, complex patterns</div>
+                                <div class="quiz-option" data-correct="false">B) They are the same thing</div>
+                                <div class="quiz-option" data-correct="false">C) Perceptron is faster</div>
+                                <div class="quiz-option" data-correct="false">D) MLP uses less memory</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What is the mathematical representation of a neuron's output?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) y = f(Σ<sub>i=1</sub><sup>n</sup> wᵢxᵢ + b) where f is the activation function, w_i are weights, x_i are inputs, and b is bias</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) y = Σ wᵢxᵢ</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) y = w × x</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) y = x + b</div>
+                                <div class="quiz-option" data-correct="true">A) y = f(Σ<sub>i=1</sub><sup>n</sup> wᵢxᵢ + b) where f is the activation function, w_i are weights, x_i are inputs, and b is bias</div>
+                                <div class="quiz-option" data-correct="false">B) y = Σ wᵢxᵢ</div>
+                                <div class="quiz-option" data-correct="false">C) y = w × x</div>
+                                <div class="quiz-option" data-correct="false">D) y = x + b</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: Interview question: "How would you initialize weights in a neural network and why?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use small random values (e.g., Xavier/Glorot or He initialization) to break symmetry, prevent vanishing/exploding gradients, and ensure different neurons learn different features</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Initialize all weights to zero</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Initialize all weights to one</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use large random values</div>
+                                <div class="quiz-option" data-correct="true">A) Use small random values (e.g., Xavier/Glorot or He initialization) to break symmetry, prevent vanishing/exploding gradients, and ensure different neurons learn different features</div>
+                                <div class="quiz-option" data-correct="false">B) Initialize all weights to zero</div>
+                                <div class="quiz-option" data-correct="false">C) Initialize all weights to one</div>
+                                <div class="quiz-option" data-correct="false">D) Use large random values</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What does the Universal Approximation Theorem guarantee?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) A feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function on compact subsets of R^n, given appropriate activation functions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Neural networks always converge to the global optimum</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Neural networks are always better than other methods</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Neural networks don't need training</div>
+                                <div class="quiz-option" data-correct="true">A) A feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function on compact subsets of R^n, given appropriate activation functions</div>
+                                <div class="quiz-option" data-correct="false">B) Neural networks always converge to the global optimum</div>
+                                <div class="quiz-option" data-correct="false">C) Neural networks are always better than other methods</div>
+                                <div class="quiz-option" data-correct="false">D) Neural networks don't need training</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Interview question: "What happens if you don't use an activation function in a neural network?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The network becomes a linear model, regardless of depth, because the composition of linear transformations is still linear, losing the ability to learn non-linear patterns</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The network becomes faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The network uses less memory</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The network becomes more accurate</div>
+                                <div class="quiz-option" data-correct="true">A) The network becomes a linear model, regardless of depth, because the composition of linear transformations is still linear, losing the ability to learn non-linear patterns</div>
+                                <div class="quiz-option" data-correct="false">B) The network becomes faster</div>
+                                <div class="quiz-option" data-correct="false">C) The network uses less memory</div>
+                                <div class="quiz-option" data-correct="false">D) The network becomes more accurate</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the role of bias in a neural network?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Bias allows the activation function to shift, enabling the network to fit data that doesn't pass through the origin and learn more flexible decision boundaries</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Bias makes computation faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Bias prevents overfitting</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Bias is optional and not needed</div>
+                                <div class="quiz-option" data-correct="true">A) Bias allows the activation function to shift, enabling the network to fit data that doesn't pass through the origin and learn more flexible decision boundaries</div>
+                                <div class="quiz-option" data-correct="false">B) Bias makes computation faster</div>
+                                <div class="quiz-option" data-correct="false">C) Bias prevents overfitting</div>
+                                <div class="quiz-option" data-correct="false">D) Bias is optional and not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Interview question: "How would you choose the number of neurons in a hidden layer?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Start with a rule of thumb (e.g., between input and output size, or 2/3 of input size), then use validation set to tune, balancing model capacity (too few = underfitting, too many = overfitting)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use the same as input size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Use as many as possible</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use exactly 10 neurons</div>
+                                <div class="quiz-option" data-correct="true">A) Start with a rule of thumb (e.g., between input and output size, or 2/3 of input size), then use validation set to tune, balancing model capacity (too few = underfitting, too many = overfitting)</div>
+                                <div class="quiz-option" data-correct="false">B) Always use the same as input size</div>
+                                <div class="quiz-option" data-correct="false">C) Use as many as possible</div>
+                                <div class="quiz-option" data-correct="false">D) Use exactly 10 neurons</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What is forward propagation in a neural network?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The process of passing input data through the network layers, computing weighted sums and applying activation functions, to produce an output prediction</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) The process of updating weights</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) The process of calculating loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) The process of initializing weights</div>
+                                <div class="quiz-option" data-correct="true">A) The process of passing input data through the network layers, computing weighted sums and applying activation functions, to produce an output prediction</div>
+                                <div class="quiz-option" data-correct="false">B) The process of updating weights</div>
+                                <div class="quiz-option" data-correct="false">C) The process of calculating loss</div>
+                                <div class="quiz-option" data-correct="false">D) The process of initializing weights</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: Interview question: "What are the key components of a neural network and how do they work together?"</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Input layer receives data, hidden layers transform data through weighted connections and activation functions, output layer produces predictions. Weights store learned patterns, biases shift activations, activation functions introduce non-linearity. Forward pass computes predictions, backpropagation updates weights based on error</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just weights and inputs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only activation functions</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Just the output layer</div>
+                                <div class="quiz-option" data-correct="true">A) Input layer receives data, hidden layers transform data through weighted connections and activation functions, output layer produces predictions. Weights store learned patterns, biases shift activations, activation functions introduce non-linearity. Forward pass computes predictions, backpropagation updates weights based on error</div>
+                                <div class="quiz-option" data-correct="false">B) Just weights and inputs</div>
+                                <div class="quiz-option" data-correct="false">C) Only activation functions</div>
+                                <div class="quiz-option" data-correct="false">D) Just the output layer</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
 
     <!-- Footer Navigation -->
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter2" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 2: Feedforward Networks →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <script>
-        // Function to scroll to section navigation
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        // Quiz function
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-        
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-        }
-    </script>
-</body>
-</html>
+<!-- KaTeX for math rendering -->
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+{% endblock %}

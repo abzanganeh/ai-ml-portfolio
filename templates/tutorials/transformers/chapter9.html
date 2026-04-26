@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 9: Complete Transformer Architecture - Transformer Architecture Deep Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 9: Complete Transformer Architecture - Transformer Architecture Deep Dive' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/transformers" class="course-link">
-                    <span>Transformer Architecture Deep Dive</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 9: Complete Transformer Architecture</h1>
@@ -446,183 +417,108 @@ def train_transformer(model, train_loader, num_epochs, warmup_steps, total_steps
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What are the key challenges in training transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Large model size requiring significant memory, long training times, need for large datasets, careful hyperparameter tuning, and managing computational costs</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No challenges</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only small datasets needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Very fast training</div>
+                                <div class="quiz-option" data-correct="true">A) Large model size requiring significant memory, long training times, need for large datasets, careful hyperparameter tuning, and managing computational costs</div>
+                                <div class="quiz-option" data-correct="false">B) No challenges</div>
+                                <div class="quiz-option" data-correct="false">C) Only small datasets needed</div>
+                                <div class="quiz-option" data-correct="false">D) Very fast training</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What is the typical learning rate schedule for transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Warmup phase (gradually increase), then constant or decay. Warmup helps stabilize training early on, then learning rate may decay to fine-tune convergence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always constant</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always decreasing</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random schedule</div>
+                                <div class="quiz-option" data-correct="true">A) Warmup phase (gradually increase), then constant or decay. Warmup helps stabilize training early on, then learning rate may decay to fine-tune convergence</div>
+                                <div class="quiz-option" data-correct="false">B) Always constant</div>
+                                <div class="quiz-option" data-correct="false">C) Always decreasing</div>
+                                <div class="quiz-option" data-correct="false">D) Random schedule</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: How do you handle memory constraints when training large transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use gradient checkpointing (recompute activations), mixed precision training, smaller batch sizes, model parallelism, or gradient accumulation to simulate larger batches</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just use larger batches</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Remove layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No solutions</div>
+                                <div class="quiz-option" data-correct="true">A) Use gradient checkpointing (recompute activations), mixed precision training, smaller batch sizes, model parallelism, or gradient accumulation to simulate larger batches</div>
+                                <div class="quiz-option" data-correct="false">B) Just use larger batches</div>
+                                <div class="quiz-option" data-correct="false">C) Remove layers</div>
+                                <div class="quiz-option" data-correct="false">D) No solutions</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is gradient accumulation and why use it?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradient accumulation computes gradients over multiple small batches before updating weights, allowing you to simulate larger batch sizes when memory is limited, improving training stability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It reduces gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It's not useful</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for small models</div>
+                                <div class="quiz-option" data-correct="true">A) Gradient accumulation computes gradients over multiple small batches before updating weights, allowing you to simulate larger batch sizes when memory is limited, improving training stability</div>
+                                <div class="quiz-option" data-correct="false">B) It reduces gradients</div>
+                                <div class="quiz-option" data-correct="false">C) It's not useful</div>
+                                <div class="quiz-option" data-correct="false">D) Only for small models</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What optimizer is commonly used for training transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Adam or AdamW (Adam with weight decay) are most common, as they adapt learning rates per parameter and work well for large models. Some use SGD with momentum for fine-tuning</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only SGD</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only RMSprop</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random optimizer</div>
+                                <div class="quiz-option" data-correct="true">A) Adam or AdamW (Adam with weight decay) are most common, as they adapt learning rates per parameter and work well for large models. Some use SGD with momentum for fine-tuning</div>
+                                <div class="quiz-option" data-correct="false">B) Only SGD</div>
+                                <div class="quiz-option" data-correct="false">C) Only RMSprop</div>
+                                <div class="quiz-option" data-correct="false">D) Random optimizer</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is mixed precision training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Using both float16 and float32 precision - forward pass and gradients in float16 for speed and memory savings, but maintaining float32 master weights for numerical stability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Using only float16</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Using only float32</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random precision</div>
+                                <div class="quiz-option" data-correct="true">A) Using both float16 and float32 precision - forward pass and gradients in float16 for speed and memory savings, but maintaining float32 master weights for numerical stability</div>
+                                <div class="quiz-option" data-correct="false">B) Using only float16</div>
+                                <div class="quiz-option" data-correct="false">C) Using only float32</div>
+                                <div class="quiz-option" data-correct="false">D) Random precision</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: How do you choose batch size for transformer training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Balance between memory constraints and training stability. Larger batches provide more stable gradients but require more memory. Use gradient accumulation if needed. Typical sizes range from 16 to 512 depending on model size</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use largest possible</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always use smallest</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Doesn't matter</div>
+                                <div class="quiz-option" data-correct="true">A) Balance between memory constraints and training stability. Larger batches provide more stable gradients but require more memory. Use gradient accumulation if needed. Typical sizes range from 16 to 512 depending on model size</div>
+                                <div class="quiz-option" data-correct="false">B) Always use largest possible</div>
+                                <div class="quiz-option" data-correct="false">C) Always use smallest</div>
+                                <div class="quiz-option" data-correct="false">D) Doesn't matter</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What is the purpose of learning rate warmup?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Warmup gradually increases learning rate from small value to target, preventing large gradient updates early in training that could destabilize the model, especially important for large models</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To decrease learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Not needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for small models</div>
+                                <div class="quiz-option" data-correct="true">A) Warmup gradually increases learning rate from small value to target, preventing large gradient updates early in training that could destabilize the model, especially important for large models</div>
+                                <div class="quiz-option" data-correct="false">B) To decrease learning rate</div>
+                                <div class="quiz-option" data-correct="false">C) Not needed</div>
+                                <div class="quiz-option" data-correct="false">D) Only for small models</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: How do you monitor transformer training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Track loss curves (training and validation), learning rate, gradient norms, perplexity for language models, and task-specific metrics. Watch for overfitting, underfitting, or training instability</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Only loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Don't monitor</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only at end</div>
+                                <div class="quiz-option" data-correct="true">A) Track loss curves (training and validation), learning rate, gradient norms, perplexity for language models, and task-specific metrics. Watch for overfitting, underfitting, or training instability</div>
+                                <div class="quiz-option" data-correct="false">B) Only loss</div>
+                                <div class="quiz-option" data-correct="false">C) Don't monitor</div>
+                                <div class="quiz-option" data-correct="false">D) Only at end</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: What is gradient clipping and when do you use it?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradient clipping caps gradient magnitude to prevent exploding gradients. Use it when gradients become very large, especially in deep networks or when using large learning rates</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Not needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Only for small models</div>
+                                <div class="quiz-option" data-correct="true">A) Gradient clipping caps gradient magnitude to prevent exploding gradients. Use it when gradients become very large, especially in deep networks or when using large learning rates</div>
+                                <div class="quiz-option" data-correct="false">B) To increase gradients</div>
+                                <div class="quiz-option" data-correct="false">C) Not needed</div>
+                                <div class="quiz-option" data-correct="false">D) Only for small models</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: How do you handle long sequences in transformer training?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Use gradient checkpointing, chunk sequences, use sparse attention patterns, or train with shorter sequences and fine-tune on longer ones. O(n²) attention complexity makes very long sequences expensive</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Always use full length</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Always truncate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) No solutions</div>
+                                <div class="quiz-option" data-correct="true">A) Use gradient checkpointing, chunk sequences, use sparse attention patterns, or train with shorter sequences and fine-tune on longer ones. O(n²) attention complexity makes very long sequences expensive</div>
+                                <div class="quiz-option" data-correct="false">B) Always use full length</div>
+                                <div class="quiz-option" data-correct="false">C) Always truncate</div>
+                                <div class="quiz-option" data-correct="false">D) No solutions</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the typical training setup for large language models?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Train on massive text corpora, use large batch sizes with gradient accumulation, AdamW optimizer with warmup and decay, mixed precision, distributed training across many GPUs, train for many epochs or until convergence</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Small dataset, single GPU</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No warmup needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Train for one epoch</div>
+                                <div class="quiz-option" data-correct="true">A) Train on massive text corpora, use large batch sizes with gradient accumulation, AdamW optimizer with warmup and decay, mixed precision, distributed training across many GPUs, train for many epochs or until convergence</div>
+                                <div class="quiz-option" data-correct="false">B) Small dataset, single GPU</div>
+                                <div class="quiz-option" data-correct="false">C) No warmup needed</div>
+                                <div class="quiz-option" data-correct="false">D) Train for one epoch</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/transformers/chapter8" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 8</a>
-                <a href="/tutorials/transformers/chapter10" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 10 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+{% block legacy_chapter_js %}
 <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-        // Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-    </script>
-</body>
-</html>
+{% endblock %}

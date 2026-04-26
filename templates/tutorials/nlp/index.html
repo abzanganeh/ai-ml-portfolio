@@ -92,10 +92,10 @@
 
         <div class="quiz-container">
             <div class="quiz-question">Quick Quiz: Which of these is NOT a typical NLP application?</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">A) Email spam detection</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">B) Language translation</div>
-            <div class="quiz-option" onclick="checkAnswer(this, true)">C) Image object detection</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sentiment analysis</div>
+            <div class="quiz-option" data-correct="false">A) Email spam detection</div>
+            <div class="quiz-option" data-correct="false">B) Language translation</div>
+            <div class="quiz-option" data-correct="true">C) Image object detection</div>
+            <div class="quiz-option" data-correct="false">D) Sentiment analysis</div>
         </div>
     </div>
 
@@ -777,10 +777,10 @@
 
         <div class="quiz-container">
             <div class="quiz-question">Quiz: Which is the biggest challenge in sentiment analysis?</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">A) Processing speed</div>
-            <div class="quiz-option" onclick="checkAnswer(this, true)">B) Understanding context and sarcasm</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">C) Memory requirements</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">D) Data storage</div>
+            <div class="quiz-option" data-correct="false">A) Processing speed</div>
+            <div class="quiz-option" data-correct="true">B) Understanding context and sarcasm</div>
+            <div class="quiz-option" data-correct="false">C) Memory requirements</div>
+            <div class="quiz-option" data-correct="false">D) Data storage</div>
         </div>
     </div>
 
@@ -1181,10 +1181,10 @@ Where:
 
         <div class="quiz-container">
             <div class="quiz-question">Quiz: What is the main advantage of multi-head attention?</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">A) Faster computation</div>
-            <div class="quiz-option" onclick="checkAnswer(this, true)">B) Captures different types of relationships simultaneously</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">C) Uses less memory</div>
-            <div class="quiz-option" onclick="checkAnswer(this, false)">D) Simpler to implement</div>
+            <div class="quiz-option" data-correct="false">A) Faster computation</div>
+            <div class="quiz-option" data-correct="true">B) Captures different types of relationships simultaneously</div>
+            <div class="quiz-option" data-correct="false">C) Uses less memory</div>
+            <div class="quiz-option" data-correct="false">D) Simpler to implement</div>
         </div>
     </div>
 
@@ -1338,6 +1338,7 @@ Where:
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
 <script>
 let currentSection = 'intro';
 const sections = ['intro', 'workflow', 'text-repr', 'embeddings', 'sentiment', 'seq2seq', 'transformers', 'attention', 'applications'];
@@ -1824,36 +1825,6 @@ function answerQuestion() {
     `;
 }
 
-function checkAnswer(element, isCorrect) {
-    if (!element.dataset.originalText) {
-        element.dataset.originalText = element.textContent.trim();
-    }
-    
-    element.parentNode.querySelectorAll('.quiz-option').forEach(option => {
-        option.classList.remove('correct', 'incorrect');
-        if (option.dataset.originalText) {
-            option.textContent = option.dataset.originalText;
-        }
-    });
-    
-    if (isCorrect) {
-        element.classList.add('correct');
-        element.textContent = element.dataset.originalText + ' ✅ Correct!';
-    } else {
-        element.classList.add('incorrect');
-        element.textContent = element.dataset.originalText + ' ❌ Incorrect';
-        
-        const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-            .find(option => {
-                const onclickStr = option.getAttribute('onclick') || '';
-                return onclickStr.includes('true');
-            });
-        if (correctOption) {
-            correctOption.classList.add('correct');
-            correctOption.textContent = correctOption.dataset.originalText + ' ✅ Correct Answer';
-        }
-    }
-}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {

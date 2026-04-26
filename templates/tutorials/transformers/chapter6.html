@@ -1,42 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 6: Residual Connections & Layer Normalization - Transformer Architecture Deep Dive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 6: Residual Connections & Layer Normalization - Transformer Architecture Deep Dive' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/transformers/transformers.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/transformers" class="course-link">
-                    <span>Transformer Architecture Deep Dive</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 6: Residual Connections & Layer Normalization</h1>
@@ -537,180 +508,108 @@ def ffn_sublayer(x, ffn_fn, layer_norm):
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: What is the main purpose of residual connections?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To reduce parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To enable gradient flow and preserve information through deep networks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To add non-linearity</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To normalize activations</div>
+                                <div class="quiz-option" data-correct="false">A) To reduce parameters</div>
+                                <div class="quiz-option" data-correct="true">B) To enable gradient flow and preserve information through deep networks</div>
+                                <div class="quiz-option" data-correct="false">C) To add non-linearity</div>
+                                <div class="quiz-option" data-correct="false">D) To normalize activations</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What does layer normalization normalize across?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Batch dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Feature dimension (for each token independently)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Sequence dimension</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) All dimensions</div>
+                                <div class="quiz-option" data-correct="false">A) Batch dimension</div>
+                                <div class="quiz-option" data-correct="true">B) Feature dimension (for each token independently)</div>
+                                <div class="quiz-option" data-correct="false">C) Sequence dimension</div>
+                                <div class="quiz-option" data-correct="false">D) All dimensions</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: In pre-norm architecture, where is layer normalization applied?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Before the sublayer (attention or FFN)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) After the sublayer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Both before and after</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Not used in pre-norm</div>
+                                <div class="quiz-option" data-correct="true">A) Before the sublayer (attention or FFN)</div>
+                                <div class="quiz-option" data-correct="false">B) After the sublayer</div>
+                                <div class="quiz-option" data-correct="false">C) Both before and after</div>
+                                <div class="quiz-option" data-correct="false">D) Not used in pre-norm</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: What is the formula for layer normalization?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) \(LayerNorm(x) = \gamma \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta\) where μ and σ are mean and std across features, γ and β are learnable parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) \(LayerNorm(x) = x\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) \(LayerNorm(x) = x - \mu\)</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) \(LayerNorm(x) = \mu\)</div>
+                                <div class="quiz-option" data-correct="true">A) \(LayerNorm(x) = \gamma \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta\) where μ and σ are mean and std across features, γ and β are learnable parameters</div>
+                                <div class="quiz-option" data-correct="false">B) \(LayerNorm(x) = x\)</div>
+                                <div class="quiz-option" data-correct="false">C) \(LayerNorm(x) = x - \mu\)</div>
+                                <div class="quiz-option" data-correct="false">D) \(LayerNorm(x) = \mu\)</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: Why are residual connections important in transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Residual connections allow gradients to flow directly through layers, preventing vanishing gradients, enabling training of very deep networks, and allowing layers to learn residual mappings</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They reduce parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They make it faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They're not important</div>
+                                <div class="quiz-option" data-correct="true">A) Residual connections allow gradients to flow directly through layers, preventing vanishing gradients, enabling training of very deep networks, and allowing layers to learn residual mappings</div>
+                                <div class="quiz-option" data-correct="false">B) They reduce parameters</div>
+                                <div class="quiz-option" data-correct="false">C) They make it faster</div>
+                                <div class="quiz-option" data-correct="false">D) They're not important</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: What is the difference between pre-norm and post-norm in transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-norm applies layer norm before sublayers (more stable, common in modern transformers), post-norm applies after sublayers (original Transformer). Pre-norm generally trains better for deep networks</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Post-norm is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Pre-norm is never used</div>
+                                <div class="quiz-option" data-correct="true">A) Pre-norm applies layer norm before sublayers (more stable, common in modern transformers), post-norm applies after sublayers (original Transformer). Pre-norm generally trains better for deep networks</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Post-norm is always better</div>
+                                <div class="quiz-option" data-correct="false">D) Pre-norm is never used</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: How does layer normalization differ from batch normalization?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Layer norm normalizes across features for each sample independently, while batch norm normalizes across batch dimension. Layer norm works better for sequences and variable batch sizes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're identical</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Batch norm is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Layer norm normalizes batches</div>
+                                <div class="quiz-option" data-correct="true">A) Layer norm normalizes across features for each sample independently, while batch norm normalizes across batch dimension. Layer norm works better for sequences and variable batch sizes</div>
+                                <div class="quiz-option" data-correct="false">B) They're identical</div>
+                                <div class="quiz-option" data-correct="false">C) Batch norm is always better</div>
+                                <div class="quiz-option" data-correct="false">D) Layer norm normalizes batches</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: What happens if you remove residual connections from transformers?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Gradients vanish in deep networks, training becomes unstable, and the model struggles to learn effectively, especially with many layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Nothing changes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It improves</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It becomes faster</div>
+                                <div class="quiz-option" data-correct="true">A) Gradients vanish in deep networks, training becomes unstable, and the model struggles to learn effectively, especially with many layers</div>
+                                <div class="quiz-option" data-correct="false">B) Nothing changes</div>
+                                <div class="quiz-option" data-correct="false">C) It improves</div>
+                                <div class="quiz-option" data-correct="false">D) It becomes faster</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: How would you implement residual connection and layer norm?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) For pre-norm: x_norm = LayerNorm(x), output = x + Sublayer(x_norm). For post-norm: output = LayerNorm(x + Sublayer(x)). Compute mean and std, normalize, scale and shift with learnable parameters</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Just add x</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Just normalize</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Random operations</div>
+                                <div class="quiz-option" data-correct="true">A) For pre-norm: x_norm = LayerNorm(x), output = x + Sublayer(x_norm). For post-norm: output = LayerNorm(x + Sublayer(x)). Compute mean and std, normalize, scale and shift with learnable parameters</div>
+                                <div class="quiz-option" data-correct="false">B) Just add x</div>
+                                <div class="quiz-option" data-correct="false">C) Just normalize</div>
+                                <div class="quiz-option" data-correct="false">D) Random operations</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: Why is epsilon added in layer normalization formula?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Epsilon (small constant like 1e-5) prevents division by zero when variance is very small, ensuring numerical stability during computation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) To increase variance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To decrease variance</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It's not needed</div>
+                                <div class="quiz-option" data-correct="true">A) Epsilon (small constant like 1e-5) prevents division by zero when variance is very small, ensuring numerical stability during computation</div>
+                                <div class="quiz-option" data-correct="false">B) To increase variance</div>
+                                <div class="quiz-option" data-correct="false">C) To decrease variance</div>
+                                <div class="quiz-option" data-correct="false">D) It's not needed</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: How do residual connections help with gradient flow?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Residual connections create direct paths for gradients to flow backward, allowing gradients to bypass layers and reach earlier layers without being multiplied many times, preventing vanishing gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They block gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) They don't affect gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) They only help forward pass</div>
+                                <div class="quiz-option" data-correct="true">A) Residual connections create direct paths for gradients to flow backward, allowing gradients to bypass layers and reach earlier layers without being multiplied many times, preventing vanishing gradients</div>
+                                <div class="quiz-option" data-correct="false">B) They block gradients</div>
+                                <div class="quiz-option" data-correct="false">C) They don't affect gradients</div>
+                                <div class="quiz-option" data-correct="false">D) They only help forward pass</div>
                             </div>
                             
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: What is the complete transformer block structure with residual and norm?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Pre-norm: x = x + Attention(LayerNorm(x)), x = x + FFN(LayerNorm(x)). Post-norm: x = LayerNorm(x + Attention(x)), x = LayerNorm(x + FFN(x)). Both use residual connections</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) No residual connections</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) No layer norm</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Sequential without connections</div>
+                                <div class="quiz-option" data-correct="true">A) Pre-norm: x = x + Attention(LayerNorm(x)), x = x + FFN(LayerNorm(x)). Post-norm: x = LayerNorm(x + Attention(x)), x = LayerNorm(x + FFN(x)). Both use residual connections</div>
+                                <div class="quiz-option" data-correct="false">B) No residual connections</div>
+                                <div class="quiz-option" data-correct="false">C) No layer norm</div>
+                                <div class="quiz-option" data-correct="false">D) Sequential without connections</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
+<!-- KaTeX for math rendering -->
+{% endblock %}
 
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/transformers" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/transformers/chapter5" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Chapter 5</a>
-                <a href="/tutorials/transformers/chapter7" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 7 →</a>
-            </div>
-        </div>
-    </footer>
-    
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-            
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/transformers/shared-tutorial.js') }}"></script>
+{% endblock %}
