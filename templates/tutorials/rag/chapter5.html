@@ -580,8 +580,8 @@ class HybridRetriever:
         
         Args:
             documents: List of document strings to index
-            alpha: Weight for sparse retrieval (1-alpha for dense)
-                  alpha=0.7 means 70% sparse, 30% dense
+            alpha: Weight for dense retrieval (1-alpha for sparse)
+                  alpha=0.7 means 70% dense, 30% sparse
         """
         if not documents:
             raise ValueError("Documents list cannot be empty")
@@ -632,8 +632,8 @@ class HybridRetriever:
             sparse_scores = self._normalize(sparse_scores)
         
         # Step 4: Combine scores
-        # alpha * sparse + (1-alpha) * dense
-        hybrid_scores = self.alpha * sparse_scores + (1 - self.alpha) * dense_scores
+        # alpha * dense + (1-alpha) * sparse
+        hybrid_scores = self.alpha * dense_scores + (1 - self.alpha) * sparse_scores
         
         # Step 5: Get top-k
         top_indices = np.argsort(hybrid_scores)[-top_k:][::-1]
