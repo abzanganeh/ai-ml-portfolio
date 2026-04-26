@@ -324,9 +324,9 @@ def test_dedicated_tutorial_templates_are_not_standalone_documents(template_path
     html = template_path.read_text(encoding="utf-8")
 
     assert "<!DOCTYPE html" not in html
-    assert "<html" not in html
-    assert "<head" not in html
-    assert "<body" not in html
+    assert re.search(r"<\s*html(?:\s|>)", html) is None
+    assert re.search(r"<\s*head(?:\s|>)", html) is None
+    assert re.search(r"<\s*body(?:\s|>)", html) is None
 
 
 @pytest.mark.parametrize(
