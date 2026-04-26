@@ -1,6 +1,6 @@
 /**
  * Universal Quiz Handler for All Tutorials
- * Works with both onclick="checkAnswer(this, true/false)" and data-correct="true/false" patterns
+ * Works with both legacy onclick="checkAnswer(this, true/false)" and data-correct="true/false" patterns.
  */
 
 // Universal checkAnswer function - works with onclick pattern
@@ -11,7 +11,7 @@ function checkAnswer(element, isCorrect) {
     }
     
     // Store original text for all options before modifying
-    const questionContainer = element.closest('.quiz-question') || element.closest('.enhanced-quiz-container');
+    const questionContainer = element.closest('.enhanced-quiz-container') || element.closest('.quiz-question') || element.closest('.quiz-container');
     if (!questionContainer) {
         console.error('Quiz question container not found for element:', element);
         return;
@@ -84,7 +84,7 @@ function handleQuizAnswer(selectedOption, isCorrect) {
         isCorrect = selectedOption.dataset.correct === 'true';
     }
     
-    const quizContainer = selectedOption.closest('.enhanced-quiz-container') || selectedOption.closest('.quiz-question');
+    const quizContainer = selectedOption.closest('.enhanced-quiz-container') || selectedOption.closest('.quiz-question') || selectedOption.closest('.quiz-container');
     if (!quizContainer) {
         console.error('Quiz container not found');
         return;
@@ -115,10 +115,10 @@ function handleQuizAnswer(selectedOption, isCorrect) {
     // Mark selected option
     if (isCorrect) {
         selectedOption.classList.add('correct');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' ✅ Correct!';
+        selectedOption.textContent = selectedOption.dataset.originalText + ' Correct!';
     } else {
         selectedOption.classList.add('incorrect');
-        selectedOption.textContent = selectedOption.dataset.originalText + ' ❌ Incorrect';
+        selectedOption.textContent = selectedOption.dataset.originalText + ' Incorrect';
         
         // Find and mark correct answer
         const correctOption = Array.from(options).find(option => {
@@ -136,7 +136,7 @@ function handleQuizAnswer(selectedOption, isCorrect) {
         
         if (correctOption) {
             correctOption.classList.add('correct');
-            correctOption.textContent = correctOption.dataset.originalText + ' ✅ Correct Answer';
+            correctOption.textContent = correctOption.dataset.originalText + ' Correct Answer';
         }
     }
     
@@ -153,8 +153,8 @@ function handleQuizAnswer(selectedOption, isCorrect) {
 
 // Initialize quizzes on page load - auto-detect pattern
 function initializeQuizzes() {
-    // Initialize enhanced-quiz-option pattern (data-correct)
-    document.querySelectorAll('.enhanced-quiz-option').forEach(option => {
+    // Initialize shared data-correct pattern for both current and legacy quiz markup.
+    document.querySelectorAll('.enhanced-quiz-option[data-correct], .quiz-option[data-correct]').forEach(option => {
         if (!option.dataset.originalText) {
             option.dataset.originalText = option.textContent.trim();
         }
@@ -169,8 +169,7 @@ function initializeQuizzes() {
         });
     });
     
-    // Initialize quiz-option pattern (onclick) - ensure checkAnswer is available globally
-    // The onclick handlers should already be in place, but we ensure the function exists
+    // Keep the legacy onclick entrypoints available while older pages migrate.
     window.checkAnswer = checkAnswer;
     window.handleQuizAnswer = handleQuizAnswer;
 }

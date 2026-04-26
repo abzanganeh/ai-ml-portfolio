@@ -136,7 +136,7 @@ The website is automatically deployed using GitHub Actions. Push changes to the 
 ## Contact
 
 **Alireza Barzin Zanganeh**  
-ML Engineer & Data Scientist  
+Software Engineer | ML & Data Pipeline Development  
 - **Website**: [zanganehai.com](https://www.zanganehai.com)
 - **GitHub**: [abzanganeh](https://github.com/abzanganeh)
 - **LinkedIn**: [linkedin.com/in/alireza-barzin-zanganeh](https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126)
