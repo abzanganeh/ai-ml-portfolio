@@ -45,6 +45,29 @@ The first cleanup pass has addressed several items from this review:
 
 Remaining work still includes deeper content review, fully implemented visualizations/labs, broader formula audits, presentation mode, and manual browser QA.
 
+## Execution Workflow
+
+Each major tutorial cleanup slice should run on its own branch, with commits and pushes made as soon as the slice is coherent and tested.
+
+- Do not leave tutorial migration work on `main`.
+- Create a focused branch before changing a tutorial family, shared template, or QA rule.
+- Commit after each logical slice: shell infrastructure, one migrated family, one concept-correctness pass, one formula pass, or one QA guardrail update.
+- Push completed branches to GitHub after local checks pass.
+- Keep generated files such as `.DS_Store` and `__pycache__` out of commits.
+
+Recommended branch sequence:
+
+1. `tutorial-canonical-shell`
+2. `tutorial-migrate-coding-interview`
+3. `tutorial-migrate-ml-fundamentals`
+4. `tutorial-migrate-ml-model-relationships`
+5. `tutorial-migrate-decision-trees`
+6. `tutorial-migrate-clustering`
+7. `tutorial-migrate-deep-learning-courses`
+8. `tutorial-migrate-single-page-tutorials`
+9. `tutorial-content-correctness-pass`
+10. `tutorial-qa-guardrails`
+
 ## Current Format Findings
 
 ### Template Structure
