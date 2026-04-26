@@ -1,51 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 4: Backpropagation Algorithm - Neural Networks Fundamentals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-    <!-- Prism.js for code syntax highlighting -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+{% extends "tutorials/shared/legacy_chapter_shell.html" %}
+{% set legacy_chapter_title = 'Chapter 4: Backpropagation Algorithm - Neural Networks Fundamentals' %}
+{% set legacy_chapter_needs_prism = true %}
 
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/neural-networks/neural-networks.css') }}">
+{% endblock %}
 
-</head>
-<body>
-    <header class="azbn-header">
-        <nav class="azbn-nav">
-            <div class="azbn-container">
-                <a href="/tutorials/neural-networks" class="course-link">
-                    <span>Neural Networks Fundamentals</span>
-                </a>
-                <div class="azbn-links">
-                    <a href="/">Home</a>
-                    <a href="/#about">About</a>
-                    <a href="/tutorials/">Tutorials</a>
-                    <a href="/#projects">Projects</a>
-                    <a href="/contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="main-content">
+{% block legacy_chapter_content %}
+<div class="main-content">
         <div class="tutorial-header">
             <div class="azbn-container">
                 <h1 class="chapter-title">Chapter 4: Backpropagation Algorithm</h1>
                 <p class="chapter-subtitle">The Learning Mechanism - Understanding how neural networks learn by computing gradients and updating weights</p>
-                
+
                 <div class="chapter-progress">
                     <div class="chapter-progress-fill" data-progress="50"></div>
                 </div>
-                
+
                 <div class="chapter-navigation">
                     <a href="/tutorials/neural-networks/chapter1" class="chapter-nav-btn">Chapter 1</a>
                     <a href="/tutorials/neural-networks/chapter2" class="chapter-nav-btn">Chapter 2</a>
@@ -56,11 +27,11 @@
                     <a href="/tutorials/neural-networks/chapter7" class="chapter-nav-btn">Chapter 7</a>
                     <a href="/tutorials/neural-networks/chapter8" class="chapter-nav-btn">Chapter 8</a>
                 </div>
-                
+
                 <div class="section-progress">
                     <div class="section-progress-fill" data-progress="12.5"></div>
                 </div>
-                
+
                 <div class="section-nav">
                     <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
                     <button class="section-nav-btn azbn-btn" data-section="chain">Chain Rule</button>
@@ -91,11 +62,11 @@
                 <main class="chapter-main-content">
                     <div id="overview" class="content-section active">
                         <h2>What is Backpropagation?</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>The Learning Algorithm</h3>
                             <p><strong>Backpropagation (backward propagation of errors) is the algorithm that enables neural networks to learn.</strong> It computes gradients of the loss function with respect to each weight and bias, allowing the network to update its parameters and improve predictions.</p>
-                            
+
                             <p><strong>The Process:</strong></p>
                             <ol>
                                 <li><strong>Forward Pass:</strong> Compute predictions using current weights</li>
@@ -120,7 +91,7 @@
                         </div>
 
                         <h3>Why "Backward"?</h3>
-                        
+
                         <div class="explanation-box">
                             <p><strong>Backpropagation works backward through the network because:</strong></p>
                             <ul>
@@ -134,7 +105,7 @@
 
                     <div id="chain" class="content-section">
                         <h2>The Chain Rule: Foundation of Backpropagation</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>🔗 Mathematical Foundation</h3>
                             <p><strong>The chain rule from calculus is the mathematical foundation of backpropagation.</strong> It allows us to compute derivatives of composite functions, which is exactly what neural networks are!</p>
@@ -142,12 +113,12 @@
 
                         <div class="formula-box">
                             <h4>Chain Rule for Single Variable</h4>
-                            
+
                             <div class="formula-display">
                                 <p><strong>If y = f(g(x)), then:</strong></p>
                                 <strong>dy/dx = (df/dg) × (dg/dx)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Intuition:</h5>
                                 <p>To find how y changes with x, we need to know:</p>
@@ -175,12 +146,12 @@
                         <div class="formula-box">
                             <h4>Chain Rule for Multiple Variables</h4>
                             <p><strong>For neural networks, we need the multivariable chain rule:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <p><strong>If z = f(x, y) where x = g(t) and y = h(t), then:</strong></p>
                                 <strong>dz/dt = (∂f/∂x)(dx/dt) + (∂f/∂y)(dy/dt)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>In Neural Networks:</h5>
                                 <ul>
@@ -231,21 +202,21 @@ print(f"dy/dx = {dy_dx}")
 
                     <div id="loss" class="content-section">
                         <h2>Loss Functions: Measuring Error</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>📏 What is a Loss Function?</h3>
                             <p><strong>A loss function measures how wrong our predictions are.</strong> It quantifies the difference between predicted and actual values. The goal of training is to minimize this loss.</p>
                         </div>
 
                         <h3>Common Loss Functions</h3>
-                        
+
                         <div class="formula-box">
                             <h4>1. Mean Squared Error (MSE) - For Regression</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>L = (1/n) Σ<sub>i=1</sub><sup>n</sup> (y_pred - y_true)²</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Properties:</h5>
                                 <ul>
@@ -259,15 +230,15 @@ print(f"dy/dx = {dy_dx}")
 
                         <div class="formula-box">
                             <h4>2. Cross-Entropy Loss - For Classification</h4>
-                            
+
                             <div class="formula-display">
                                 <p><strong>Binary Cross-Entropy:</strong></p>
                                 <strong>L = -(1/n) Σ<sub>i=1</sub><sup>n</sup> [ y_true log(y_pred) + (1 - y_true) log(1 - y_pred) ]</strong>
-                                
+
                                 <p style="margin-top: 1rem;"><strong>Multi-class Cross-Entropy:</strong></p>
                                 <strong>L = -(1/n) Σ<sub>i=1</sub><sup>n</sup> Σ<sub>c=1</sub><sup>C</sup> y_true,c log(y_pred,c)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Why Cross-Entropy?</h5>
                                 <ul>
@@ -286,7 +257,7 @@ print(f"dy/dx = {dy_dx}")
 def mse_loss(y_pred, y_true):
     """
     Mean Squared Error
-    
+
     Parameters:
     y_pred: Predicted values (n_samples,)
     y_true: True values (n_samples,)
@@ -300,7 +271,7 @@ def mse_loss_derivative(y_pred, y_true):
 def binary_cross_entropy(y_pred, y_true, epsilon=1e-15):
     """
     Binary Cross-Entropy Loss
-    
+
     Parameters:
     y_pred: Predicted probabilities (n_samples,)
     y_true: True labels (0 or 1) (n_samples,)
@@ -318,7 +289,7 @@ def binary_cross_entropy_derivative(y_pred, y_true, epsilon=1e-15):
 def cross_entropy(y_pred, y_true, epsilon=1e-15):
     """
     Multi-class Cross-Entropy Loss
-    
+
     Parameters:
     y_pred: Predicted probabilities (n_samples, n_classes)
     y_true: True labels (one-hot encoded) (n_samples, n_classes)
@@ -339,22 +310,22 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
 
                     <div id="backward" class="content-section">
                         <h2>The Backward Pass: Computing Gradients</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>⬅️ Working Backward Through Layers</h3>
                             <p><strong>The backward pass computes gradients starting from the output layer and moving backward to the input layer.</strong> We use the chain rule to propagate errors through each layer.</p>
                         </div>
 
                         <h3>Step-by-Step Backward Pass</h3>
-                        
+
                         <div class="formula-box">
                             <h4>1. Output Layer Gradient</h4>
                             <p><strong>Start with the loss gradient at the output:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <strong>∂L/∂a⁽L⁾ = derivative of loss with respect to output</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>For MSE Loss:</h5>
                                 <ul>
@@ -367,11 +338,11 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                         <div class="formula-box">
                             <h4>2. Gradient Through Activation</h4>
                             <p><strong>Apply chain rule through activation function:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <strong>∂L/∂z⁽L⁾ = (∂L/∂a⁽L⁾) × f′(z⁽L⁾)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Example with Sigmoid:</h5>
                                 <ul>
@@ -384,12 +355,12 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                         <div class="formula-box">
                             <h4>3. Gradient for Weights and Biases</h4>
                             <p><strong>Compute gradients for parameters:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <strong>∂L/∂W⁽L⁾ = (∂L/∂z⁽L⁾) × (a⁽L⁻¹⁾)ᵀ</strong><br>
                                 <strong>∂L/∂b⁽L⁾ = Σ ∂L/∂z⁽L⁾</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Intuition:</h5>
                                 <ul>
@@ -402,11 +373,11 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                         <div class="formula-box">
                             <h4>4. Propagate to Previous Layer</h4>
                             <p><strong>Compute error for previous layer:</strong></p>
-                            
+
                             <div class="formula-display">
                                 <strong>∂L/∂a⁽L⁻¹⁾ = (W⁽L⁾)ᵀ × (∂L/∂z⁽L⁾)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>This becomes the error signal for layer L-1:</h5>
                                 <ul>
@@ -420,7 +391,7 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                         <div class="example-box">
                             <h4>Complete Example: 2-Layer Network</h4>
                             <p><strong>Network:</strong> 2 inputs → 3 hidden → 1 output</p>
-                            
+
                             <p><strong>Forward Pass (already computed):</strong></p>
                             <ul>
                                 <li>a⁽⁰⁾ = [0.5, 0.8] (input)</li>
@@ -429,9 +400,9 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
                                 <li>z⁽²⁾ = 1.076 (output pre-activation)</li>
                                 <li>a⁽²⁾ = 0.746 (output, using sigmoid)</li>
                             </ul>
-                            
+
                             <p><strong>True value:</strong> y_true = 1.0</p>
-                            
+
                             <p><strong>Backward Pass:</strong></p>
                             <ol>
                                 <li><strong>Output layer error:</strong> ∂L/∂a⁽²⁾ = a⁽²⁾ - y_true = 0.746 - 1.0 = -0.254</li>
@@ -446,32 +417,32 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
 
                     <div id="gradients" class="content-section">
                         <h2>Gradient Computation: The Math</h2>
-                        
+
                         <div class="formula-box">
                             <h4>Complete Gradient Formulas</h4>
                             <p><strong>For a network with L layers:</strong></p>
-                            
+
                             <p><strong>Output Layer (L):</strong></p>
                             <div class="formula-display">
                                 <strong>δ⁽L⁾ = (∂L/∂a⁽L⁾) ⊙ f′⁽L⁾(z⁽L⁾)</strong>
                             </div>
                             <p>Where ⊙ is element-wise multiplication</p>
-                            
+
                             <p><strong>Hidden Layers (l = L-1, L-2, ..., 1):</strong></p>
                             <div class="formula-display">
                                 <strong>δ⁽ˡ⁾ = ((W⁽ˡ⁺¹⁾)ᵀ × δ⁽ˡ⁺¹⁾) ⊙ f′⁽ˡ⁾(z⁽ˡ⁾)</strong>
                             </div>
-                            
+
                             <p><strong>Weight Gradients:</strong></p>
                             <div class="formula-display">
                                 <strong>∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ × (a⁽ˡ⁻¹⁾)ᵀ</strong>
                             </div>
-                            
+
                             <p><strong>Bias Gradients:</strong></p>
                             <div class="formula-display">
                                 <strong>∂L/∂b⁽ˡ⁾ = δ⁽ˡ⁾ (sum over batch dimension)</strong>
                             </div>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Notation:</h5>
                                 <ul>
@@ -488,20 +459,20 @@ print(f"BCE: {binary_cross_entropy(y_pred_cls, y_true_cls):.4f}")</code></pre>
 
 class NeuralNetwork:
     """Neural Network with Backpropagation"""
-    
+
     def __init__(self, layer_sizes, activation='relu'):
         self.layer_sizes = layer_sizes
         self.activation = activation
         self.weights = []
         self.biases = []
-        
+
         # Initialize weights (He initialization for ReLU)
         for i in range(len(layer_sizes) - 1):
             W = np.random.randn(layer_sizes[i+1], layer_sizes[i]) * np.sqrt(2.0 / layer_sizes[i])
             b = np.zeros((layer_sizes[i+1], 1))
             self.weights.append(W)
             self.biases.append(b)
-    
+
     def _activate(self, z):
         """Activation function"""
         if self.activation == 'relu':
@@ -510,7 +481,7 @@ class NeuralNetwork:
             z = np.clip(z, -250, 250)
             return 1 / (1 + np.exp(-z))
         return z
-    
+
     def _activate_derivative(self, z):
         """Derivative of activation function"""
         if self.activation == 'relu':
@@ -519,66 +490,66 @@ class NeuralNetwork:
             s = self._activate(z)
             return s * (1 - s)
         return np.ones_like(z)
-    
+
     def forward(self, X):
         """Forward propagation"""
         activations = [X]
         z_values = []
         current = X
-        
+
         for W, b in zip(self.weights, self.biases):
             z = np.dot(W, current) + b
             z_values.append(z)
             a = self._activate(z)
             activations.append(a)
             current = a
-        
+
         return activations, z_values
-    
+
     def backward(self, X, y_true, activations, z_values):
         """
         Backpropagation
-        
+
         Returns gradients for weights and biases
         """
         m = X.shape[1]  # batch size
         grads_W = []
         grads_b = []
-        
+
         # Output layer error
         a_L = activations[-1]
         delta = a_L - y_true  # For MSE loss
-        
+
         # Backpropagate through layers
         for l in range(len(self.weights) - 1, -1, -1):
             # Gradient through activation
             delta = delta * self._activate_derivative(z_values[l])
-            
+
             # Weight and bias gradients
             grad_W = np.dot(delta, activations[l].T) / m
             grad_b = np.sum(delta, axis=1, keepdims=True) / m
-            
+
             grads_W.insert(0, grad_W)
             grads_b.insert(0, grad_b)
-            
+
             # Propagate error to previous layer (if not first layer)
             if l > 0:
                 delta = np.dot(self.weights[l].T, delta)
-        
+
         return grads_W, grads_b
-    
+
     def update_weights(self, grads_W, grads_b, learning_rate=0.01):
         """Update weights using gradients"""
         for i in range(len(self.weights)):
             self.weights[i] -= learning_rate * grads_W[i]
             self.biases[i] -= learning_rate * grads_b[i]
-    
+
     def train_step(self, X, y_true, learning_rate=0.01):
         """One training step: forward + backward + update"""
         activations, z_values = self.forward(X)
         grads_W, grads_b = self.backward(X, y_true, activations, z_values)
         self.update_weights(grads_W, grads_b, learning_rate)
-        
+
         # Return loss
         loss = np.mean((activations[-1] - y_true)**2)
         return loss
@@ -598,7 +569,7 @@ for epoch in range(100):
 
                     <div id="update" class="content-section">
                         <h2>Weight Updates: Gradient Descent</h2>
-                        
+
                         <div class="explanation-box">
                             <h3>⬇️ Minimizing the Loss</h3>
                             <p><strong>Once we have gradients, we update weights to reduce the loss.</strong> We move in the direction opposite to the gradient (gradient descent).</p>
@@ -606,14 +577,14 @@ for epoch in range(100):
 
                         <div class="formula-box">
                             <h4>Gradient Descent Update Rule</h4>
-                            
+
                             <div class="formula-display">
                                 <strong>W ← W - η × (∂L/∂W)</strong><br>
                                 <strong>b ← b - η × (∂L/∂b)</strong>
                             </div>
-                            
+
                             <p>Where <strong>η</strong> (eta) is the learning rate</p>
-                            
+
                             <div class="formula-explanation">
                                 <h5>Why Subtract?</h5>
                                 <ul>
@@ -644,7 +615,7 @@ for epoch in range(100):
 def train_network(network, X_train, y_train, epochs=1000, learning_rate=0.01):
     """
     Complete training loop
-    
+
     Parameters:
     network: NeuralNetwork instance
     X_train: Training inputs (n_features, n_samples)
@@ -653,25 +624,25 @@ def train_network(network, X_train, y_train, epochs=1000, learning_rate=0.01):
     learning_rate: Step size for gradient descent
     """
     losses = []
-    
+
     for epoch in range(epochs):
         # Forward pass
         activations, z_values = network.forward(X_train)
-        
+
         # Compute loss
         loss = np.mean((activations[-1] - y_train)**2)
         losses.append(loss)
-        
+
         # Backward pass
         grads_W, grads_b = network.backward(X_train, y_train, activations, z_values)
-        
+
         # Update weights
         network.update_weights(grads_W, grads_b, learning_rate)
-        
+
         # Print progress
         if epoch % 100 == 0:
             print(f"Epoch {epoch}, Loss: {loss:.6f}")
-    
+
     return losses
 
 # Example: Learn XOR function
@@ -691,20 +662,20 @@ print("True values:", y.flatten())</code></pre>
 
                     <div id="implementation" class="content-section">
                         <h2>Complete Implementation</h2>
-                        
+
                         <div class="code-box">
                             <h4>Full Backpropagation Implementation</h4>
                             <pre><code class="language-python">import numpy as np
 
 class FeedforwardNetwork:
     """Complete Feedforward Network with Backpropagation"""
-    
+
     def __init__(self, layer_sizes, activation='relu', init_method='he'):
         self.layer_sizes = layer_sizes
         self.activation = activation
         self.weights = []
         self.biases = []
-        
+
         # Initialize
         for i in range(len(layer_sizes) - 1):
             n_in, n_out = layer_sizes[i], layer_sizes[i+1]
@@ -715,7 +686,7 @@ class FeedforwardNetwork:
             b = np.zeros((n_out, 1))
             self.weights.append(W)
             self.biases.append(b)
-    
+
     def _activate(self, z):
         if self.activation == 'relu':
             return np.maximum(0, z)
@@ -723,7 +694,7 @@ class FeedforwardNetwork:
             z = np.clip(z, -250, 250)
             return 1 / (1 + np.exp(-z))
         return z
-    
+
     def _activate_derivative(self, z):
         if self.activation == 'relu':
             return (z > 0).astype(float)
@@ -731,28 +702,28 @@ class FeedforwardNetwork:
             s = self._activate(z)
             return s * (1 - s)
         return np.ones_like(z)
-    
+
     def forward(self, X):
         """Forward propagation"""
         activations = [X]
         z_values = []
         current = X
-        
+
         for W, b in zip(self.weights, self.biases):
             z = np.dot(W, current) + b
             z_values.append(z)
             a = self._activate(z)
             activations.append(a)
             current = a
-        
+
         return activations, z_values
-    
+
     def backward(self, X, y_true, activations, z_values, loss='mse'):
         """Backpropagation"""
         m = X.shape[1]  # batch size
         grads_W = []
         grads_b = []
-        
+
         # Output layer error (depends on loss function)
         a_L = activations[-1]
         if loss == 'mse':
@@ -760,31 +731,31 @@ class FeedforwardNetwork:
         elif loss == 'cross_entropy':
             # For cross-entropy with sigmoid output
             delta = (a_L - y_true) / m
-        
+
         # Backpropagate
         for l in range(len(self.weights) - 1, -1, -1):
             # Gradient through activation
             delta = delta * self._activate_derivative(z_values[l])
-            
+
             # Compute gradients
             grad_W = np.dot(delta, activations[l].T)
             grad_b = np.sum(delta, axis=1, keepdims=True)
-            
+
             grads_W.insert(0, grad_W)
             grads_b.insert(0, grad_b)
-            
+
             # Propagate to previous layer
             if l > 0:
                 delta = np.dot(self.weights[l].T, delta)
-        
+
         return grads_W, grads_b
-    
+
     def update(self, grads_W, grads_b, learning_rate):
         """Update weights"""
         for i in range(len(self.weights)):
             self.weights[i] -= learning_rate * grads_W[i]
             self.biases[i] -= learning_rate * grads_b[i]
-    
+
     def train(self, X, y, epochs=1000, learning_rate=0.01, verbose=True):
         """Training loop"""
         losses = []
@@ -792,13 +763,13 @@ class FeedforwardNetwork:
             activations, z_values = self.forward(X)
             loss = np.mean((activations[-1] - y)**2)
             losses.append(loss)
-            
+
             grads_W, grads_b = self.backward(X, y, activations, z_values)
             self.update(grads_W, grads_b, learning_rate)
-            
+
             if verbose and epoch % (epochs // 10) == 0:
                 print(f"Epoch {epoch}: Loss = {loss:.6f}")
-        
+
         return losses
 
 # Usage example
@@ -812,111 +783,122 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
 
                     <div id="quiz" class="content-section">
                         <h2>Test Your Understanding</h2>
-                        
+
                         <div class="quiz-container">
                             <div class="quiz-question">
                                 <h3>Question 1: Why is backpropagation called "backward" propagation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) Because it's slower than forward propagation</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) Because it computes gradients starting from the output layer and moving backward to the input</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Because it reverses the network architecture</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Because it's done after forward propagation</div>
+                                <div class="quiz-option" data-correct="false">A) Because it's slower than forward propagation</div>
+                                <div class="quiz-option" data-correct="true">B) Because it computes gradients starting from the output layer and moving backward to the input</div>
+                                <div class="quiz-option" data-correct="false">C) Because it reverses the network architecture</div>
+                                <div class="quiz-option" data-correct="false">D) Because it's done after forward propagation</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 2: What mathematical principle is backpropagation based on?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Chain rule from calculus</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Matrix multiplication</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Linear algebra</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Probability theory</div>
+                                <div class="quiz-option" data-correct="true">A) Chain rule from calculus</div>
+                                <div class="quiz-option" data-correct="false">B) Matrix multiplication</div>
+                                <div class="quiz-option" data-correct="false">C) Linear algebra</div>
+                                <div class="quiz-option" data-correct="false">D) Probability theory</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 3: In gradient descent, why do we subtract the gradient from weights?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">A) To increase the loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">B) To move in the direction that decreases the loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) To normalize the weights</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To prevent overfitting</div>
+                                <div class="quiz-option" data-correct="false">A) To increase the loss</div>
+                                <div class="quiz-option" data-correct="true">B) To move in the direction that decreases the loss</div>
+                                <div class="quiz-option" data-correct="false">C) To normalize the weights</div>
+                                <div class="quiz-option" data-correct="false">D) To prevent overfitting</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 4: Explain how backpropagation uses the chain rule.</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The chain rule lets us compute gradients layer by layer. We start with the output layer gradient, then multiply by each layer's derivative going backward, chaining the gradients together to get the final weight updates</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) It multiplies all gradients at once</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) It only uses the output gradient</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It doesn't use chain rule</div>
+                                <div class="quiz-option" data-correct="true">A) The chain rule lets us compute gradients layer by layer. We start with the output layer gradient, then multiply by each layer's derivative going backward, chaining the gradients together to get the final weight updates</div>
+                                <div class="quiz-option" data-correct="false">B) It multiplies all gradients at once</div>
+                                <div class="quiz-option" data-correct="false">C) It only uses the output gradient</div>
+                                <div class="quiz-option" data-correct="false">D) It doesn't use chain rule</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 5: What happens if the learning rate is too large during gradient descent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) The network overshoots the optimal weights, causing loss to increase or oscillate, and may never converge</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Training becomes faster</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Nothing changes</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) It prevents overfitting</div>
+                                <div class="quiz-option" data-correct="true">A) The network overshoots the optimal weights, causing loss to increase or oscillate, and may never converge</div>
+                                <div class="quiz-option" data-correct="false">B) Training becomes faster</div>
+                                <div class="quiz-option" data-correct="false">C) Nothing changes</div>
+                                <div class="quiz-option" data-correct="false">D) It prevents overfitting</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 6: How do you compute the gradient for a weight in the hidden layer?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Multiply the error from the next layer by the activation derivative and the input to that weight, then propagate backward using chain rule</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Use only the output error</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Random value</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Same as output layer</div>
+                                <div class="quiz-option" data-correct="true">A) Multiply the error from the next layer by the activation derivative and the input to that weight, then propagate backward using chain rule</div>
+                                <div class="quiz-option" data-correct="false">B) Use only the output error</div>
+                                <div class="quiz-option" data-correct="false">C) Random value</div>
+                                <div class="quiz-option" data-correct="false">D) Same as output layer</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 7: What is the formula for updating weights using gradient descent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) W_new = W_old - α(∂L/∂W) where α is learning rate and L is loss</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) W_new = W_old + α</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) W_new = α × W_old</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) W_new = W_old × (∂L/∂W)</div>
+                                <div class="quiz-option" data-correct="true">A) W_new = W_old - α(∂L/∂W) where α is learning rate and L is loss</div>
+                                <div class="quiz-option" data-correct="false">B) W_new = W_old + α</div>
+                                <div class="quiz-option" data-correct="false">C) W_new = α × W_old</div>
+                                <div class="quiz-option" data-correct="false">D) W_new = W_old × (∂L/∂W)</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 8: Why do we need to store activations during forward propagation for backpropagation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) We need the activations to compute the derivatives of the activation functions and to multiply with gradients when applying the chain rule</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're not needed</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Only for debugging</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) To save memory</div>
+                                <div class="quiz-option" data-correct="true">A) We need the activations to compute the derivatives of the activation functions and to multiply with gradients when applying the chain rule</div>
+                                <div class="quiz-option" data-correct="false">B) They're not needed</div>
+                                <div class="quiz-option" data-correct="false">C) Only for debugging</div>
+                                <div class="quiz-option" data-correct="false">D) To save memory</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 9: What is the difference between batch gradient descent and stochastic gradient descent?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Batch uses all training examples to compute gradient before updating weights, while stochastic updates weights after each single example, making it faster but noisier</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) They're the same</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Batch is always better</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Stochastic uses all data</div>
+                                <div class="quiz-option" data-correct="true">A) Batch uses all training examples to compute gradient before updating weights, while stochastic updates weights after each single example, making it faster but noisier</div>
+                                <div class="quiz-option" data-correct="false">B) They're the same</div>
+                                <div class="quiz-option" data-correct="false">C) Batch is always better</div>
+                                <div class="quiz-option" data-correct="false">D) Stochastic uses all data</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 10: How does backpropagation handle bias gradients?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Bias gradients are computed similarly to weight gradients, but since bias is added (not multiplied), its gradient is just the error signal from the next layer</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Biases don't have gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Same as weight gradients</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Biases are not updated</div>
+                                <div class="quiz-option" data-correct="true">A) Bias gradients are computed similarly to weight gradients, but since bias is added (not multiplied), its gradient is just the error signal from the next layer</div>
+                                <div class="quiz-option" data-correct="false">B) Biases don't have gradients</div>
+                                <div class="quiz-option" data-correct="false">C) Same as weight gradients</div>
+                                <div class="quiz-option" data-correct="false">D) Biases are not updated</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 11: What causes vanishing gradients in deep networks?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) When gradients become extremely small as they propagate backward through many layers, often due to activation functions with small derivatives like sigmoid, causing early layers to learn very slowly</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Too many neurons</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Large learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Too much data</div>
+                                <div class="quiz-option" data-correct="true">A) When gradients become extremely small as they propagate backward through many layers, often due to activation functions with small derivatives like sigmoid, causing early layers to learn very slowly</div>
+                                <div class="quiz-option" data-correct="false">B) Too many neurons</div>
+                                <div class="quiz-option" data-correct="false">C) Large learning rate</div>
+                                <div class="quiz-option" data-correct="false">D) Too much data</div>
                             </div>
-                            
+
                             <div class="quiz-question" style="margin-top: 2rem;">
                                 <h3>Question 12: How would you debug a network that's not learning during backpropagation?</h3>
-                                <div class="quiz-option" onclick="checkAnswer(this, true)">A) Check gradient magnitudes (should not be zero or extremely small), verify loss is decreasing, check learning rate, inspect weight updates, ensure activations are in reasonable range, verify backprop implementation is correct</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">B) Increase learning rate</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">C) Add more layers</div>
-                                <div class="quiz-option" onclick="checkAnswer(this, false)">D) Use more data</div>
+                                <div class="quiz-option" data-correct="true">A) Check gradient magnitudes (should not be zero or extremely small), verify loss is decreasing, check learning rate, inspect weight updates, ensure activations are in reasonable range, verify backprop implementation is correct</div>
+                                <div class="quiz-option" data-correct="false">B) Increase learning rate</div>
+                                <div class="quiz-option" data-correct="false">C) Add more layers</div>
+                                <div class="quiz-option" data-correct="false">D) Use more data</div>
                             </div>
                         </div>
                     </div>
                 </main>
             </div>
         </section>
-    </main>
+    </div>
 
-    <script>
+
+        <!-- KaTeX for math rendering -->
+
+
+
+
+    <!-- Footer Navigation -->
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
+<script>
         document.querySelectorAll('.section-nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const section = this.dataset.section;
@@ -930,85 +912,5 @@ losses = network.train(X, y, epochs=1000, learning_rate=0.5)</code></pre>
             });
         });
 
-        function checkAnswer(element, isCorrect) {
-            element.parentNode.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('correct', 'incorrect');
-            });
-            if (isCorrect) {
-                element.classList.add('correct');
-                element.textContent += ' ✓ Correct!';
-            } else {
-                element.classList.add('incorrect');
-                element.textContent += ' ✗ Incorrect';
-                const correctOption = Array.from(element.parentNode.querySelectorAll('.quiz-option'))
-                    .find(opt => {
-                        const onclick = opt.getAttribute('onclick') || '';
-                        return onclick.includes('true');
-                    });
-                if (correctOption && !correctOption.classList.contains('incorrect')) {
-                    correctOption.classList.add('correct');
-                    correctOption.textContent += ' ✓ Correct Answer';
-                }
-            }
-        }
-    </script>
-        <!-- KaTeX for math rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/tutorials/shared-quiz.js') }}?v=2"></script>
-<script src="{{ url_for('static', filename='js/tutorials/neural-networks/shared-tutorial.js') }}"></script>
-    <!-- Footer Navigation -->
-    <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 3rem; border-top: 2px solid #5B7553;">
-        <div class="azbn-container" style="text-align: center;">
-            <button onclick="scrollToSectionNav()" class="azbn-btn" style="margin: 0.5rem;">
-                ↑ Back to Section Navigation
-            </button>
-            <div style="margin-top: 1.5rem;">
-                <a href="/tutorials/neural-networks" class="azbn-btn azbn-secondary" style="text-decoration: none; margin: 0.5rem;">← Back to Tutorial</a>
-                <a href="/tutorials/neural-networks/chapter5" class="azbn-btn" style="text-decoration: none; margin: 0.5rem;">Chapter 5 →</a>
-            </div>
-        </div>
-    </footer>
-    
-    <script>
-        function scrollToSectionNav() {
-            const sectionNav = document.querySelector('.section-nav');
-            if (sectionNav) {
-                sectionNav.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-// Initialize KaTeX rendering - ensure KaTeX is loaded first
-        function initKaTeX() {
-            if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "\\[", right: "\\]", display: true},
-                        {left: "$", right: "$", display: false},
-                        {left: "\\(", right: "\\)", display: false}
-                    ],
-                    throwOnError: false
-                });
-            } else {
-                // Retry if KaTeX not loaded yet
-                setTimeout(initKaTeX, 100);
-                return;
-            }
-            
-            // Initialize Prism.js syntax highlighting
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        }
-        
-        // Wait for DOM and KaTeX to be ready
-        if (document.readyState === 'loading') {
-            document.addEventListener("DOMContentLoaded", initKaTeX);
-        } else {
-            // DOM already loaded, wait for KaTeX
-            initKaTeX();
-        }
-    </script>
-</body>
-</html>
+            </script>
+{% endblock %}
