@@ -212,7 +212,7 @@ PROJECTS_DATA = [
             'recall': '78.9%',
             'f1_score': '80.4%'
         },
-        'github_url': 'https://github.com/abzanganeh/titanic-survival',
+        'github_url': None,
         'demo_url': None,
         'featured': True,
         'image_url': '/static/images/projects/titanic-survival.png',
