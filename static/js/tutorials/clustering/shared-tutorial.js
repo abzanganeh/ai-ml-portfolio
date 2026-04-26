@@ -1687,7 +1687,7 @@ class ClusteringPresentationMode {
 }
 
 function initializeDynamicLabs() {
-    const placeholders = Array.from(document.querySelectorAll('.visualization-placeholder'));
+    const placeholders = Array.from(document.querySelectorAll('.tutorial-template-lab__planned'));
 
     placeholders.forEach((placeholder, index) => {
         new ClusteringDynamicLab(placeholder, index + 1).initialize();

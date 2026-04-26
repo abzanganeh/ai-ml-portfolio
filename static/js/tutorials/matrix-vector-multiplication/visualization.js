@@ -165,7 +165,7 @@ class MatrixVectorVisualization {
         const determinant = this.matrix.a11 * this.matrix.a22 - this.matrix.a12 * this.matrix.a21;
         document.getElementById('determinant').textContent = determinant.toFixed(2);
         
-        // Calculate angle of transformation
+        // Show the polar direction of the transformed vector, not a matrix-wide rotation angle.
         const angle = Math.atan2(this.transformedVector.y, this.transformedVector.x) * 180 / Math.PI;
         document.getElementById('angle').textContent = `${angle.toFixed(0)}°`;
     }

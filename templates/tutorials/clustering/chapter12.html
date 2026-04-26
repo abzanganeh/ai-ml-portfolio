@@ -58,20 +58,6 @@
             <div class="azbn-container">
 
                 <!-- Learning Objectives -->
-                <div class="learning-objectives-box">
-                    <h2>Learning Objectives</h2>
-                    <ul>
-                        <li>Understand the probabilistic foundation of Gaussian Mixture Models</li>
-                        <li>Master multivariate Gaussian distributions and mixture model theory</li>
-                        <li>Learn the Expectation-Maximization (EM) algorithm step by step</li>
-                        <li>Analyze convergence properties and parameter estimation</li>
-                        <li>Explore model selection techniques for determining optimal components</li>
-                        <li>Compare GMMs with hard clustering methods like K-means</li>
-                        <li>Apply GMMs to real-world probabilistic clustering problems</li>
-                        <li>Understand soft clustering and uncertainty quantification</li>
-                    </ul>
-                </div>
-
                 <!-- Main Content Area -->
                 <main class="chapter-main-content">
                     <!-- Introduction Section -->
@@ -128,7 +114,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: Hard vs Soft Clustering</h4>
                                 <p><strong>Interactive Comparison:</strong> Side-by-side view showing K-means hard assignments vs GMM soft assignments on the same dataset. The GMM visualization shows probability contours and uncertainty regions, while K-means shows discrete cluster boundaries. Points are colored by their strongest cluster membership but with transparency indicating uncertainty.</p>
                             </div>
@@ -219,10 +205,10 @@
                         <h3>Multivariate Gaussian Distribution</h3>
                         <p>The building block of GMMs is the multivariate Gaussian distribution, which generalizes the familiar bell curve to multiple dimensions.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>Multivariate Gaussian Probability Density</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For a d-dimensional vector <strong>x</strong> with mean <strong>μ</strong> and covariance matrix <strong>Σ</strong>:</p>
                                 <strong>{% raw %}𝒩(x|μ, Σ) = (2π)^(-d/2) |Σ|^(-1/2) exp(-½(x-μ)ᵀΣ⁻¹(x-μ)){% endraw %}</strong>
                             </div>
@@ -241,10 +227,10 @@
                         <h3>Mixture Model Formulation</h3>
                         <p>A Gaussian Mixture Model combines multiple Gaussian distributions with mixing weights to model complex data distributions.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>GMM Probability Density</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>A mixture of K Gaussian components:</p>
                                 <strong>{% raw %}p(x) = Σᵢ₌₁ᴷ πᵢ 𝒩(x|μᵢ, Σᵢ){% endraw %}</strong>
                             </div>
@@ -260,7 +246,7 @@
                             </div>
                             
                             <h4>Posterior Probabilities (Responsibilities)</h4>
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>Probability that point x belongs to component k:</p>
                                 <strong>{% raw %}γ(zₖ) = πₖ𝒩(x|μₖ, Σₖ) / Σⱼ₌₁ᴷ πⱼ𝒩(x|μⱼ, Σⱼ){% endraw %}</strong>
                             </div>
@@ -268,7 +254,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: GMM Components and Mixing</h4>
                                 <p><strong>Interactive 3D Surface:</strong> Shows individual Gaussian components and their weighted combination forming the mixture distribution. Users can adjust mixing weights and see how the overall distribution changes. Includes 2D contour plots showing how different covariance matrices create different cluster shapes.</p>
                             </div>
@@ -277,15 +263,15 @@
                         <h3>Likelihood and Log-Likelihood</h3>
                         <p>Parameter estimation in GMMs relies on maximizing the likelihood of the observed data under the model.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>Likelihood Functions</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For N data points, the likelihood is:</p>
                                 <strong>{% raw %}L(θ) = ∏ᵢ₌₁ᴺ p(xᵢ|θ) = ∏ᵢ₌₁ᴺ Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ){% endraw %}</strong>
                             </div>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>Log-likelihood (easier to optimize):</p>
                                 <strong>{% raw %}ℓ(θ) = Σᵢ₌₁ᴺ log(Σₖ₌₁ᴷ πₖ𝒩(xᵢ|μₖ, Σₖ)){% endraw %}</strong>
                             </div>
@@ -325,10 +311,10 @@
                         <h3>E-Step: Computing Responsibilities</h3>
                         <p>The Expectation step computes the posterior probability that each data point belongs to each component.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>E-Step Computations</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <p>For each data point xᵢ and component k, compute:</p>
                                 <strong>{% raw %}γᵢₖ⁽ᵗ⁾ = πₖ⁽ᵗ⁻¹⁾𝒩(xᵢ|μₖ⁽ᵗ⁻¹⁾, Σₖ⁽ᵗ⁻¹⁾) / Σⱼ₌₁ᴷ πⱼ⁽ᵗ⁻¹⁾𝒩(xᵢ|μⱼ⁽ᵗ⁻¹⁾, Σⱼ⁽ᵗ⁻¹⁾){% endraw %}</strong>
                             </div>
@@ -347,32 +333,32 @@
                         <h3>M-Step: Parameter Updates</h3>
                         <p>The Maximization step updates model parameters using the computed responsibilities as weighted assignments.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>M-Step Parameter Updates</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Effective Sample Size:</h5>
                                 <strong>{% raw %}Nₖ⁽ᵗ⁾ = Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾{% endraw %}</strong>
                             </div>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Mixing Weights:</h5>
                                 <strong>{% raw %}πₖ⁽ᵗ⁾ = Nₖ⁽ᵗ⁾ / n{% endraw %}</strong>
                             </div>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Means:</h5>
                                 <strong>{% raw %}μₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ xᵢ{% endraw %}</strong>
                             </div>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Covariances:</h5>
                                 <strong>{% raw %}Σₖ⁽ᵗ⁾ = (1/Nₖ⁽ᵗ⁾) Σᵢ₌₁ⁿ γᵢₖ⁽ᵗ⁾ (xᵢ - μₖ⁽ᵗ⁾)(xᵢ - μₖ⁽ᵗ⁾)ᵀ{% endraw %}</strong>
                             </div>
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: EM Algorithm Iterations</h4>
                                 <p><strong>Animated EM Process:</strong> Step-by-step visualization showing how EM converges. Shows initial random parameters, then alternates between E-step (updating point colors/transparency based on responsibilities) and M-step (moving cluster centers and reshaping ellipses). Includes log-likelihood plot showing monotonic increase.</p>
                             </div>
@@ -493,7 +479,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: Convergence Analysis</h4>
                                 <p><strong>Multi-panel Dashboard:</strong> Shows log-likelihood progression, parameter trajectories, and responsibility evolution during EM iterations. Includes examples of good convergence, local maxima trapping, and numerical issues. Users can adjust initialization and see different convergence behaviors.</p>
                             </div>
@@ -530,15 +516,15 @@
                         <h3>Information Criteria</h3>
                         <p>Information criteria balance model fit with complexity by penalizing the number of parameters.</p>
 
-                        <div class="formula-box">
+                        <div class="tutorial-template-card tutorial-template-formula">
                             <h4>Model Selection Criteria</h4>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Akaike Information Criterion (AIC):</h5>
                                 <strong>{% raw %}AIC = -2ℓ(θ̂) + 2p{% endraw %}</strong>
                             </div>
                             
-                            <div class="formula-display">
+                            <div class="tutorial-template-formula__display">
                                 <h5>Bayesian Information Criterion (BIC):</h5>
                                 <strong>{% raw %}BIC = -2ℓ(θ̂) + p log(n){% endraw %}</strong>
                             </div>
@@ -556,7 +542,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: Model Selection Curves</h4>
                                 <p><strong>Interactive Model Selection:</strong> Shows log-likelihood, AIC, and BIC curves as functions of K. Users can see how different criteria suggest different optimal values. Includes visualization of fitted models for different K values to show underfitting and overfitting effects.</p>
                             </div>
@@ -709,7 +695,7 @@
                         </div>
 
                         <div class="image-container">
-                            <div class="visualization-placeholder">
+                            <div class="tutorial-template-lab__planned">
                                 <h4>Visualization: Method Comparison on Various Datasets</h4>
                                 <p><strong>Multi-Algorithm Comparison:</strong> Shows GMM, K-means, and DBSCAN results on different synthetic datasets: (1) Well-separated spherical clusters, (2) Overlapping elliptical clusters, (3) Clusters with different densities, (4) Non-convex shapes. Demonstrates each method's strengths and limitations.</p>
                             </div>
@@ -783,7 +769,7 @@
                             </div>
                             
                             <div class="demo-visualization">
-                                <div id="gmm-demo-canvas" class="visualization-placeholder">
+                                <div id="gmm-demo-canvas" class="tutorial-template-lab__planned">
                                     <h4>Interactive GMM Visualization</h4>
                                     <p>Shows probability contours, data points with soft assignments</p>
                                     <p><em>Ellipses show 1σ, 2σ confidence regions • Point transparency indicates membership probability</em></p>
@@ -820,7 +806,7 @@
                             
                             <div class="demo-layout">
                                 <div class="demo-visualization">
-                                    <div id="em-demo-canvas" class="visualization-placeholder">
+                                    <div id="em-demo-canvas" class="tutorial-template-lab__planned">
                                         <h4>EM Algorithm Progress</h4>
                                         <p>Watch clusters evolve through iterations</p>
                                     </div>

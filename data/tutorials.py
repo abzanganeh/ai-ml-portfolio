@@ -12,7 +12,7 @@ TUTORIALS_DATA = [
         'has_dedicated_template': True,
         'template_path': 'tutorials/nlp/index.html',
         'published': True,
-        'excerpt': 'Master NLP concepts through 8 interactive sections covering tokenization, sentiment analysis, and more.',
+        'excerpt': 'Master NLP concepts through 9 interactive sections covering tokenization, sentiment analysis, and more.',
         'tags': 'nlp, text-processing, sentiment-analysis, language-models'
     },
     {
