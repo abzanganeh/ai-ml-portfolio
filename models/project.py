@@ -5,6 +5,8 @@ import json
 # Use the same db instance as tutorials
 from models.tutorial import db
 
+DISABLED_CODE_PROJECTS: set[str] = {"titanic-survival"}
+
 class Project(db.Model):
     __tablename__ = 'projects'
     
@@ -75,6 +77,14 @@ class Project(db.Model):
         if self.image_url:
             return self.image_url
         return f"/static/images/projects/{self.name}.jpg"
+
+    @property
+    def code_repository_disabled(self) -> bool:
+        return self.name in DISABLED_CODE_PROJECTS
+
+    @property
+    def has_code_repository(self) -> bool:
+        return bool(self.github_url) and not self.code_repository_disabled
     
     def to_dict(self):
         """Convert project to dictionary"""
@@ -98,5 +108,7 @@ class Project(db.Model):
             'has_dedicated_template': self.has_dedicated_template,
             'template_path': self.template_path,
             'url': self.url,
-            'image_url': self.default_image_url
+            'image_url': self.default_image_url,
+            'code_repository_disabled': self.code_repository_disabled,
+            'has_code_repository': self.has_code_repository
         }
