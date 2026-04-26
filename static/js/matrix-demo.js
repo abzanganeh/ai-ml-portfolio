@@ -177,7 +177,12 @@ class VectorWorldDemo {
     
     draw() {
         // Update animation progress for eigenvector demo
-        if (this.currentMode === 'eigen' && this.currentStep > 0) {
+        if (this.currentMode === 'eigen' && [1, 2, 4].includes(this.currentStep)) {
+            this.animationProgress += this.animationSpeed;
+            if (this.animationProgress > 1) {
+                this.animationProgress = 0;
+            }
+        } else if (this.currentMode === 'eigen' && this.currentStep > 0) {
             this.animationProgress += this.animationSpeed;
             if (this.animationProgress > 1) {
                 this.animationProgress = 1;
@@ -948,573 +953,367 @@ class VectorWorldDemo {
     drawEigenDemo() {
         const lambda1 = 3;
         const lambda2 = 1;
-        
-        // Clear canvas
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = '#111827';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawGrid();
-        
+        this.drawEigenHeader();
+
         switch (this.currentStep) {
             case 0:
-                // What are eigenvectors? - Clear explanation with visual
                 this.drawEigenvectorConcept();
                 break;
-                
             case 1:
-                // Visual transformation - Show before/after clearly
                 this.drawTransformationComparison();
                 break;
-                
             case 2:
-                // Find eigenvector directions - Interactive discovery
                 this.drawEigenvectorDiscovery(lambda1, lambda2);
                 break;
-                
             case 3:
-                // Calculate eigenvalues - Step-by-step calculation
                 this.drawEigenvalueCalculation(lambda1, lambda2);
                 break;
-                
             case 4:
-                // Mathematical proof - Show Av = λv in action
                 this.drawMathematicalProof(lambda1, lambda2);
                 break;
-                
             case 5:
-                // Real-world applications - PCA, PageRank, etc.
                 this.drawRealWorldApplications();
                 break;
         }
     }
-    
+
+    drawEigenHeader() {
+        const title = this.demoModes.eigen.steps[this.currentStep] || 'Eigenvectors and Eigenvalues';
+        this.drawPanel(32, 24, this.canvas.width - 64, 72, 'rgba(17, 24, 39, 0.92)', '#334155');
+        this.ctx.fillStyle = '#f8fafc';
+        this.ctx.font = 'bold 24px Arial';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`Step ${this.currentStep + 1}: ${title}`, 56, 58);
+        this.ctx.fillStyle = '#94a3b8';
+        this.ctx.font = '14px Arial';
+        this.ctx.fillText('Matrix A = [[2, 1], [1, 2]]   |   Eigenvectors: [1, 1] and [1, -1]', 56, 82);
+    }
+
     drawEigenvectorConcept() {
-        // Title
-        this.ctx.fillStyle = '#fff';
+        this.drawPanel(48, 128, 350, 310, 'rgba(15, 23, 42, 0.9)', '#2563eb');
+        this.drawTextBlock(72, 166, [
+            { text: 'What makes a vector special?', color: '#38bdf8', font: 'bold 20px Arial' },
+            { text: 'Most vectors rotate or tilt when A transforms them.', color: '#e5e7eb' },
+            { text: 'Eigenvectors keep the same line of direction.', color: '#e5e7eb' },
+            { text: 'Only their length changes by a scaling factor.', color: '#e5e7eb' },
+            { text: 'That scaling factor is the eigenvalue.', color: '#e5e7eb' },
+        ], 27);
+
+        this.drawPanel(48, 468, 350, 190, 'rgba(15, 23, 42, 0.86)', '#7c3aed');
+        this.drawTextBlock(72, 504, [
+            { text: 'Why ML cares', color: '#c084fc', font: 'bold 18px Arial' },
+            { text: 'PCA uses eigenvectors as principal directions.', color: '#f8fafc' },
+            { text: 'PageRank uses eigenvectors to score importance.', color: '#f8fafc' },
+            { text: 'Many models look for stable directions in data.', color: '#f8fafc' },
+        ], 27);
+
+        this.drawDirectionComparisonScene();
+    }
+
+    drawTransformationComparison() {
+        const progress = this.easeInOut(this.animationProgress);
+        this.drawPanel(48, 124, 285, 150, 'rgba(15, 23, 42, 0.9)', '#0ea5e9');
+        this.drawTextBlock(72, 160, [
+            { text: 'Before to after', color: '#38bdf8', font: 'bold 20px Arial' },
+            { text: 'The moving arrow shows Av as A is applied.', color: '#e5e7eb' },
+            { text: 'Red vector changes direction.', color: '#f87171' },
+            { text: 'Green vector keeps its direction.', color: '#4ade80' },
+        ], 27);
+
+        this.drawEigenLines(0.32);
+        const vectors = [
+            { x: 2, y: 1, color: '#ef4444', label: 'regular [2,1]' },
+            { x: 1, y: 1, color: '#22c55e', label: 'eigen [1,1]' },
+            { x: -1, y: 2, color: '#f59e0b', label: 'regular [-1,2]' },
+        ];
+
+        vectors.forEach((vector, index) => {
+            const transformed = this.applyEigenMatrix(vector);
+            const current = {
+                x: vector.x + (transformed.x - vector.x) * progress,
+                y: vector.y + (transformed.y - vector.y) * progress,
+            };
+
+            this.drawEigenVector(vector, vector.color, '', 0.35, 2);
+            this.drawTransformationTrail(vector, transformed, vector.color);
+            this.drawEigenVector(current, vector.color, vector.label, 1, 4);
+
+            if (index === 1) {
+                const point = this.toCanvasPoint(current);
+                this.drawBadge(point.x + 18, point.y - 46, 'same direction', '#22c55e');
+            }
+        });
+
+        this.drawProgressMeter(690, 132, progress, 'Transformation progress');
+    }
+
+    drawEigenvectorDiscovery(lambda1, lambda2) {
+        const progress = this.easeInOut(this.animationProgress);
+        this.drawPanel(48, 122, 330, 170, 'rgba(15, 23, 42, 0.9)', '#22c55e');
+        this.drawTextBlock(72, 158, [
+            { text: 'Finding the directions', color: '#4ade80', font: 'bold 20px Arial' },
+            { text: 'The dashed lines are the natural axes of A.', color: '#e5e7eb' },
+            { text: `[1, 1] scales by ${lambda1}.`, color: '#bbf7d0' },
+            { text: `[1, -1] scales by ${lambda2}.`, color: '#fecaca' },
+        ], 27);
+
+        this.drawEigenLines(0.72);
+
+        [
+            { x: 1, y: 1, color: '#22c55e', label: 'v1, lambda=3' },
+            { x: 1, y: -1, color: '#ef4444', label: 'v2, lambda=1' },
+        ].forEach((vector) => {
+            const transformed = this.applyEigenMatrix(vector);
+            const current = {
+                x: vector.x + (transformed.x - vector.x) * progress,
+                y: vector.y + (transformed.y - vector.y) * progress,
+            };
+            this.drawEigenVector(vector, vector.color, '', 0.28, 2);
+            this.drawEigenVector(current, vector.color, vector.label, 1, 5);
+        });
+
+        [
+            { x: 2, y: 1, color: '#60a5fa', label: 'tilts' },
+            { x: -1, y: 2, color: '#f59e0b', label: 'tilts' },
+        ].forEach((vector) => {
+            const transformed = this.applyEigenMatrix(vector);
+            const current = {
+                x: vector.x + (transformed.x - vector.x) * progress,
+                y: vector.y + (transformed.y - vector.y) * progress,
+            };
+            this.drawTransformationTrail(vector, transformed, vector.color);
+            this.drawEigenVector(current, vector.color, vector.label, 0.9, 3);
+        });
+    }
+
+    drawEigenvalueCalculation(lambda1, lambda2) {
+        this.drawPanel(48, 118, 420, 430, 'rgba(15, 23, 42, 0.92)', '#f59e0b');
+        this.drawTextBlock(72, 154, [
+            { text: 'Calculating eigenvalues', color: '#fbbf24', font: 'bold 20px Arial' },
+            { text: 'Characteristic equation: det(A - lambda I) = 0', color: '#67e8f9' },
+            { text: 'A - lambda I = [[2-lambda, 1], [1, 2-lambda]]', color: '#f8fafc' },
+            { text: 'det(A - lambda I) = (2-lambda)^2 - 1', color: '#f8fafc' },
+            { text: '= lambda^2 - 4lambda + 3', color: '#f8fafc' },
+            { text: 'lambda^2 - 4lambda + 3 = 0', color: '#fbbf24', font: 'bold 17px Arial' },
+            { text: '(lambda - 3)(lambda - 1) = 0', color: '#f8fafc' },
+            { text: `lambda1 = ${lambda1}, lambda2 = ${lambda2}`, color: '#4ade80', font: 'bold 18px Arial' },
+        ], 31);
+
+        this.drawEigenLines(0.45);
+        this.drawEigenVector({ x: 3, y: 3 }, '#22c55e', '3 x [1,1]', 1, 4);
+        this.drawEigenVector({ x: 1, y: -1 }, '#ef4444', '1 x [1,-1]', 1, 4);
+        this.drawBadge(610, 690, 'eigenvalues are scale factors', '#f59e0b');
+    }
+
+    drawMathematicalProof(lambda1, lambda2) {
+        const progress = this.easeInOut(this.animationProgress);
+        this.drawPanel(48, 118, 430, 485, 'rgba(15, 23, 42, 0.92)', '#22c55e');
+        this.drawTextBlock(72, 154, [
+            { text: 'Proof: Av = lambda v', color: '#86efac', font: 'bold 20px Arial' },
+            { text: `For v1 = [1, 1], lambda1 = ${lambda1}`, color: '#bbf7d0', font: 'bold 16px Arial' },
+            { text: 'A[1,1] = [2*1 + 1*1, 1*1 + 2*1]', color: '#f8fafc' },
+            { text: '= [3, 3] = 3[1, 1]', color: '#f8fafc' },
+            { text: `For v2 = [1, -1], lambda2 = ${lambda2}`, color: '#fecaca', font: 'bold 16px Arial' },
+            { text: 'A[1,-1] = [2*1 + 1*(-1), 1*1 + 2*(-1)]', color: '#f8fafc' },
+            { text: '= [1, -1] = 1[1, -1]', color: '#f8fafc' },
+            { text: 'Both vectors stay on their original lines.', color: '#67e8f9', font: 'bold 16px Arial' },
+        ], 31);
+
+        this.drawEigenLines(0.45);
+        [
+            { x: 1, y: 1, color: '#22c55e', label: 'v1 -> 3v1' },
+            { x: 1, y: -1, color: '#ef4444', label: 'v2 -> 1v2' },
+        ].forEach((vector) => {
+            const transformed = this.applyEigenMatrix(vector);
+            const current = {
+                x: vector.x + (transformed.x - vector.x) * progress,
+                y: vector.y + (transformed.y - vector.y) * progress,
+            };
+            this.drawEigenVector(vector, vector.color, '', 0.25, 2);
+            this.drawEigenVector(current, vector.color, vector.label, 1, 5);
+        });
+    }
+
+    drawRealWorldApplications() {
+        this.drawPanel(60, 126, 860, 540, 'rgba(15, 23, 42, 0.92)', '#38bdf8');
+        this.ctx.fillStyle = '#f8fafc';
         this.ctx.font = 'bold 24px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('🎯 What are Eigenvectors?', this.centerX, 50);
-        
-        // Main concept explanation
-        this.ctx.font = '18px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillStyle = '#4ecdc4';
-        this.ctx.fillText('Eigenvectors are SPECIAL vectors that:', 50, 100);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('✅ Keep their DIRECTION when transformed', 70, 130);
-        this.ctx.fillText('✅ Only get SCALED (stretched/shrunk)', 70, 155);
-        this.ctx.fillText('✅ Are the "natural axes" of the transformation', 70, 180);
-        
-        // Visual demonstration
-        this.ctx.fillStyle = '#ff6b35';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('Visual Example:', 50, 220);
-        
-        // Draw a regular vector that changes direction
-        this.ctx.strokeStyle = '#e74c3c';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX - 100, this.centerY - 50);
-        this.ctx.lineTo(this.centerX - 50, this.centerY - 100);
-        this.ctx.stroke();
-        
-        // Arrow for regular vector
-        this.drawArrow(this.centerX - 50, this.centerY - 100, this.centerX - 100, this.centerY - 50, '#e74c3c');
-        
-        this.ctx.fillStyle = '#e74c3c';
-        this.ctx.font = '14px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Regular vector', this.centerX - 75, this.centerY - 110);
-        this.ctx.fillText('changes direction', this.centerX - 75, this.centerY - 125);
-        
-        // Draw an eigenvector that keeps direction
-        this.ctx.strokeStyle = '#2ecc71';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX + 50, this.centerY - 50);
-        this.ctx.lineTo(this.centerX + 100, this.centerY - 100);
-        this.ctx.stroke();
-        
-        // Arrow for eigenvector
-        this.drawArrow(this.centerX + 100, this.centerY - 100, this.centerX + 50, this.centerY - 50, '#2ecc71');
-        
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText('Eigenvector', this.centerX + 75, this.centerY - 110);
-        this.ctx.fillText('keeps direction!', this.centerX + 75, this.centerY - 125);
-        
-        // Mathematical equation
-        this.ctx.fillStyle = '#f39c12';
-        this.ctx.font = 'bold 20px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Av = λv', this.centerX, 350);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('A = transformation matrix', this.centerX, 375);
-        this.ctx.fillText('v = eigenvector', this.centerX, 395);
-        this.ctx.fillText('λ = eigenvalue (scaling factor)', this.centerX, 415);
-        
-        // Why it matters
-        this.ctx.fillStyle = '#9b59b6';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Why this matters in ML:', 50, 460);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText('• Principal Component Analysis (PCA)', 70, 485);
-        this.ctx.fillText('• Google PageRank algorithm', 70, 505);
-        this.ctx.fillText('• Face recognition systems', 70, 525);
-        this.ctx.fillText('• Recommendation systems', 70, 545);
-    }
-    
-    drawTransformationSquishing() {
-        // Show multiple vectors being transformed to demonstrate squishing
-        const testVectors = [
-            { x: 2, y: 3, color: '#ff6b35', label: 'a', name: 'Vector A' },
-            { x: -1, y: 2, color: '#4ecdc4', label: 'b', name: 'Vector B' },
-            { x: 1, y: 1, color: '#9b59b6', label: 'v₁', name: 'Eigenvector v₁' },
-            { x: 1, y: -1, color: '#e74c3c', label: 'v₂', name: 'Eigenvector v₂' },
-            { x: 3, y: 2, color: '#f39c12', label: 'c', name: 'Vector C' }
+        this.ctx.fillText('Where eigenvectors show up', this.centerX, 168);
+
+        const cards = [
+            ['PCA', 'Finds the strongest directions of variation in data.', '#22c55e'],
+            ['PageRank', 'Scores web pages by stable importance flow.', '#60a5fa'],
+            ['Vibration analysis', 'Finds natural modes of mechanical systems.', '#f87171'],
+            ['Quantum mechanics', 'Represents stable states of operators.', '#c084fc'],
+            ['Machine learning', 'Supports compression, denoising, and embeddings.', '#f59e0b'],
         ];
-        
-        const progress = Math.min(1, this.animationProgress);
-        
-        testVectors.forEach((vec, index) => {
-            // Original vector
-            const originalEndX = this.centerX + vec.x * this.scale;
-            const originalEndY = this.centerY - vec.y * this.scale;
-            
-            // Transformed vector using matrix [[2,1],[1,2]]
-            const transformedX = 2 * vec.x + 1 * vec.y;
-            const transformedY = 1 * vec.x + 2 * vec.y;
-            const transformedEndX = this.centerX + transformedX * this.scale;
-            const transformedEndY = this.centerY - transformedY * this.scale;
-            
-            // Animate between original and transformed
-            const currentEndX = this.centerX + (vec.x + progress * (transformedX - vec.x)) * this.scale;
-            const currentEndY = this.centerY - (vec.y + progress * (transformedY - vec.y)) * this.scale;
-            
-            // Draw original vector (faded)
-            this.ctx.strokeStyle = vec.color + '40';
+
+        cards.forEach((card, index) => {
+            const col = index % 2;
+            const row = Math.floor(index / 2);
+            const x = 105 + col * 405;
+            const y = 215 + row * 120;
+            this.drawPanel(x, y, 350, 86, 'rgba(30, 41, 59, 0.88)', card[2]);
+            this.ctx.fillStyle = card[2];
+            this.ctx.font = 'bold 18px Arial';
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(card[0], x + 22, y + 32);
+            this.ctx.fillStyle = '#e5e7eb';
+            this.ctx.font = '14px Arial';
+            this.ctx.fillText(card[1], x + 22, y + 58);
+        });
+
+        this.drawBadge(330, 605, 'Core idea: find directions that stay stable under transformation', '#38bdf8');
+    }
+
+    drawDirectionComparisonScene() {
+        const regular = { x: 2, y: 1 };
+        const regularAfter = this.applyEigenMatrix(regular);
+        const eigen = { x: 1, y: 1 };
+        const eigenAfter = this.applyEigenMatrix(eigen);
+
+        this.drawPanel(445, 132, 440, 360, 'rgba(15, 23, 42, 0.72)', '#334155');
+        this.drawEigenVector(regular, '#ef4444', 'regular v', 0.35, 3);
+        this.drawTransformationTrail(regular, regularAfter, '#ef4444');
+        this.drawEigenVector({ x: 3.2, y: 2.4 }, '#ef4444', 'direction changes', 1, 4);
+        this.drawEigenVector(eigen, '#22c55e', 'eigen v', 0.35, 3);
+        this.drawEigenVector(eigenAfter, '#22c55e', 'same line, scaled', 1, 4);
+        this.drawBadge(605, 440, 'Av = lambda v', '#f59e0b');
+    }
+
+    drawEigenLines(alpha = 0.55) {
+        const lines = [
+            { vector: { x: 1, y: 1 }, color: `rgba(34, 197, 94, ${alpha})` },
+            { vector: { x: 1, y: -1 }, color: `rgba(239, 68, 68, ${alpha})` },
+        ];
+
+        lines.forEach((line) => {
+            const start = this.toCanvasPoint({ x: -7 * line.vector.x, y: -7 * line.vector.y });
+            const end = this.toCanvasPoint({ x: 7 * line.vector.x, y: 7 * line.vector.y });
+            this.ctx.strokeStyle = line.color;
             this.ctx.lineWidth = 3;
+            this.ctx.setLineDash([10, 8]);
             this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(originalEndX, originalEndY);
+            this.ctx.moveTo(start.x, start.y);
+            this.ctx.lineTo(end.x, end.y);
             this.ctx.stroke();
-            
-            // Draw transforming vector
-            this.ctx.strokeStyle = vec.color;
-            this.ctx.lineWidth = 4;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(currentEndX, currentEndY);
-            this.ctx.stroke();
-            
-            // Draw arrow head
-            this.drawArrowHead(this.centerX, this.centerY, currentEndX, currentEndY, vec.color);
-            
-            // Label
-            this.ctx.fillStyle = vec.color;
-            this.ctx.font = 'bold 14px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(vec.label, currentEndX + 20, currentEndY - 10);
+            this.ctx.setLineDash([]);
         });
-        
-        // Draw legend
-        this.drawLegend(testVectors);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Watch vectors transform...', 50, 100);
-        this.ctx.fillText('Notice how they seem to be pulled toward certain directions!', 50, 125);
-        this.ctx.fillText('These directions are the eigenvector lines', 50, 150);
     }
-    
-    drawLegend(vectors) {
-        // Draw legend in top-right corner
-        const legendX = this.canvas.width - 200;
-        const legendY = 50;
-        
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(legendX - 10, legendY - 10, 180, vectors.length * 25 + 20);
-        
-        this.ctx.fillStyle = '#fff';
+
+    drawEigenVector(vector, color, label = '', alpha = 1, width = 4) {
+        const end = this.toCanvasPoint(vector);
+        this.ctx.save();
+        this.ctx.globalAlpha = alpha;
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = width;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.centerX, this.centerY);
+        this.ctx.lineTo(end.x, end.y);
+        this.ctx.stroke();
+        this.drawArrowHead(this.centerX, this.centerY, end.x, end.y, color);
+        this.ctx.restore();
+
+        if (label) {
+            this.ctx.fillStyle = color;
+            this.ctx.font = 'bold 15px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(label, end.x + 42, end.y - 14);
+        }
+    }
+
+    drawTransformationTrail(fromVector, toVector, color) {
+        const from = this.toCanvasPoint(fromVector);
+        const to = this.toCanvasPoint(toVector);
+        this.ctx.strokeStyle = `${color}66`;
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([6, 6]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(from.x, from.y);
+        this.ctx.lineTo(to.x, to.y);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+    }
+
+    drawPanel(x, y, width, height, fill, stroke) {
+        this.ctx.save();
+        this.ctx.fillStyle = fill;
+        this.ctx.strokeStyle = stroke;
+        this.ctx.lineWidth = 1.5;
+        this.roundRect(x, y, width, height, 14);
+        this.ctx.fill();
+        this.ctx.stroke();
+        this.ctx.restore();
+    }
+
+    drawTextBlock(x, y, lines, lineHeight = 26) {
+        lines.forEach((line, index) => {
+            this.ctx.fillStyle = line.color || '#f8fafc';
+            this.ctx.font = line.font || '15px Arial';
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(line.text, x, y + index * lineHeight);
+        });
+    }
+
+    drawProgressMeter(x, y, progress, label) {
+        this.drawPanel(x, y, 210, 70, 'rgba(15, 23, 42, 0.9)', '#38bdf8');
+        this.ctx.fillStyle = '#e5e7eb';
+        this.ctx.font = '13px Arial';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(label, x + 16, y + 24);
+        this.ctx.fillStyle = '#334155';
+        this.ctx.fillRect(x + 16, y + 40, 178, 10);
+        this.ctx.fillStyle = '#38bdf8';
+        this.ctx.fillRect(x + 16, y + 40, 178 * progress, 10);
+    }
+
+    drawBadge(x, y, text, color) {
         this.ctx.font = 'bold 14px Arial';
+        const width = this.ctx.measureText(text).width + 28;
+        this.drawPanel(x, y, width, 34, 'rgba(15, 23, 42, 0.92)', color);
+        this.ctx.fillStyle = color;
         this.ctx.textAlign = 'left';
-        this.ctx.fillText('Vector Legend:', legendX, legendY);
-        
-        vectors.forEach((vec, index) => {
-            const y = legendY + 20 + index * 25;
-            
-            // Draw color square
-            this.ctx.fillStyle = vec.color;
-            this.ctx.fillRect(legendX, y - 8, 12, 12);
-            
-            // Draw label
-            this.ctx.fillStyle = '#fff';
-            this.ctx.font = '12px Arial';
-            this.ctx.fillText(vec.name, legendX + 18, y);
-        });
+        this.ctx.fillText(text, x + 14, y + 22);
     }
-    
-    drawEigenvectorLines(lambda1, lambda2) {
-        // Draw the eigenvector lines
-        const eigen1 = { x: 1, y: 1, color: '#9b59b6', name: 'Eigenvector v₁' };
-        const eigen2 = { x: 1, y: -1, color: '#e74c3c', name: 'Eigenvector v₂' };
-        
-        // Draw eigenvector lines extending beyond the grid
-        const lineLength = 8 * this.scale;
-        
-        // First eigenvector line (v₁ = [1,1])
-        this.ctx.strokeStyle = eigen1.color + '80';
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([15, 8]);
+
+    roundRect(x, y, width, height, radius) {
         this.ctx.beginPath();
-        const eigen1StartX = this.centerX - lineLength * Math.cos(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1StartY = this.centerY + lineLength * Math.sin(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1EndX = this.centerX + lineLength * Math.cos(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1EndY = this.centerY - lineLength * Math.sin(Math.atan2(eigen1.y, eigen1.x));
-        this.ctx.moveTo(eigen1StartX, eigen1StartY);
-        this.ctx.lineTo(eigen1EndX, eigen1EndY);
-        this.ctx.stroke();
-        
-        // Second eigenvector line (v₂ = [1,-1])
-        this.ctx.strokeStyle = eigen2.color + '80';
-        this.ctx.beginPath();
-        const eigen2StartX = this.centerX - lineLength * Math.cos(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2StartY = this.centerY + lineLength * Math.sin(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2EndX = this.centerX + lineLength * Math.cos(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2EndY = this.centerY - lineLength * Math.sin(Math.atan2(eigen2.y, eigen2.x));
-        this.ctx.moveTo(eigen2StartX, eigen2StartY);
-        this.ctx.lineTo(eigen2EndX, eigen2EndY);
-        this.ctx.stroke();
-        
-        this.ctx.setLineDash([]);
-        
-        // Show some vectors being transformed toward these lines with more dramatic motion
-        const testVectors = [
-            { x: 2, y: 3, color: '#ff6b35', label: 'a', name: 'Vector A' },
-            { x: -1, y: 2, color: '#4ecdc4', label: 'b', name: 'Vector B' },
-            { x: 3, y: 2, color: '#f39c12', label: 'c', name: 'Vector C' }
-        ];
-        
-        // Use a more dramatic animation curve
-        const progress = Math.min(1, this.animationProgress);
-        const easedProgress = progress * progress * (3 - 2 * progress); // Smooth step function
-        
-        testVectors.forEach((vec) => {
-            // Original vector
-            const originalEndX = this.centerX + vec.x * this.scale;
-            const originalEndY = this.centerY - vec.y * this.scale;
-            
-            // Transformed vector using matrix [[2,1],[1,2]]
-            const transformedX = 2 * vec.x + 1 * vec.y;
-            const transformedY = 1 * vec.x + 2 * vec.y;
-            const transformedEndX = this.centerX + transformedX * this.scale;
-            const transformedEndY = this.centerY - transformedY * this.scale;
-            
-            // Animate between original and transformed with eased motion
-            const currentEndX = this.centerX + (vec.x + easedProgress * (transformedX - vec.x)) * this.scale;
-            const currentEndY = this.centerY - (vec.y + easedProgress * (transformedY - vec.y)) * this.scale;
-            
-            // Draw trajectory line (squishing path)
-            this.ctx.strokeStyle = vec.color + '40';
-            this.ctx.lineWidth = 2;
-            this.ctx.setLineDash([5, 5]);
-            this.ctx.beginPath();
-            this.ctx.moveTo(originalEndX, originalEndY);
-            this.ctx.lineTo(transformedEndX, transformedEndY);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
-            
-            // Draw original vector (faded)
-            this.ctx.strokeStyle = vec.color + '40';
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(originalEndX, originalEndY);
-            this.ctx.stroke();
-            
-            // Draw transforming vector with pulsing effect
-            const pulse = 1 + 0.3 * Math.sin(this.animationProgress * Math.PI * 4);
-            this.ctx.strokeStyle = vec.color;
-            this.ctx.lineWidth = 3 + pulse;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(currentEndX, currentEndY);
-            this.ctx.stroke();
-            
-            this.drawArrowHead(this.centerX, this.centerY, currentEndX, currentEndY, vec.color);
-            
-            // Label with better positioning
-            this.ctx.fillStyle = vec.color;
-            this.ctx.font = 'bold 14px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(vec.label, currentEndX + 25, currentEndY - 10);
-        });
-        
-        // Draw legend
-        this.drawLegend([...testVectors, eigen1, eigen2]);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('These dashed lines are the eigenvector directions!', 50, 100);
-        this.ctx.fillText('Watch how vectors get "squished" onto these lines', 50, 125);
-        this.ctx.fillText('Purple line: v₁ = [1,1] direction', 50, 150);
-        this.ctx.fillText('Red line: v₂ = [1,-1] direction', 50, 175);
+        this.ctx.moveTo(x + radius, y);
+        this.ctx.lineTo(x + width - radius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.ctx.lineTo(x + width, y + height - radius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.ctx.lineTo(x + radius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.ctx.lineTo(x, y + radius);
+        this.ctx.quadraticCurveTo(x, y, x + radius, y);
+        this.ctx.closePath();
     }
-    
-    drawSquishingMotion(lambda1, lambda2) {
-        // Show vectors being squished onto eigenvector lines with dramatic motion
-        const eigen1 = { x: 1, y: 1, color: '#9b59b6', name: 'Eigenvector v₁' };
-        const eigen2 = { x: 1, y: -1, color: '#e74c3c', name: 'Eigenvector v₂' };
-        
-        // Draw eigenvector lines
-        const lineLength = 7 * this.scale;
-        
-        // First eigenvector line with animation
-        const lineProgress = Math.min(1, this.animationProgress * 2); // Draw lines first
-        this.ctx.strokeStyle = eigen1.color + '60';
-        this.ctx.lineWidth = 3 + 2 * lineProgress;
-        this.ctx.setLineDash([10, 6]);
-        this.ctx.beginPath();
-        const eigen1StartX = this.centerX - lineLength * Math.cos(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1StartY = this.centerY + lineLength * Math.sin(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1EndX = this.centerX + lineLength * Math.cos(Math.atan2(eigen1.y, eigen1.x));
-        const eigen1EndY = this.centerY - lineLength * Math.sin(Math.atan2(eigen1.y, eigen1.x));
-        this.ctx.moveTo(eigen1StartX, eigen1StartY);
-        this.ctx.lineTo(eigen1EndX, eigen1EndY);
-        this.ctx.stroke();
-        
-        // Second eigenvector line with animation
-        this.ctx.strokeStyle = eigen2.color + '60';
-        this.ctx.beginPath();
-        const eigen2StartX = this.centerX - lineLength * Math.cos(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2StartY = this.centerY + lineLength * Math.sin(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2EndX = this.centerX + lineLength * Math.cos(Math.atan2(eigen2.y, eigen2.x));
-        const eigen2EndY = this.centerY - lineLength * Math.sin(Math.atan2(eigen2.y, eigen2.x));
-        this.ctx.moveTo(eigen2StartX, eigen2StartY);
-        this.ctx.lineTo(eigen2EndX, eigen2EndY);
-        this.ctx.stroke();
-        
-        this.ctx.setLineDash([]);
-        
-        // Show vectors being squished with dramatic motion
-        const testVectors = [
-            { x: 2, y: 3, color: '#ff6b35', label: 'A', name: 'Vector A' },
-            { x: -1, y: 2, color: '#4ecdc4', label: 'B', name: 'Vector B' },
-            { x: 3, y: 1, color: '#f39c12', label: 'C', name: 'Vector C' },
-            { x: 0, y: 3, color: '#2ecc71', label: 'D', name: 'Vector D' }
-        ];
-        
-        const progress = Math.min(1, Math.max(0, this.animationProgress - 0.3)); // Start after lines appear
-        const easedProgress = 1 - Math.pow(1 - progress, 3); // Ease-out cubic for dramatic effect
-        
-        testVectors.forEach((vec, index) => {
-            // Original vector
-            const originalEndX = this.centerX + vec.x * this.scale;
-            const originalEndY = this.centerY - vec.y * this.scale;
-            
-            // Transformed vector using matrix [[2,1],[1,2]]
-            const transformedX = 2 * vec.x + 1 * vec.y;
-            const transformedY = 1 * vec.x + 2 * vec.y;
-            const transformedEndX = this.centerX + transformedX * this.scale;
-            const transformedEndY = this.centerY - transformedY * this.scale;
-            
-            // Animate between original and transformed with dramatic easing
-            const currentEndX = this.centerX + (vec.x + easedProgress * (transformedX - vec.x)) * this.scale;
-            const currentEndY = this.centerY - (vec.y + easedProgress * (transformedY - vec.y)) * this.scale;
-            
-            // Draw trajectory line showing the squishing path with animation
-            const trajectoryProgress = Math.min(1, this.animationProgress * 1.5);
-            this.ctx.strokeStyle = vec.color + '40';
-            this.ctx.lineWidth = 2;
-            this.ctx.setLineDash([8, 4]);
-            this.ctx.beginPath();
-            this.ctx.moveTo(originalEndX, originalEndY);
-            this.ctx.lineTo(transformedEndX, transformedEndY);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
-            
-            // Draw original vector (faded)
-            this.ctx.strokeStyle = vec.color + '50';
-            this.ctx.lineWidth = 2;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(originalEndX, originalEndY);
-            this.ctx.stroke();
-            
-            // Draw transforming vector with dramatic pulsing
-            const pulse = 1 + 0.5 * Math.sin(this.animationProgress * Math.PI * 6);
-            this.ctx.strokeStyle = vec.color;
-            this.ctx.lineWidth = 4 + pulse;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(currentEndX, currentEndY);
-            this.ctx.stroke();
-            
-            this.drawArrowHead(this.centerX, this.centerY, currentEndX, currentEndY, vec.color);
-            
-            // Label with better positioning
-            this.ctx.fillStyle = vec.color;
-            this.ctx.font = 'bold 16px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(vec.label, currentEndX + 30, currentEndY - 15);
-        });
-        
-        // Draw legend
-        this.drawLegend([...testVectors, eigen1, eigen2]);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('The squishing motion!', 50, 100);
-        this.ctx.fillText('Vectors get pulled toward eigenvector lines', 50, 125);
-        this.ctx.fillText('Notice the trajectory lines showing the squishing path', 50, 150);
-        this.ctx.fillText('This is the key insight of eigenvectors!', 50, 175);
+
+    applyEigenMatrix(vector) {
+        return {
+            x: this.transformationMatrix.a11 * vector.x + this.transformationMatrix.a12 * vector.y,
+            y: this.transformationMatrix.a21 * vector.x + this.transformationMatrix.a22 * vector.y,
+        };
     }
-    
-    drawEigenvectorScaling(lambda1, lambda2) {
-        // Show both eigenvectors with their eigenvalue scaling
-        const eigen1 = { x: 1, y: 1, color: '#9b59b6' };
-        const eigen2 = { x: 1, y: -1, color: '#e74c3c' };
-        
-        const progress = Math.min(1, this.animationProgress);
-        
-        // First eigenvector with scaling animation
-        const eigen1OriginalEndX = this.centerX + eigen1.x * this.scale;
-        const eigen1OriginalEndY = this.centerY - eigen1.y * this.scale;
-        const eigen1ScaledEndX = this.centerX + eigen1.x * lambda1 * this.scale;
-        const eigen1ScaledEndY = this.centerY - eigen1.y * lambda1 * this.scale;
-        
-        // Animate scaling
-        const eigen1CurrentEndX = this.centerX + eigen1.x * (1 + progress * (lambda1 - 1)) * this.scale;
-        const eigen1CurrentEndY = this.centerY - eigen1.y * (1 + progress * (lambda1 - 1)) * this.scale;
-        
-        // Draw first eigenvector
-        this.ctx.strokeStyle = eigen1.color + '60';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX, this.centerY);
-        this.ctx.lineTo(eigen1OriginalEndX, eigen1OriginalEndY);
-        this.ctx.stroke();
-        
-        this.ctx.strokeStyle = eigen1.color;
-        this.ctx.lineWidth = 4;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX, this.centerY);
-        this.ctx.lineTo(eigen1CurrentEndX, eigen1CurrentEndY);
-        this.ctx.stroke();
-        
-        this.drawArrowHead(this.centerX, this.centerY, eigen1CurrentEndX, eigen1CurrentEndY, eigen1.color);
-        
-        // Second eigenvector with scaling animation
-        const eigen2OriginalEndX = this.centerX + eigen2.x * this.scale;
-        const eigen2OriginalEndY = this.centerY - eigen2.y * this.scale;
-        const eigen2ScaledEndX = this.centerX + eigen2.x * lambda2 * this.scale;
-        const eigen2ScaledEndY = this.centerY - eigen2.y * lambda2 * this.scale;
-        
-        // Animate scaling
-        const eigen2CurrentEndX = this.centerX + eigen2.x * (1 + progress * (lambda2 - 1)) * this.scale;
-        const eigen2CurrentEndY = this.centerY - eigen2.y * (1 + progress * (lambda2 - 1)) * this.scale;
-        
-        // Draw second eigenvector
-        this.ctx.strokeStyle = eigen2.color + '60';
-        this.ctx.lineWidth = 3;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX, this.centerY);
-        this.ctx.lineTo(eigen2OriginalEndX, eigen2OriginalEndY);
-        this.ctx.stroke();
-        
-        this.ctx.strokeStyle = eigen2.color;
-        this.ctx.lineWidth = 4;
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.centerX, this.centerY);
-        this.ctx.lineTo(eigen2CurrentEndX, eigen2CurrentEndY);
-        this.ctx.stroke();
-        
-        this.drawArrowHead(this.centerX, this.centerY, eigen2CurrentEndX, eigen2CurrentEndY, eigen2.color);
-        
-        // Labels
-        this.ctx.fillStyle = eigen1.color;
-        this.ctx.font = 'bold 16px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('v₁=[1,1]', eigen1CurrentEndX + 30, eigen1CurrentEndY - 15);
-        this.ctx.fillText('λ₁=4', eigen1CurrentEndX + 30, eigen1CurrentEndY + 5);
-        
-        this.ctx.fillStyle = eigen2.color;
-        this.ctx.fillText('v₂=[1,-1]', eigen2CurrentEndX + 30, eigen2CurrentEndY - 15);
-        this.ctx.fillText('λ₂=1', eigen2CurrentEndX + 30, eigen2CurrentEndY + 5);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Eigenvectors scale by their eigenvalues!', 50, 100);
-        this.ctx.fillText('v₁=[1,1] stretches by factor 4', 50, 125);
-        this.ctx.fillText('v₂=[1,-1] stays the same (factor 1)', 50, 150);
-        this.ctx.fillText('Direction never changes - only magnitude!', 50, 175);
+
+    toCanvasPoint(vector) {
+        return {
+            x: this.centerX + vector.x * this.scale,
+            y: this.centerY - vector.y * this.scale,
+        };
     }
-    
-    drawMathematicalRelationship(lambda1, lambda2) {
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('The Eigenvalue Equation: Av = λv', this.centerX, 80);
-        
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Mathematical Verification:', 50, 120);
-        this.ctx.fillText('For v₁=[1,1]:', 70, 145);
-        this.ctx.fillText('  Av₁ = [[2,1],[1,2]] × [1,1] = [3,3] = 3×[1,1]', 90, 170);
-        this.ctx.fillText('  Therefore λ₁ = 3', 90, 195);
-        
-        this.ctx.fillText('For v₂=[1,-1]:', 70, 230);
-        this.ctx.fillText('  Av₂ = [[2,1],[1,2]] × [1,-1] = [1,-1] = 1×[1,-1]', 90, 255);
-        this.ctx.fillText('  Therefore λ₂ = 1', 90, 280);
-        
-        this.ctx.fillText('Key insight:', 50, 315);
-        this.ctx.fillText('• Vectors on eigenvector lines stay on those lines', 70, 340);
-        this.ctx.fillText('• They only get scaled by the eigenvalue factor', 70, 365);
-        this.ctx.fillText('• This is why eigenvectors are so important!', 70, 390);
+
+    easeInOut(t) {
+        return t * t * (3 - 2 * t);
     }
-    
-    drawApplications(lambda1, lambda2) {
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 20px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Why Eigenvectors Matter', this.centerX, 80);
-        
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('The squishing insight leads to powerful applications:', 50, 120);
-        
-        this.ctx.fillText(' Data Analysis:', 50, 155);
-        this.ctx.fillText('   PCA finds the main directions of variation in data', 70, 180);
-        this.ctx.fillText('   Eigenvectors show which features matter most', 70, 205);
-        
-        this.ctx.fillText(' Computer Graphics:', 50, 240);
-        this.ctx.fillText('   Image compression by keeping only important directions', 70, 265);
-        this.ctx.fillText('   Rotation matrices have obvious eigenvectors', 70, 290);
-        
-        this.ctx.fillText(' Machine Learning:', 50, 325);
-        this.ctx.fillText('   Dimensionality reduction without losing information', 70, 350);
-        this.ctx.fillText('   Understanding how neural networks transform data', 70, 375);
-        
-        this.ctx.fillText(' Physics & Engineering:', 50, 410);
-        this.ctx.fillText('   Natural vibration modes of structures', 70, 435);
-        this.ctx.fillText('   Quantum mechanics and energy states', 70, 460);
-        
-        this.ctx.fillText('The eigenvectors we discovered:', 50, 495);
-        this.ctx.fillText('• v₁=[1,1] with λ₁=4 (stretches by 4×)', 70, 520);
-        this.ctx.fillText('• v₂=[1,-1] with λ₂=1 (unchanged)', 70, 545);
-        this.ctx.fillText('These are the "natural" directions of our matrix!', 70, 570);
-    }
-    
-    
+
     drawArrowHead(startX, startY, endX, endY, color) {
         const angle = Math.atan2(endY - startY, endX - startX);
         const arrowLength = 15;
@@ -1606,374 +1405,6 @@ class VectorWorldDemo {
         this.currentScalar = 0;
         this.updateDisplay();
         this.draw();
-    }
-    
-    drawTransformationComparison() {
-        // Title
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 22px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🔄 Before vs After Transformation', this.centerX, 50);
-        
-        // Show the transformation matrix
-        this.ctx.fillStyle = '#4ecdc4';
-        this.ctx.font = '18px Arial';
-        this.ctx.fillText('Matrix A = [[2,1],[1,2]]', this.centerX, 80);
-        
-        // Test vectors
-        const testVectors = [
-            { x: 2, y: 1, color: '#e74c3c', label: 'v₁', name: 'Regular Vector', isEigen: false },
-            { x: 1, y: 1, color: '#2ecc71', label: 'v₂', name: 'Eigenvector!', isEigen: true },
-            { x: -1, y: 2, color: '#f39c12', label: 'v₃', name: 'Regular Vector', isEigen: false }
-        ];
-        
-        const progress = Math.min(1, this.animationProgress);
-        
-        testVectors.forEach((vec, index) => {
-            const yOffset = 120 + index * 120;
-            
-            // Original vector
-            const originalEndX = this.centerX - 150 + vec.x * 30;
-            const originalEndY = yOffset - vec.y * 30;
-            
-            // Transformed vector using matrix [[2,1],[1,2]]
-            const transformedX = 2 * vec.x + 1 * vec.y;
-            const transformedY = 1 * vec.x + 2 * vec.y;
-            const transformedEndX = this.centerX + 150 + transformedX * 30;
-            const transformedEndY = yOffset - transformedY * 30;
-            
-            // Draw original vector
-            this.ctx.strokeStyle = vec.color;
-            this.ctx.lineWidth = 3;
-            this.ctx.globalAlpha = 0.7;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX - 150, yOffset);
-            this.ctx.lineTo(originalEndX, originalEndY);
-            this.ctx.stroke();
-            this.drawArrow(originalEndX, originalEndY, this.centerX - 150, yOffset, vec.color);
-            
-            // Draw transformed vector
-            this.ctx.globalAlpha = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX + 150, yOffset);
-            this.ctx.lineTo(transformedEndX, transformedEndY);
-            this.ctx.stroke();
-            this.drawArrow(transformedEndX, transformedEndY, this.centerX + 150, yOffset, vec.color);
-            
-            // Labels
-            this.ctx.fillStyle = vec.color;
-            this.ctx.font = 'bold 16px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(vec.label, this.centerX - 150, yOffset + 20);
-            this.ctx.fillText(vec.label, this.centerX + 150, yOffset + 20);
-            
-            // Vector coordinates
-            this.ctx.font = '12px Arial';
-            this.ctx.fillText(`[${vec.x},${vec.y}]`, this.centerX - 150, yOffset + 35);
-            this.ctx.fillText(`[${transformedX},${transformedY}]`, this.centerX + 150, yOffset + 35);
-            
-            // Special indicator for eigenvectors
-            if (vec.isEigen) {
-                this.ctx.fillStyle = '#2ecc71';
-                this.ctx.font = 'bold 14px Arial';
-                this.ctx.fillText('✨ EIGENVECTOR!', this.centerX, yOffset - 20);
-                this.ctx.fillText('Same direction!', this.centerX, yOffset - 5);
-            } else {
-                this.ctx.fillStyle = '#e74c3c';
-                this.ctx.font = '14px Arial';
-                this.ctx.fillText('Direction changed', this.centerX, yOffset - 10);
-            }
-        });
-        
-        // Explanation
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Key Observation:', 50, 500);
-        this.ctx.fillText('• Regular vectors change direction when transformed', 70, 525);
-        this.ctx.fillText('• Eigenvectors keep their direction (just get scaled)', 70, 550);
-        this.ctx.fillText('• This is the fundamental property of eigenvectors!', 70, 575);
-    }
-    
-    drawEigenvectorDiscovery(lambda1, lambda2) {
-        // Title
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 22px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🔍 Finding Eigenvector Directions', this.centerX, 50);
-        
-        // Show the eigenvectors
-        const eigen1 = { x: 1, y: 1, color: '#2ecc71', label: 'v₁', lambda: lambda1 };
-        const eigen2 = { x: 1, y: -1, color: '#e74c3c', label: 'v₂', lambda: lambda2 };
-        
-        // Draw eigenvector lines extending across the canvas
-        this.ctx.strokeStyle = eigen1.color;
-        this.ctx.lineWidth = 2;
-        this.ctx.setLineDash([5, 5]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(50, this.centerY - 200);
-        this.ctx.lineTo(this.canvas.width - 50, this.centerY + 200);
-        this.ctx.stroke();
-        
-        this.ctx.strokeStyle = eigen2.color;
-        this.ctx.beginPath();
-        this.ctx.moveTo(50, this.centerY + 200);
-        this.ctx.lineTo(this.canvas.width - 50, this.centerY - 200);
-        this.ctx.stroke();
-        
-        this.ctx.setLineDash([]);
-        
-        // Draw eigenvectors
-        [eigen1, eigen2].forEach((eigen, index) => {
-            const endX = this.centerX + eigen.x * 60;
-            const endY = this.centerY - eigen.y * 60;
-            
-            this.ctx.strokeStyle = eigen.color;
-            this.ctx.lineWidth = 4;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX, this.centerY);
-            this.ctx.lineTo(endX, endY);
-            this.ctx.stroke();
-            
-            this.drawArrow(endX, endY, this.centerX, this.centerY, eigen.color);
-            
-            // Labels
-            this.ctx.fillStyle = eigen.color;
-            this.ctx.font = 'bold 18px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(`${eigen.label} = [${eigen.x},${eigen.y}]`, endX + 30, endY - 10);
-            this.ctx.fillText(`λ = ${eigen.lambda}`, endX + 30, endY + 10);
-        });
-        
-        // Show test vectors being pulled toward eigenvector lines
-        const testVectors = [
-            { x: 3, y: 0, color: '#f39c12' },
-            { x: 0, y: 3, color: '#9b59b6' },
-            { x: 2, y: 2, color: '#3498db' }
-        ];
-        
-        testVectors.forEach((vec, index) => {
-            const yOffset = 300 + index * 80;
-            
-            // Original vector
-            const originalEndX = this.centerX - 200 + vec.x * 20;
-            const originalEndY = yOffset - vec.y * 20;
-            
-            // Transformed vector using matrix [[2,1],[1,2]]
-            const transformedX = 2 * vec.x + 1 * vec.y;
-            const transformedY = 1 * vec.x + 2 * vec.y;
-            const transformedEndX = this.centerX + 200 + transformedX * 20;
-            const transformedEndY = yOffset - transformedY * 20;
-            
-            // Draw original
-            this.ctx.strokeStyle = vec.color;
-            this.ctx.lineWidth = 2;
-            this.ctx.globalAlpha = 0.5;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX - 200, yOffset);
-            this.ctx.lineTo(originalEndX, originalEndY);
-            this.ctx.stroke();
-            
-            // Draw transformed
-            this.ctx.globalAlpha = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.centerX + 200, yOffset);
-            this.ctx.lineTo(transformedEndX, transformedEndY);
-            this.ctx.stroke();
-            
-            // Show how they align to eigenvector directions
-            this.ctx.fillStyle = vec.color;
-            this.ctx.font = '12px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(`[${vec.x},${vec.y}] → [${transformedX},${transformedY}]`, this.centerX, yOffset + 20);
-        });
-        
-        // Explanation
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Discovery:', 50, 600);
-        this.ctx.fillText('• v₁ = [1,1] is an eigenvector with λ₁ = 3', 70, 625);
-        this.ctx.fillText('• v₂ = [1,-1] is an eigenvector with λ₂ = 1', 70, 650);
-        this.ctx.fillText('• All vectors get "pulled" toward these directions!', 70, 675);
-    }
-    
-    drawEigenvalueCalculation(lambda1, lambda2) {
-        // Title
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 22px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🧮 Calculating Eigenvalues', this.centerX, 50);
-        
-        // Show the characteristic equation
-        this.ctx.fillStyle = '#4ecdc4';
-        this.ctx.font = '18px Arial';
-        this.ctx.fillText('Characteristic Equation: det(A - λI) = 0', this.centerX, 100);
-        
-        // Show matrix A
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Matrix A = [[2,1],[1,2]]', 50, 140);
-        
-        // Show A - λI
-        this.ctx.fillText('A - λI = [[2-λ, 1],[1, 2-λ]]', 50, 170);
-        
-        // Show determinant calculation
-        this.ctx.fillText('det(A - λI) = (2-λ)(2-λ) - 1×1', 50, 200);
-        this.ctx.fillText('            = 4 - 4λ + λ² - 1', 50, 230);
-        this.ctx.fillText('            = λ² - 4λ + 3', 50, 260);
-        
-        // Show quadratic equation
-        this.ctx.fillStyle = '#f39c12';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('λ² - 4λ + 3 = 0', 50, 300);
-        
-        // Show solution using quadratic formula
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('Using quadratic formula or factoring:', 50, 340);
-        this.ctx.fillText('λ = (4 ± √(16-12))/2', 70, 370);
-        this.ctx.fillText('λ = (4 ± 2)/2', 70, 400);
-        
-        // Show the two eigenvalues
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('λ₁ = 3', 50, 450);
-        this.ctx.fillText('λ₂ = 1', 50, 480);
-        
-        // Verify eigenvectors
-        this.ctx.fillStyle = '#4ecdc4';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('Verification:', 50, 520);
-        this.ctx.fillText('• For λ₁ = 3: eigenvector is [1,1]', 70, 550);
-        this.ctx.fillText('• For λ₂ = 1: eigenvector is [1,-1]', 70, 575);
-    }
-    
-    drawMathematicalProof(lambda1, lambda2) {
-        // Title
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 22px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('✅ Mathematical Proof: Av = λv', this.centerX, 50);
-        
-        // Show the proof for v₁ = [1,1]
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.textAlign = 'left';
-        this.ctx.fillText('Proof for v₁ = [1,1] with λ₁ = 3:', 50, 100);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('Av₁ = [[2,1],[1,2]] × [1,1]', 70, 130);
-        this.ctx.fillText('     = [2×1 + 1×1, 1×1 + 2×1]', 70, 160);
-        this.ctx.fillText('     = [3, 3]', 70, 190);
-        
-        this.ctx.fillText('λ₁v₁ = 3 × [1,1]', 70, 220);
-        this.ctx.fillText('      = [3, 3]', 70, 250);
-        
-        // Show that they are equal!
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.fillText('✅ Av₁ = λ₁v₁ ✓', 70, 290);
-        this.ctx.fillText('Perfect! [1,1] is truly an eigenvector!', 90, 320);
-        
-        // Show the proof for v₂ = [1,-1]
-        this.ctx.fillStyle = '#e74c3c';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('Proof for v₂ = [1,-1] with λ₂ = 1:', 50, 400);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('Av₂ = [[2,1],[1,2]] × [1,-1]', 70, 430);
-        this.ctx.fillText('     = [2×1 + 1×(-1), 1×1 + 2×(-1)]', 70, 460);
-        this.ctx.fillText('     = [1, -1]', 70, 490);
-        
-        this.ctx.fillText('λ₂v₂ = 1 × [1,-1]', 70, 520);
-        this.ctx.fillText('      = [1, -1]', 70, 550);
-        
-        // Show that they are equal!
-        this.ctx.fillStyle = '#2ecc71';
-        this.ctx.fillText('✅ Av₂ = λ₂v₂ ✓', 70, 580);
-        this.ctx.fillText('Perfect! [1,-1] is truly an eigenvector!', 90, 610);
-        
-        // Key insight
-        this.ctx.fillStyle = '#9b59b6';
-        this.ctx.font = 'bold 16px Arial';
-        this.ctx.fillText('Key Insight:', 50, 600);
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText('Eigenvectors are the "natural directions" of the transformation', 70, 625);
-        this.ctx.fillText('They represent the fundamental ways the space can be stretched', 70, 650);
-    }
-    
-    drawRealWorldApplications() {
-        // Title
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 22px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('🌍 Real-World Applications', this.centerX, 50);
-        
-        // Applications
-        const applications = [
-            {
-                title: 'Principal Component Analysis (PCA)',
-                description: 'Reduces data dimensions while preserving most information',
-                example: 'Face recognition, data compression',
-                color: '#2ecc71'
-            },
-            {
-                title: 'Google PageRank',
-                description: 'Ranks web pages by importance using eigenvector centrality',
-                example: 'Search engine ranking algorithm',
-                color: '#3498db'
-            },
-            {
-                title: 'Vibration Analysis',
-                description: 'Finds natural frequencies of mechanical systems',
-                example: 'Bridge design, earthquake engineering',
-                color: '#e74c3c'
-            },
-            {
-                title: 'Quantum Mechanics',
-                description: 'Energy states of quantum systems',
-                example: 'Atomic orbitals, molecular vibrations',
-                color: '#9b59b6'
-            },
-            {
-                title: 'Machine Learning',
-                description: 'Feature extraction and dimensionality reduction',
-                example: 'Image processing, recommendation systems',
-                color: '#f39c12'
-            }
-        ];
-        
-        applications.forEach((app, index) => {
-            const y = 100 + index * 100;
-            
-            this.ctx.fillStyle = app.color;
-            this.ctx.font = 'bold 16px Arial';
-            this.ctx.textAlign = 'left';
-            this.ctx.fillText(app.title, 50, y);
-            
-            this.ctx.fillStyle = '#fff';
-            this.ctx.font = '14px Arial';
-            this.ctx.fillText(app.description, 70, y + 25);
-            
-            this.ctx.fillStyle = '#ccc';
-            this.ctx.font = '12px Arial';
-            this.ctx.fillText(`Example: ${app.example}`, 70, y + 45);
-        });
-        
-        // Why eigenvectors matter
-        this.ctx.fillStyle = '#4ecdc4';
-        this.ctx.font = 'bold 18px Arial';
-        this.ctx.fillText('Why Eigenvectors Matter:', 50, 650);
-        
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('• They reveal the fundamental structure of data', 70, 680);
-        this.ctx.fillText('• They provide the most efficient way to represent information', 70, 705);
-        this.ctx.fillText('• They are the mathematical foundation of many ML algorithms', 70, 730);
     }
 }
 
