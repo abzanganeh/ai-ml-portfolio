@@ -15,6 +15,7 @@ class TutorialChapterTemplate {
         this.initializeSectionNavigation();
         this.initializeSectionObserver();
         this.initializeLabResetControls();
+        this.initializeHashTarget();
     }
 
     initializeSectionNavigation() {
@@ -27,6 +28,7 @@ class TutorialChapterTemplate {
                 }
 
                 event.preventDefault();
+                this.activateLegacyContentSection(target);
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 this.setActiveSection(link);
             });
@@ -92,6 +94,31 @@ class TutorialChapterTemplate {
 
                 lab.dispatchEvent(new CustomEvent('tutorial:lab-reset', { bubbles: true }));
             });
+        });
+    }
+
+    initializeHashTarget() {
+        if (!window.location.hash) {
+            return;
+        }
+
+        const target = this.documentRoot.querySelector(window.location.hash);
+        if (target) {
+            this.activateLegacyContentSection(target);
+        }
+    }
+
+    activateLegacyContentSection(target) {
+        if (!target.classList.contains('content-section')) {
+            return;
+        }
+
+        this.documentRoot.querySelectorAll('.content-section').forEach((section) => {
+            section.classList.toggle('active', section === target);
+        });
+
+        this.documentRoot.querySelectorAll('.section-nav-btn').forEach((button) => {
+            button.classList.toggle('active', button.getAttribute('data-section') === target.id);
         });
     }
 
