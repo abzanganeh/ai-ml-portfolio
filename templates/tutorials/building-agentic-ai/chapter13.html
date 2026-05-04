@@ -1,0 +1,298 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 13: CrewAI & OpenAI Agents SDK — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 3 — Multi-Agent Systems &amp; Orchestration</div>
+            <h1 class="chapter-title">Chapter 13: CrewAI &amp; OpenAI Agents SDK</h1>
+            <p class="chapter-subtitle">Role-based crews, event-driven flows, and the triage agent pattern</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="59"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 13 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="crewai">CrewAI</button>
+                <button class="section-nav-btn azbn-btn" data-section="openai-sdk">OpenAI SDK</button>
+                <button class="section-nav-btn azbn-btn" data-section="comparison">Framework Comparison</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Two Complementary Frameworks</h2>
+                    <p>LangGraph (Chapter 12) gives maximum control via explicit graph definitions. CrewAI and the OpenAI Agents SDK prioritize speed of development and ergonomics. They are not competitors — each serves a different point on the control vs. simplicity spectrum.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>CrewAI</h4>
+                            <ul>
+                                <li>Role-based agents ("Researcher", "Writer", "Editor")</li>
+                                <li>~46K GitHub stars, 450M monthly workflows</li>
+                                <li>Fastest time-to-working-demo</li>
+                                <li>Sequential and parallel crew execution</li>
+                                <li>Built-in event-driven Flows</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>OpenAI Agents SDK</h4>
+                            <ul>
+                                <li>Agents + Runners + Handoffs + Guardrails</li>
+                                <li>97% successful run rate in benchmarks</li>
+                                <li>Native MCP support</li>
+                                <li>Best for OpenAI ecosystem users</li>
+                                <li>~10 minutes to hello-world</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="crewai" class="content-section">
+                    <h2>CrewAI</h2>
+                    <p>CrewAI models a multi-agent system as a "crew" of agents with distinct roles, each assigned tasks. The crew executes tasks in a configured order (sequential or parallel), with agents optionally delegating to one another.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — CrewAI content production crew</span></div>
+                        <pre><code class="language-python">from crewai import Agent, Task, Crew, Process
+from crewai_tools import SerperDevTool
+
+search_tool = SerperDevTool()
+
+# ── Define Agents with Roles ─────────────────────────────────────────────────
+
+researcher = Agent(
+    role="Senior Research Analyst",
+    goal="Find comprehensive, accurate information on the given topic",
+    backstory=(
+        "You are an expert researcher with 10 years of experience synthesizing "
+        "complex information from multiple sources. You always cite your sources."
+    ),
+    tools=[search_tool],
+    llm="gpt-4o",
+    verbose=True,
+)
+
+writer = Agent(
+    role="Content Strategist",
+    goal="Write clear, engaging content based on research findings",
+    backstory=(
+        "You transform complex research into accessible, compelling narratives. "
+        "You write for a technical audience and always back claims with evidence."
+    ),
+    llm="gpt-4o",
+)
+
+# ── Define Tasks ─────────────────────────────────────────────────────────────
+
+research_task = Task(
+    description="Research the current state of {topic}. Find key developments in 2025-2026.",
+    expected_output="A structured research report with key findings, sources, and data points.",
+    agent=researcher,
+)
+
+writing_task = Task(
+    description="Write a 500-word article about {topic} based on the research report.",
+    expected_output="A complete article with title, intro, 3 body sections, and conclusion.",
+    agent=writer,
+    context=[research_task],   # this task depends on research_task's output
+)
+
+# ── Assemble Crew ─────────────────────────────────────────────────────────────
+
+crew = Crew(
+    agents=[researcher, writer],
+    tasks=[research_task, writing_task],
+    process=Process.sequential,   # or Process.hierarchical for supervisor pattern
+    verbose=True,
+)
+
+result = crew.kickoff(inputs={"topic": "AI agent frameworks in 2026"})</code></pre>
+                    </div>
+
+                    <h3>CrewAI Flows — Event-Driven Orchestration</h3>
+                    <p>Flows extend CrewAI beyond sequential crews to event-driven pipelines. A Flow method decorated with <code>@start</code> or <code>@listen</code> runs when a specific event fires or when another method completes.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — CrewAI Flow example</span></div>
+                        <pre><code class="language-python">from crewai.flow.flow import Flow, start, listen, router
+
+class ContentFlow(Flow):
+
+    @start()
+    def classify_request(self):
+        return "technical" if "code" in self.state.get("topic", "") else "general"
+
+    @router(classify_request)
+    def route_by_type(self, result: str) -> str:
+        return "technical_crew" if result == "technical" else "general_crew"
+
+    @listen("technical_crew")
+    def run_technical_crew(self):
+        # run technical writing crew
+        return technical_crew.kickoff(inputs=self.state)
+
+    @listen("general_crew")
+    def run_general_crew(self):
+        return general_crew.kickoff(inputs=self.state)
+
+flow = ContentFlow()
+result = flow.kickoff(inputs={"topic": "Python async patterns"})</code></pre>
+                    </div>
+                </div>
+
+                <div id="openai-sdk" class="content-section">
+                    <h2>OpenAI Agents SDK</h2>
+                    <p>The OpenAI Agents SDK (successor to the experimental Swarm project) provides a minimal, production-ready agent framework centered around <strong>Agents</strong>, <strong>Runners</strong>, <strong>Handoffs</strong>, and <strong>Guardrails</strong>.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — triage agent with handoffs</span></div>
+                        <pre><code class="language-python">from agents import Agent, Runner, handoff, input_guardrail, GuardrailFunctionOutput
+from pydantic import BaseModel
+
+# ── Specialist agents ────────────────────────────────────────────────────────
+
+billing_agent = Agent(
+    name="Billing Agent",
+    instructions=(
+        "You handle billing questions: invoices, charges, refunds, and payment methods. "
+        "Be concise and factual. If you cannot resolve the issue, say so."
+    ),
+)
+
+technical_agent = Agent(
+    name="Technical Support Agent",
+    instructions=(
+        "You handle technical issues: bugs, configuration, API errors, and performance. "
+        "Ask for logs or error messages before diagnosing."
+    ),
+)
+
+# ── Input guardrail — blocks off-topic requests ──────────────────────────────
+
+class TopicCheck(BaseModel):
+    is_support_related: bool
+    reasoning: str
+
+@input_guardrail
+async def support_topic_guardrail(ctx, agent, input_text) -> GuardrailFunctionOutput:
+    result = await Runner.run(
+        Agent(
+            name="Topic Classifier",
+            instructions="Determine if this message is customer support related.",
+            output_type=TopicCheck,
+        ),
+        input=input_text,
+    )
+    check = result.final_output
+    return GuardrailFunctionOutput(
+        output_info=check,
+        tripwire_triggered=not check.is_support_related,
+    )
+
+# ── Triage agent — routes to specialists ─────────────────────────────────────
+
+triage_agent = Agent(
+    name="Triage Agent",
+    instructions=(
+        "Classify the customer request and route it to the appropriate specialist. "
+        "Use billing_handoff for billing questions, technical_handoff for technical issues."
+    ),
+    handoffs=[
+        handoff(billing_agent, tool_name_override="billing_handoff"),
+        handoff(technical_agent, tool_name_override="technical_handoff"),
+    ],
+    input_guardrails=[support_topic_guardrail],
+)
+
+# ── Run ───────────────────────────────────────────────────────────────────────
+
+import asyncio
+
+async def main():
+    result = await Runner.run(
+        triage_agent,
+        input="I was charged twice for my subscription last month. Please help.",
+    )
+    print(result.final_output)
+
+asyncio.run(main())</code></pre>
+                    </div>
+                </div>
+
+                <div id="comparison" class="content-section">
+                    <h2>Framework Comparison</h2>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Criterion</th><th>LangGraph</th><th>CrewAI</th><th>OpenAI SDK</th></tr></thead>
+                        <tbody>
+                            <tr><td>Control granularity</td><td>Maximum (graph-level)</td><td>Medium (role/task)</td><td>Medium (agent/handoff)</td></tr>
+                            <tr><td>Time to first working agent</td><td>Hours–days</td><td>Minutes–hours</td><td>Minutes</td></tr>
+                            <tr><td>Checkpointing / fault tolerance</td><td>Built-in</td><td>Limited</td><td>Via sessions</td></tr>
+                            <tr><td>Human-in-the-loop</td><td>First-class</td><td>Plugin</td><td>Limited</td></tr>
+                            <tr><td>MCP support</td><td>Via tools</td><td>Via tools</td><td>Native</td></tr>
+                            <tr><td>Model agnosticism</td><td>Full (LangChain)</td><td>Full</td><td>OpenAI-first, LiteLLM for others</td></tr>
+                            <tr><td>Production reliability (benchmarks)</td><td>95%</td><td>91%</td><td>97%</td></tr>
+                            <tr><td>Best use case</td><td>Complex stateful workflows</td><td>Role-based parallel crews</td><td>Simple chains, OpenAI users</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Which to choose?</h4>
+                        <p><strong>CrewAI</strong> if you need a working prototype quickly and your task maps naturally to distinct roles. <strong>OpenAI Agents SDK</strong> if you are already in the OpenAI ecosystem and need the triage/handoff pattern. <strong>LangGraph</strong> if you need fine-grained control, checkpointing, or complex conditional flows in production.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 13 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. In CrewAI, what does setting <code>context=[research_task]</code> on a writing task do?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It makes the writing task run in parallel with the research task</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> It passes the research task's output as context to the writing task, establishing a dependency</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It forces the researcher agent to also complete the writing task</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It adds the research task to the crew's shared memory store</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. In the OpenAI Agents SDK, what triggers a "handoff"?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A Python exception raised by the current agent</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> The current agent calls the handoff function as a tool — execution transfers to the target agent with the conversation context</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The user explicitly requests a different agent by name</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A guardrail tripwire fires and redirects to a fallback agent</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Which framework is best suited for a complex stateful workflow with checkpointing and human-in-the-loop approval steps?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> CrewAI — because it has the most GitHub stars</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> OpenAI Agents SDK — because it has the highest production reliability benchmark</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> LangGraph — because it provides first-class checkpointing and HITL interrupt primitives built into the graph</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> All three frameworks are equally capable for this use case</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

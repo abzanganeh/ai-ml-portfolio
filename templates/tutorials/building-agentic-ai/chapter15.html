@@ -1,0 +1,206 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 15: Evaluation — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 4 — Production Engineering</div>
+            <h1 class="chapter-title">Chapter 15: Evaluation</h1>
+            <p class="chapter-subtitle">Trajectory-level vs endpoint, benchmarks, LLM-as-judge, and building an eval harness</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="68"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 15 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="metrics">Metrics</button>
+                <button class="section-nav-btn azbn-btn" data-section="benchmarks">Benchmarks</button>
+                <button class="section-nav-btn azbn-btn" data-section="harness">Eval Harness</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Why Standard NLP Metrics Fail for Agents</h2>
+                    <p>BLEU, ROUGE, and perplexity measure the quality of text generation in a single-turn setting. They cannot capture whether an agent: (1) called the right tools in the right order, (2) reached the correct goal state, (3) made efficient use of available information, or (4) failed gracefully under adversarial conditions.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Endpoint Evaluation</h4>
+                            <ul>
+                                <li>Did the agent reach the correct final state?</li>
+                                <li>Is the final answer correct or useful?</li>
+                                <li>Simple to measure; course-grained</li>
+                                <li>Doesn't reveal <em>why</em> the agent failed</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Trajectory Evaluation</h4>
+                            <ul>
+                                <li>Were the intermediate steps correct?</li>
+                                <li>Was each tool call necessary and well-formed?</li>
+                                <li>More expensive; requires annotated reference trajectories</li>
+                                <li>Reveals failure points — enables targeted improvement</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="metrics" class="content-section">
+                    <h2>Key Agent Metrics</h2>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Task Success Rate (TSR)</strong><span>Fraction of tasks completed correctly — the primary metric. Must be measured on a held-out task set, not the training tasks.</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Steps to Success</strong><span>Average number of (Thought, Action, Observation) turns required to complete a task. Lower = more efficient. An agent that needs 30 steps for a task that takes a human 5 steps has a problem.</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Error Rate</strong><span>Fraction of steps where the agent takes a clearly wrong action — wrong tool, malformed arguments, or unnecessary call. Measured via reference trajectory comparison.</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Cost per Task</strong><span>Total LLM tokens + tool call costs per successful task completion. Critical for production viability — a task that costs $2 to complete is often not economically viable.</span></div></div>
+                        <div class="layer-item l5"><div class="layer-num">5</div><div class="layer-content"><strong>Failure Mode Distribution</strong><span>Categorize failures: wrong tool, hallucinated tool result, infinite loop, context overflow, refusal. Different categories require different fixes.</span></div></div>
+                    </div>
+                </div>
+
+                <div id="benchmarks" class="content-section">
+                    <h2>Agent Benchmarks</h2>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Benchmark</th><th>What it tests</th><th>Format</th><th>Why it matters</th></tr></thead>
+                        <tbody>
+                            <tr><td>GAIA</td><td>General AI assistant tasks: real-world questions requiring tool use</td><td>~450 questions, 3 difficulty levels</td><td>Closest to real user tasks; covers web search, file reading, math</td></tr>
+                            <tr><td>AgentBench</td><td>8 real-world environments (web, database, OS, code)</td><td>Multi-step tasks per environment</td><td>Breadth across agent types and tool categories</td></tr>
+                            <tr><td>SWE-bench</td><td>Resolve real GitHub issues in open-source Python repos</td><td>300+ issues; measure % resolved</td><td>Gold standard for code agents; hard and grounded</td></tr>
+                            <tr><td>WebArena</td><td>Navigate and complete tasks on realistic web environments</td><td>812 tasks across 5 websites</td><td>Evaluates computer-use agents end-to-end</td></tr>
+                            <tr><td>ATBench</td><td>Long-horizon safety evaluation over multi-turn trajectories</td><td>1,000 trajectories, avg 9 turns</td><td>Catches risks that only emerge across multiple steps</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="info-box">
+                        <h3>LLM-as-judge: where it works and where it lies</h3>
+                        <p><strong>Where it works well:</strong> scoring free-form text quality (relevance, clarity, helpfulness), comparing two responses side-by-side, checking for safety violations in output. <strong>Where it fails:</strong> verifying factual correctness (the judge LLM can be wrong on the same facts), evaluating code correctness (run tests instead), and providing consistent scores across session (temperature variance).</p>
+                        <p>Always validate your LLM judge against human annotations on a sample set before using it for automated evaluation.</p>
+                    </div>
+                </div>
+
+                <div id="harness" class="content-section">
+                    <h2>Building an Eval Harness</h2>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — minimal agent eval harness</span></div>
+                        <pre><code class="language-python">from dataclasses import dataclass
+from typing import Callable
+
+@dataclass
+class EvalTask:
+    task_id: str
+    input: str
+    expected_output: str | None   # None for tasks with open-ended correct answers
+    verify_fn: Callable[[str, str], bool] | None = None  # optional programmatic verifier
+
+@dataclass
+class EvalResult:
+    task_id: str
+    success: bool
+    steps_taken: int
+    cost_usd: float
+    final_output: str
+    failure_mode: str | None = None
+
+
+class AgentEvalHarness:
+    def __init__(self, agent_fn: Callable[[str], str], judge_llm=None) -> None:
+        self.agent = agent_fn
+        self.judge = judge_llm
+
+    def run(self, tasks: list[EvalTask]) -> dict:
+        results = []
+        for task in tasks:
+            result = self._run_one(task)
+            results.append(result)
+
+        tsr = sum(r.success for r in results) / len(results)
+        avg_steps = sum(r.steps_taken for r in results) / len(results)
+        avg_cost = sum(r.cost_usd for r in results) / len(results)
+
+        return {
+            "task_success_rate": tsr,
+            "avg_steps_to_success": avg_steps,
+            "avg_cost_per_task_usd": avg_cost,
+            "failure_modes": self._count_failure_modes(results),
+        }
+
+    def _run_one(self, task: EvalTask) -> EvalResult:
+        output, steps, cost = self._run_agent_with_instrumentation(task.input)
+
+        if task.verify_fn and task.expected_output:
+            success = task.verify_fn(output, task.expected_output)
+        elif task.expected_output:
+            success = self._llm_judge(task.input, output, task.expected_output)
+        else:
+            success = True   # no expected output — assume success if agent completed
+
+        return EvalResult(
+            task_id=task.task_id,
+            success=success,
+            steps_taken=steps,
+            cost_usd=cost,
+            final_output=output,
+        )</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Golden trajectories</h4>
+                        <p>A golden trajectory is a human-annotated sequence of (Thought, Action, Observation) turns that represents the correct way to solve a task. They are expensive to create but invaluable: they enable trajectory-level evaluation, few-shot examples in prompts, and regression testing. Start with 20–50 golden trajectories for your most critical task types.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 15 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Why is trajectory evaluation more valuable than endpoint evaluation for improving an agent?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Trajectory evaluation requires no human annotation, making it cheaper</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Trajectory evaluation reveals which specific steps failed, enabling targeted fixes rather than just knowing the end result was wrong</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Trajectory evaluation always produces higher task success rates</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Endpoint evaluation cannot measure final output quality</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. For which task should you use programmatic testing instead of LLM-as-judge?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Rating the helpfulness of a customer support response</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Verifying that a code agent's generated function passes all unit tests</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Comparing two summarizations of an article for clarity</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Checking whether a response violates content safety guidelines</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What is the primary purpose of "golden trajectories" in agent evaluation?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> To train the LLM backbone via supervised fine-tuning</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> To serve as reference step-by-step solutions for trajectory-level evaluation and regression testing against new model versions</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> To replace the need for a judge LLM</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> To automatically generate new eval tasks via task-inversion</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

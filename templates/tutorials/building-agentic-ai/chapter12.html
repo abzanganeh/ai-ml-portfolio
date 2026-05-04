@@ -1,0 +1,281 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 12: Building with LangGraph — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 3 — Multi-Agent Systems &amp; Orchestration</div>
+            <h1 class="chapter-title">Chapter 12: Building with LangGraph</h1>
+            <p class="chapter-subtitle">Graph-based state machines, checkpointing, HITL, and subgraphs</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="55"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 12 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="core-concepts">Core Concepts</button>
+                <button class="section-nav-btn azbn-btn" data-section="build">Building a Graph</button>
+                <button class="section-nav-btn azbn-btn" data-section="production">Production Features</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Why LangGraph?</h2>
+                    <p>LangGraph is a graph-based agent orchestration framework from LangChain. Instead of defining agent behavior in a sequential loop, you define it as a <strong>directed graph</strong> where nodes are functions (actions) and edges are transitions between them — including conditional edges that route based on state.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Standard Agent Loop</h4>
+                            <ul>
+                                <li>Linear while-loop</li>
+                                <li>Hard to add branching</li>
+                                <li>No built-in checkpointing</li>
+                                <li>Human-in-the-loop requires custom code</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>LangGraph</h4>
+                            <ul>
+                                <li>Directed graph (nodes + edges)</li>
+                                <li>Conditional routing via edge functions</li>
+                                <li>Built-in checkpointing (durable execution)</li>
+                                <li>HITL via interrupt_before/interrupt_after</li>
+                                <li>Subgraphs for modular composition</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>Production adoption</h3>
+                        <p>LangGraph 1.0+ reached production stability in 2025. Used at Uber, LinkedIn, Klarna, and Replit. ~39M monthly PyPI downloads (early 2026).</p>
+                    </div>
+                </div>
+
+                <div id="core-concepts" class="content-section">
+                    <h2>Core Concepts</h2>
+
+                    <!-- LangGraph architecture diagram -->
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">State</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>TypedDict / Pydantic State Schema</strong>
+                                    <span>Shared data structure passed between all nodes; each node can read and update it</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Nodes</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>agent</strong>
+                                    <span>Calls LLM; updates state with response</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>tool_executor</strong>
+                                    <span>Runs pending tool calls; updates state with results</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>custom_fn</strong>
+                                    <span>Any Python function that transforms state</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Edges</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell yellow">
+                                    <strong>Unconditional</strong>
+                                    <span>Always go from A → B</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Conditional</strong>
+                                    <span>Route(state) → "node_name" based on state</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>END</strong>
+                                    <span>Special terminal node — graph stops here</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>The key concept: <em>every node receives the full state and returns a partial state update</em>. LangGraph merges the update into the shared state automatically. This means nodes are pure functions — they don't need to know how state is passed around.</p>
+                </div>
+
+                <div id="build" class="content-section">
+                    <h2>Building a ReAct Agent in LangGraph</h2>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — complete LangGraph ReAct agent</span></div>
+                        <pre><code class="language-python">from typing import Annotated, Literal
+from typing_extensions import TypedDict
+from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+
+# ── 1. Define State ──────────────────────────────────────────────────────────
+
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]   # add_messages is a reducer — appends, doesn't replace
+
+# ── 2. Define Tools ──────────────────────────────────────────────────────────
+
+@tool
+def search_web(query: str) -> str:
+    """Search the web for current information."""
+    return f"[Mock result for '{query}']"   # replace with real search API
+
+tools = [search_web]
+
+# ── 3. Define Nodes ──────────────────────────────────────────────────────────
+
+llm = ChatOpenAI(model="gpt-4o").bind_tools(tools)
+
+def agent_node(state: AgentState) -> dict:
+    """Call LLM with current messages; return updated messages."""
+    response = llm.invoke(state["messages"])
+    return {"messages": [response]}
+
+def should_continue(state: AgentState) -> Literal["tools", "__end__"]:
+    """Conditional edge: route to tools if LLM made tool calls, else end."""
+    last_message = state["messages"][-1]
+    if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+        return "tools"
+    return "__end__"
+
+# ── 4. Build Graph ───────────────────────────────────────────────────────────
+
+graph = StateGraph(AgentState)
+
+graph.add_node("agent", agent_node)
+graph.add_node("tools", ToolNode(tools))   # prebuilt node handles tool dispatch
+
+graph.set_entry_point("agent")
+graph.add_conditional_edges("agent", should_continue, {"tools": "tools", "__end__": END})
+graph.add_edge("tools", "agent")   # after tools, always go back to agent
+
+app = graph.compile()
+
+# ── 5. Run ───────────────────────────────────────────────────────────────────
+
+result = app.invoke({"messages": [{"role": "user", "content": "What is the latest news about LLMs?"}]})
+print(result["messages"][-1].content)</code></pre>
+                    </div>
+
+                    <!-- Graph flow visualization -->
+                    <div class="flow-diagram">
+                        <div class="flow-node" style="border-color:#22d3ee;"><div class="flow-icon">🚪</div><strong>START</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>agent</strong><p>LLM decision</p></div>
+                        <div class="flow-arrow">→ (conditional)</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔧</div><strong>tools</strong><p>Execute calls</p></div>
+                        <div class="flow-arrow" style="color:#10b981;">↺ back to agent</div>
+                        <div class="flow-node" style="border-color:#ef4444;"><div class="flow-icon">🏁</div><strong>END</strong></div>
+                    </div>
+                </div>
+
+                <div id="production" class="content-section">
+                    <h2>Production Features</h2>
+
+                    <h3>Checkpointing</h3>
+                    <p>LangGraph checkpoints state after every node execution. If the graph crashes, it resumes from the last checkpoint — no work is lost. This is critical for long-running workflows (minutes to hours).</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — persistent checkpointing with SQLite</span></div>
+                        <pre><code class="language-python">from langgraph.checkpoint.sqlite import SqliteSaver
+
+checkpointer = SqliteSaver.from_conn_string("./checkpoints.db")
+app = graph.compile(checkpointer=checkpointer)
+
+# Run with a thread_id — LangGraph uses this as the checkpoint key
+config = {"configurable": {"thread_id": "user-123-task-456"}}
+result = app.invoke({"messages": [...]}, config=config)
+
+# Resume the same thread later — LangGraph loads from checkpoint
+result2 = app.invoke({"messages": [...]}, config=config)</code></pre>
+                    </div>
+
+                    <h3>Human-in-the-Loop (HITL)</h3>
+                    <p>LangGraph can pause execution before or after any node, waiting for human review. The state is persisted; when the human approves (or edits), execution resumes.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — interrupt before executing tools</span></div>
+                        <pre><code class="language-python"># Compile with interrupt_before — pause before the "tools" node
+app = graph.compile(
+    checkpointer=checkpointer,
+    interrupt_before=["tools"]   # pause here for human review
+)
+
+# Run until interrupt
+state = app.invoke({"messages": [...]}, config=config)
+
+# Human reviews the pending tool calls in state["messages"][-1].tool_calls
+# Then resume (optionally with updated state)
+state = app.invoke(None, config=config)   # None = use existing state, resume</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Subgraphs for modular composition</h4>
+                        <p>A LangGraph subgraph is a compiled graph used as a node inside a parent graph. This enables true modularity: the "research" subgraph is developed independently, tested in isolation, and plugged into the supervisor graph. State schemas must be compatible at the boundary.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 12 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. In LangGraph, what does a "conditional edge" do?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It executes a tool call conditionally based on the LLM's output</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> It inspects the current state and routes to one of several possible next nodes based on a function's return value</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It validates that a node's output matches the state schema before passing it forward</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It checks if the LLM's response contains a specific keyword before proceeding</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What does <code>add_messages</code> do in the AgentState definition?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It adds a new message type that LangGraph understands</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> It is a reducer function — when a node returns messages, LangGraph appends them to the existing list instead of replacing it</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It serializes messages to JSON for the checkpoint store</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It filters duplicate messages before they enter the LLM context</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Why is Human-in-the-Loop (HITL) implemented via <code>interrupt_before</code> rather than a separate API endpoint?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> API endpoints add too much latency for agent workflows</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> By pausing at the graph level with a persisted checkpoint, you can resume execution from exactly the same state after human review — the graph itself is the state machine</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Separate API endpoints cannot modify tool call arguments</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> HITL only works with the SQLite checkpointer, not other backends</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

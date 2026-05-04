@@ -1,0 +1,226 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 14: Advanced Multi-Agent Patterns — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 3 — Multi-Agent Systems &amp; Orchestration</div>
+            <h1 class="chapter-title">Chapter 14: Advanced Multi-Agent Patterns</h1>
+            <p class="chapter-subtitle">Role-aware memory, meta-agents, adversarial pairs, and consensus mechanisms</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="64"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 14 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="role-memory">Role-Aware Memory</button>
+                <button class="section-nav-btn azbn-btn" data-section="meta-agents">Meta-Agents</button>
+                <button class="section-nav-btn azbn-btn" data-section="adversarial">Adversarial &amp; Consensus</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Beyond Basic Coordination</h2>
+                    <p>Chapters 10–13 covered how to build and run multi-agent systems. This chapter covers the patterns that appear when you push multi-agent systems toward higher autonomy, quality, or scale — patterns that require deliberate design rather than falling out naturally from the frameworks.</p>
+                    <div class="pattern-grid">
+                        <div class="pattern-card"><h4>Role-Aware Memory</h4><p>Different agents need different memories — the orchestrator needs task-level context; workers need execution-level detail.</p></div>
+                        <div class="pattern-card green-top"><h4>Meta-Agents</h4><p>Agents that spawn, configure, and manage other agents dynamically based on task requirements.</p></div>
+                        <div class="pattern-card yellow-top"><h4>Adversarial Pairs</h4><p>A red-team agent tries to break or manipulate outputs; a blue-team agent validates and defends.</p></div>
+                        <div class="pattern-card purple-top"><h4>Consensus Mechanisms</h4><p>Multiple agents independently produce answers; majority vote or confidence aggregation selects the final output.</p></div>
+                    </div>
+                </div>
+
+                <div id="role-memory" class="content-section">
+                    <h2>Role-Aware Memory</h2>
+                    <p>Naive multi-agent systems give all agents access to the same memory store. This creates two problems: (1) agents see irrelevant context that wastes tokens, and (2) agents that process sensitive data leak information to less-trusted agents. Role-aware memory customizes what each agent can access.</p>
+
+                    <div class="info-box">
+                        <h3>LatentMem (2026)</h3>
+                        <p>LatentMem addresses multi-agent memory by role-aware customization and token-efficient latent memory synthesis. Instead of giving all agents the same memory, it includes: (1) an experience bank storing interaction trajectories per role, and (2) a memory composer that synthesizes compact, role-specific memories. Results: up to <strong>19.36% performance gains</strong> over vanilla shared memory, with significant token savings.</p>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>LEGOMem: orchestrator vs executor memory separation</h4>
+                        <p>LEGOMem's key finding: <strong>orchestrator memory is critical for task decomposition</strong> (knowing what sub-tasks to assign and in what order), while <strong>fine-grained agent memory improves execution accuracy</strong> (knowing the details of past tool call results for similar tasks). Mixing these memory types in a single shared store causes both to degrade.</p>
+                    </div>
+
+                    <!-- Role-aware memory diagram -->
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Role-scoped memory access</p>
+                        <div class="network-row">
+                            <div class="net-node orchestrator">Orchestrator</div>
+                            <div class="net-arrow">→ reads</div>
+                            <div class="net-node tool">Task decomposition memory</div>
+                        </div>
+                        <div class="net-arrow down" style="margin:0.25rem;">↕</div>
+                        <div class="network-row">
+                            <div class="net-node specialist">Worker Agent A</div>
+                            <div class="net-arrow">→ reads</div>
+                            <div class="net-node tool">Role A execution history</div>
+                        </div>
+                        <div class="net-arrow down" style="margin:0.25rem;">↕</div>
+                        <div class="network-row">
+                            <div class="net-node specialist">Worker Agent B</div>
+                            <div class="net-arrow">→ reads</div>
+                            <div class="net-node tool">Role B execution history</div>
+                        </div>
+                        <p style="color:#475569;font-size:0.72rem;margin-top:1rem;text-align:center;">No cross-agent memory access unless explicitly granted</p>
+                    </div>
+                </div>
+
+                <div id="meta-agents" class="content-section">
+                    <h2>Meta-Agents: Agents That Build Agents</h2>
+                    <p>A meta-agent dynamically spawns, configures, and routes to specialized sub-agents based on task analysis. Rather than hardcoding the team composition, the meta-agent decides at runtime what agents are needed.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — meta-agent spawning specialists dynamically</span></div>
+                        <pre><code class="language-python">from openai import OpenAI
+from dataclasses import dataclass
+
+@dataclass
+class AgentSpec:
+    name: str
+    role: str
+    tools: list[str]
+    model: str = "gpt-4o"
+
+def meta_agent(task: str, available_tool_registry: dict) -> str:
+    """
+    Analyzes the task and dynamically spawns the right specialist agents.
+    Returns the final assembled result.
+    """
+    client = OpenAI()
+
+    # Phase 1: meta-agent decides what agents are needed
+    planning_response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": (
+                "You are a team architect. Given a task, decide what specialist agents are needed. "
+                f"Available tools: {list(available_tool_registry.keys())}. "
+                "Return JSON: [{name, role, tools, reason}]"
+            )},
+            {"role": "user", "content": f"Task: {task}"},
+        ],
+        response_format={"type": "json_object"},
+    )
+
+    import json
+    team_specs = json.loads(planning_response.choices[0].message.content)["agents"]
+
+    # Phase 2: spawn and run each specialist
+    results = {}
+    for spec in team_specs:
+        agent_tools = [available_tool_registry[t] for t in spec["tools"] if t in available_tool_registry]
+        result = run_specialist(
+            role=spec["role"],
+            task=f"Your part of the task: {spec['reason']}. Full context: {task}",
+            tools=agent_tools,
+            model=spec.get("model", "gpt-4o"),
+        )
+        results[spec["name"]] = result
+
+    # Phase 3: meta-agent assembles final output
+    final = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Synthesize the specialist outputs into a single coherent result."},
+            {"role": "user", "content": f"Original task: {task}\n\nSpecialist results:\n{json.dumps(results, indent=2)}"},
+        ],
+    )
+    return final.choices[0].message.content</code></pre>
+                    </div>
+                </div>
+
+                <div id="adversarial" class="content-section">
+                    <h2>Adversarial Agent Pairs &amp; Consensus</h2>
+
+                    <h3>Red-Team / Blue-Team Agents</h3>
+                    <p>Inspired by security red-teaming, this pattern pairs a <strong>generator agent</strong> with a dedicated <strong>adversarial critic</strong> whose sole job is to find flaws, contradictions, security vulnerabilities, or unsafe content in the generator's output.</p>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>Generator</strong><p>Produces output</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#ef4444;"><div class="flow-icon">🔴</div><strong>Red-Team Agent</strong><p>Adversarially attacks: "How could this fail?"</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔵</div><strong>Blue-Team Agent</strong><p>Reviews attack; decides if issue is real</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🔄</div><strong>Revise</strong><p>If issue confirmed</p></div>
+                    </div>
+
+                    <h3>Consensus Mechanisms</h3>
+                    <p>When the cost of a single agent being wrong is high, run the same task with N independent agents and aggregate their outputs.</p>
+
+                    <table class="decision-matrix">
+                        <thead><tr><th>Mechanism</th><th>How it works</th><th>Best for</th></tr></thead>
+                        <tbody>
+                            <tr><td>Majority Vote</td><td>N agents answer independently; most common answer wins</td><td>Discrete classification, fact checking</td></tr>
+                            <tr><td>Confidence Aggregation</td><td>Each agent provides a confidence score; highest confidence (or weighted average) wins</td><td>When agents can estimate their own uncertainty</td></tr>
+                            <tr><td>Synthesis Judge</td><td>A fourth "judge" agent reads all N responses and synthesizes the final answer, reconciling contradictions</td><td>Open-ended generation where exact agreement is unlikely</td></tr>
+                            <tr><td>Best-of-N</td><td>A scoring function (LLM-as-judge or automated test) selects the best of N candidates</td><td>Code generation, where tests can verify correctness</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Cost-quality trade-off in consensus</h4>
+                        <p>Running N=3 agents with majority vote costs 3× per task but substantially reduces per-task error rates on knowledge-intensive queries. The break-even depends on your error cost: if a single wrong answer costs $1000 in downstream damage, spending $0.30 extra on 3× inference is highly rational. For low-stakes tasks, don't bother — single-agent is fine.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 14 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. According to LEGOMem research, which type of memory is most critical for an orchestrator agent?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Execution-level tool call history for each specialist</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Task decomposition memory — knowing how to split goals into sub-tasks and assign them in the right order</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The full shared memory pool from all agents combined</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Procedural memory about which LLM model to call</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What makes a "meta-agent" different from a standard orchestrator?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A meta-agent uses a larger model than regular agents</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> A meta-agent dynamically decides at runtime what specialist agents to spawn and configure, rather than routing to a fixed pre-defined team</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A meta-agent coordinates only with other orchestrators, never with worker agents</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A meta-agent is a LangGraph subgraph that contains other subgraphs</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. The "Best-of-N" consensus mechanism is particularly well-suited for code generation. Why?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Code agents always produce N=3 identical solutions</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Code correctness can be verified automatically by running tests, providing an objective scoring function to select the best candidate from N attempts</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Code generation is cheaper than text generation, making N runs affordable</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Code agents cannot use majority voting because code is always unique</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

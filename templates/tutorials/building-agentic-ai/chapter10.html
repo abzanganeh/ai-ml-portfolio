@@ -1,0 +1,239 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 10: Multi-Agent Systems — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 3 — Multi-Agent Systems &amp; Orchestration</div>
+            <h1 class="chapter-title">Chapter 10: Multi-Agent Systems</h1>
+            <p class="chapter-subtitle">Why go multi-agent, communication patterns, trust models, and handoffs</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="45"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 10 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="why">Why Multi-Agent</button>
+                <button class="section-nav-btn azbn-btn" data-section="communication">Communication</button>
+                <button class="section-nav-btn azbn-btn" data-section="trust">Trust &amp; Handoffs</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>From One Agent to Many</h2>
+                    <p>A single agent with all capabilities in one context is the simplest design — and the right starting point. Multi-agent systems are justified only when single-agent limits actually matter for the task at hand. This chapter explains those limits and when crossing them is worth the added complexity.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Single-Agent Limits</h4>
+                            <ul>
+                                <li>Context window caps — can't hold everything for complex, multi-document tasks</li>
+                                <li>Specialization trade-offs — a general agent is mediocre at all domains</li>
+                                <li>Sequential execution — one agent does one thing at a time</li>
+                                <li>Single point of failure — one model, one reasoning path</li>
+                                <li>No adversarial verification — no second opinion</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Multi-Agent Gains</h4>
+                            <ul>
+                                <li>Parallelism — multiple agents work simultaneously on different subtasks</li>
+                                <li>Specialization — each agent optimized for its domain</li>
+                                <li>Scale — tasks that exceed one context window are split across agents</li>
+                                <li>Verification — a second agent checks the first's work</li>
+                                <li>Resilience — one agent failing doesn't stop the whole pipeline</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Multi-agent complexity cost</h4>
+                        <p>Each agent boundary introduces: (1) latency (inter-agent communication), (2) context loss (agents only know what they're told), (3) debugging difficulty (tracing across agents is harder than tracing within one), and (4) coordination cost. Over 40% of agentic AI projects fail by end of 2027 — and most failures come from premature over-engineering, not weak models.</p>
+                    </div>
+                </div>
+
+                <div id="why" class="content-section">
+                    <h2>When Multi-Agent is Worth It</h2>
+
+                    <table class="decision-matrix">
+                        <thead><tr><th>Signal</th><th>Single Agent</th><th>Multi-Agent</th></tr></thead>
+                        <tbody>
+                            <tr><td>Task fits in 1 context window</td><td>✓</td><td>—</td></tr>
+                            <tr><td>Task requires domain expertise (legal + code + finance)</td><td>Mediocre on all</td><td>✓ Specialists</td></tr>
+                            <tr><td>Subtasks are independent and parallelizable</td><td>Sequential, slow</td><td>✓ Parallel</td></tr>
+                            <tr><td>Output quality needs adversarial verification</td><td>Self-critique only</td><td>✓ Separate critic</td></tr>
+                            <tr><td>Pipeline has clear handoff points (research → write → edit)</td><td>Role confusion</td><td>✓ Staged roles</td></tr>
+                            <tr><td>Simple, single-turn task</td><td>✓</td><td>Overkill</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Multi-agent network diagram -->
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Multi-agent system: Orchestrator + Specialists</p>
+                        <div class="network-row">
+                            <div class="net-node orchestrator">Orchestrator Agent</div>
+                        </div>
+                        <div class="net-arrow down">↓ delegates tasks</div>
+                        <div class="network-row" style="gap:1rem;">
+                            <div class="net-node specialist">Research Agent</div>
+                            <div class="net-node specialist">Code Agent</div>
+                            <div class="net-node specialist">Writer Agent</div>
+                        </div>
+                        <div class="net-arrow down">↓ use tools</div>
+                        <div class="network-row" style="gap:0.5rem;">
+                            <div class="net-node tool">search()</div>
+                            <div class="net-node tool">execute_code()</div>
+                            <div class="net-node tool">write_file()</div>
+                            <div class="net-node tool">read_doc()</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="communication" class="content-section">
+                    <h2>Agent Communication Patterns</h2>
+
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <h4>Shared State</h4>
+                            <p>All agents read from and write to a common state store (dictionary, database). Simple but requires careful concurrency control.</p>
+                            <div class="use-when">Use when: agents work on different parts of a shared document</div>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>Message Passing</h4>
+                            <p>Agents send structured messages to each other via a message queue. Decoupled, scalable, auditable.</p>
+                            <div class="use-when">Use when: agents run in separate processes or asynchronously</div>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>Event-Driven</h4>
+                            <p>Agents subscribe to event topics; an event from one agent triggers another. Loosely coupled.</p>
+                            <div class="use-when">Use when: pipelines are reactive (trigger on completion, not scheduled)</div>
+                        </div>
+                        <div class="pattern-card purple-top">
+                            <h4>Direct Function Call (Agents-as-Tools)</h4>
+                            <p>The orchestrator calls a sub-agent exactly like a tool — synchronous, in-process. Simplest integration pattern.</p>
+                            <div class="use-when">Use when: sub-agent work is synchronous and short-lived</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="trust" class="content-section">
+                    <h2>Trust Between Agents &amp; Handoffs</h2>
+
+                    <div class="info-box">
+                        <h3>The trust problem</h3>
+                        <p>When Agent A sends a message to Agent B, should Agent B treat that message as trusted (like a developer instruction) or untrusted (like user input)? This is not a hypothetical — a compromised sub-agent could inject malicious instructions into its output that the orchestrator passes to other agents. The general rule: <strong>output from any agent that processed user input should be treated as untrusted until validated</strong>.</p>
+                    </div>
+
+                    <h3>Handoff Protocol</h3>
+                    <p>A handoff transfers task context from one agent to another. A good handoff message includes:</p>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Task summary</strong><span>What has been done so far and why</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Current state</strong><span>All relevant data the receiving agent needs (don't rely on it having access to the full history)</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Remaining objective</strong><span>Exactly what the receiving agent needs to accomplish</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Constraints and context</strong><span>User preferences, deadlines, quality standards that must be preserved</span></div></div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — agents-as-tools pattern</span></div>
+                        <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+
+def research_agent(topic: str) -> str:
+    """Specialist: searches and synthesizes information about a topic."""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are a research specialist. Search the web and synthesize findings."},
+            {"role": "user", "content": f"Research this topic thoroughly: {topic}"},
+        ],
+        tools=SEARCH_TOOLS,
+    )
+    # ... execute tool calls, return final answer
+    return final_answer
+
+
+# Register the specialist as a tool for the orchestrator
+ORCHESTRATOR_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "research_agent",
+            "description": "Delegate deep research on a specific topic to a specialist agent. Returns a comprehensive summary.",
+            "parameters": {
+                "type": "object",
+                "properties": {"topic": {"type": "string", "description": "Topic to research"}},
+                "required": ["topic"],
+            },
+        },
+    }
+]
+
+# The orchestrator uses research_agent exactly like any other tool
+def orchestrator(user_goal: str) -> str:
+    messages = [
+        {"role": "system", "content": "You are an orchestrator. Delegate research tasks to the research_agent tool."},
+        {"role": "user", "content": user_goal},
+    ]
+    # ... standard agent loop with ORCHESTRATOR_TOOLS
+</code></pre>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 10 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Which scenario most justifies using a multi-agent system over a single agent?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Answering a factual question about a historical event</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Producing a report that requires parallel research across 5 domains, each needing specialized knowledge</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Summarizing a 2-page document</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Translating a sentence from English to French</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. In the "agents-as-tools" pattern, how does the orchestrator call a sub-agent?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> By sending a HTTP POST request to the sub-agent's server</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> By calling it exactly like a regular tool — the sub-agent is registered in the orchestrator's tool registry with a function schema</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> By injecting the sub-agent's system prompt into the current context</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> By spawning a new Python thread that shares the orchestrator's memory</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Why should output from a sub-agent that processed user input be treated as untrusted?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Sub-agents always produce lower quality output than the orchestrator</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Sub-agent APIs have higher error rates than direct LLM calls</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> A compromised sub-agent could inject malicious instructions into its output, which the orchestrator then passes to other agents</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Sub-agents do not have access to the system prompt</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

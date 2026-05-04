@@ -1,0 +1,255 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 7: Memory Systems — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 2 — Core Building Blocks</div>
+            <h1 class="chapter-title">Chapter 7: Memory Systems</h1>
+            <p class="chapter-subtitle">Four memory types, temporal knowledge graphs, and hybrid retrieval</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="32"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 7 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="four-types">Four Types</button>
+                <button class="section-nav-btn azbn-btn" data-section="retrieval">Retrieval Strategies</button>
+                <button class="section-nav-btn azbn-btn" data-section="code">Implementation</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Memory is Not the Context Window</h2>
+                    <p>The most common misconception in agent design: treating the context window as memory. The context window is a <em>fixed-size working buffer</em>. Memory is a set of external storage systems that selectively surface relevant information into that buffer on demand.</p>
+                    <div class="warning-box">
+                        <h4>Why context ≠ memory</h4>
+                        <ul>
+                            <li>Context windows are expensive — GPT-4o charges per token; a 128K context with 10K tokens of conversation history costs significantly more per turn than one with only relevant 2K tokens</li>
+                            <li>Context windows are ephemeral — they disappear when the session ends</li>
+                            <li>Context windows degrade at long range — model performance on facts in the middle of a very long context is measurably worse than facts at the start or end (the "lost in the middle" problem)</li>
+                        </ul>
+                    </div>
+                    <p>The goal of a memory system is to <strong>decide what is worth putting in the context window</strong> for a given query, and to <strong>persist information across sessions</strong>.</p>
+                </div>
+
+                <div id="four-types" class="content-section">
+                    <h2>Four Memory Types</h2>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1">
+                            <div class="layer-num">1</div>
+                            <div class="layer-content">
+                                <strong>Working Memory — In-context State</strong>
+                                <span>The active conversation messages. Sub-10ms access. Used for the current task. Cleared when the session ends.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l2">
+                            <div class="layer-num">2</div>
+                            <div class="layer-content">
+                                <strong>Episodic Memory — What Happened</strong>
+                                <span>Timestamped log of past interactions, tool calls, and outcomes. Supports temporal queries: "what did we do last Tuesday?" Stored in relational DB or time-series store.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l3">
+                            <div class="layer-num">3</div>
+                            <div class="layer-content">
+                                <strong>Semantic Memory — What I Know</strong>
+                                <span>Facts and knowledge stored as vector embeddings. Supports similarity search: "what do I know about topic X?" Stored in vector DB (pgvector, Chroma, Qdrant).</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l4">
+                            <div class="layer-num">4</div>
+                            <div class="layer-content">
+                                <strong>Procedural Memory — How to Do Things</strong>
+                                <span>Stored tool schemas, system prompt templates, workflow patterns, and learned skills. Consulted when the agent needs to know its own capabilities.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Temporal Knowledge Graphs</h3>
+                    <p>Standard vector databases only answer "what is similar to this query?" A <strong>temporal knowledge graph</strong> (e.g. Zep/Graphiti) also answers "how did things change over time?" and "what relationships exist between entities?" It combines semantic search with entity extraction, relationship modeling, and time-range filtering.</p>
+
+                    <!-- Knowledge graph visual -->
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Temporal Knowledge Graph Structure</p>
+                        <div class="network-row">
+                            <div class="net-node orchestrator">User: Alice</div>
+                            <div class="net-arrow">—prefers→</div>
+                            <div class="net-node specialist">Python</div>
+                        </div>
+                        <div class="net-arrow down">↓ worked_on</div>
+                        <div class="network-row">
+                            <div class="net-node specialist">Project: API Refactor</div>
+                            <div class="net-arrow">—completed→</div>
+                            <div class="net-node tool">2026-04-01</div>
+                        </div>
+                        <div class="net-arrow down">↓ related_to</div>
+                        <div class="network-row">
+                            <div class="net-node specialist">FastAPI migration</div>
+                            <div class="net-arrow">—blocked_by→</div>
+                            <div class="net-node tool">Auth module</div>
+                        </div>
+                        <p style="color:#475569;font-size:0.72rem;margin-top:1rem;text-align:center;">Edges carry timestamps — supports "what was true before/after date X?"</p>
+                    </div>
+
+                    <p>Zep's Graphiti achieves <strong>94.8% accuracy</strong> on Deep Memory Retrieval benchmarks, compared to flat vector search baselines. The improvement comes from using graph traversal to chain related facts rather than returning independent document chunks.</p>
+                </div>
+
+                <div id="retrieval" class="content-section">
+                    <h2>Retrieval Strategies</h2>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">❓</div><strong>Query</strong><p>"Tell me about Alice's recent work"</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🔢</div><strong>Embed</strong><p>Dense vector (e.g., text-embedding-3)</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">🔍</div><strong>Hybrid Search</strong><p>Dense + BM25 + rerank</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">📋</div><strong>Top-K Chunks</strong><p>Injected into context</p></div>
+                    </div>
+
+                    <h3>Dense vs Sparse vs Hybrid</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Strategy</th><th>Mechanism</th><th>Best For</th><th>Weakness</th></tr></thead>
+                        <tbody>
+                            <tr><td>Dense (vector)</td><td>Cosine similarity on embeddings</td><td>Semantic similarity, paraphrases</td><td>Misses exact keyword matches</td></tr>
+                            <tr><td>Sparse (BM25)</td><td>TF-IDF keyword matching</td><td>Exact terms, codes, IDs</td><td>Misses semantic similarity</td></tr>
+                            <tr><td>Hybrid</td><td>Dense + sparse, score fusion</td><td>General purpose — best recall</td><td>More complex pipeline, higher latency</td></tr>
+                            <tr><td>Reranking</td><td>Cross-encoder re-scores top-K</td><td>Precision on top-1 result</td><td>Added latency; requires 2nd model call</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Delta compression for multi-turn agents</h4>
+                        <p>RetainDB's research shows delta compression of episodic memory achieves <strong>50–90% token savings</strong> in multi-turn scenarios by storing only what changed between turns rather than the full conversation state. This is especially valuable for long-running agent sessions where memory accumulates quickly.</p>
+                    </div>
+                </div>
+
+                <div id="code" class="content-section">
+                    <h2>Memory System Implementation</h2>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — pluggable memory backend for an agent</span></div>
+                        <pre><code class="language-python">from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any
+import json
+
+@dataclass
+class MemoryEntry:
+    content: str
+    metadata: dict[str, Any] = field(default_factory=dict)
+    timestamp: datetime = field(default_factory=datetime.utcnow)
+    memory_type: str = "episodic"   # episodic | semantic | procedural
+
+
+class MemoryBackend(ABC):
+    @abstractmethod
+    def store(self, entry: MemoryEntry) -> str:
+        """Store a memory entry; return its ID."""
+
+    @abstractmethod
+    def search(self, query: str, top_k: int = 5, memory_type: str | None = None) -> list[MemoryEntry]:
+        """Retrieve the most relevant memories for the query."""
+
+
+class ChromaMemoryBackend(MemoryBackend):
+    """Semantic memory using ChromaDB and OpenAI embeddings."""
+
+    def __init__(self, collection_name: str = "agent_memory") -> None:
+        import chromadb
+        from chromadb.utils import embedding_functions
+
+        self._client = chromadb.PersistentClient(path="./chroma_store")
+        self._ef = embedding_functions.OpenAIEmbeddingFunction(
+            model_name="text-embedding-3-small"
+        )
+        self._collection = self._client.get_or_create_collection(
+            name=collection_name, embedding_function=self._ef
+        )
+
+    def store(self, entry: MemoryEntry) -> str:
+        import uuid
+        entry_id = str(uuid.uuid4())
+        self._collection.add(
+            documents=[entry.content],
+            metadatas=[{**entry.metadata, "type": entry.memory_type, "ts": entry.timestamp.isoformat()}],
+            ids=[entry_id],
+        )
+        return entry_id
+
+    def search(self, query: str, top_k: int = 5, memory_type: str | None = None) -> list[MemoryEntry]:
+        where = {"type": memory_type} if memory_type else None
+        results = self._collection.query(
+            query_texts=[query], n_results=top_k, where=where
+        )
+        entries = []
+        for doc, meta in zip(results["documents"][0], results["metadatas"][0]):
+            entries.append(MemoryEntry(
+                content=doc,
+                metadata=meta,
+                timestamp=datetime.fromisoformat(meta.get("ts", datetime.utcnow().isoformat())),
+                memory_type=meta.get("type", "semantic"),
+            ))
+        return entries</code></pre>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 7 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. What is the "lost in the middle" problem?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> When a vector database loses documents during a disk write</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> LLM performance on facts located in the middle of a very long context degrades compared to facts at the start or end</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> When an agent's memory eviction policy removes the most important facts</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> When BM25 keyword search fails to find a document with exact keyword matches</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What advantage does a temporal knowledge graph have over a flat vector database?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It stores documents as compressed byte arrays, reducing storage costs</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> It models relationships between entities and time, enabling queries like "what changed after date X?" and "how are A and B related?"</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It has sub-millisecond query latency for very large corpora</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> It eliminates the need for embedding models</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Why does hybrid search (dense + BM25) outperform either approach alone?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> It uses two GPUs in parallel, halving latency</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> BM25 is always more accurate than dense retrieval</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Dense retrieval excels on semantic similarity while BM25 excels on exact keyword matches; combining both improves recall across query types</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Hybrid search avoids the need for a reranking step</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

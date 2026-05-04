@@ -184,6 +184,20 @@ TUTORIALS_DATA = [
         'tags': 'rag,retrieval-augmented-generation,vector-databases,embeddings,semantic-search,pinecone,chroma'
     },
     {
+        'title': 'Building Agentic AI Systems',
+        'slug': 'building-agentic-ai',
+        'description': 'Advanced complete guide to building production Agentic AI. 22 chapters across 5 sections covering architectures, tool use, MCP, memory, multi-agent orchestration, LangGraph, safety, evaluation, fine-tuning, and frontier research.',
+        'category': 'Deep Learning',
+        'difficulty': 'advanced',
+        'duration': '600 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/building-agentic-ai/index.html',
+        'published': True,
+        'excerpt': 'Complete advanced course on building Agentic AI systems: agent architectures, MCP, memory systems, multi-agent orchestration, LangGraph, CrewAI, safety, evaluation, and fine-tuning for tool use.',
+        'tags': 'agents,agentic-ai,langgraph,crewai,mcp,multi-agent,tool-use,memory,rlhf,production,safety'
+    },
+    {
         'title': 'Agentic AI & LLM Agents',
         'slug': 'agentic-ai',
         'description': 'Master AI Agents and Agentic AI systems. 8 comprehensive chapters covering agent architectures, tool-using agents, ReAct framework, multi-agent systems, agent orchestration, and building production agents.',

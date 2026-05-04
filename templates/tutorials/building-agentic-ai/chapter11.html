@@ -1,0 +1,234 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 11: Orchestration Patterns — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 3 — Multi-Agent Systems &amp; Orchestration</div>
+            <h1 class="chapter-title">Chapter 11: Orchestration Patterns</h1>
+            <p class="chapter-subtitle">Supervisor, Swarm, Pipeline, Fan-out, and Critic loop — with a decision matrix</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="50"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 11 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="patterns">Five Patterns</button>
+                <button class="section-nav-btn azbn-btn" data-section="state">State Management</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>How Multi-Agent Systems Are Structured</h2>
+                    <p>There is no single "correct" multi-agent architecture. The right pattern depends on the task's degree of parallelism, interdependency, and quality requirements. This chapter gives you five production-proven patterns, each with a clear use case and trade-off profile.</p>
+
+                    <!-- Overview diagram showing all 5 patterns -->
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <h4>1. Supervisor (Hierarchical)</h4>
+                            <p>Central controller delegates to specialized workers</p>
+                            <div class="use-when">Best for: complex tasks with diverse subtasks</div>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>2. Swarm (Peer-to-Peer)</h4>
+                            <p>Dynamic handoffs between agents, no central controller</p>
+                            <div class="use-when">Best for: customer service routing, flexible workflows</div>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>3. Sequential Pipeline</h4>
+                            <p>Output of one agent becomes input of the next</p>
+                            <div class="use-when">Best for: content production (research → write → edit)</div>
+                        </div>
+                        <div class="pattern-card purple-top">
+                            <h4>4. Fan-out + Aggregator</h4>
+                            <p>Multiple agents work in parallel; results are merged</p>
+                            <div class="use-when">Best for: multi-source research, parallel analysis</div>
+                        </div>
+                        <div class="pattern-card cyan-top">
+                            <h4>5. Critic Loop</h4>
+                            <p>Generator + evaluator iterate until quality threshold</p>
+                            <div class="use-when">Best for: code generation, creative writing, safety checking</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="patterns" class="content-section">
+                    <h2>Five Patterns in Depth</h2>
+
+                    <h3>Pattern 1: Supervisor / Hierarchical</h3>
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Supervisor Pattern</p>
+                        <div class="network-row">
+                            <div class="net-node orchestrator">Supervisor</div>
+                        </div>
+                        <div class="net-arrow down">↙ ↓ ↘ delegates</div>
+                        <div class="network-row" style="gap:1rem;">
+                            <div class="net-node specialist">Worker A</div>
+                            <div class="net-node specialist">Worker B</div>
+                            <div class="net-node specialist">Worker C</div>
+                        </div>
+                        <div class="net-arrow down">results ↑ ↑ ↑</div>
+                        <div class="network-row"><div class="net-node orchestrator">Supervisor aggregates</div></div>
+                    </div>
+                    <p>The supervisor knows the goal and the available workers. It decomposes the task, delegates subtasks to appropriate workers, and assembles results. Workers report back to the supervisor — they do not communicate with each other.</p>
+
+                    <h3>Pattern 2: Swarm</h3>
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Swarm Pattern — peer handoffs</p>
+                        <div class="network-row" style="gap:0.75rem;">
+                            <div class="net-node specialist">Triage Agent</div>
+                            <div class="net-arrow">→ handoff →</div>
+                            <div class="net-node specialist">Support Agent</div>
+                            <div class="net-arrow">→ escalate →</div>
+                            <div class="net-node specialist">Expert Agent</div>
+                        </div>
+                    </div>
+                    <p>Each agent decides whether to handle the request or transfer it to a more appropriate peer. No central controller — routing emerges from each agent's own decision. This is the architecture behind many customer support systems.</p>
+
+                    <h3>Pattern 3: Sequential Pipeline</h3>
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🔍</div><strong>Research Agent</strong><p>Gather sources</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">✍️</div><strong>Writer Agent</strong><p>Draft content</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🔎</div><strong>Editor Agent</strong><p>Review &amp; revise</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">📤</div><strong>Publisher</strong><p>Output</p></div>
+                    </div>
+                    <p>Simple, predictable, easy to debug. Weakness: the pipeline is as slow as the sum of each stage's latency. Adding parallelism requires switching to Fan-out or Supervisor patterns.</p>
+
+                    <h3>Pattern 4: Fan-out + Aggregator</h3>
+                    <div class="network-diagram">
+                        <p style="color:#94a3b8;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Fan-out: parallel agents, then aggregation</p>
+                        <div class="network-row"><div class="net-node orchestrator">Dispatcher</div></div>
+                        <div class="net-arrow down">↙ ↓ ↘ parallel</div>
+                        <div class="network-row" style="gap:1rem;">
+                            <div class="net-node specialist">Agent 1<br><small style="color:#94a3b8;">source A</small></div>
+                            <div class="net-node specialist">Agent 2<br><small style="color:#94a3b8;">source B</small></div>
+                            <div class="net-node specialist">Agent 3<br><small style="color:#94a3b8;">source C</small></div>
+                        </div>
+                        <div class="net-arrow down">↘ ↓ ↙ merge</div>
+                        <div class="network-row"><div class="net-node orchestrator">Aggregator</div></div>
+                    </div>
+                    <p>Fan-out is the pattern for parallelism. The dispatcher assigns independent subtasks to multiple agents running concurrently. The aggregator merges the results. Total latency = slowest agent, not sum of all. Best for multi-source research or parallel data processing.</p>
+
+                    <h3>Pattern 5: Critic Loop</h3>
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>Generator</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#ef4444;"><div class="flow-icon">👩‍⚖️</div><strong>Critic</strong><p>Score + feedback</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">❓</div><strong>Score ≥ threshold?</strong></div>
+                    </div>
+                    <div class="comparison-grid" style="margin-top:0.5rem;">
+                        <div class="comparison-col"><h4>Yes</h4><ul><li>Output approved</li><li>Return to user</li></ul></div>
+                        <div class="comparison-col"><h4>No</h4><ul><li>Generator revises based on critic feedback</li><li>Loop again (max N iterations)</li></ul></div>
+                    </div>
+
+                    <h3>Decision Matrix</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Pattern</th><th>Parallelism</th><th>Control Complexity</th><th>Debugging</th><th>Latency</th></tr></thead>
+                        <tbody>
+                            <tr><td>Supervisor</td><td>Medium</td><td>High</td><td>Moderate</td><td>Medium</td></tr>
+                            <tr><td>Swarm</td><td>Low</td><td>Low</td><td>Hard (emergent)</td><td>Low</td></tr>
+                            <tr><td>Pipeline</td><td>None</td><td>Lowest</td><td>Easiest</td><td>Highest (sum)</td></tr>
+                            <tr><td>Fan-out</td><td>Highest</td><td>Medium</td><td>Easy per agent</td><td>Lowest (max)</td></tr>
+                            <tr><td>Critic Loop</td><td>None</td><td>Low</td><td>Easy</td><td>Variable (iterations)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="state" class="content-section">
+                    <h2>State Management Across Agents</h2>
+                    <p>The hardest part of multi-agent systems is not the agents themselves — it's the shared state that flows between them.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Shared State Store</h4>
+                            <ul>
+                                <li>Central dict or database all agents read/write</li>
+                                <li>Simple; requires locking for concurrent writes</li>
+                                <li>Good for: supervisor-controlled pipelines</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Scoped State (per-agent)</h4>
+                            <ul>
+                                <li>Each agent has its own state; passes output to next agent</li>
+                                <li>No shared mutable state; cleaner isolation</li>
+                                <li>Good for: pipelines with clear handoffs</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Handoff-Only State</h4>
+                            <ul>
+                                <li>All state travels with the handoff message</li>
+                                <li>Most portable; no external dependency</li>
+                                <li>Good for: swarm patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Checkpointing for fault tolerance</h4>
+                        <p>For long multi-agent workflows, save a checkpoint after each major step completes. If the workflow fails mid-way (network error, rate limit, agent crash), you can resume from the last checkpoint rather than restarting from the beginning. LangGraph's built-in checkpointing (covered in Chapter 12) makes this straightforward.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 11 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. In the Fan-out + Aggregator pattern, what determines the total task latency?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The sum of all individual agent latencies</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> The latency of the slowest individual agent (since all agents run in parallel)</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The latency of the dispatcher + all agent latencies</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The latency of the aggregator only</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. Which pattern is hardest to debug and why?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Pipeline — because it has no parallelism</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Swarm — because routing is emergent (each agent decides locally), making the global execution path non-deterministic and hard to trace</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Critic Loop — because it has variable number of iterations</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Fan-out — because agents run in parallel</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What is the primary advantage of "handoff-only state" in the Swarm pattern?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> It reduces context window usage by compressing the conversation history</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> All state travels with the handoff message, so agents have no shared external dependency and can be deployed independently</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> It allows multiple agents to write to the same state simultaneously without locking</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> It eliminates the need for an aggregator agent</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}
