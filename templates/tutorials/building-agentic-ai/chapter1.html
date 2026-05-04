@@ -1,0 +1,310 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 1: What is an Agent? — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 1 — Foundations &amp; Mental Models</div>
+            <h1 class="chapter-title">Chapter 1: What is an Agent?</h1>
+            <p class="chapter-subtitle">From prompt-response to goal-directed autonomous systems</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="5"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 1 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="agent-loop">The Agent Loop</button>
+                <button class="section-nav-btn azbn-btn" data-section="vs-chatbot">vs Chatbots</button>
+                <button class="section-nav-btn azbn-btn" data-section="paradigms">Paradigms</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <!-- OVERVIEW -->
+                <div id="overview" class="content-section active">
+                    <h2>What is an Agent?</h2>
+
+                    <div class="info-box">
+                        <h3>Definition</h3>
+                        <p>An <strong>agent</strong> is a system that perceives its environment, reasons about a goal, chooses actions from a set of tools, executes them, and uses the results to continue until the goal is met — <em>without human intervention at each step</em>.</p>
+                    </div>
+
+                    <p>Every LLM you have used is stateless by default: you send a prompt, you get a response. The LLM does not remember the exchange tomorrow, cannot search the web, cannot write a file, and cannot retry when something fails. Agents break all four of those constraints.</p>
+
+                    <h3>Four Defining Properties</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1">
+                            <div class="layer-num">1</div>
+                            <div class="layer-content">
+                                <strong>Perceive</strong>
+                                <span>Receive observations from the environment — user messages, tool outputs, API responses, file contents</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l2">
+                            <div class="layer-num">2</div>
+                            <div class="layer-content">
+                                <strong>Reason</strong>
+                                <span>Use an LLM to interpret the observation, recall relevant memory, and decide what to do next</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l3">
+                            <div class="layer-num">3</div>
+                            <div class="layer-content">
+                                <strong>Plan</strong>
+                                <span>Decompose a complex goal into an ordered sequence of sub-tasks and contingencies</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l4">
+                            <div class="layer-num">4</div>
+                            <div class="layer-content">
+                                <strong>Act</strong>
+                                <span>Execute a tool call, send a message, write to storage, or signal task completion</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Why this matters now</h4>
+                        <p>Function calling was available in GPT-4 in 2023. What changed in 2024–2026 is <strong>reliability</strong>: reasoning models like o1, o3, and DeepSeek-R1 lowered the error rate per step enough that long multi-step tasks became practical in production.</p>
+                    </div>
+                </div>
+
+                <!-- AGENT LOOP -->
+                <div id="agent-loop" class="content-section">
+                    <h2>The Agent Loop</h2>
+
+                    <p>Every agent, regardless of its sophistication, runs some variation of this loop. Understanding it deeply is the foundation for reasoning about every design decision in later chapters.</p>
+
+                    <!-- Circular loop diagram -->
+                    <div style="background:#f0f4ff;border-radius:12px;padding:2rem;margin:1.5rem 0;border:1px solid #e2e8f0;">
+                        <div style="display:grid;grid-template-columns:1fr auto 1fr;grid-template-rows:1fr auto 1fr;gap:0.5rem;max-width:420px;margin:0 auto;align-items:center;justify-items:center;">
+                            <!-- Row 1 -->
+                            <div class="flow-node" style="width:120px;">
+                                <div class="flow-icon">🎯</div>
+                                <strong>Goal</strong>
+                                <p>High-level task</p>
+                            </div>
+                            <div style="font-size:1.4rem;color:#6366f1;transform:rotate(45deg);">↓</div>
+                            <div class="flow-node" style="width:120px;">
+                                <div class="flow-icon">👁</div>
+                                <strong>Observe</strong>
+                                <p>Read environment</p>
+                            </div>
+                            <!-- Row 2 -->
+                            <div style="font-size:1.4rem;color:#6366f1;transform:rotate(-45deg);">↑</div>
+                            <div style="text-align:center;font-size:0.75rem;color:#6366f1;font-weight:700;padding:0.3rem 0.6rem;border:2px dashed #6366f1;border-radius:8px;">LOOP</div>
+                            <div style="font-size:1.4rem;color:#6366f1;transform:rotate(45deg);">↓</div>
+                            <!-- Row 3 -->
+                            <div class="flow-node" style="width:120px;">
+                                <div class="flow-icon">⚡</div>
+                                <strong>Act</strong>
+                                <p>Execute tool / output</p>
+                            </div>
+                            <div style="font-size:1.4rem;color:#6366f1;transform:rotate(-45deg);">↑</div>
+                            <div class="flow-node" style="width:120px;">
+                                <div class="flow-icon">🧠</div>
+                                <strong>Think &amp; Plan</strong>
+                                <p>Reason, decide action</p>
+                            </div>
+                        </div>
+                        <p style="text-align:center;font-size:0.8rem;color:#64748b;margin-top:1rem;">The loop runs until the agent emits a <code>FINISH</code> signal or reaches a step/time limit.</p>
+                    </div>
+
+                    <h3>What can go wrong in the loop?</h3>
+                    <table class="decision-matrix">
+                        <thead>
+                            <tr><th>Failure Mode</th><th>Typical Cause</th><th>Mitigation</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Infinite loop</td><td>No convergence signal, LLM repeats same action</td><td>Max iterations + state change check</td></tr>
+                            <tr><td>Hallucinated tool result</td><td>LLM infers result instead of calling the tool</td><td>Force tool-use mode; don't allow free-form text as "observations"</td></tr>
+                            <tr><td>Context overflow</td><td>History grows unbounded across iterations</td><td>Summarize or evict old observations (Chapter 9)</td></tr>
+                            <tr><td>Irreversible action</td><td>Agent deletes or sends without confirmation</td><td>Human-in-the-loop gate for write operations (Chapter 16)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- VS CHATBOT -->
+                <div id="vs-chatbot" class="content-section">
+                    <h2>Agent vs Chatbot</h2>
+
+                    <p>The distinction is not about model size or intelligence — it is about <strong>who executes side effects</strong>.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Chatbot / LLM</h4>
+                            <ul>
+                                <li>Single-turn input → output</li>
+                                <li>No persistent memory across sessions</li>
+                                <li>No tool execution (unless explicitly added)</li>
+                                <li>Goal is to generate good text</li>
+                                <li>User drives every step</li>
+                                <li>Deterministic control flow</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Agent</h4>
+                            <ul>
+                                <li>Multi-step, goal-directed loop</li>
+                                <li>Persistent memory (episodic, semantic)</li>
+                                <li>Calls tools, APIs, databases</li>
+                                <li>Goal is to complete a task</li>
+                                <li>Agent drives its own steps</li>
+                                <li>Emergent, conditional control flow</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>When an agent is the wrong choice</h4>
+                        <p>Not every task benefits from an agent loop. If the problem can be solved in a single, well-structured prompt, adding an agent loop only introduces latency, cost, and failure surfaces. Use an agent when the task genuinely requires <em>multiple steps, external data, or decisions based on intermediate results</em>.</p>
+                    </div>
+                </div>
+
+                <!-- PARADIGMS -->
+                <div id="paradigms" class="content-section">
+                    <h2>Two Foundational Paradigms</h2>
+
+                    <p>Modern agentic architectures fall into two lineages that differ in how they represent knowledge and make decisions. Most production systems blend both.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Symbolic / Classical</h4>
+                            <ul>
+                                <li>Explicit rules and logic</li>
+                                <li>Planning via search (A*, STRIPS, HTN)</li>
+                                <li>Deterministic, auditable</li>
+                                <li>Brittle under distribution shift</li>
+                                <li>Dominates safety-critical domains (healthcare, aviation)</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Neural / Generative</h4>
+                            <ul>
+                                <li>LLM-driven reasoning and generation</li>
+                                <li>Planning via prompt instructions</li>
+                                <li>Flexible, adaptive, natural language</li>
+                                <li>Hallucination and non-determinism</li>
+                                <li>Dominates data-rich, adaptive domains</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Neuro-Symbolic (Hybrid)</h4>
+                            <ul>
+                                <li>LLM for understanding + symbolic planner for execution</li>
+                                <li>Combines flexibility with verifiability</li>
+                                <li>Emerging research area (2025–)</li>
+                                <li>Best of both paradigms</li>
+                                <li>Future direction for high-stakes agents</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — minimal agent skeleton</span></div>
+                        <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI()
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_web",
+            "description": "Search the web for current information",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string"}},
+                "required": ["query"]
+            }
+        }
+    }
+]
+
+messages = [{"role": "user", "content": "What is the latest GPT-5 benchmark result?"}]
+
+while True:
+    response = client.chat.completions.create(
+        model="gpt-4o", messages=messages, tools=tools
+    )
+    choice = response.choices[0]
+
+    # Agent decided to call a tool
+    if choice.finish_reason == "tool_calls":
+        for call in choice.message.tool_calls:
+            result = execute_tool(call.function.name, call.function.arguments)
+            messages.append({"role": "tool", "content": result, "tool_call_id": call.id})
+
+    # Agent decided it has enough information
+    elif choice.finish_reason == "stop":
+        print(choice.message.content)
+        break   # Exit the loop — task complete</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Chapter 1 takeaway</h4>
+                        <p>An agent is a loop. The LLM is the brain, tools are the hands, and memory is what makes it coherent across steps. Everything in the remaining 21 chapters is about making that loop reliable, safe, and scalable.</p>
+                    </div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 1 Quiz</h2>
+                    <div class="quiz-container">
+
+                        <div class="quiz-question">
+                            <p>1. Which property distinguishes an agent from a standard LLM call?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Larger parameter count</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Multi-step goal-directed loop with tool execution</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Using a transformer architecture</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Running on a GPU</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>2. In the agent loop, what is an "observation"?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The user's original request</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The agent's internal scratchpad</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> The result returned by a tool call, which the agent feeds back into its next reasoning step</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The model's attention weights</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>3. A neuro-symbolic architecture combines:</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Two separate neural networks voting on each action</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> An LLM for flexible language understanding with a deterministic symbolic planner for execution</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Reinforcement learning with supervised learning</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> BERT for encoding and GPT for decoding</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

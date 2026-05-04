@@ -1,0 +1,209 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 20: Fine-Tuning for Agentic Behavior — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 5 — Advanced Topics &amp; Frontiers</div>
+            <h1 class="chapter-title">Chapter 20: Fine-Tuning for Agentic Behavior</h1>
+            <p class="chapter-subtitle">SFT, RLVR, Tool-R0, ToolPO, ATLAS, and Trinity-RFT</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="91"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 20 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="sft">SFT</button>
+                <button class="section-nav-btn azbn-btn" data-section="rlvr">RLVR &amp; RL Methods</button>
+                <button class="section-nav-btn azbn-btn" data-section="recipes">Recipes</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Why Fine-Tune for Agentic Behavior?</h2>
+                    <p>General-purpose LLMs are trained primarily on text prediction — they are not optimized for the specific patterns of agentic workflows: consistent tool call formatting, multi-step planning, correct handling of tool errors, and restraint (knowing when <em>not</em> to call a tool).</p>
+                    <p>Fine-tuning on agent-specific data improves: tool selection accuracy, argument formatting reliability, reasoning quality over multi-step tasks, and compliance with the instruction hierarchy. This chapter covers the leading approaches from 2024–2026.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>When fine-tuning makes sense</h4>
+                            <ul>
+                                <li>Your tool schemas are domain-specific and not well-represented in pre-training</li>
+                                <li>Consistency of tool call format is critical</li>
+                                <li>Latency budget requires a smaller, faster model</li>
+                                <li>You have high-quality trajectory data from production</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>When fine-tuning is premature</h4>
+                            <ul>
+                                <li>Your prompt engineering has not yet been optimized</li>
+                                <li>You have fewer than ~500 high-quality trajectories</li>
+                                <li>The target behavior changes frequently</li>
+                                <li>You can't afford the evaluation infrastructure to validate fine-tuned behavior</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sft" class="content-section">
+                    <h2>Supervised Fine-Tuning (SFT) on Tool Demonstrations</h2>
+                    <p>SFT teaches the model to imitate expert trajectories. You provide a dataset of (goal, reference trajectory) pairs where the trajectory represents ideal (Thought, Action, Observation, …, Answer) sequences.</p>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">📚</div><strong>Trajectory Dataset</strong><p>Human-annotated or filtered production data</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🔧</div><strong>Data Format</strong><p>Conversation-style with tool messages</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🧠</div><strong>SFT Training</strong><p>Next-token prediction on trajectory tokens</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">✅</div><strong>Fine-tuned Model</strong></div>
+                    </div>
+
+                    <p>SFT's limitation: it teaches imitation, not reasoning. A model fine-tuned only on SFT may fail on tasks that differ slightly from the training distribution, because it has learned <em>what to do</em> but not <em>why</em>.</p>
+
+                    <div class="info-box">
+                        <h4>Data quality beats data quantity</h4>
+                        <p>Research consistently shows that 500 high-quality, diverse trajectories outperform 5,000 mediocre ones. Quality criteria: (1) the trajectory actually solves the task, (2) tool calls are necessary (no redundant calls), (3) reasoning steps are sound, (4) trajectories cover diverse failure modes, not just happy paths.</p>
+                    </div>
+                </div>
+
+                <div id="rlvr" class="content-section">
+                    <h2>RLVR and Reinforcement Fine-Tuning</h2>
+
+                    <p>Reinforcement Learning from Verifiable Rewards (RLVR) trains the model to maximize a reward signal based on whether the task outcome is correct — not to imitate a reference trajectory. The key insight from DeepSeek-R1: <em>RL on tasks with verifiable rewards (math, code tests) produces strong emergent reasoning</em>.</p>
+
+                    <!-- RLVR training loop -->
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>Policy Model</strong><p>Current agent model</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🎯</div><strong>Run Task</strong><p>Agent attempts the task</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">🏆</div><strong>Verifiable Reward</strong><p>Did the task succeed? +1 / -1</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">📈</div><strong>Policy Update</strong><p>GRPO / PPO gradient step</p></div>
+                        <div class="flow-arrow" style="color:#10b981;font-size:0.8rem;">↺ iterate</div>
+                    </div>
+
+                    <h3>Leading Methods (2025–2026)</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Method</th><th>Approach</th><th>Key Result</th></tr></thead>
+                        <tbody>
+                            <tr><td>VerlTool</td><td>RL on tool-use trajectories with tool execution as the verifier</td><td>+15% tool accuracy on API-Call-Bench vs SFT-only</td></tr>
+                            <tr><td>Trinity-RFT</td><td>Three-stage: curriculum hard-case mining, process-level reward shaping, and KV-cache reuse for efficiency</td><td>State-of-the-art on MATH, AIME, and agent benchmarks</td></tr>
+                            <tr><td>ATLAS</td><td>Scales RLVR to small models (1B–7B) via tool-selection reward shaping</td><td>7B model matches GPT-4o on tool benchmarks</td></tr>
+                            <tr><td>Tool-R0</td><td>RL via self-play: model generates tasks for itself and trains on outcomes</td><td>Demonstrates RL-driven reasoning emergence for tools</td></tr>
+                            <tr><td>ToolPO</td><td>Preference optimization with fine-grained credit assignment to specific tool calls</td><td>Reduces hallucinated tool use by 40% vs standard DPO</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="recipes" class="content-section">
+                    <h2>Practical Fine-Tuning Recipes</h2>
+
+                    <h3>Minimum Viable Recipe</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Collect 500–2000 golden trajectories</strong><span>From human annotation or filtering high-quality production runs (success = true, steps &lt; 15, no error retries)</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>SFT for 2–3 epochs on a 7B base model</strong><span>Using LoRA (rank 16, alpha 32) to minimize GPU memory. Full fine-tune if you have A100s.</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Evaluate on held-out eval set</strong><span>Compare TSR, steps-per-task, and cost against the prompt-only baseline on the same tasks</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Add RLVR if SFT TSR &lt; 80%</strong><span>Use ToolPO or VerlTool if you have verifiable task outcomes. GRPO for compute efficiency.</span></div></div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — format trajectory data for SFT</span></div>
+                        <pre><code class="language-python">def format_trajectory_for_sft(trajectory: dict) -> dict:
+    """
+    Convert an agent trajectory into the OpenAI fine-tuning message format.
+    trajectory = {
+        "goal": str,
+        "steps": [{"thought": str, "action": dict | None, "observation": str | None}],
+        "final_answer": str,
+    }
+    """
+    messages = [
+        {"role": "system", "content": AGENT_SYSTEM_PROMPT},
+        {"role": "user",   "content": trajectory["goal"]},
+    ]
+
+    for step in trajectory["steps"]:
+        if step.get("thought"):
+            # Include thought as part of the assistant turn before the action
+            messages.append({
+                "role": "assistant",
+                "content": f"Thought: {step['thought']}",
+            })
+        if step.get("action"):
+            messages.append({
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [{"function": step["action"]}],
+            })
+        if step.get("observation"):
+            messages.append({
+                "role": "tool",
+                "content": step["observation"],
+            })
+
+    messages.append({"role": "assistant", "content": trajectory["final_answer"]})
+
+    return {"messages": messages}</code></pre>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 20 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. What is the key limitation of SFT-only fine-tuning for agents?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> SFT requires too many GPU hours to complete</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> SFT teaches imitation of reference trajectories, not underlying reasoning — the model may fail on tasks that differ slightly from the training distribution</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> SFT cannot be applied to models smaller than 7B parameters</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> SFT always reduces performance on non-tool tasks</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. How does ToolPO improve over standard DPO for tool-use fine-tuning?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> ToolPO uses a larger batch size than standard DPO</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> ToolPO assigns fine-grained credit to specific tool calls within a trajectory, rather than treating the entire trajectory as a single preference unit</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> ToolPO replaces the reference model with a retrieval database</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> ToolPO trains exclusively on negative examples (incorrect tool calls)</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. In the RLVR training loop, what provides the reward signal?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> A human annotator rating the quality of the agent's response</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> A separately trained reward model from RLHF</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> An automated verifier that checks whether the agent's task outcome is correct — e.g., code test pass/fail, math answer correctness, API call success</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> The LLM-as-judge evaluator from the eval harness</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

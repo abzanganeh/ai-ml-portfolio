@@ -1,0 +1,226 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 3: Agent Taxonomy — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 1 — Foundations &amp; Mental Models</div>
+            <h1 class="chapter-title">Chapter 3: Agent Taxonomy</h1>
+            <p class="chapter-subtitle">Eight architecture types — and a decision matrix for choosing between them</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="14"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 3 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="architectures">Architecture Types</button>
+                <button class="section-nav-btn azbn-btn" data-section="matrix">Decision Matrix</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <!-- OVERVIEW -->
+                <div id="overview" class="content-section active">
+                    <h2>Picking the Right Architecture</h2>
+
+                    <p>Most engineering mistakes in agentic AI come from applying a complex architecture to a problem that did not need it — or a simple one to a task that demanded more. This chapter gives you the vocabulary and the criteria to match architecture to problem.</p>
+
+                    <p>The eight types below are not mutually exclusive. A production system often combines a <em>planner</em> that coordinates a team of <em>tool-using</em> workers, each of which uses <em>reflection</em> to verify its output.</p>
+
+                    <!-- Architecture overview visual -->
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin:1.5rem 0;">
+                        <div class="pattern-card" style="border-top-color:#6366f1;">
+                            <h4>Reactive</h4>
+                            <p>Direct stimulus → action, no planning</p>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>Tool-Using</h4>
+                            <p>Single-step function calls</p>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>ReAct</h4>
+                            <p>Reason + Act loop</p>
+                        </div>
+                        <div class="pattern-card purple-top">
+                            <h4>Planning</h4>
+                            <p>Decompose then execute</p>
+                        </div>
+                        <div class="pattern-card cyan-top">
+                            <h4>Reflection</h4>
+                            <p>Self-critique + revise</p>
+                        </div>
+                        <div class="pattern-card" style="border-top-color:#ef4444;">
+                            <h4>Critic</h4>
+                            <p>Separate judge model</p>
+                        </div>
+                        <div class="pattern-card" style="border-top-color:#f59e0b;">
+                            <h4>Computer-Use</h4>
+                            <p>Vision + mouse/keyboard</p>
+                        </div>
+                        <div class="pattern-card" style="border-top-color:#10b981;">
+                            <h4>Code-Execution</h4>
+                            <p>Write &amp; run code</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ARCHITECTURE TYPES -->
+                <div id="architectures" class="content-section">
+                    <h2>Architecture Types in Depth</h2>
+
+                    <h3>1. Reactive Agent</h3>
+                    <p>No memory, no planning. Maps the current observation directly to an action using a lookup or a single LLM call. Fast and cheap. Use for narrow, well-defined, stateless tasks — e.g., classifying an incoming support ticket.</p>
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">📥</div><strong>Input</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">⚡</div><strong>Action</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">📤</div><strong>Output</strong></div>
+                    </div>
+
+                    <h3>2. Tool-Using Agent (Single-Step)</h3>
+                    <p>Adds a tool call layer. The LLM decides which tool to invoke based on the user request, executes once, and returns the result. Still single-turn from the user's perspective. Example: a flight search that calls one API.</p>
+
+                    <h3>3. ReAct Agent (Reason + Act)</h3>
+                    <p>Interleaves reasoning (Thought) with tool calls (Action) and reads back results (Observation). Loops until the goal is met. This is the most common architecture for general-purpose agents. Introduced by Yao et al. (2022).</p>
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">💭</div><strong>Thought</strong><p>Reason about next step</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🔧</div><strong>Action</strong><p>Call tool</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">👁</div><strong>Observation</strong><p>Tool result</p></div>
+                        <div class="flow-arrow" style="color:#10b981;font-size:0.8rem;">↺ repeat</div>
+                    </div>
+
+                    <h3>4. Planning Agent</h3>
+                    <p>Before any tool call, generates a full plan. The plan is then executed step by step by an executor. Better for long-horizon tasks where upfront decomposition reduces errors. The planner can also replan if an execution step fails unexpectedly.</p>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🗺</div><strong>Planner</strong><p>Decompose goal</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">📋</div><strong>Plan</strong><p>Ordered subtasks</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">⚙️</div><strong>Executor</strong><p>Run each step</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">✅</div><strong>Result</strong></div>
+                    </div>
+
+                    <h3>5. Reflection Agent</h3>
+                    <p>After producing an output, the same LLM (or a second call) critiques it and decides whether to revise. Key insight: <em>a model is better at evaluating an output than generating it correctly on the first attempt</em>. Self-consistency and Best-of-N sampling are simpler variants of reflection.</p>
+
+                    <h3>6. Critic Agent</h3>
+                    <p>A separate model (judge) evaluates the primary agent's output and provides structured feedback. The primary agent uses that feedback to revise. More expensive than self-reflection but higher quality — the critic can be prompted to focus on specific failure modes.</p>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>Generator</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">👩‍⚖️</div><strong>Critic</strong><p>Score + feedback</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🔄</div><strong>Revise</strong></div>
+                        <div class="flow-arrow" style="color:#10b981;font-size:0.8rem;">↺ until score ≥ threshold</div>
+                    </div>
+
+                    <h3>7. Computer-Use Agent</h3>
+                    <p>Takes screenshots as observations, decides on keyboard/mouse actions, and interacts with any application without a dedicated API. Required when no programmatic interface exists. Claude's "computer use" capability is the canonical example. Slow, costly, and harder to debug — use only when necessary.</p>
+
+                    <h3>8. Code-Execution Agent</h3>
+                    <p>Writes Python (or another language) to solve problems, runs it in a sandboxed interpreter, reads stdout/stderr as observations, and iterates until the output is correct. Extremely powerful for data analysis, mathematical computation, and automated testing. Always run code in an isolated environment (e.g., E2B, Modal, Docker).</p>
+                </div>
+
+                <!-- DECISION MATRIX -->
+                <div id="matrix" class="content-section">
+                    <h2>Decision Matrix</h2>
+
+                    <p>Use this table to select a starting architecture for a new task. Start with the simplest option that satisfies the requirements and complexity column.</p>
+
+                    <table class="decision-matrix">
+                        <thead>
+                            <tr>
+                                <th>Architecture</th>
+                                <th>Task Horizon</th>
+                                <th>Needs Memory?</th>
+                                <th>External Tools?</th>
+                                <th>Verification?</th>
+                                <th>Cost/Step</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Reactive</td><td>Single turn</td><td>No</td><td>No</td><td>No</td><td>Lowest</td></tr>
+                            <tr><td>Tool-Using</td><td>Single turn</td><td>No</td><td>Yes (1 call)</td><td>No</td><td>Low</td></tr>
+                            <tr><td>ReAct</td><td>Multi-step</td><td>Short-term</td><td>Yes (multi)</td><td>Implicit</td><td>Medium</td></tr>
+                            <tr><td>Planning</td><td>Long-horizon</td><td>Yes</td><td>Yes</td><td>At plan level</td><td>Medium</td></tr>
+                            <tr><td>Reflection</td><td>Any</td><td>Optional</td><td>Optional</td><td>Self-critique</td><td>Medium+</td></tr>
+                            <tr><td>Critic</td><td>High-quality output</td><td>Optional</td><td>Optional</td><td>Separate judge</td><td>High</td></tr>
+                            <tr><td>Computer-Use</td><td>Multi-step</td><td>Yes</td><td>Any app (visual)</td><td>Screenshot diff</td><td>Very High</td></tr>
+                            <tr><td>Code-Execution</td><td>Multi-step</td><td>Session state</td><td>Via code</td><td>stdout/test</td><td>High</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>Practical guidance</h4>
+                        <p><strong>Start with ReAct</strong> for 80% of general-purpose agent tasks. Add a separate Planner when you observe the agent making poor mid-task decisions. Add a Critic when output quality is the bottleneck, not task completion. Use Code-Execution when the task is computation-heavy. Computer-Use is the last resort.</p>
+                    </div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 3 Quiz</h2>
+                    <div class="quiz-container">
+
+                        <div class="quiz-question">
+                            <p>1. A ReAct agent interleaves Thought, Action, and Observation. What is the purpose of the "Thought" step?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Executing the tool call and waiting for the result</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Explicitly reasoning about the current state and deciding which action to take next</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Storing the tool result in episodic memory</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Summarizing the conversation history to reduce token usage</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>2. When should you prefer a Critic Agent over self-reflection?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> When you want to reduce cost per step</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> When output quality is the bottleneck and you want specialized evaluation targeting specific failure modes</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> When the task has no external tools available</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> When the task is a single-turn classification</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>3. A Computer-Use Agent's "observation" is:</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> The JSON response from a REST API</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> The content of a retrieved vector database document</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> A screenshot of the current screen state after the last keyboard/mouse action</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> The agent's internal reasoning trace (scratchpad)</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

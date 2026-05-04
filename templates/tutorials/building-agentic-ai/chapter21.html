@@ -1,0 +1,211 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 21: Domain-Specific Agents — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 5 — Advanced Topics &amp; Frontiers</div>
+            <h1 class="chapter-title">Chapter 21: Domain-Specific Agents</h1>
+            <p class="chapter-subtitle">Coding, research, computer-use, data analysis, and high-stakes domains</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="95"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 21 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="coding">Coding Agents</button>
+                <button class="section-nav-btn azbn-btn" data-section="research">Research Agents</button>
+                <button class="section-nav-btn azbn-btn" data-section="high-stakes">High-Stakes Domains</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Domain Constraints Change Everything</h2>
+                    <p>A general-purpose agent design from Chapter 2 is the starting point, but each domain introduces unique constraints: specific tools, safety requirements, user expectations, regulatory obligations, and failure modes. This chapter covers the major categories.</p>
+
+                    <table class="decision-matrix">
+                        <thead><tr><th>Domain</th><th>Primary Capability</th><th>Key Constraint</th><th>Benchmark</th></tr></thead>
+                        <tbody>
+                            <tr><td>Coding</td><td>Code generation, test execution, bug fixing</td><td>Must run in sandboxed environment; test-driven verification</td><td>SWE-bench (% issues resolved)</td></tr>
+                            <tr><td>Deep Research</td><td>Multi-source retrieval, synthesis, citation</td><td>Accuracy and source attribution; must not hallucinate facts</td><td>GAIA, BrowseComp</td></tr>
+                            <tr><td>Computer-Use</td><td>UI navigation, form filling, screenshot-based control</td><td>Slow; brittle to UI changes; high error cost on write actions</td><td>WebArena, OSWorld</td></tr>
+                            <tr><td>Data Analysis</td><td>SQL queries, pandas, visualization generation</td><td>Data privacy; correct statistical interpretation</td><td>DS-1000, BIRD</td></tr>
+                            <tr><td>Customer Support</td><td>Triage, FAQ, escalation, CRM integration</td><td>Cannot make promises; must escalate edge cases</td><td>Business-specific KPIs</td></tr>
+                            <tr><td>Healthcare / Legal</td><td>Information retrieval, document analysis</td><td>Regulatory compliance; cannot give medical/legal advice directly</td><td>Domain-specific, human-in-loop required</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="coding" class="content-section">
+                    <h2>Coding Agents</h2>
+                    <p>Coding agents are among the most mature and commercially deployed category. Claude Sonnet on SWE-bench (verified) reached 49% issue resolution in 2024; Devin 2 and similar systems reach 55%+ in 2025. The test suite is the verifier, making these agents ideal for RLVR fine-tuning (Chapter 20).</p>
+
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Perception</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>Repository Context</strong>
+                                    <span>File tree, relevant code files, issue description, test output</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Action</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>read_file</strong>
+                                    <span>Read file contents at a path</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>edit_file</strong>
+                                    <span>Apply a targeted edit (unified diff)</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>run_tests</strong>
+                                    <span>Execute test suite in sandbox; return pass/fail</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>search_codebase</strong>
+                                    <span>Semantic or lexical search across repo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Loop</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell accent">
+                                    <strong>Understand → Locate → Edit → Test → Iterate</strong>
+                                    <span>Until all tests pass or max iterations reached</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Key engineering decisions for coding agents</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Targeted edits over full rewrites</strong><span>Have the agent emit unified diffs or targeted function replacements, not rewrite whole files — reduces errors and makes review easier</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Test harness as oracle</strong><span>After every edit, run the test suite. The result is the ground-truth feedback signal — much more reliable than LLM self-evaluation of code correctness</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Repo-map for context efficiency</strong><span>Instead of providing full file contents, use a repository map (file tree + function signatures) to help the agent navigate to relevant files before reading them in full</span></div></div>
+                    </div>
+                </div>
+
+                <div id="research" class="content-section">
+                    <h2>Deep Research Agents</h2>
+                    <p>Research agents (Perplexity Deep Research, ChatGPT Deep Research, OpenAI o3 + search) synthesize multi-source information into comprehensive reports. The central challenge is <strong>source attribution</strong> — preventing hallucination by ensuring every factual claim is backed by a retrieved source.</p>
+
+                    <!-- Research agent flow -->
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">❓</div><strong>Research Query</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🗺</div><strong>Plan Searches</strong><p>Decompose into sub-queries</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔍</div><strong>Parallel Search</strong><p>N agents, N sub-queries</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">📖</div><strong>Read &amp; Extract</strong><p>Verified facts + citations</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#a855f7;"><div class="flow-icon">📝</div><strong>Synthesize</strong><p>Report with inline citations</p></div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Common failure: citation hallucination</h4>
+                        <p>The agent cites a real URL but attributes a claim to it that does not appear in the source. Mitigation: after synthesis, run a <em>citation verification pass</em> — for each cited claim, retrieve the source and verify the claim appears in it. Flag or remove uncorroborated claims.</p>
+                    </div>
+                </div>
+
+                <div id="high-stakes" class="content-section">
+                    <h2>High-Stakes Domains: Healthcare &amp; Legal</h2>
+                    <p>Agents in regulated domains face hard constraints that do not apply to general assistants. Understanding these constraints prevents both regulatory risk and harm to end users.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Healthcare Agent Constraints</h4>
+                            <ul>
+                                <li>Cannot diagnose or prescribe — can only provide general information</li>
+                                <li>Must disclose AI-generated nature of responses</li>
+                                <li>HIPAA: no storage of PHI without patient consent and encryption</li>
+                                <li>Must recommend professional consultation for symptoms</li>
+                                <li>Audit trail required for all interactions</li>
+                                <li>Human-in-the-loop for any clinical decision support</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Legal Agent Constraints</h4>
+                            <ul>
+                                <li>Cannot provide specific legal advice — only general legal information</li>
+                                <li>Unauthorized practice of law (UPL) risk varies by jurisdiction</li>
+                                <li>Confidentiality obligations if user shares privileged information</li>
+                                <li>Must cite jurisdiction-specific statutes, not generalizations</li>
+                                <li>Attorney supervision required for client-facing applications in most jurisdictions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="danger-box">
+                        <h4>The deployment boundary is not a technical decision</h4>
+                        <p>For healthcare and legal agents, the line between "providing information" and "practicing medicine/law" is a legal question, not an engineering one. Always consult a domain expert or compliance officer before deploying in these fields. The regulatory landscape is also rapidly changing in response to AI agent deployments.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>The safest high-stakes pattern</h4>
+                        <p>Design the agent to: (1) gather information efficiently (replacing the tedious parts), (2) present structured findings to a human expert, and (3) let the human make the final decision. This "research and present" pattern avoids direct decision-making while still providing significant efficiency gains.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 21 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Why is SWE-bench particularly well-suited for evaluating coding agents?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It tests the agent's ability to explain code in plain English</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> It uses real GitHub issues with existing test suites, providing an objective, automated verifier — tests pass or fail, no LLM judge needed</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It measures the speed of code generation in tokens per second</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It evaluates the agent's ability to write documentation</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What is "citation hallucination" in research agents?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The agent invents fictional author names or journal titles</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> The agent cites a real URL but attributes a claim to it that does not actually appear in the source document</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The agent includes too many citations, making the report hard to read</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The citation formatting does not match the required style guide</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What is the recommended deployment pattern for agents in regulated healthcare/legal domains?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Full autonomy with a disclaimer noting AI may make errors</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Use a larger model to reduce error rates to near-zero before deploying</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> "Research and present" — agent gathers and structures information; a licensed human professional makes all final decisions</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Deploy in a sandboxed environment and only reveal the final answer after 24 hours of internal review</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

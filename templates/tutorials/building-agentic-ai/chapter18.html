@@ -1,0 +1,242 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 18: Deployment & Scaling — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 4 — Production Engineering</div>
+            <h1 class="chapter-title">Chapter 18: Deployment &amp; Scaling</h1>
+            <p class="chapter-subtitle">Stateless vs stateful, async queues, model routing, cost optimization</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="82"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 18 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="state">Stateless vs Stateful</button>
+                <button class="section-nav-btn azbn-btn" data-section="async">Async &amp; Queues</button>
+                <button class="section-nav-btn azbn-btn" data-section="cost">Cost Optimization</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Deploying Agents at Scale</h2>
+                    <p>An agent that works in a notebook is not production-ready. Production deployment requires decisions about state management, async execution, load balancing, caching, and cost. This chapter covers each.</p>
+                    <div class="info-box">
+                        <h3>Key difference from regular API deployment</h3>
+                        <p>A standard API request completes in milliseconds and is stateless. An agent task may take minutes, maintains state across many LLM/tool calls, and has unpredictable resource usage (a task requiring 3 tool calls is very different from one requiring 25). This means standard web server deployment patterns must be augmented with async task queues, checkpointing, and fine-grained cost tracking.</p>
+                    </div>
+                </div>
+
+                <div id="state" class="content-section">
+                    <h2>Stateless vs Stateful Deployment</h2>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Stateless Agent</h4>
+                            <ul>
+                                <li>No state persisted between requests</li>
+                                <li>Each request is a fresh start</li>
+                                <li>Horizontally scalable (any server handles any request)</li>
+                                <li>Simple; no session affinity needed</li>
+                                <li>Use for: single-turn, short-task agents</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Stateful Agent</h4>
+                            <ul>
+                                <li>State persisted in external store (Redis, DB)</li>
+                                <li>Requests in the same session share state</li>
+                                <li>Requires sticky routing OR session key lookup</li>
+                                <li>Supports resumable tasks, HITL, multi-session memory</li>
+                                <li>Use for: multi-turn assistants, long-running workflows</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Request</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>API Gateway / Load Balancer</strong>
+                                    <span>Routes by session_id for stateful; random round-robin for stateless</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Worker</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>Agent Worker A</strong>
+                                    <span>Runs agent loop; reads/writes state store</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>Agent Worker B</strong>
+                                    <span>Runs agent loop; reads/writes state store</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>Agent Worker N…</strong>
+                                    <span>Auto-scaled based on queue depth</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">State</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell yellow">
+                                    <strong>Redis / DynamoDB</strong>
+                                    <span>Session state, checkpoints, working memory</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Vector DB</strong>
+                                    <span>Long-term semantic memory</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="async" class="content-section">
+                    <h2>Async Processing with Task Queues</h2>
+                    <p>A user should not wait synchronously for a 3-minute agent task to complete. Use an async task queue: the API receives the request, creates a task, returns a task_id immediately, and the result is fetched later via polling or webhook.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — async agent task with Celery</span></div>
+                        <pre><code class="language-python">from celery import Celery
+from fastapi import FastAPI, BackgroundTasks
+from pydantic import BaseModel
+import uuid, redis
+
+celery_app = Celery("agent_tasks", broker="redis://localhost:6379/0", backend="redis://localhost:6379/1")
+api = FastAPI()
+r = redis.Redis(host="localhost", port=6379, db=2)
+
+class AgentRequest(BaseModel):
+    goal: str
+    user_id: str
+
+# ── Celery task: runs the agent loop asynchronously ──────────────────────────
+
+@celery_app.task(bind=True, max_retries=3)
+def run_agent_task(self, task_id: str, goal: str, user_id: str) -> dict:
+    try:
+        r.hset(f"task:{task_id}", mapping={"status": "running", "progress": "0"})
+        result = agent_core.run(goal)          # your agent from earlier chapters
+        r.hset(f"task:{task_id}", mapping={"status": "done", "result": result})
+        return {"status": "done", "result": result}
+    except Exception as exc:
+        r.hset(f"task:{task_id}", mapping={"status": "failed", "error": str(exc)})
+        raise self.retry(exc=exc, countdown=60)
+
+# ── API endpoints ─────────────────────────────────────────────────────────────
+
+@api.post("/tasks")
+def create_task(req: AgentRequest) -> dict:
+    task_id = str(uuid.uuid4())
+    run_agent_task.delay(task_id, req.goal, req.user_id)
+    return {"task_id": task_id, "status": "queued"}
+
+@api.get("/tasks/{task_id}")
+def get_task_status(task_id: str) -> dict:
+    data = r.hgetall(f"task:{task_id}")
+    if not data:
+        return {"error": "Task not found"}
+    return {k.decode(): v.decode() for k, v in data.items()}</code></pre>
+                    </div>
+                </div>
+
+                <div id="cost" class="content-section">
+                    <h2>Cost Optimization</h2>
+                    <p>LLM costs dominate agent infrastructure costs. Understanding where money goes is the first step to cutting it.</p>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Input tokens (largest cost)</strong><span>System prompt + tool schemas + conversation history + memory retrievals. Reduce by: shorter system prompt, fewer tools per turn, aggressive context eviction.</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Output tokens</strong><span>Model's reasoning + action + answer. Reduce by: structured output (JSON vs prose), instructing the model to be concise.</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Model tier</strong><span>o3 costs ~20× more than gpt-4o-mini. Most agent steps are simple (dispatch a tool, format a result) — use the cheapest model that can handle each step.</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Prompt caching</strong><span>Anthropic and OpenAI offer prompt prefix caching — the system prompt and static context are cached at the API level. ~90% cost reduction on the cached prefix.</span></div></div>
+                        <div class="layer-item l5"><div class="layer-num">5</div><div class="layer-content"><strong>Semantic caching</strong><span>Cache agent responses by query similarity — if the same question was answered recently with high confidence, return the cached result. Requires TTL and a freshness heuristic.</span></div></div>
+                    </div>
+
+                    <h3>Model Routing Pattern</h3>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — route steps to cheapest viable model</span></div>
+                        <pre><code class="language-python">def select_model_for_step(step_type: str, task_complexity: str) -> str:
+    """
+    Route to the cheapest model that can handle the step reliably.
+    """
+    routing_table = {
+        # (step_type, complexity) → model
+        ("tool_dispatch",    "simple"):   "gpt-4o-mini",
+        ("tool_dispatch",    "complex"):  "gpt-4o",
+        ("reasoning",        "simple"):   "gpt-4o-mini",
+        ("reasoning",        "complex"):  "gpt-4o",
+        ("planning",         "any"):      "o3-mini",     # planning benefits from reasoning model
+        ("final_synthesis",  "simple"):   "gpt-4o",
+        ("final_synthesis",  "complex"):  "o3",          # highest quality for final output
+    }
+    return routing_table.get((step_type, task_complexity), "gpt-4o")</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Auto-scaling based on queue depth</h4>
+                        <p>Scale your agent workers horizontally based on Celery queue depth (or equivalent). A queue depth of 0 → scale down to minimum workers. Queue depth rising above 10 → scale up. This prevents both underprovisioning (slow tasks) and overprovisioning (wasted cost when idle).</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 18 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Why is synchronous HTTP request handling usually insufficient for production agent tasks?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> HTTP does not support streaming responses from LLMs</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Agent tasks can take minutes, blocking the HTTP connection and the server thread, making the system unresponsive to other users</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Synchronous handlers cannot access Redis for state storage</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> HTTP request timeouts are always set to 30 seconds</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. Prompt prefix caching reduces costs by:</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Storing complete agent responses and reusing them for identical user questions</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Caching the static prefix (system prompt, tool schemas) at the API level so the model does not re-process it on every request</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Compressing tool schemas to reduce their token count</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Routing all requests to a smaller cached model</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. When should you use an expensive reasoning model (o3) in your model routing strategy?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> For every step to ensure maximum quality</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Only for tool dispatch steps, which are the most frequent</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> For planning and final synthesis steps where reasoning depth has the highest impact on quality</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> For all steps with "complex" classification regardless of type</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

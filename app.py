@@ -414,6 +414,12 @@ def agentic_ai_chapter(chapter_num):
     """Agentic AI & LLM Agents tutorial chapters"""
     return render_tutorial_chapter('agentic-ai', chapter_num)
 
+# Building Agentic AI Systems tutorial chapter routes
+@app.route('/tutorials/building-agentic-ai/chapter<int:chapter_num>')
+def building_agentic_ai_chapter(chapter_num):
+    """Building Agentic AI Systems tutorial chapters"""
+    return render_tutorial_chapter('building-agentic-ai', chapter_num)
+
 
 @app.route('/blog')
 def blog():

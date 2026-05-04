@@ -184,18 +184,32 @@ TUTORIALS_DATA = [
         'tags': 'rag,retrieval-augmented-generation,vector-databases,embeddings,semantic-search,pinecone,chroma'
     },
     {
-        'title': 'Agentic AI & LLM Agents',
-        'slug': 'agentic-ai',
-        'description': 'Master AI Agents and Agentic AI systems. 8 comprehensive chapters covering agent architectures, tool-using agents, ReAct framework, multi-agent systems, agent orchestration, and building production agents.',
+        'title': 'Building Agentic AI Systems',
+        'slug': 'building-agentic-ai',
+        'description': 'Production Handbook: 22 chapters across 5 sections covering architectures, tool use, MCP, memory, multi-agent orchestration, LangGraph, safety, evaluation, fine-tuning, and frontier research. Prerequisite: Agentic AI Foundations.',
         'category': 'Deep Learning',
         'difficulty': 'advanced',
+        'duration': '600 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/building-agentic-ai/index.html',
+        'published': True,
+        'excerpt': 'Complete advanced course on building Agentic AI systems: agent architectures, MCP, memory systems, multi-agent orchestration, LangGraph, CrewAI, safety, evaluation, and fine-tuning for tool use.',
+        'tags': 'agents,agentic-ai,langgraph,crewai,mcp,multi-agent,tool-use,memory,rlhf,production,safety'
+    },
+    {
+        'title': 'Agentic AI Foundations',
+        'slug': 'agentic-ai',
+        'description': 'Core Concepts: 8 chapters covering the agent loop, ReAct framework, tool-using agents, multi-agent systems, orchestration, and building your first production agent. The recommended starting point before the advanced course.',
+        'category': 'Deep Learning',
+        'difficulty': 'intermediate',
         'duration': '200 min',
         'author': 'Alireza Barzin Zanganeh',
         'has_dedicated_template': True,
         'template_path': 'tutorials/agentic-ai/index.html',
         'published': True,
-        'excerpt': 'Complete agentic AI course covering agent architectures, tool-using agents, ReAct, multi-agent systems, orchestration, and production deployment with detailed explanations and code examples.',
-        'tags': 'agents,agentic-ai,react,langchain,multi-agent,tool-using,orchestration,autogpt'
+        'excerpt': 'Core Concepts: agent loop, ReAct, tool use, multi-agent systems, and orchestration across 8 focused chapters. Start here before the Production Handbook.',
+        'tags': 'agents,agentic-ai,react,langchain,multi-agent,tool-using,orchestration,foundations'
     }
 
     

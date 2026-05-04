@@ -1,0 +1,264 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 6: Model Context Protocol — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 2 — Core Building Blocks</div>
+            <h1 class="chapter-title">Chapter 6: Model Context Protocol (MCP)</h1>
+            <p class="chapter-subtitle">The universal standard for agent-to-tool communication</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="27"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 6 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="architecture">Architecture</button>
+                <button class="section-nav-btn azbn-btn" data-section="building">Building a Server</button>
+                <button class="section-nav-btn azbn-btn" data-section="production">Production Gaps</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>What is MCP?</h2>
+                    <p>The <strong>Model Context Protocol (MCP)</strong> is an open standard — introduced by Anthropic in November 2024 and donated to the Linux Foundation in December 2025 — that defines how AI agents discover and invoke external tools. Think of it as <em>USB-C for AI tools</em>: any agent that speaks MCP can talk to any MCP-compliant server without custom integration code.</p>
+                    <div class="info-box">
+                        <h3>Scale of adoption (early 2026)</h3>
+                        <ul>
+                            <li>10,000+ active MCP servers in production</li>
+                            <li>500+ MCP client integrations (Claude, ChatGPT, Cursor, VS Code, Replit)</li>
+                            <li>97 million monthly SDK downloads</li>
+                            <li>All major agent frameworks support MCP natively: LangGraph, CrewAI, OpenAI Agents SDK, Google ADK</li>
+                        </ul>
+                    </div>
+                    <p>Before MCP, every agent needed custom integration code for every tool. With MCP, you write a tool server once, and any MCP-compatible agent can use it.</p>
+                </div>
+
+                <div id="architecture" class="content-section">
+                    <h2>MCP Architecture</h2>
+                    <p>MCP uses a three-tier model: the <strong>host</strong> (the application running the agent), the <strong>client</strong> (the MCP client embedded in the host), and the <strong>server</strong> (a process exposing tools).</p>
+
+                    <!-- Architecture diagram -->
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Host</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>AI Application (Claude, Cursor, your agent)</strong>
+                                    <span>Manages the LLM; decides which MCP servers to connect to</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Client</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell accent">
+                                    <strong>MCP Client (1:1 with each server)</strong>
+                                    <span>JSON-RPC 2.0 connection; handles capability negotiation and message routing</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Transport</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>stdio</strong>
+                                    <span>Local subprocess — lowest latency</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>HTTP Streaming (SSE)</strong>
+                                    <span>Remote server — production web deployments</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>Streamable HTTP</strong>
+                                    <span>Bidirectional HTTP — newest transport</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Server</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell yellow">
+                                    <strong>Tools</strong>
+                                    <span>Callable functions (search, DB, APIs)</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Resources</strong>
+                                    <span>Read-only data sources (files, DB rows)</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Prompts</strong>
+                                    <span>Templated workflows the client can use</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>The Three Primitives</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Primitive</th><th>Purpose</th><th>Agent interaction</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Tools</strong></td><td>Functions the model can invoke</td><td>Model calls <code>tools/call</code>; receives result</td></tr>
+                            <tr><td><strong>Resources</strong></td><td>Context data the model can read</td><td>Model requests <code>resources/read</code>; URI identifies the resource</td></tr>
+                            <tr><td><strong>Prompts</strong></td><td>Pre-built workflow templates</td><td>User or system selects prompt; rendered into conversation</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="building" class="content-section">
+                    <h2>Building an MCP Server from Scratch</h2>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — minimal MCP server (using mcp SDK)</span></div>
+                        <pre><code class="language-python">from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp import types
+import httpx
+
+app = Server("my-tools")
+
+# ── Declare available tools ──────────────────────────────────────────────────
+
+@app.list_tools()
+async def list_tools() -> list[types.Tool]:
+    """MCP clients call this at startup to discover what the server offers."""
+    return [
+        types.Tool(
+            name="get_weather",
+            description="Get current weather for a city. Returns temperature, conditions, and humidity.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string", "description": "City name, e.g. 'London'"},
+                    "units": {"type": "string", "enum": ["celsius", "fahrenheit"], "default": "celsius"},
+                },
+                "required": ["city"],
+            },
+        )
+    ]
+
+# ── Handle tool calls ────────────────────────────────────────────────────────
+
+@app.call_tool()
+async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
+    """MCP clients call this to invoke a tool; return content blocks."""
+    if name == "get_weather":
+        city = arguments["city"]
+        units = arguments.get("units", "celsius")
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.openweathermap.org/data/2.5/weather",
+                params={"q": city, "units": "metric" if units == "celsius" else "imperial", "appid": WEATHER_API_KEY},
+            )
+        data = response.json()
+        return [types.TextContent(
+            type="text",
+            text=f"Weather in {city}: {data['weather'][0]['description']}, "
+                 f"Temp: {data['main']['temp']}°, Humidity: {data['main']['humidity']}%",
+        )]
+
+    raise ValueError(f"Unknown tool: {name}")
+
+# ── Run the server ────────────────────────────────────────────────────────────
+
+async def main():
+    async with stdio_server() as (read_stream, write_stream):
+        await app.run(read_stream, write_stream, app.create_initialization_options())
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>MCP server in 3 steps</h4>
+                        <p>1. <code>pip install mcp</code>. 2. Declare tools with <code>@app.list_tools()</code>. 3. Handle calls with <code>@app.call_tool()</code>. Clients discover your tools automatically via the initialization handshake — no further registration needed.</p>
+                    </div>
+                </div>
+
+                <div id="production" class="content-section">
+                    <h2>Production Gaps &amp; Solutions</h2>
+                    <p>MCP standardizes discovery and invocation, but does not yet cover identity, budgeting, or structured errors. For production systems, three additional patterns are needed.</p>
+
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <h4>CABP — Context-Aware Broker Protocol</h4>
+                            <p>Attaches a user/tenant identity to every tool request, enabling per-user rate limiting, audit logs, and permission enforcement at the server level.</p>
+                            <div class="use-when">Problem solved: "Which user triggered this tool call?"</div>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>ATBA — Adaptive Timeout Budget Allocation</h4>
+                            <p>Tracks cumulative tool call latency per turn. If total time is exceeding budget, deprioritizes or cancels slow non-critical calls.</p>
+                            <div class="use-when">Problem solved: "This agent is taking 45 seconds per turn."</div>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>SERF — Structured Error Recovery Framework</h4>
+                            <p>Returns machine-readable error codes (<code>TOOL_RATE_LIMITED</code>, <code>TOOL_PERMISSION_DENIED</code>) instead of unstructured error strings, enabling the agent to take different recovery actions per error type.</p>
+                            <div class="use-when">Problem solved: "The agent doesn't know why the tool failed."</div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Context window overload</h4>
+                        <p>When an agent connects to thousands of MCP tools, hundreds of thousands of tokens can be consumed by tool schemas before the first user message. Solution: use <strong>semantic tool routing</strong> — embed the user query, retrieve the top-K most relevant tool descriptions, and inject only those into the current context. This is the same principle as RAG but applied to tool registries.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 6 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. In MCP architecture, what is the "host"?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The server that exposes the tool functions</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> The AI application (e.g. Claude, your agent) that manages the LLM and decides which MCP servers to connect to</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The cloud provider running the compute</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The JSON-RPC 2.0 transport layer</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What is an MCP "Resource"?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A callable function the model can invoke</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> A pre-built workflow template rendered into the conversation</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> A read-only data source (file, database row, document) the model can request context from</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The CPU/GPU compute allocated to the model</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What problem does the SERF pattern solve?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Context window overload from too many tool schemas</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Slow tool calls exceeding per-turn latency budgets</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Unstructured error strings that prevent agents from taking appropriate recovery actions per error type</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Identity propagation for per-user rate limiting</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

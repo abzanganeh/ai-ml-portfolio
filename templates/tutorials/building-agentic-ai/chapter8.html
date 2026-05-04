@@ -1,0 +1,273 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 8: Planning — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 2 — Core Building Blocks</div>
+            <h1 class="chapter-title">Chapter 8: Planning</h1>
+            <p class="chapter-subtitle">ReAct loop, Plan-and-Execute, HTN, MCTS, and dynamic replanning</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="36"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 8 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="react">ReAct Loop</button>
+                <button class="section-nav-btn azbn-btn" data-section="plan-execute">Plan-and-Execute</button>
+                <button class="section-nav-btn azbn-btn" data-section="advanced">Advanced Planning</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Planning: Decomposing Goals Into Actions</h2>
+                    <p>Planning is the process of transforming a high-level goal into an ordered sequence of executable steps. In simple agents, planning is implicit — the LLM decides the next action in the context of current observations. In sophisticated agents, planning is a separate, explicit phase with its own prompt, model, or algorithm.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Implicit Planning (ReAct)</h4>
+                            <ul>
+                                <li>Each step: observe → think → act</li>
+                                <li>No upfront plan document</li>
+                                <li>Adapts naturally to surprises</li>
+                                <li>Can make locally good but globally poor decisions</li>
+                                <li>Good for short-to-medium tasks</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Explicit Planning (Plan-and-Execute)</h4>
+                            <ul>
+                                <li>Phase 1: generate a plan (full task graph)</li>
+                                <li>Phase 2: execute each step</li>
+                                <li>Better global coherence</li>
+                                <li>Replanning needed when plan fails</li>
+                                <li>Good for long-horizon, structured tasks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="react" class="content-section">
+                    <h2>ReAct: The Default Planning Loop</h2>
+                    <p>ReAct (Yao et al., 2022) is the most widely deployed planning pattern. The agent interleaves <strong>Thought</strong> (explicit reasoning about what to do), <strong>Action</strong> (tool call), and <strong>Observation</strong> (tool result) until it decides to emit a final answer.</p>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">💭</div><strong>Thought</strong><p>"I need to check X before doing Y"</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔧</div><strong>Action</strong><p>tool_name(args)</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">👁</div><strong>Observation</strong><p>{result from tool}</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#a855f7; min-width:80px;"><div class="flow-icon">🔄</div><strong>Loop</strong></div>
+                    </div>
+
+                    <h3>Preventing Infinite Loops</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Max iterations guard</strong><span>Hard cap: if the agent reaches N iterations without a FINISH action, abort and surface an error</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>State change detection</strong><span>If the last 3 Thoughts and Actions are identical, the agent is stuck in a loop — break out</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Tool call deduplication</strong><span>If the agent calls the same tool with the same arguments twice, flag it and provide a hint to try a different approach</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Time budget</strong><span>Hard wall-clock timeout; important for user-facing agents where response time matters</span></div></div>
+                    </div>
+                </div>
+
+                <div id="plan-execute" class="content-section">
+                    <h2>Plan-and-Execute Pattern</h2>
+                    <p>For tasks that require many ordered steps, an upfront planning phase produces a better global strategy than reactive step-by-step decisions.</p>
+
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Phase 1</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell accent">
+                                    <strong>Planner LLM Call</strong>
+                                    <span>Given goal + context → produce ordered JSON task list</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Plan</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>Step 1: search "topic X"</strong>
+                                    <span>depends_on: []</span>
+                                </div>
+                                <div class="arch-cell primary">
+                                    <strong>Step 2: summarize results</strong>
+                                    <span>depends_on: [step_1]</span>
+                                </div>
+                                <div class="arch-cell primary">
+                                    <strong>Step 3: write report</strong>
+                                    <span>depends_on: [step_2]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Phase 2</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>Executor</strong>
+                                    <span>Runs each step; on failure → triggers Replanner</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Replanner</strong>
+                                    <span>Receives updated state → revises remaining steps</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — plan-and-execute skeleton</span></div>
+                        <pre><code class="language-python">from pydantic import BaseModel
+from typing import Literal
+
+class PlanStep(BaseModel):
+    step_id: str
+    description: str
+    tool: str
+    tool_args: dict
+    depends_on: list[str]
+    status: Literal["pending", "running", "done", "failed"] = "pending"
+
+class Plan(BaseModel):
+    goal: str
+    steps: list[PlanStep]
+
+def generate_plan(goal: str, available_tools: list[str], llm_client) -> Plan:
+    """Phase 1: ask the LLM to decompose the goal into ordered steps."""
+    system = (
+        "You are a planning agent. Given a goal and available tools, "
+        "produce a JSON execution plan with ordered steps. "
+        "Each step must specify exactly which tool to call and with what arguments."
+    )
+    response = llm_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": f"Goal: {goal}\nTools: {available_tools}"},
+        ],
+        response_format={"type": "json_object"},
+    )
+    return Plan.model_validate_json(response.choices[0].message.content)
+
+
+def execute_plan(plan: Plan, tool_registry: dict, llm_client) -> str:
+    """Phase 2: execute each step in dependency order; replan on failure."""
+    results: dict[str, str] = {}
+
+    for step in plan.steps:
+        # Check dependencies are complete
+        if not all(results.get(dep) for dep in step.depends_on):
+            continue   # will be retried after dependencies complete
+
+        step.status = "running"
+        result = dispatch_tool_call(tool_registry, step.tool, step.tool_args)
+
+        if '"error"' in result:
+            step.status = "failed"
+            plan = replan(plan, step, result, llm_client)   # dynamic replanning
+        else:
+            step.status = "done"
+            results[step.step_id] = result
+
+    return results.get(plan.steps[-1].step_id, "Plan did not complete")</code></pre>
+                    </div>
+                </div>
+
+                <div id="advanced" class="content-section">
+                    <h2>Advanced Planning: HTN and MCTS</h2>
+
+                    <h3>Hierarchical Task Networks (HTN)</h3>
+                    <p>HTN planning decomposes goals hierarchically: a high-level task is broken into sub-tasks, which are broken into primitive actions. This mirrors how humans plan — first at a high level ("prepare a report"), then at a mid level ("research, draft, edit"), then at a primitive level ("call search API with query X").</p>
+                    <div class="flow-diagram">
+                        <div class="flow-node" style="min-width:120px;"><div class="flow-icon">🎯</div><strong>Goal</strong><p>Write report on Topic X</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="min-width:130px;border-color:#a855f7;"><div class="flow-icon">📦</div><strong>Sub-tasks</strong><p>Research · Draft · Edit</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="min-width:130px;border-color:#10b981;"><div class="flow-icon">⚙️</div><strong>Primitives</strong><p>search() · write() · revise()</p></div>
+                    </div>
+
+                    <h3>MCTS with LLM Guidance</h3>
+                    <p>Monte Carlo Tree Search (MCTS) explores the action space as a tree. At each node (state), the LLM proposes candidate next actions (expansion), a fast evaluator scores them (simulation), and high-scoring paths are explored deeper (selection). Used in AlphaApollo and similar systems for tasks where the solution space has strong branching.</p>
+
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <h4>Selection</h4>
+                            <p>Traverse tree from root using UCB1 formula: balance exploitation (high-score nodes) vs exploration (less-visited nodes)</p>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>Expansion</h4>
+                            <p>LLM proposes N candidate next actions from the current node's state</p>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>Simulation</h4>
+                            <p>Fast rollout: run actions to terminal state; score with reward function or LLM-as-judge</p>
+                        </div>
+                        <div class="pattern-card purple-top">
+                            <h4>Backpropagation</h4>
+                            <p>Update scores back up the tree; nodes leading to high-reward outcomes get higher visit priorities</p>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>When to use MCTS vs ReAct</h4>
+                        <p>ReAct is greedy — it always takes the next best action. MCTS explores alternatives before committing. Use MCTS when: (1) wrong decisions early are costly/irreversible, (2) the task has multiple valid solution paths, (3) you have a reliable reward signal. MCTS is compute-intensive — typical budget is 10–50 simulations per decision node.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 8 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. In Plan-and-Execute, what triggers the Replanner?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Completing every step in the original plan</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> A step execution failure that makes remaining plan steps invalid or impossible</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The user sending a new message mid-execution</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Reaching the max iteration limit</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What is the primary purpose of "Backpropagation" in MCTS?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Calculating gradients for fine-tuning the LLM</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Updating the scores of nodes along a path in the tree so that future selections prioritize high-reward routes</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Rolling back failed tool calls to a previous state</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Propagating user input backward through the planning hierarchy</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Which state change detection rule helps prevent an agent from being stuck in a ReAct loop?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Aborting if the context window exceeds 50% capacity</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> If the last 3 Thoughts and Actions are identical, break out and surface an error</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Switching to a faster model after 5 iterations</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Limiting the plan to at most 3 steps</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

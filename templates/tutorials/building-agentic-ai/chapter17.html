@@ -1,0 +1,214 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 17: Observability & Debugging — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 4 — Production Engineering</div>
+            <h1 class="chapter-title">Chapter 17: Observability &amp; Debugging</h1>
+            <p class="chapter-subtitle">Distributed tracing, spans, cost attribution, and debugging failed trajectories</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="77"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 17 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="tracing">Traces &amp; Spans</button>
+                <button class="section-nav-btn azbn-btn" data-section="platforms">Platforms</button>
+                <button class="section-nav-btn azbn-btn" data-section="debugging">Debugging</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Why Traditional App Monitoring is Insufficient</h2>
+                    <p>Standard APM tools (Datadog, New Relic) track HTTP latency, error rates, and CPU usage. This tells you that your agent is slow — but not <em>why</em>. Was it a slow LLM response? A tool API timeout? An infinite reasoning loop? Thirty redundant tool calls? Agent observability requires a domain-specific layer that understands the structure of agent execution.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Traditional APM</h4>
+                            <ul>
+                                <li>HTTP response times</li>
+                                <li>Error counts and stack traces</li>
+                                <li>CPU / memory usage</li>
+                                <li>Database query latencies</li>
+                                <li>No concept of "reasoning steps"</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Agent Observability</h4>
+                            <ul>
+                                <li>Per-step LLM latency and token counts</li>
+                                <li>Tool call success/failure rates</li>
+                                <li>Reasoning quality (LLM-graded)</li>
+                                <li>Cost per step, per task, per user</li>
+                                <li>Full trajectory replay for debugging</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tracing" class="content-section">
+                    <h2>Traces, Spans, and Events</h2>
+                    <p>Agent observability follows the same distributed tracing model as microservices — but the "services" are LLM calls, tool calls, and reasoning steps instead of HTTP requests.</p>
+
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Trace</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>Full Task Execution (trace_id: abc123)</strong>
+                                    <span>Root span: user goal → final answer · Duration: 12.4s · Cost: $0.023</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Spans</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>LLM Call (step 1)</strong>
+                                    <span>Model: gpt-4o · Tokens: 1,200 in + 350 out · Latency: 1.8s</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Tool: search_web</strong>
+                                    <span>Query: "latest news on X" · Status: success · Latency: 0.9s</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>LLM Call (step 2)</strong>
+                                    <span>Model: gpt-4o · Tokens: 2,100 in + 480 out · Latency: 2.1s</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Events</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell accent">
+                                    <strong>Tool retry</strong>
+                                    <span>Event logged on retry · Reason: RateLimitError · Retry #1 succeeded</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Agent-Specific Signals to Monitor</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Signal</th><th>What it indicates when high</th><th>Action</th></tr></thead>
+                        <tbody>
+                            <tr><td>Steps per task (P95)</td><td>Agent is looping or inefficient</td><td>Check for state change failures; add loop detection</td></tr>
+                            <tr><td>Tool retry rate</td><td>API instability or rate limits</td><td>Add back-off; check upstream SLAs</td></tr>
+                            <tr><td>Cost per task (P95)</td><td>Context growing unbounded</td><td>Add context eviction; check for large tool results</td></tr>
+                            <tr><td>LLM call latency (P99)</td><td>Model overload or large context</td><td>Switch to faster model for cheap steps; reduce context</td></tr>
+                            <tr><td>Task failure rate</td><td>Model degradation or prompt regression</td><td>Run regression eval; check if prompt changed</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="platforms" class="content-section">
+                    <h2>Observability Platforms</h2>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Platform</th><th>Strength</th><th>Best For</th></tr></thead>
+                        <tbody>
+                            <tr><td>LangSmith</td><td>Deep LangChain/LangGraph integration; trajectory viewer with step-through replay</td><td>Teams using LangGraph in production</td></tr>
+                            <tr><td>LangFuse</td><td>Open-source, self-hostable; cost tracking, prompt versioning</td><td>Cost-sensitive teams; privacy requirements</td></tr>
+                            <tr><td>Arize Phoenix</td><td>LLM-native evaluation + monitoring; UMAP visualization of embedding clusters</td><td>Teams doing systematic evals alongside monitoring</td></tr>
+                            <tr><td>Helicone</td><td>Simple drop-in proxy; caching, rate limiting, cost tracking with zero code changes</td><td>Quick observability without refactoring</td></tr>
+                            <tr><td>Braintrust</td><td>Eval + tracing in one platform; collaborative prompt debugging</td><td>Teams iterating rapidly on prompts</td></tr>
+                        </tbody>
+                    </table>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — LangSmith tracing (zero-code integration)</span></div>
+                        <pre><code class="language-python">import os
+
+# Set env vars — all LangChain/LangGraph calls automatically traced
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "my-agent-production"
+os.environ["LANGCHAIN_API_KEY"] = "ls__..."   # from LangSmith dashboard
+
+# That's it — your existing LangGraph app now sends traces to LangSmith
+result = app.invoke({"messages": [...]}, config=config)
+
+# For non-LangChain code, use the @traceable decorator
+from langsmith import traceable
+
+@traceable(name="web_search_tool", run_type="tool")
+def search_web(query: str) -> str:
+    # ... tool implementation
+    return result</code></pre>
+                    </div>
+                </div>
+
+                <div id="debugging" class="content-section">
+                    <h2>Debugging Failed Trajectories</h2>
+                    <p>A failed agent trajectory is a sequence of (Thought, Action, Observation) steps that ends in a wrong answer, an error, or a timeout. The debugging process mirrors debugging regular code — but the "call stack" is a reasoning chain.</p>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Identify the failing trajectory</strong><span>From your eval harness or production monitoring: task_id, session_id, timestamp</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Retrieve the full trace</strong><span>Open the trajectory in your tracing tool; you need every (Thought, Action, Observation) turn</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Find the first wrong step</strong><span>Work backward from the failure: what was the last correct state? What action caused the deviation?</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Classify the failure mode</strong><span>Wrong tool selected? Malformed arguments? Misread tool result? Context overflow? Classification determines the fix.</span></div></div>
+                        <div class="layer-item l5"><div class="layer-num">5</div><div class="layer-content"><strong>Fix and validate</strong><span>Adjust system prompt, tool description, context management, or eviction policy; run regression suite to verify the fix doesn't break other tasks</span></div></div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Detecting runaway costs</h4>
+                        <p>Set a per-session cost alert at 2–3× your expected average task cost. If a session exceeds the threshold, automatically terminate it and flag for manual review. Most runaway costs trace to: (1) infinite loops accumulating tool result tokens, (2) very large document ingestion without chunk limits, or (3) recursive agent spawning without depth limits.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 17 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. What is a "trace" in the context of agent observability?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> A Python stack trace triggered by an unhandled exception in a tool</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> The complete record of a single task execution — all LLM calls, tool calls, and events from start to finish, linked by a shared trace ID</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The agent's internal scratchpad reasoning text</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> A log of all tokens generated by the LLM in a session</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. A high "steps per task (P95)" metric indicates which problem?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The LLM's model quality has improved and it's doing more reasoning</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> The agent may be looping or taking inefficient paths — possibly a state change detection failure or poorly defined termination conditions</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The tool APIs are responding with rate limit errors</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> The context window is being evicted too aggressively</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What is the correct first step when debugging a failed agent trajectory?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Immediately update the system prompt based on the failure description</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Run the same task again with a higher-intelligence model</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Retrieve the full trace for the failing task and identify the first step where the agent deviated from the correct path</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Increase the max iterations limit to give the agent more attempts</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}
