@@ -1,0 +1,209 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 9: Context Management — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 2 — Core Building Blocks</div>
+            <h1 class="chapter-title">Chapter 9: Context Management</h1>
+            <p class="chapter-subtitle">Budget, summarization, system prompt design, and instruction hierarchy</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="41"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 9 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="budget">Context Budget</button>
+                <button class="section-nav-btn azbn-btn" data-section="system-prompt">System Prompt Design</button>
+                <button class="section-nav-btn azbn-btn" data-section="anti-patterns">Anti-Patterns</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Context is the Agent's Working Memory</h2>
+                    <p>The context window is both the most important and most constrained resource in an agent. Everything the LLM sees — the system prompt, tool schemas, conversation history, memory retrievals, tool results — must fit inside it. Managing what goes in is a first-class engineering concern.</p>
+                    <div class="info-box">
+                        <h3>Cost reality check</h3>
+                        <p>A GPT-4o-mini agent with a 16K token context per turn, running 10 turns to complete a task, with 100 tasks per day = <strong>16M tokens/day</strong> just for input. At current pricing, context management decisions directly translate to infrastructure cost. A 40% reduction in average context size = 40% cost reduction for the same throughput.</p>
+                    </div>
+                </div>
+
+                <div id="budget" class="content-section">
+                    <h2>Context Budget Management</h2>
+                    <p>Budget management is the practice of deciding, for each turn, what to include in the context window and at what token cost.</p>
+
+                    <!-- Context composition diagram -->
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Fixed</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>System Prompt</strong>
+                                    <span>~500–2000 tokens · Constant per request</span>
+                                </div>
+                                <div class="arch-cell primary">
+                                    <strong>Tool Schemas</strong>
+                                    <span>~50–200 tokens per tool · Semi-constant</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Dynamic</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>Memory Retrievals</strong>
+                                    <span>~500–3000 tokens · Varies with query</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Recent Conversation</strong>
+                                    <span>~1000–8000 tokens · Grows with turns</span>
+                                </div>
+                                <div class="arch-cell accent">
+                                    <strong>Tool Results</strong>
+                                    <span>~200–5000 tokens per call · Varies with tool</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Eviction Strategies</h3>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Strategy</th><th>What gets evicted</th><th>Trade-off</th></tr></thead>
+                        <tbody>
+                            <tr><td>Sliding window</td><td>Oldest N messages</td><td>Simple; loses early context that may still be relevant</td></tr>
+                            <tr><td>Summarization</td><td>Oldest N messages → replaced by summary</td><td>Preserves information; costs 1 LLM call per eviction</td></tr>
+                            <tr><td>Importance scoring</td><td>Messages with lowest relevance score</td><td>Best quality; requires scoring (embedding similarity or LLM)</td></tr>
+                            <tr><td>Tool result compression</td><td>Full tool output → compressed key-value</td><td>Major token savings; requires extraction step</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="system-prompt" class="content-section">
+                    <h2>System Prompt Design for Agents</h2>
+                    <p>The system prompt is the single most impactful piece of text in your agent. It defines the agent's identity, goals, constraints, available tools, and failure behavior. Most production bugs trace back to a poorly structured system prompt.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>text — well-structured agent system prompt template</span></div>
+                        <pre><code class="language-text">## Identity
+You are a research assistant agent. Your role is to help users find, summarize,
+and synthesize information from the web and internal knowledge bases.
+
+## Goal
+Complete the user's research task as accurately and concisely as possible.
+Always cite sources. Never fabricate information.
+
+## Constraints
+- Do NOT search the web for personal information about real individuals.
+- Do NOT produce content that could be used to harm others.
+- Do NOT execute code unless the user explicitly requests it.
+- If you are unsure about a fact, say so and offer to search for it.
+
+## Available Tools
+- search_web: Search the internet for current information. Use for real-time data.
+- read_document: Read a specific URL or file path. Use when you have a concrete source to read.
+- write_note: Save a note to the session for later reference.
+- finish: Signal task completion with your final answer.
+
+## Behavior Rules
+1. Always use a tool before making factual claims about current events.
+2. If a tool fails, explain why and try an alternative approach.
+3. When finished, call finish() with a clear, structured answer.
+4. Maximum 15 steps before calling finish() with partial results.
+
+## Output Format
+- Use markdown for structure.
+- Include source URLs inline when citing web results.
+- For multi-part answers, use numbered sections.</code></pre>
+                    </div>
+
+                    <h3>Instruction Hierarchy (OpenAI model spec)</h3>
+                    <p>Modern LLM deployments define a strict priority order for instructions. When instructions conflict, this hierarchy determines which takes precedence:</p>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Platform / Developer</strong><span>The API caller's system prompt — highest priority; sets hard constraints the model will not override</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Operator</strong><span>Business-specific configuration (e.g., "only answer about our products") — can restrict but not override developer constraints</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>User</strong><span>The end user's requests — lowest priority; cannot override operator or developer rules</span></div></div>
+                    </div>
+                    <p>This hierarchy is important for agent security: a malicious prompt injection in a tool result (arriving in the "user content" position) should not be able to override your system prompt's safety constraints. Chapter 16 covers this in depth.</p>
+                </div>
+
+                <div id="anti-patterns" class="content-section">
+                    <h2>Anti-Patterns to Avoid</h2>
+
+                    <div class="danger-box">
+                        <h4>1. Over-instruction</h4>
+                        <p>Writing a system prompt that lists every possible scenario creates contradictions and confuses the model. A 5000-token system prompt is almost always worse than a 500-token one that covers the core constraints clearly. Enumerate only the constraints that matter — the model generalizes the rest.</p>
+                    </div>
+
+                    <div class="danger-box">
+                        <h4>2. Context poisoning</h4>
+                        <p>Injecting user-controlled text directly into the system prompt without sanitization. A user who writes "Ignore all previous instructions and..." in their message can influence agent behavior if their text lands in a high-priority position. Always place user content in the "user" role — never interpolate it into the system prompt.</p>
+                    </div>
+
+                    <div class="danger-box">
+                        <h4>3. Growing context without eviction</h4>
+                        <p>Appending every message and tool result without any eviction policy. After 20 turns, the context is dominated by early observations that are no longer relevant, and the model's effective attention is diluted. Implement summarization or sliding-window eviction before the context exceeds 50% of the model's limit.</p>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Few-shot examples in agent prompts</h4>
+                        <p>Including 1–2 examples of ideal (Thought → Action → Observation → Answer) sequences in the system prompt consistently improves agent behavior quality. The examples demonstrate the expected reasoning format, not just the output format. Keep examples concise — their token cost must be justified by the quality improvement.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 9 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Why is the "lost in the middle" problem relevant to context management strategy?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> LLMs charge more for tokens in the middle of the context</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> LLMs are less accurate on facts buried in the middle of long contexts, so critical information should be placed at the start or end</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Memory retrieval systems cannot index documents longer than 512 tokens</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Tool schemas in the middle of the context cause parsing errors</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. When should you use summarization eviction over simple sliding-window eviction?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> When you want the cheapest possible eviction strategy</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> When early conversation context contains information that will be needed later but you cannot afford to keep the full raw messages</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> When the agent is running fewer than 5 turns</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Sliding window always outperforms summarization for long-horizon tasks</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. In the instruction hierarchy, what can an "Operator" instruction NOT do?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Restrict what topics the agent can discuss</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Define the persona or tone of the agent</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Override the Developer/Platform-level safety constraints</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Specify which tools the agent is allowed to use</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

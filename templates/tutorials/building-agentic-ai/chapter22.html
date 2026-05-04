@@ -1,0 +1,234 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 22: The Frontier — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 5 — Advanced Topics &amp; Frontiers</div>
+            <h1 class="chapter-title">Chapter 22: The Frontier</h1>
+            <p class="chapter-subtitle">Embodied AI, agent economies, persistent agents, regulation, and open problems</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="100"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 22 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="embodied">Embodied AI</button>
+                <button class="section-nav-btn azbn-btn" data-section="economies">Agent Economies</button>
+                <button class="section-nav-btn azbn-btn" data-section="open-problems">Open Problems</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>The State of the Art in 2026</h2>
+                    <p>This course was written in early 2026. The field is moving fast. This final chapter surveys the frontier: what is becoming possible, what remains unsolved, and what the trajectory looks like over the next 3–5 years.</p>
+
+                    <!-- Timeline diagram -->
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <h4>2022–2023 — Foundations</h4>
+                            <p>ReAct, function calling (GPT-4), early experiments with autonomous agents (AutoGPT, BabyAGI). Mostly research demos; high failure rates.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>2024 — Framework Maturity</h4>
+                            <p>LangGraph, CrewAI stable. MCP launched. Claude computer use. First production deployments at scale. SWE-bench becomes the coding agent benchmark.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>2025 — Reasoning Models</h4>
+                            <p>o3, DeepSeek-R1, Gemini 2.5 Pro. Long-horizon tasks become practical. Multi-agent systems deployed for knowledge work. GAIA scores cross 75%.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>2026 — Scale &amp; Specialization</h4>
+                            <p>97% production run rates on routine tasks. Domain-specific fine-tuned agents. Agent coordination at enterprise scale. EU AI Act enforcement begins.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <h4>2027–2028 — Projection</h4>
+                            <p>Persistent personal agents with month-scale memory. Embodied agents at human-comparable task completion rates. Agent-to-agent commerce. Autonomous software engineering.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="embodied" class="content-section">
+                    <h2>Embodied AI and Physical Agents</h2>
+                    <p>Digital agents work in the world of APIs, files, and text. Embodied agents work in the physical world — robotics, manufacturing, logistics. The same agentic principles apply, but the observation space is now sensors and cameras, and actions are motor commands.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Digital Agent</h4>
+                            <ul>
+                                <li>Observations: text, JSON, screenshots</li>
+                                <li>Actions: API calls, file writes, keyboard/mouse</li>
+                                <li>State: database, memory store</li>
+                                <li>Rollback: possible on most actions</li>
+                                <li>Latency tolerance: seconds–minutes</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Embodied Agent</h4>
+                            <ul>
+                                <li>Observations: camera, LIDAR, tactile sensors</li>
+                                <li>Actions: servo commands, gripper control, navigation</li>
+                                <li>State: physical world state (not easily serialized)</li>
+                                <li>Rollback: impossible (object dropped, item damaged)</li>
+                                <li>Latency tolerance: milliseconds (real-time control)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>World Models</h3>
+                    <p>A world model is a neural network that predicts how the environment will change in response to actions. For embodied agents, world models (GAIA-1, Dreamer V3, UniSim) enable <em>mental simulation</em> — the agent can plan by imagining the consequences of its actions before executing them, much like how humans plan physical movements. This is a major unsolved research area.</p>
+
+                    <div class="info-box">
+                        <h4>Foundation models for robotics</h4>
+                        <p>RT-2 (Google, 2023) demonstrated that a vision-language model fine-tuned on robot demonstrations can generalize to novel objects and instructions. Figure 01, Optimus (Tesla), and RoboVLMs build on this paradigm. The convergence between LLM reasoning and physical embodiment is the defining research direction of the late 2020s.</p>
+                    </div>
+                </div>
+
+                <div id="economies" class="content-section">
+                    <h2>Agent Economies &amp; Persistent Agents</h2>
+
+                    <h3>Persistent Personal Agents</h3>
+                    <p>Today's agents have session memory at best. The next frontier is <em>persistent agents</em> — systems that maintain a coherent, evolving model of the user's life, preferences, relationships, and goals across months and years. Technical requirements: multi-tier memory (Chapter 7 at massive scale), temporal knowledge graphs, privacy-preserving storage, and principled forgetting policies.</p>
+
+                    <div class="warning-box">
+                        <h4>The memory privacy paradox</h4>
+                        <p>A persistent agent becomes more valuable the more it knows about you. But the more it knows, the higher the privacy risk if the system is compromised. Architectures that store personal agent memories must be designed from the ground up for privacy: on-device processing, end-to-end encryption, user-controlled data deletion. No major system has solved this satisfactorily as of 2026.</p>
+                    </div>
+
+                    <h3>Agent-to-Agent Commerce</h3>
+                    <p>As agents become capable of autonomous work, they will increasingly interact with other agents as service providers and consumers — with minimal human involvement. Early examples:</p>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Operator → Service Agent</strong><span>Your orchestrator calls a specialized third-party agent (legal research, financial modeling) via API as a paid service</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Agent Marketplaces</strong><span>Like app stores, but for agents — discover, subscribe to, and route tasks to pre-built specialized agents</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Agent Identity and Trust</strong><span>How do you verify an agent's identity, track its decision history, or hold it accountable? Federated agent identity standards are an open research problem.</span></div></div>
+                    </div>
+
+                    <h3>Regulation Landscape</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-card" style="border-top-color:#6366f1;">
+                            <h4>EU AI Act (enforced 2025–2026)</h4>
+                            <p>Classifies AI systems by risk tier. High-risk agentic systems require conformity assessment, transparency reports, and human oversight mechanisms.</p>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>US Executive Orders</h4>
+                            <p>Sector-specific guidance for healthcare, finance, critical infrastructure. Focus on safety testing and reporting for frontier models and agentic deployments.</p>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>Agent Accountability</h4>
+                            <p>Open question: when an agent causes harm, who is liable? The developer, the deployer, the user who approved the action, or the model provider? Answers vary by jurisdiction and are actively evolving.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="open-problems" class="content-section">
+                    <h2>Open Research Problems</h2>
+                    <p>These are the problems that the research community is actively working on as of 2026. If you are building on the frontier, these are the areas where contributions are most needed.</p>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1">
+                            <div class="layer-num">1</div>
+                            <div class="layer-content">
+                                <strong>Long-horizon task completion with high reliability</strong>
+                                <span>Current agents succeed on tasks requiring ~10–20 steps. Tasks requiring 100+ steps still fail at unacceptable rates due to error compounding. Need: better state management, error recovery, and early task failure detection.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l2">
+                            <div class="layer-num">2</div>
+                            <div class="layer-content">
+                                <strong>Reliable uncertainty estimation</strong>
+                                <span>Agents should know when they don't know. Current models are confidently wrong far too often. Need: calibrated confidence that tells the agent when to verify, ask for clarification, or stop.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l3">
+                            <div class="layer-num">3</div>
+                            <div class="layer-content">
+                                <strong>Formal agent verification</strong>
+                                <span>Can we prove that an agent will never take action X? Formal methods from computer science (model checking, type systems) are being adapted for LLM-based systems, but a general solution does not exist.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l4">
+                            <div class="layer-num">4</div>
+                            <div class="layer-content">
+                                <strong>Compositional generalization</strong>
+                                <span>An agent trained on tasks A and B should be able to solve "do A then B" without explicit training on the combination. Current systems require direct examples of each composition.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l5">
+                            <div class="layer-num">5</div>
+                            <div class="layer-content">
+                                <strong>Multi-agent alignment</strong>
+                                <span>How do you ensure a team of agents collectively pursues the intended goal when each agent is separately aligned? Agents can behave safely individually but produce unsafe emergent behavior collectively.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l6">
+                            <div class="layer-num">6</div>
+                            <div class="layer-content">
+                                <strong>Efficient continual learning</strong>
+                                <span>Agents deployed in production encounter new tools, new domains, and new user preferences continuously. Current fine-tuning approaches require retraining from scratch or risk catastrophic forgetting.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Course complete — what's next?</h4>
+                        <p>You now have the full conceptual and practical foundation to build, deploy, and improve production Agentic AI systems. The field moves fast: follow arXiv (cs.AI, cs.LG), the LangChain blog, Anthropic research, and OpenAI's model documentation for the latest developments. The most important thing now is to <em>build</em> — the gap between theory and working systems is still large, and hands-on experience is irreplaceable.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 22 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. What is the primary technical role of a "world model" in embodied AI?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> A 3D reconstruction of the robot's physical environment</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> A neural network that predicts how the environment will change in response to the agent's actions, enabling mental simulation before physical execution</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> A map of all available tools and their schemas for an embodied agent</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The training dataset of all human demonstrations used to fine-tune a robot</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. What is the "memory privacy paradox" in persistent agents?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Persistent agents forget too much, making them less useful than one-session agents</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> An agent becomes more valuable as it accumulates more personal knowledge, but the more it knows, the greater the privacy risk if the system is compromised</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Memory storage costs grow exponentially, making persistent agents economically unviable</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Users cannot distinguish what information the agent knows about them</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. What is "multi-agent alignment" as an open research problem?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Getting multiple models to agree on a single answer using consensus mechanisms</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Aligning the training objectives of multiple fine-tuning runs</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Ensuring a team of individually aligned agents doesn't produce unsafe emergent collective behavior that no single agent was designed to exhibit</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Making sure all agents in a multi-agent system use the same model architecture</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

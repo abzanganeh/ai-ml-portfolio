@@ -1,0 +1,241 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 19: CI/CD for Agents — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 4 — Production Engineering</div>
+            <h1 class="chapter-title">Chapter 19: CI/CD for Agents</h1>
+            <p class="chapter-subtitle">Testing pipelines, golden trajectories, canary deployments, and rollback</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="86"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 19 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="testing">Testing Layers</button>
+                <button class="section-nav-btn azbn-btn" data-section="pipeline">CI/CD Pipeline</button>
+                <button class="section-nav-btn azbn-btn" data-section="rollout">Rollout &amp; Rollback</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Why Agent CI/CD is Harder Than Standard CI/CD</h2>
+                    <p>Standard CI/CD tests deterministic code: given input X, expect output Y. Agents are non-deterministic: the same input may produce different outputs on different runs (due to LLM temperature, API latency, and tool result variation). This means traditional unit tests must be supplemented with probabilistic and trajectory-based approaches.</p>
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Standard CI/CD</h4>
+                            <ul>
+                                <li>Unit test: assert output == expected</li>
+                                <li>Integration test: end-to-end flow</li>
+                                <li>One correct answer per test case</li>
+                                <li>Deterministic pass/fail</li>
+                                <li>Fast (seconds)</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Agent CI/CD</h4>
+                            <ul>
+                                <li>Unit test: tool schemas, prompt parsing, dispatchers</li>
+                                <li>Trajectory test: N runs, measure success rate</li>
+                                <li>Many acceptable answers per task</li>
+                                <li>Probabilistic pass (e.g., 95% success rate)</li>
+                                <li>Slow (minutes per eval run)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="testing" class="content-section">
+                    <h2>Testing Layers</h2>
+
+                    <div class="layer-stack">
+                        <div class="layer-item l1">
+                            <div class="layer-num">1</div>
+                            <div class="layer-content">
+                                <strong>Unit Tests — deterministic components</strong>
+                                <span>Test: tool schema validity, tool dispatcher routing, prompt template rendering, context assembler output, state schema validation. These are fully deterministic and run in milliseconds.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l2">
+                            <div class="layer-num">2</div>
+                            <div class="layer-content">
+                                <strong>Integration Tests — agent in sandbox</strong>
+                                <span>Run the full agent against a mock tool environment. Tools return fixture responses. Measure: does the agent call the right tools? Does it terminate correctly? Runs in seconds.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l3">
+                            <div class="layer-num">3</div>
+                            <div class="layer-content">
+                                <strong>Golden Trajectory Regression</strong>
+                                <span>Run the agent on your golden task set. Compare trajectories against reference solutions. Flag degradations in task success rate or step efficiency. Runs in minutes.</span>
+                            </div>
+                        </div>
+                        <div class="layer-item l4">
+                            <div class="layer-num">4</div>
+                            <div class="layer-content">
+                                <strong>A/B / Shadow Mode</strong>
+                                <span>Run new agent version in parallel with production on live traffic; compare outcomes without exposing users to new version. Most expensive but most realistic.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — unit testing a tool dispatcher</span></div>
+                        <pre><code class="language-python">import pytest
+import json
+from my_agent.tools import dispatch_tool_call
+
+def test_dispatch_routes_correctly():
+    registry = {
+        "search_web": lambda query, max_results=5: f"results for {query}",
+    }
+    result = dispatch_tool_call(registry, "search_web", json.dumps({"query": "test"}))
+    assert "results for test" in result
+
+def test_dispatch_unknown_tool_returns_error():
+    result = dispatch_tool_call({}, "nonexistent_tool", "{}")
+    data = json.loads(result)
+    assert data["retryable"] is False
+    assert "Unknown tool" in data["error"]
+
+def test_dispatch_malformed_args_returns_error():
+    result = dispatch_tool_call({"fn": lambda: None}, "fn", "not valid json{{")
+    data = json.loads(result)
+    assert "Invalid tool arguments" in data["error"]</code></pre>
+                    </div>
+                </div>
+
+                <div id="pipeline" class="content-section">
+                    <h2>CI/CD Pipeline Design</h2>
+
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">📝</div><strong>Code Change</strong><p>Prompt, tool, or agent logic</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🧪</div><strong>Unit Tests</strong><p>&lt;1 min</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔗</div><strong>Integration</strong><p>Mock tools, ~2 min</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">📊</div><strong>Eval Suite</strong><p>Golden tasks, ~15 min</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#a855f7;"><div class="flow-icon">🐦</div><strong>Canary</strong><p>5% live traffic</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#22d3ee;"><div class="flow-icon">🚀</div><strong>Full Deploy</strong></div>
+                    </div>
+
+                    <h3>Prompt and Tool Version Control</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Store prompts in version control (git)</strong><span>System prompts and few-shot examples are code — treat them like code. Every change is a commit with a message explaining the intent.</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Semantic versioning for prompt templates</strong><span>MAJOR: breaking changes (different output format). MINOR: improvements to same behavior. PATCH: typo fixes, clarifications.</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Feature flags for agent capabilities</strong><span>Disable new tools/behaviors at runtime without deploying new code. A feature flag lets you roll out a new tool to 10% of users while monitoring for problems.</span></div></div>
+                    </div>
+                </div>
+
+                <div id="rollout" class="content-section">
+                    <h2>Canary Deployments and Rollback</h2>
+
+                    <div class="info-box">
+                        <h3>Why agent rollbacks are harder</h3>
+                        <p>Rolling back a web server restores old code. Rolling back an agent may also require: (1) restoring old system prompt templates, (2) reverting tool schema changes (if the old schema is incompatible with new tool function signatures), and (3) clearing or migrating checkpointed state that was written by the new version. Plan your versioning strategy before you ship.</p>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — canary rollout with feature flags</span></div>
+                        <pre><code class="language-python">import hashlib
+
+def get_agent_version_for_user(user_id: str, canary_percentage: int = 5) -> str:
+    """
+    Route a fraction of users to the new agent version.
+    Deterministic: same user always gets same version (no flickering).
+    """
+    # Deterministic hash-based assignment
+    bucket = int(hashlib.md5(user_id.encode()).hexdigest()[:4], 16) % 100
+
+    if bucket < canary_percentage:
+        return "v2"   # new version
+    return "v1"       # stable version
+
+def create_agent(version: str) -> AgentCore:
+    configs = {
+        "v1": {"model": "gpt-4o", "system_prompt": SYSTEM_PROMPT_V1, "tools": TOOLS_V1},
+        "v2": {"model": "gpt-4o", "system_prompt": SYSTEM_PROMPT_V2, "tools": TOOLS_V2},
+    }
+    cfg = configs[version]
+    return AgentCore(
+        llm_client=client,
+        model=cfg["model"],
+        system_prompt=cfg["system_prompt"],
+        tools=cfg["tools"],
+    )
+
+# In your request handler:
+def handle_request(user_id: str, goal: str) -> str:
+    version = get_agent_version_for_user(user_id)
+    agent = create_agent(version)
+    track_metric("agent_version", version)   # monitor per-version metrics
+    return agent.run(goal)</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Rollback decision criteria</h4>
+                        <p>Automatically trigger a rollback if within the first 30 minutes of canary: task success rate drops more than 5 percentage points, cost per task increases more than 30%, or P99 latency increases more than 50%. These thresholds should be calibrated to your specific system during stable baseline periods.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 19 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. Why can't you use a standard "assert output == expected" unit test for an agent's final answer?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Agents always produce JSON output that cannot be compared with ==</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Agents are non-deterministic — the same input may produce different but equally correct outputs across runs due to LLM temperature and tool variation</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Python's == operator doesn't work with strings longer than 512 characters</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Unit tests cannot import the agent module without a live API key</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. In a canary deployment, why should user routing be deterministic (hash-based)?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Random routing would expose all users to the new version simultaneously</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> A specific user should always see the same version — flickering between v1 and v2 on each request creates confusing, inconsistent experiences and makes metrics unreliable</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Hash-based routing is faster than random routing</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Deterministic routing prevents the new version from being tested on paying users</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. Why is rolling back an agent harder than rolling back a standard web application?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Agent code is compiled and cannot be easily redeployed</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> A rollback may also require reverting prompt templates, tool schema changes, and migrating persisted state that was written in the new format</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Agent containers take longer to restart than web server containers</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> LLM APIs do not support version pinning</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

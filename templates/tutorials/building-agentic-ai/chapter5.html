@@ -1,0 +1,258 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 5: Tool Use — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 2 — Core Building Blocks</div>
+            <h1 class="chapter-title">Chapter 5: Tool Use</h1>
+            <p class="chapter-subtitle">Anatomy, schemas, parallel calls, failures, and integration</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="23"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 5 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="anatomy">Tool Anatomy</button>
+                <button class="section-nav-btn azbn-btn" data-section="call-flow">Call Flow</button>
+                <button class="section-nav-btn azbn-btn" data-section="parallel">Parallel Tools</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <div id="overview" class="content-section active">
+                    <h2>Tool Use — The Agent's Hands</h2>
+                    <p>Tool use is what transforms a language model into an agent that can affect the world. Without tools, an agent can only generate text. With tools, it can search the web, run code, call APIs, read/write files, query databases, and trigger workflows.</p>
+                    <div class="info-box">
+                        <h3>How tool calling works at inference time</h3>
+                        <p>The model receives the tool schemas alongside the conversation. When it decides to use a tool, it generates a <strong>structured JSON object</strong> containing the tool name and arguments instead of a free-form text response. Your application code intercepts that JSON, executes the real function, and returns the result as a new message. The model never directly executes anything — it only decides <em>what to call</em>.</p>
+                    </div>
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>LLM</strong><p>Generates JSON call</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">🔌</div><strong>Dispatcher</strong><p>Parses &amp; routes</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🛠</div><strong>Tool Fn</strong><p>Executes</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">📩</div><strong>Result</strong><p>Returned as tool message</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node"><div class="flow-icon">🤖</div><strong>LLM</strong><p>Reads result, continues</p></div>
+                    </div>
+                </div>
+
+                <div id="anatomy" class="content-section">
+                    <h2>Tool Anatomy</h2>
+                    <p>A well-designed tool has three parts: a clear name, a precise description, and a strict parameter schema. The description is read by the LLM at inference time — it is documentation for the model, not for developers.</p>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — well-designed tool definition</span></div>
+                        <pre><code class="language-python">from pydantic import BaseModel, Field
+from typing import Literal
+
+# Use Pydantic for schema generation — avoids JSON schema hand-rolling
+
+class WebSearchInput(BaseModel):
+    query: str = Field(
+        description="Specific, focused search query. Be precise — vague queries return poor results."
+    )
+    max_results: int = Field(
+        default=5,
+        ge=1, le=20,
+        description="Number of results to retrieve. Use 3-5 for general queries."
+    )
+
+def search_web(query: str, max_results: int = 5) -> str:
+    """
+    Search the web for current information not in the training data.
+    Use for: current events, real-time data, recent publications.
+    Do NOT use for: mathematical computation, code execution, or static factual knowledge.
+    Returns: top results as formatted text with titles, URLs, and snippets.
+    """
+    # Implementation: call search API (Brave, Serper, Tavily, etc.)
+    results = _call_search_api(query, max_results)
+    return _format_results(results)
+
+
+# Convert to OpenAI tool schema
+import openai_schema_generator  # or build manually
+
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_web",
+            "description": search_web.__doc__,
+            "parameters": WebSearchInput.model_json_schema(),
+            "strict": True,  # Forces exact schema adherence (OpenAI structured outputs)
+        }
+    }
+]</code></pre>
+                    </div>
+
+                    <h3>Tool Design Rules</h3>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>One tool, one responsibility</strong><span>A tool that searches AND writes is harder to reason about and audit than two separate tools</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Description tells the model WHEN to use it</strong><span>Not just what it does, but when NOT to use it — negative guidance prevents misuse</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Idempotent tools are safer</strong><span>Read-only and idempotent write tools can be safely retried; non-idempotent ones (send email) need confirmation guards</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Return structured output, not prose</strong><span>Return JSON or structured text — the model parses the tool result; unstructured prose degrades parsing quality</span></div></div>
+                        <div class="layer-item l5"><div class="layer-num">5</div><div class="layer-content"><strong>Include error messages in the return type</strong><span>A tool that raises an exception breaks the loop; return <code>{"error": "...", "retryable": true}</code> instead</span></div></div>
+                    </div>
+                </div>
+
+                <div id="call-flow" class="content-section">
+                    <h2>Tool Call Flow &amp; Failure Handling</h2>
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — robust tool dispatcher</span></div>
+                        <pre><code class="language-python">import json
+import time
+from typing import Any
+
+def dispatch_tool_call(
+    tool_registry: dict[str, callable],
+    tool_name: str,
+    raw_arguments: str,
+    max_retries: int = 2,
+    retry_delay: float = 1.0,
+) -> str:
+    # 1. Parse arguments — catch malformed JSON from the LLM
+    try:
+        args = json.loads(raw_arguments)
+    except json.JSONDecodeError as e:
+        return json.dumps({"error": f"Invalid tool arguments: {e}", "retryable": False})
+
+    # 2. Resolve tool — catch hallucinated tool names
+    tool_fn = tool_registry.get(tool_name)
+    if tool_fn is None:
+        return json.dumps({
+            "error": f"Unknown tool '{tool_name}'. Available: {list(tool_registry.keys())}",
+            "retryable": False,
+        })
+
+    # 3. Execute with retry for transient failures (rate limits, timeouts)
+    for attempt in range(max_retries + 1):
+        try:
+            result = tool_fn(**args)
+            return result if isinstance(result, str) else json.dumps(result)
+        except RateLimitError:
+            if attempt < max_retries:
+                time.sleep(retry_delay * (2 ** attempt))   # exponential back-off
+                continue
+            return json.dumps({"error": "Rate limit exceeded after retries", "retryable": True})
+        except TimeoutError:
+            return json.dumps({"error": "Tool timed out", "retryable": True})
+        except Exception as e:
+            return json.dumps({"error": str(e), "retryable": False})</code></pre>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Never let a tool exception propagate to the LLM loop</h4>
+                        <p>If a tool raises an uncaught exception, your agent loop crashes and the user sees an error. Wrap every tool execution in a try/except and return a structured error message. The LLM can then decide to retry, use an alternative tool, or report the problem gracefully.</p>
+                    </div>
+                </div>
+
+                <div id="parallel" class="content-section">
+                    <h2>Parallel vs Sequential Tool Calls</h2>
+                    <p>Modern LLMs (GPT-4o, Claude 3.5+) can request multiple tool calls in a single response turn. This is called <strong>parallel function calling</strong>. When the calls are independent, it can cut total latency dramatically.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Sequential</h4>
+                            <ul>
+                                <li>Call 1 → wait → Call 2 → wait → Call 3</li>
+                                <li>Total latency = sum of all tool latencies</li>
+                                <li>Necessary when: Call 2 depends on Call 1's result</li>
+                                <li>Example: search → read top result → summarize</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Parallel</h4>
+                            <ul>
+                                <li>Calls 1, 2, 3 dispatched simultaneously</li>
+                                <li>Total latency = max(individual latencies)</li>
+                                <li>Necessary when: all calls are independent</li>
+                                <li>Example: search 3 topics simultaneously for a report</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — executing parallel tool calls</span></div>
+                        <pre><code class="language-python">import asyncio
+from openai.types.chat import ChatCompletionMessageToolCall
+
+async def execute_parallel_tools(
+    tool_calls: list[ChatCompletionMessageToolCall],
+    tool_registry: dict[str, callable],
+) -> list[dict]:
+    """Execute all tool calls concurrently; return results in the same order."""
+
+    async def _run_one(call: ChatCompletionMessageToolCall) -> dict:
+        result = await asyncio.to_thread(
+            dispatch_tool_call, tool_registry, call.function.name, call.function.arguments
+        )
+        return {"role": "tool", "tool_call_id": call.id, "content": result}
+
+    return await asyncio.gather(*[_run_one(c) for c in tool_calls])</code></pre>
+                    </div>
+
+                    <div class="tip-box">
+                        <h4>Tool selection when the list is large</h4>
+                        <p>Models perform poorly when given more than ~30 tools at once — the schema descriptions overload the context and the model struggles to select correctly. For large tool sets (50+), use <strong>semantic tool routing</strong>: embed the user query, find the top-K most semantically relevant tool descriptions, and only include those K tools in the current turn's context.</p>
+                    </div>
+                </div>
+
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 5 Quiz</h2>
+                    <div class="quiz-container">
+                        <div class="quiz-question">
+                            <p>1. When the LLM "calls a tool," what actually executes the function?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The LLM itself, through its neural network computations</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Application code in your agent loop that intercepts the structured JSON the LLM outputs and calls the real function</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> The OpenAI API server, which routes function calls to a built-in registry</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> A separate fine-tuned model specialized in execution</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>2. Why should a tool's description specify when NOT to use it?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> To satisfy the OpenAI API schema validation requirements</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Because the model reads the description at inference time to decide which tool to call; negative guidance prevents selection errors</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> To reduce the number of tokens in the context window</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Documentation is only for developers, not for the model</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        <div class="quiz-question">
+                            <p>3. When are parallel tool calls NOT appropriate?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> When all tool calls are independent of each other</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> When a later tool call depends on the result of an earlier one</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> When the agent has more than 5 tools in its registry</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> When using async frameworks like asyncio</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

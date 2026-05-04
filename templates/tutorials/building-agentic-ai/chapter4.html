@@ -1,0 +1,257 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 4: Reasoning Deep-Dive — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 1 — Foundations &amp; Mental Models</div>
+            <h1 class="chapter-title">Chapter 4: Reasoning Deep-Dive</h1>
+            <p class="chapter-subtitle">Chain-of-thought, reasoning models, and when to search instead of think</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="18"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 4 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="cot">Chain-of-Thought</button>
+                <button class="section-nav-btn azbn-btn" data-section="models">Reasoning Models</button>
+                <button class="section-nav-btn azbn-btn" data-section="search-vs-reason">Search vs Reason</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <!-- OVERVIEW -->
+                <div id="overview" class="content-section active">
+                    <h2>How Agents Think</h2>
+
+                    <p>An agent's behavior quality is bounded by two things: the quality of its reasoning and the quality of its information. This chapter is about reasoning. Information access (tools, RAG, memory) is covered in Chapters 5–7.</p>
+
+                    <p>Reasoning in the context of agents means something specific: <em>the process of moving from the current state of observations to a decision about the next action</em>. Poor reasoning leads to choosing the wrong tool, misinterpreting tool results, or failing to recognize when the goal is complete.</p>
+
+                    <div class="info-box">
+                        <h3>Reasoning quality is not the same as model intelligence</h3>
+                        <p>A well-prompted GPT-4o with explicit chain-of-thought often outperforms o3 with a minimal prompt on agent tasks. Reasoning quality is a function of <strong>model capability × prompt structure × task difficulty</strong>. Optimizing the prompt is always cheaper than switching to a larger model.</p>
+                    </div>
+                </div>
+
+                <!-- COT -->
+                <div id="cot" class="content-section">
+                    <h2>Chain-of-Thought (CoT)</h2>
+
+                    <p>Chain-of-thought prompting (Wei et al., 2022) asks the model to reason step-by-step before giving a final answer. The mechanism: explicitly producing intermediate reasoning steps causes the model to allocate more compute (attention) to the problem, which dramatically reduces errors on multi-step tasks.</p>
+
+                    <!-- CoT vs direct comparison -->
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Direct Prompt (No CoT)</h4>
+                            <ul>
+                                <li>User: "Should I search the web or use the database?"</li>
+                                <li>Model: "Use the database."</li>
+                                <li>No reasoning exposed</li>
+                                <li>Error rate: high on complex decisions</li>
+                                <li>Faster, lower token cost</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>CoT Prompt</h4>
+                            <ul>
+                                <li>User: same question, but "Think step by step"</li>
+                                <li>Model: "The question asks about current events. My training cutoff is 2024. Current events are not in the database. Therefore I should search the web."</li>
+                                <li>Reasoning is auditable</li>
+                                <li>Error rate: lower on complex decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>CoT in the Agent Context</h3>
+                    <p>In a ReAct agent, the <strong>Thought</strong> step is CoT made explicit. The scratchpad — the Thought text before each Action — is the chain-of-thought. This is why ReAct is effective: it forces the model to reason before acting on every step, not just at the end.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>Example ReAct scratchpad — the Thought IS the chain-of-thought</span></div>
+                        <pre><code class="language-text">Thought: The user wants to know the current stock price of NVDA.
+        I cannot answer from memory because stock prices change in real time.
+        I should call the `get_stock_price` tool with ticker="NVDA".
+
+Action: get_stock_price({"ticker": "NVDA"})
+Observation: {"ticker": "NVDA", "price": 132.45, "currency": "USD", "timestamp": "2026-05-04T17:02:00Z"}
+
+Thought: I now have the current price. No additional tool calls needed.
+        I should report the price clearly with the timestamp.
+
+Final Answer: NVDA is currently trading at $132.45 USD (as of 17:02 UTC, May 4 2026).</code></pre>
+                    </div>
+
+                    <h3>Advanced CoT Variants</h3>
+                    <div class="pattern-grid">
+                        <div class="pattern-card">
+                            <h4>Self-Consistency</h4>
+                            <p>Sample N reasoning chains independently; take the majority answer. Works well when the answer space is discrete.</p>
+                            <div class="use-when">Use when: answer correctness matters more than cost</div>
+                        </div>
+                        <div class="pattern-card green-top">
+                            <h4>Tree-of-Thoughts</h4>
+                            <p>Explore multiple reasoning branches in a tree structure, evaluating and pruning at each node.</p>
+                            <div class="use-when">Use when: the solution space has branching paths (e.g., planning, math proofs)</div>
+                        </div>
+                        <div class="pattern-card yellow-top">
+                            <h4>Mind-Map Agent</h4>
+                            <p>Constructs a knowledge graph during reasoning to track logical relationships across many retrieved facts.</p>
+                            <div class="use-when">Use when: tasks require synthesizing many documents (deep research)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REASONING MODELS -->
+                <div id="models" class="content-section">
+                    <h2>Reasoning Models</h2>
+
+                    <p>Standard LLMs like GPT-4o generate the next token directly from the prompt. Reasoning models (o1, o3, QwQ, DeepSeek-R1) are trained to produce an extended internal scratchpad — sometimes called "thinking tokens" — before generating the visible response. This scratchpad is akin to forced chain-of-thought, happening at inference time.</p>
+
+                    <table class="decision-matrix">
+                        <thead>
+                            <tr><th>Model</th><th>Approach</th><th>Strength in Agents</th><th>Weakness</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GPT-4o</td>
+                                <td>Standard next-token prediction with RLHF</td>
+                                <td>Fast, broad capability, strong tool calling</td>
+                                <td>Multi-step reasoning errors on complex tasks</td>
+                            </tr>
+                            <tr>
+                                <td>o3 / o4-mini</td>
+                                <td>Extended thinking via RL on verifiable tasks</td>
+                                <td>Long-horizon planning, math/code reasoning</td>
+                                <td>Higher latency and cost per step</td>
+                            </tr>
+                            <tr>
+                                <td>DeepSeek-R1</td>
+                                <td>Distilled reasoning from large R1 model</td>
+                                <td>Open weights, strong STEM, cost-efficient</td>
+                                <td>Weaker on non-STEM knowledge tasks</td>
+                            </tr>
+                            <tr>
+                                <td>QwQ / Qwen3</td>
+                                <td>Thinking mode toggled via system prompt</td>
+                                <td>Flexible: fast mode or thinking mode</td>
+                                <td>Newer, less production data</td>
+                            </tr>
+                            <tr>
+                                <td>Claude 3.5/4 (extended thinking)</td>
+                                <td>Extended thinking budget via API parameter</td>
+                                <td>Very strong instruction following + reasoning</td>
+                                <td>Expensive at high thinking budgets</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="tip-box">
+                        <h4>When to pay for a reasoning model</h4>
+                        <p>Use a reasoning model (o3, R1, QwQ thinking mode) when individual steps require complex planning or mathematical precision — e.g., a planner agent decomposing a 20-step research task. Use a standard model for routine tool dispatch steps (e.g., "given the search query the planner generated, call the search API") where reasoning depth is not the bottleneck.</p>
+                    </div>
+                </div>
+
+                <!-- SEARCH VS REASON -->
+                <div id="search-vs-reason" class="content-section">
+                    <h2>When to Search Instead of Reason</h2>
+
+                    <p>One of the most impactful decisions in agent design is distinguishing between knowledge that should be <em>reasoned about</em> (known facts, logical inferences) and knowledge that must be <em>retrieved</em> (current events, proprietary data, anything after the model's training cutoff).</p>
+
+                    <div class="info-box">
+                        <h3>The SMTL Pattern (Search More, Think Less)</h3>
+                        <p>Research from 2026 (SMTL framework) showed that replacing sequential long reasoning chains with <strong>parallel evidence acquisition followed by synthesis</strong> reduced average reasoning steps by 70.7% while achieving state-of-the-art results on GAIA (75.7%) and BrowseComp (48.6%). The insight: an agent that retrieves 10 sources in parallel and then synthesizes is faster and more accurate than one that reasons at length from an incomplete knowledge base.</p>
+                    </div>
+
+                    <!-- Search vs reason decision flow -->
+                    <div class="flow-diagram">
+                        <div class="flow-node"><div class="flow-icon">❓</div><strong>Question</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#f59e0b;"><div class="flow-icon">🤔</div><strong>Is this factual / current?</strong></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;"><div class="flow-icon">🔍</div><strong>Search / Retrieve</strong><p>Real-time, proprietary</p></div>
+                    </div>
+                    <div class="flow-diagram" style="margin-top:0.5rem;">
+                        <div class="flow-node" style="opacity:0;min-width:100px;"></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">🧠</div><strong>Reason</strong><p>Logic, math, inference</p></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#6366f1;"><div class="flow-icon">✅</div><strong>Answer</strong></div>
+                    </div>
+
+                    <h3>Practical heuristics</h3>
+                    <table class="decision-matrix">
+                        <thead>
+                            <tr><th>Task</th><th>Correct approach</th><th>Wrong approach</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Calculate the sum of a list</td><td>Run code (tool)</td><td>Reason numerically in CoT (error-prone)</td></tr>
+                            <tr><td>Latest model benchmark scores</td><td>Web search</td><td>Rely on training data (stale)</td></tr>
+                            <tr><td>Design a plan to refactor code</td><td>Deep reasoning (o3)</td><td>Simple search (no single document answers this)</td></tr>
+                            <tr><td>Current exchange rates</td><td>Finance API tool</td><td>Any form of reasoning from memory</td></tr>
+                            <tr><td>Explain gradient descent</td><td>Standard LLM (GPT-4o)</td><td>Reasoning model (overkill; waste of cost)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 4 Quiz</h2>
+                    <div class="quiz-container">
+
+                        <div class="quiz-question">
+                            <p>1. Why does chain-of-thought prompting reduce errors on multi-step tasks?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It compresses the context so the LLM sees less irrelevant information</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Generating intermediate steps forces the model to allocate more compute to the problem, reducing cascading errors</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It bypasses the model's RLHF fine-tuning constraints</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> It makes the model use a larger vocabulary during generation</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>2. In the SMTL framework, why does parallel evidence acquisition outperform long sequential reasoning?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Parallel requests are cheaper per token than sequential ones</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Long reasoning on incomplete knowledge leads to hallucinated inferences; retrieving real evidence first then synthesizing is more accurate</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Reasoning models cannot process more than 10 reasoning steps</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Parallel requests always have lower latency than sequential reasoning</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>3. For which task is a standard fast LLM (GPT-4o) the correct choice — NOT a reasoning model?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Decomposing a 20-step software architecture plan</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Solving a 50-line mathematical proof</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> Dispatching a tool call given a search query already generated by a planning step</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Analyzing and debugging a 500-line Python file</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

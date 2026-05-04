@@ -1,0 +1,371 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_title = 'Chapter 2: Anatomy of an Agent — Building Agentic AI Systems' %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content">
+    <div class="tutorial-header">
+        <div class="azbn-container">
+            <div class="section-label-badge">Section 1 — Foundations &amp; Mental Models</div>
+            <h1 class="chapter-title">Chapter 2: Anatomy of an Agent</h1>
+            <p class="chapter-subtitle">Every component explained — from backbone to action space</p>
+            <div class="chapter-progress">
+                <div class="chapter-progress-fill" data-progress="9"></div>
+            </div>
+            <div class="chapter-navigation">
+                {% for n in range(1, 23) %}
+                <a href="/tutorials/building-agentic-ai/chapter{{ n }}"
+                   class="chapter-nav-btn{% if n == 2 %} active{% endif %}">{{ n }}</a>
+                {% endfor %}
+            </div>
+            <div class="section-nav">
+                <button class="section-nav-btn azbn-btn active" data-section="overview">Overview</button>
+                <button class="section-nav-btn azbn-btn" data-section="components">Components</button>
+                <button class="section-nav-btn azbn-btn" data-section="llm-core">LLM Core</button>
+                <button class="section-nav-btn azbn-btn" data-section="code">Implementation</button>
+                <button class="section-nav-btn azbn-btn" data-section="quiz">Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <section class="azbn-section">
+        <div class="azbn-container">
+            <main class="chapter-main-content">
+
+                <!-- OVERVIEW -->
+                <div id="overview" class="content-section active">
+                    <h2>Inside Every Agent</h2>
+
+                    <p>The agent loop from Chapter 1 is the high-level view. Zooming in, every agent is built from a specific set of components. Knowing what each component does — and what it does <em>not</em> do — is what separates a working agent from a fragile demo.</p>
+
+                    <!-- Architecture layer diagram -->
+                    <div class="arch-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-label">Interface</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell primary">
+                                    <strong>User / Operator Channel</strong>
+                                    <span>Incoming goals, system prompts, constraints</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Reasoning</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell accent">
+                                    <strong>LLM Core</strong>
+                                    <span>GPT-4o / Claude / Gemini / local model</span>
+                                </div>
+                                <div class="arch-cell accent">
+                                    <strong>Scratchpad / CoT</strong>
+                                    <span>Internal reasoning trace</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">State</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell green">
+                                    <strong>Working Memory</strong>
+                                    <span>In-context conversation state</span>
+                                </div>
+                                <div class="arch-cell green">
+                                    <strong>Long-term Memory</strong>
+                                    <span>Vector DB · Knowledge graph · Session store</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arch-layer">
+                            <div class="arch-label">Execution</div>
+                            <div class="arch-cells">
+                                <div class="arch-cell yellow">
+                                    <strong>Tool Registry</strong>
+                                    <span>Available tools, schemas, permissions</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Tool Executor</strong>
+                                    <span>Dispatches calls, validates outputs</span>
+                                </div>
+                                <div class="arch-cell yellow">
+                                    <strong>Planner</strong>
+                                    <span>Task decomposition strategy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPONENTS -->
+                <div id="components" class="content-section">
+                    <h2>Component Deep-Dive</h2>
+
+                    <div class="info-box">
+                        <h4>Orchestrator vs Executor</h4>
+                        <p>This distinction is critical in multi-agent systems (Chapter 10). The <strong>orchestrator</strong> decides what to do next; the <strong>executor</strong> carries out one specific action. A single agent often acts as both, but in scaled systems they are separate processes with separate permissions.</p>
+                    </div>
+
+                    <h3>1 — LLM Core (Backbone)</h3>
+                    <p>The LLM is the only component that cannot be replaced with deterministic code. Its job is to map (context + instructions + tool list) → (next action decision). Model choice matters:</p>
+                    <table class="decision-matrix">
+                        <thead><tr><th>Model Family</th><th>Strength in Agent Context</th><th>Weakness</th></tr></thead>
+                        <tbody>
+                            <tr><td>GPT-4o / GPT-4.1</td><td>Strong function calling, broad knowledge</td><td>Cost at scale</td></tr>
+                            <tr><td>o3 / o4-mini</td><td>Long-horizon reasoning, complex multi-step</td><td>Higher latency per step</td></tr>
+                            <tr><td>Claude 3.5 / 4</td><td>Instruction following, long context</td><td>Different tool calling syntax</td></tr>
+                            <tr><td>Gemini 2.0 / 2.5</td><td>Multimodal, natively long context</td><td>Newer, less agent tooling maturity</td></tr>
+                            <tr><td>Qwen / DeepSeek</td><td>Cost-effective, open weights for fine-tuning</td><td>Smaller ecosystem</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3>2 — Memory Subsystems (Preview)</h3>
+                    <p>Memory is covered in depth in Chapter 7. Here, the key insight is that memory is <em>not</em> the context window — it is a set of retrieval mechanisms that surface relevant information into the context window on demand.</p>
+                    <div class="layer-stack">
+                        <div class="layer-item l1"><div class="layer-num">1</div><div class="layer-content"><strong>Working Memory</strong><span>The active context window — cheapest, fastest, smallest (32K–2M tokens)</span></div></div>
+                        <div class="layer-item l2"><div class="layer-num">2</div><div class="layer-content"><strong>Episodic Memory</strong><span>Timestamped logs of past interactions — "what happened before?"</span></div></div>
+                        <div class="layer-item l3"><div class="layer-num">3</div><div class="layer-content"><strong>Semantic Memory</strong><span>Vector embeddings of knowledge — "what do I know about X?"</span></div></div>
+                        <div class="layer-item l4"><div class="layer-num">4</div><div class="layer-content"><strong>Procedural Memory</strong><span>Stored tool schemas, prompt templates, learned skills</span></div></div>
+                    </div>
+
+                    <h3>3 — Tool Interface</h3>
+                    <p>Tools are functions the agent can invoke. Each tool has a JSON schema describing its name, description, and parameter types. The LLM reads these schemas at inference time and generates a structured call when it decides to use one. Chapter 5 covers this fully.</p>
+
+                    <h3>4 — Planner</h3>
+                    <p>The planner translates a goal into a sequence of steps. In simple agents, the LLM is the planner (implicit planning in CoT). In advanced agents, the planner is a separate system prompt or even a separate LLM call dedicated to decomposition before execution begins.</p>
+
+                    <h3>5 — Action Space</h3>
+                    <p>Everything the agent is allowed to do. This is a <em>designed constraint</em>, not an emergent property. The action space should be the minimum set of capabilities needed to accomplish the goal — broader action spaces mean larger attack surfaces.</p>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-col">
+                            <h4>Read-only actions</h4>
+                            <ul>
+                                <li>Web search</li>
+                                <li>Database query</li>
+                                <li>File read</li>
+                                <li>API GET request</li>
+                                <li>Memory retrieval</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-col">
+                            <h4>Write / side-effect actions</h4>
+                            <ul>
+                                <li>Send email / Slack</li>
+                                <li>Create / modify files</li>
+                                <li>API POST / PATCH / DELETE</li>
+                                <li>Execute code</li>
+                                <li>Spawn sub-agents</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="danger-box">
+                        <h4>Principle of Least Privilege</h4>
+                        <p>Never give an agent a write action it does not <em>need</em> for the current task. A research agent that can only search and read is far safer than one that also has email access — even if it never uses email.</p>
+                    </div>
+                </div>
+
+                <!-- LLM CORE -->
+                <div id="llm-core" class="content-section">
+                    <h2>Selecting the Right Backbone</h2>
+
+                    <p>The backbone model determines the ceiling on your agent's reasoning quality. But it is not the only factor — prompt structure, tool schemas, and memory retrieval quality often matter more than model choice for a given task.</p>
+
+                    <!-- Flow: context assembly -->
+                    <div class="flow-diagram">
+                        <div class="flow-node">
+                            <div class="flow-icon">📋</div>
+                            <strong>System Prompt</strong>
+                            <p>Role, goals, constraints</p>
+                        </div>
+                        <div class="flow-arrow">+</div>
+                        <div class="flow-node">
+                            <div class="flow-icon">🔧</div>
+                            <strong>Tool Schemas</strong>
+                            <p>Available actions</p>
+                        </div>
+                        <div class="flow-arrow">+</div>
+                        <div class="flow-node">
+                            <div class="flow-icon">🧩</div>
+                            <strong>Memory Retrieval</strong>
+                            <p>Relevant past context</p>
+                        </div>
+                        <div class="flow-arrow">+</div>
+                        <div class="flow-node">
+                            <div class="flow-icon">💬</div>
+                            <strong>Conversation</strong>
+                            <p>Turns + observations</p>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node" style="border-color:#10b981;">
+                            <div class="flow-icon">🤖</div>
+                            <strong>LLM Decision</strong>
+                            <p>Next action</p>
+                        </div>
+                    </div>
+
+                    <p>The LLM sees all of this assembled into a single prompt. <strong>Context assembly quality is as important as model quality.</strong> If the assembled context is noisy, contradictory, or overflowing, even the best model will produce poor decisions.</p>
+                </div>
+
+                <!-- CODE -->
+                <div id="code" class="content-section">
+                    <h2>Agent Class Skeleton</h2>
+
+                    <p>Here is a minimal but well-structured Python class that expresses the component map above. Chapters 5–12 will expand each method significantly.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header"><span>python — agent_core.py</span></div>
+                        <pre><code class="language-python">from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Any, Callable
+
+@dataclass
+class Tool:
+    name: str
+    description: str
+    parameters: dict[str, Any]
+    fn: Callable[..., str]
+
+    def to_schema(self) -> dict[str, Any]:
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": self.parameters,
+            },
+        }
+
+
+class AgentCore:
+    """
+    Single-agent loop with a pluggable LLM client, tool registry,
+    and swappable memory backend.
+    """
+
+    def __init__(
+        self,
+        llm_client: Any,
+        model: str,
+        system_prompt: str,
+        tools: list[Tool] | None = None,
+        memory_backend: Any | None = None,
+        max_iterations: int = 25,
+    ) -> None:
+        self.llm = llm_client
+        self.model = model
+        self.system_prompt = system_prompt
+        self.tools: dict[str, Tool] = {t.name: t for t in (tools or [])}
+        self.memory = memory_backend
+        self.max_iterations = max_iterations
+        self._messages: list[dict[str, Any]] = [
+            {"role": "system", "content": system_prompt}
+        ]
+
+    # ── Public API ──────────────────────────────────────────────────────────
+
+    def run(self, goal: str) -> str:
+        self._messages.append({"role": "user", "content": goal})
+        self._inject_memory(goal)          # retrieve relevant past context
+
+        for _ in range(self.max_iterations):
+            response = self._call_llm()
+            choice = response.choices[0]
+
+            if choice.finish_reason == "tool_calls":
+                for call in choice.message.tool_calls:
+                    result = self._execute_tool(call)
+                    self._messages.append({
+                        "role": "tool",
+                        "content": result,
+                        "tool_call_id": call.id,
+                    })
+
+            elif choice.finish_reason == "stop":
+                answer = choice.message.content
+                self._persist_memory(goal, answer)   # store to long-term memory
+                return answer
+
+        raise RuntimeError("Max iterations reached without FINISH signal")
+
+    # ── Private helpers ──────────────────────────────────────────────────────
+
+    def _call_llm(self) -> Any:
+        return self.llm.chat.completions.create(
+            model=self.model,
+            messages=self._messages,
+            tools=[t.to_schema() for t in self.tools.values()] or None,
+        )
+
+    def _execute_tool(self, call: Any) -> str:
+        tool = self.tools.get(call.function.name)
+        if tool is None:
+            return f"Error: unknown tool '{call.function.name}'"
+        import json
+        args = json.loads(call.function.arguments)
+        return tool.fn(**args)
+
+    def _inject_memory(self, query: str) -> None:
+        if self.memory:
+            relevant = self.memory.search(query, top_k=5)
+            if relevant:
+                self._messages.append({
+                    "role": "system",
+                    "content": "Relevant past context:\n" + "\n".join(relevant),
+                })
+
+    def _persist_memory(self, query: str, answer: str) -> None:
+        if self.memory:
+            self.memory.store(query=query, answer=answer)</code></pre>
+                    </div>
+                </div>
+
+                <!-- QUIZ -->
+                <div id="quiz" class="content-section">
+                    <h2>Chapter 2 Quiz</h2>
+                    <div class="quiz-container">
+
+                        <div class="quiz-question">
+                            <p>1. What is the primary role of the LLM Core in an agent?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Storing long-term memories in a vector database</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="true"> Mapping the assembled context and tool schemas to the next action decision</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Executing tool calls against external APIs</label>
+                                <label class="quiz-option"><input type="radio" name="q1" data-correct="false"> Validating that tool output is well-formed JSON</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>2. Which type of memory answers the question "what happened in our last conversation?"</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Semantic memory</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Procedural memory</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="true"> Episodic memory</label>
+                                <label class="quiz-option"><input type="radio" name="q2" data-correct="false"> Working memory</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-question">
+                            <p>3. Why should an agent's action space be the minimum required set?</p>
+                            <div class="quiz-options">
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> More tools slow down the LLM inference speed</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> The LLM cannot handle more than 20 tools</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="true"> A broader action space creates a larger attack surface and higher risk of unintended side effects</label>
+                                <label class="quiz-option"><input type="radio" name="q3" data-correct="false"> Extra tools increase context window usage unnecessarily</label>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </section>
+</div>
+{% endblock %}

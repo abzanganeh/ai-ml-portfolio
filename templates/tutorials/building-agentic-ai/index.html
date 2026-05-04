@@ -1,0 +1,356 @@
+{% extends "tutorials/shared/course_index.html" %}
+
+{% block legacy_course_index_title %}Building Agentic AI Systems — {{ site_title }}{% endblock %}
+
+{% block legacy_course_index_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/building-agentic-ai/building-agentic-ai.css') }}">
+<style>
+.course-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+    color: #e2e8f0;
+    padding: 4rem 0 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.course-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(99,102,241,0.22) 0%, transparent 70%);
+}
+.course-hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #e0e7ff, #a5b4fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 0.75rem;
+}
+.course-hero p {
+    color: #94a3b8;
+    max-width: 680px;
+    margin: 0 auto 2rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+}
+.course-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+.stat-item {
+    text-align: center;
+}
+.stat-item .stat-num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #a5b4fc;
+}
+.stat-item .stat-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+.section-group {
+    margin: 2.5rem 0;
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+.section-num {
+    background: #6366f1;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.section-header h2 {
+    font-size: 1.2rem;
+    color: #1e293b;
+    margin: 0;
+}
+.chapter-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+.chapter-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    border-left: 4px solid #6366f1;
+    transition: all 0.2s;
+}
+.chapter-card:hover {
+    box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+    transform: translateY(-2px);
+}
+.chapter-card h3 {
+    font-size: 0.9rem;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+}
+.chapter-card p {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+.chapter-card .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+}
+.chapter-card .tag {
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.68rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+}
+.chapter-card a {
+    font-size: 0.82rem;
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+}
+.chapter-card a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block legacy_course_index_content %}
+<div class="course-hero">
+    <div class="azbn-container">
+        <h1>Building Agentic AI Systems</h1>
+        <p>
+            A comprehensive advanced course for AI/ML practitioners. Go from understanding agent theory to building
+            production-grade multi-agent systems with LangGraph, MCP, memory, safety, and fine-tuning.
+        </p>
+        <div class="course-stats">
+            <div class="stat-item">
+                <div class="stat-num">22</div>
+                <div class="stat-label">Chapters</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">5</div>
+                <div class="stat-label">Sections</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">10h+</div>
+                <div class="stat-label">Content</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-num">Advanced</div>
+                <div class="stat-label">Level</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="azbn-section">
+    <div class="azbn-container">
+
+        <div class="section-group">
+            <div class="section-header">
+                <div class="section-num">1</div>
+                <h2>Foundations &amp; Mental Models</h2>
+            </div>
+            <div class="chapter-cards">
+                <div class="chapter-card">
+                    <h3>Ch 1 &mdash; What is an Agent?</h3>
+                    <p>Prompt-response vs goal-directed. The agent loop: observe → think → plan → act. Dual-paradigm: symbolic vs neural vs hybrid.</p>
+                    <div class="tags"><span class="tag">Foundation</span><span class="tag">Architecture</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter1">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 2 &mdash; Anatomy of an Agent</h3>
+                    <p>Every component explained: LLM core, memory subsystems, tool interface, planning engine, action space, orchestrator vs executor.</p>
+                    <div class="tags"><span class="tag">Architecture</span><span class="tag">Components</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter2">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 3 &mdash; Agent Taxonomy</h3>
+                    <p>Reactive, ReAct, planning, reflection, critic, computer-use, code-execution, deep research. Decision matrix: which architecture for which problem.</p>
+                    <div class="tags"><span class="tag">Taxonomy</span><span class="tag">Decision Matrix</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter3">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 4 &mdash; Reasoning Deep-Dive</h3>
+                    <p>Chain-of-thought, scratchpad reasoning, o1/o3/DeepSeek-R1, SMTL pattern, Mind-Map agents, Tree-of-Thoughts, Self-Consistency.</p>
+                    <div class="tags"><span class="tag">Reasoning</span><span class="tag">CoT</span><span class="tag">o1/o3</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter4">Start →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-group">
+            <div class="section-header">
+                <div class="section-num">2</div>
+                <h2>Core Building Blocks</h2>
+            </div>
+            <div class="chapter-cards">
+                <div class="chapter-card">
+                    <h3>Ch 5 &mdash; Tool Use</h3>
+                    <p>Tool anatomy, schemas, parallel vs sequential calls, failure handling, retry logic, tool result integration.</p>
+                    <div class="tags"><span class="tag">Tools</span><span class="tag">Function Calling</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter5">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 6 &mdash; Model Context Protocol</h3>
+                    <p>MCP architecture: hosts, clients, servers. JSON-RPC 2.0. Building an MCP server from scratch. Production gaps: CABP, ATBA, SERF.</p>
+                    <div class="tags"><span class="tag">MCP</span><span class="tag">Protocol</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter6">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 7 &mdash; Memory Systems</h3>
+                    <p>Working, episodic, semantic, procedural memory. Temporal knowledge graphs (Zep). Delta compression. Hybrid search with BM25 + reranking.</p>
+                    <div class="tags"><span class="tag">Memory</span><span class="tag">RAG</span><span class="tag">Vector DB</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter7">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 8 &mdash; Planning</h3>
+                    <p>ReAct loop (Thought-Action-Observation), Plan-and-Execute, dynamic replanning, hierarchical task networks, MCTS with LLM guidance.</p>
+                    <div class="tags"><span class="tag">Planning</span><span class="tag">ReAct</span><span class="tag">MCTS</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter8">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 9 &mdash; Context Management</h3>
+                    <p>Context window budgeting, summarization strategies, system prompt design for agents, structured output, instruction hierarchy.</p>
+                    <div class="tags"><span class="tag">Prompt Engineering</span><span class="tag">Context</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter9">Start →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-group">
+            <div class="section-header">
+                <div class="section-num">3</div>
+                <h2>Multi-Agent Systems &amp; Orchestration</h2>
+            </div>
+            <div class="chapter-cards">
+                <div class="chapter-card">
+                    <h3>Ch 10 &mdash; Multi-Agent Systems</h3>
+                    <p>Why and when to go multi-agent. Communication protocols, trust models, agent handoffs, agents-as-tools pattern.</p>
+                    <div class="tags"><span class="tag">Multi-Agent</span><span class="tag">Orchestration</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter10">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 11 &mdash; Orchestration Patterns</h3>
+                    <p>Supervisor, Swarm, Pipeline, Fan-out + Aggregator, Critic loop. Decision matrix and state management strategies.</p>
+                    <div class="tags"><span class="tag">Patterns</span><span class="tag">Design</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter11">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 12 &mdash; Building with LangGraph</h3>
+                    <p>Graph-based state machines, checkpointing, human-in-the-loop, subgraphs. Full project: research assistant with supervisor + specialists.</p>
+                    <div class="tags"><span class="tag">LangGraph</span><span class="tag">Stateful</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter12">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 13 &mdash; CrewAI &amp; OpenAI SDK</h3>
+                    <p>Roles, backstories, crews vs flows. OpenAI Agents SDK: agents, runners, guardrails, handoffs. Triage agent pattern.</p>
+                    <div class="tags"><span class="tag">CrewAI</span><span class="tag">OpenAI SDK</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter13">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 14 &mdash; Advanced Multi-Agent</h3>
+                    <p>Role-aware memory (LatentMem, LEGOMem), meta-agents, adversarial red/blue pairs, consensus mechanisms.</p>
+                    <div class="tags"><span class="tag">Advanced</span><span class="tag">Meta-Agents</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter14">Start →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-group">
+            <div class="section-header">
+                <div class="section-num">4</div>
+                <h2>Production Engineering</h2>
+            </div>
+            <div class="chapter-cards">
+                <div class="chapter-card">
+                    <h3>Ch 15 &mdash; Evaluation</h3>
+                    <p>Trajectory-level vs endpoint evaluation. GAIA, AgentBench, SWE-bench, ATBench. LLM-as-judge pitfalls. Building your own eval harness.</p>
+                    <div class="tags"><span class="tag">Evaluation</span><span class="tag">Benchmarks</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter15">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 16 &mdash; Safety &amp; Guardrails</h3>
+                    <p>Prompt injection (direct/indirect), ART benchmark findings, input/output guardrails, least-privilege tools, audit logs.</p>
+                    <div class="tags"><span class="tag">Safety</span><span class="tag">Security</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter16">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 17 &mdash; Observability &amp; Debugging</h3>
+                    <p>Distributed tracing across agents, spans and events, LangSmith/LangFuse/Arize Phoenix, cost attribution, debugging failed trajectories.</p>
+                    <div class="tags"><span class="tag">Observability</span><span class="tag">Tracing</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter17">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 18 &mdash; Deployment &amp; Scaling</h3>
+                    <p>Stateless vs stateful deployment, async queues, model routing, caching strategies, cost breakdown, auto-scaling.</p>
+                    <div class="tags"><span class="tag">Deployment</span><span class="tag">Scaling</span><span class="tag">Cost</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter18">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 19 &mdash; CI/CD for Agents</h3>
+                    <p>Unit and integration testing, golden trajectory regression, canary deployments, prompt version control, rollback procedures.</p>
+                    <div class="tags"><span class="tag">CI/CD</span><span class="tag">Testing</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter19">Start →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-group">
+            <div class="section-header">
+                <div class="section-num">5</div>
+                <h2>Advanced Topics &amp; Frontiers</h2>
+            </div>
+            <div class="chapter-cards">
+                <div class="chapter-card">
+                    <h3>Ch 20 &mdash; Fine-Tuning for Agentic Behavior</h3>
+                    <p>SFT on tool-use demonstrations, RLVR (VerlTool, Trinity-RFT), ATLAS for small models, Tool-R0 self-play, ToolPO credit assignment.</p>
+                    <div class="tags"><span class="tag">Fine-Tuning</span><span class="tag">RLVR</span><span class="tag">RL</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter20">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 21 &mdash; Domain-Specific Agents</h3>
+                    <p>Coding agents (SWE-bench), research agents (Deep Research), computer-use, data analysis, customer support, healthcare/legal constraints.</p>
+                    <div class="tags"><span class="tag">Domains</span><span class="tag">Applied AI</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter21">Start →</a>
+                </div>
+                <div class="chapter-card">
+                    <h3>Ch 22 &mdash; The Frontier</h3>
+                    <p>Embodied AI, world models, agent economies, persistent personal agents, regulation (EU AI Act), open research problems.</p>
+                    <div class="tags"><span class="tag">Research</span><span class="tag">Future</span></div>
+                    <a href="/tutorials/building-agentic-ai/chapter22">Start →</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
