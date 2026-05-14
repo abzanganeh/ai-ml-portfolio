@@ -1,0 +1,57 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('loop')">Observe–plan–act</button>
+<button type="button" onclick="showSection('tools')">Tooling risk</button>
+<button type="button" onclick="showSection('eval')">Evaluation hooks</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="loop" class="content-section active">
+<h2>Agent loop for ML SWE narratives</h2>
+<p>Agents sense state (messages, telemetry), plan decomposition, invoke tools/APIs idempotently where possible, then verify outcomes—not single forward pass storytelling.</p>
+</div>
+
+<div id="tools" class="content-section">
+<p>Enumerate permission boundaries: least privilege keys, sanitization before SQL execution (if hypothetical), escalation when tool returns contradictory signals.</p>
+</div>
+
+<div id="eval" class="content-section">
+<p>Offline trajectories rarely capture production concurrency—pair benchmarking with simulated fault injection anecdotes.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/agentic-ai/">Agentic AI Foundations</a> · <a href="/tutorials/building-agentic-ai/">Building Agentic AI Systems</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Most production-critical omission when demoing flashy tool calls?</p>
+<label><input type="radio" name="q1" value="a"> Ignoring timeouts, retries, auth scoping, and traceability behind each invocation.</label><br>
+<label><input type="radio" name="q1" value="b"> Font choice in dashboards.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

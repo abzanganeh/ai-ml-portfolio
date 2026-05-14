@@ -118,6 +118,11 @@ COURSE_PREREQUISITES: dict[str, tuple[str, ...]] = {
         "Basic supervised learning concepts.",
         "Familiarity with classification and regression tasks.",
     ),
+    "ml-swe-interview-prep": (
+        "Comfort describing ML projects aloud (datasets, constraints, failures).",
+        "High-level familiarity with Python data tooling and supervised learning terminology.",
+        "Exposure to neural networks OR willingness to skim those chapters alongside the NN tutorial.",
+    ),
 }
 
 

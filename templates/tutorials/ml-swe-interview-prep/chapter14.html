@@ -1,0 +1,63 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('embed')">Embeddings</button>
+<button type="button" onclick="showSection('rnn')">RNN/LSTM arcs</button>
+<button type="button" onclick="showSection('trans')">Transformers bridge</button>
+<button type="button" onclick="showSection('rl')">RL vocabulary</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="embed" class="content-section active">
+<h2>Discrete tokens → vectors</h2>
+<p><strong>Word2Vec / GloVe</strong>: local window co-occurrence vs global statistics; both yield static embeddings lacking polysemy richness—contextual models supersede for production NLU—but interviews still probe reasoning.</p>
+</div>
+
+<div id="rnn" class="content-section">
+<p><strong>RNNs</strong> recurse hidden state across time; exploding/vanishing gradients motivate <strong>LSTM/GRU gating</strong> (forget/input/output structures verbally).</p>
+</div>
+
+<div id="trans" class="content-section">
+<p><strong>Self-attention</strong> mixes all positions with softmax weights—parallelizable unlike recurrent cores; dominates modern LLMs. Tie to quadratic memory in sequence length caveat.</p>
+</div>
+
+<div id="rl" class="content-section">
+<h3>MDP / Q-learning snapshot</h3>
+<p><strong>MDP tuple</strong> (states, actions, transitions, rewards, discount). Q-learning learns action values; policy gradient alternatives exist—keep story honest if role not RL-heavy.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/nlp-fundamentals/">NLP Fundamentals</a> · <a href="/tutorials/transformers/">Transformers Deep Dive</a> · <a href="/tutorials/neural-networks/">Neural Networks</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Transformer self-attention parallelism advantage vs recurrence?</p>
+<label><input type="radio" name="q1" value="a"> All pairwise token interactions projected in parallel subject to GPU memory rather than sequential hidden updates.</label><br>
+<label><input type="radio" name="q1" value="b"> Removes need for embeddings.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

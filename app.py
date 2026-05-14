@@ -421,6 +421,12 @@ def building_agentic_ai_chapter(chapter_num):
     return render_tutorial_chapter('building-agentic-ai', chapter_num)
 
 
+@app.route('/tutorials/ml-swe-interview-prep/chapter<int:chapter_num>')
+def ml_swe_interview_prep_chapter(chapter_num):
+    """ML Software Engineering Interview Concept Review chapters"""
+    return render_tutorial_chapter('ml-swe-interview-prep', chapter_num)
+
+
 @app.route('/blog')
 def blog():
     """Blog listing page"""

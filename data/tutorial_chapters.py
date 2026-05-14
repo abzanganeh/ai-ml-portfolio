@@ -118,6 +118,11 @@ COURSE_OBJECTIVE_TEMPLATES: dict[str, tuple[str, str, str]] = {
         "Apply {chapter_title} to design safer, more reliable agent workflows.",
         "Identify operational risks in tool use, orchestration, evaluation, and monitoring.",
     ),
+    "ml-swe-interview-prep": (
+        "Relate {chapter_title} to common ML software engineering interview questions and trade-offs.",
+        "Explain when this topic deserves a deeper pass through another tutorial on this site versus staying at recap depth.",
+        "Surface assumptions, pitfalls, and follow-up probes an interviewer is likely to use.",
+    ),
 }
 
 
@@ -290,6 +295,29 @@ CHAPTER_COURSES: dict[str, ChapterCourseConfig] = {
             "Agent Orchestration",
             "Agent Evaluation & Monitoring",
             "Building Production Agents",
+        ),
+    ),
+    "ml-swe-interview-prep": ChapterCourseConfig(
+        slug="ml-swe-interview-prep",
+        template_dir="ml-swe-interview-prep",
+        chapter_titles=(
+            "How to Use This Prep Path",
+            "Python Stack for ML & Data Science",
+            "Data Analysis & EDA Mindset",
+            "ML Workflow & First Models",
+            "Workshops — Applied Checkpoints",
+            "Generative AI & Prompting for Interviews",
+            "Tree-Based Models in Interviews",
+            "Ensembles & Boosting Mental Models",
+            "Metrics & Model Interpretation",
+            "Supervised Learning — Interview Deep Review",
+            "Unsupervised Learning — Interview Deep Review",
+            "Optimization & Gradient Methods",
+            "Deep Learning I — Vision & Architectures",
+            "Deep Learning II — Sequences, NLP & RL Vocabulary",
+            "RAG & Retrieval in Interview Answers",
+            "Agents, Tools & Reliability Angles",
+            "Building ML & GenAI Products End to End",
         ),
     ),
 }

@@ -1,0 +1,59 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('metrics')">Metric choice</button>
+<button type="button" onclick="showSection('ROC')">ROC vs PR</button>
+<button type="button" onclick="showSection('interp')">Interpretation</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="metrics" class="content-section active">
+<h2>Offline metrics are policy choices</h2>
+<p>Accuracy misleads skewed labels. Pair metrics with slice analysis (region, device, user tenure) to mirror business risk.</p>
+<p><strong>Calibration matters</strong> when downstream systems threshold predicted probabilities (ads bidding, risk scoring).</p>
+</div>
+
+<div id="ROC" class="content-section">
+<h3>ROC versus precision–recall trade space</h3>
+<p>ROC AUC tolerates massive negatives; PR focuses on rare positives—default to PR narrative in heavy imbalance unless interviewer clarifies uniform prior.</p>
+</div>
+
+<div id="interp" class="content-section">
+<p>SHAP / feature importances serve communication, not causation. Say that clearly to avoid “explainable AI” mythology traps.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/ml-fundamentals/">Machine Learning Fundamentals</a> (evaluation language) · <a href="/tutorials/ml-model-relationships/">Model Relationships</a> (selection narratives)</p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Massive negative class, small positive—first plot family?</p>
+<label><input type="radio" name="q1" value="a"> ROC only because it always looks good.</label><br>
+<label><input type="radio" name="q1" value="b"> Precision–recall + calibrated probability inspection.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('vocab')">Vocabulary triage</button>
+<button type="button" onclick="showSection('when')">Prompt vs retrieval vs fine-tune</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="vocab" class="content-section active">
+<h2>GenAI interviewing vocabulary</h2>
+<p>An interviewer checks whether you can separate pretrained capabilities, factual grounding, hallucination mitigation, tooling cost, latency sensitivity, and evaluator design.</p>
+<p><strong>Prompt engineering</strong> is not meme templates—it is iterative specification with measurement against rubrics/regressions suites.</p>
+</div>
+
+<div id="when" class="content-section">
+<h3>Decision lens</h3>
+<ul>
+<li><strong>Frozen prompt</strong>: fastest if task stable + eval harness exists.</li>
+<li><strong>Retrieval</strong>: factual drift, citations, freshness—pair with grounding checks.</li>
+<li><strong>Supervised fine-tune / preference tune</strong>: repeated domain skew prompting failures.</li>
+</ul>
+<p>Articulate negatives: retrieval adds infra + failure classes; fine-tuning needs data governance.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/llms/">Large Language Models (LLMs)</a> · <a href="/tutorials/rag/">RAG &amp; Retrieval Systems</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Retrieval-first rationale?</p>
+<label><input type="radio" name="q1" value="a"> Guarantees truthful answers forever.</label><br>
+<label><input type="radio" name="q1" value="b"> Ground responses in mutable corpora/citations reducing purely parametric hallucination risk—still evaluates retrieval precision.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

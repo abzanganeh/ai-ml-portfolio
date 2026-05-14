@@ -1,0 +1,81 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('overview')">Overview</button>
+<button type="button" onclick="showSection('loops')">Interview loops</button>
+<button type="button" onclick="showSection('pacing')">Pacing cadence</button>
+<button type="button" onclick="showSection('pitfalls')">Common mistakes</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="overview" class="content-section active">
+<h2>Purpose</h2>
+<p><strong>ML Software Engineering: Interview Concept Review</strong> stitches together recap sections you can skim before phone screens while pointing to fuller tutorials wherever this portfolio already invests depth. It favors honest trade-off language over buzzwords.</p>
+<p>You should leave each chapter knowing (1) why an interviewer cares, (2) what definitions you owe them, (3) which failure modes to volunteer, (4) when to pause and ask clarifying constraints.</p>
+</div>
+
+<div id="loops" class="content-section">
+<h2>Four parallel loops</h2>
+<p><strong>Modeling fundamentals.</strong> Supervised intuition, ensembles, leakage, calibration, clustering, PCA, NN vocabulary. Expect derivation-lite explanations but crisp mental models.</p>
+<p><strong>ML systems.</strong> Data flywheel, latency budgets, deployments, retrieval stacks, experimentation. Often separate from textbook ML—budget time here if the role mentions platform or production ML.</p>
+<p><strong>Algorithms / coding.</strong> Use the onsite <a href="/tutorials/coding-interview-algorithms/">Coding Interview Algorithms</a> companion for DSA pacing; here we occasionally reference complexity when bridges to inference pipelines matter.</p>
+<p><strong>Behavioral storytelling.</strong> Out of depth for authored HTML in this repo, yet every technical answer improves when anchored to stakeholder impact.</p>
+</div>
+
+<div id="pacing" class="content-section">
+<h2>How to skim vs study</h2>
+<p><strong>Skim chapter shell</strong>: hero objectives (auto-generated above), headings, pitfalls, quizzes.</p>
+<p><strong>Study deeper</strong> when a recruiter/job description spikes a keyword—then open linked tutorials sequentially (fundamentals → model relationships → decision trees → neural networks, etc.).</p>
+<p>Flagship recap chapters (<em>Supervised deep review</em>, <em>Unsupervised deep review</em>, <em>Deep learning I &amp; II</em>) consolidate multi-week curricula; rehearse aloud after reading.</p>
+</div>
+
+<div id="pitfalls" class="content-section">
+<h2>Mistakes to avoid early</h2>
+<ul>
+<li>Rattling architectures without tying them to latency, throughput, labeling cost, or eval strategy.</li>
+<li>Discussing ROC without stating class imbalance prevalence or stating PR vs ROC choice.</li>
+<li>Talking distributed training before mastering train/validation/test splits and leakage.</li>
+<li>Flattening prompting, retrieval, supervision into one mythical “foundation model solves it” storyline.</li>
+</ul>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<h2>Sense-check</h2>
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> You learn the role emphasizes shipping weekly model experiments to production APIs. Which prep bucket gets extra rehearsal?</p>
+<label><input type="radio" name="q1" value="a"> Only gradient derivations.</label><br>
+<label><input type="radio" name="q1" value="b"> ML systems vocabulary + reproducible pipelines alongside modeling.</label><br>
+<label><input type="radio" name="q1" value="c"> Purely sorting algorithms trivia.</label><br>
+<button type="button" class="check-answer-btn azbn-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+
+<div class="quiz-question quiz-container">
+<p><strong>2.</strong> Behaviorally, interviewers punish “perfect accuracy” boasting when you skip which detail?</p>
+<label><input type="radio" name="q2" value="a"> Mentioning Python version.</label><br>
+<label><input type="radio" name="q2" value="b"> Label noise, slicing strategy, leakage checks, degradation over time.</label><br>
+<label><input type="radio" name="q2" value="c"> Stating Transformer head count.</label><br>
+<button type="button" class="check-answer-btn azbn-btn" onclick="checkAnswer(2, 'b')">Check Answer</button>
+<div id="q2-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}
