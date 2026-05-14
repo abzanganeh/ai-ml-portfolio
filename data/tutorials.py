@@ -210,7 +210,22 @@ TUTORIALS_DATA = [
         'published': True,
         'excerpt': 'Core Concepts: agent loop, ReAct, tool use, multi-agent systems, and orchestration across 8 focused chapters. Start here before the Production Handbook.',
         'tags': 'agents,agentic-ai,react,langchain,multi-agent,tool-using,orchestration,foundations'
+    },
+    {
+        'title': 'ML Software Engineering: Interview Concept Review',
+        'slug': 'ml-swe-interview-prep',
+        'description': 'Structured recap for ML SWE loops: foundational stack, supervised and unsupervised learning, deep learning, retrieval and agents — with onsite deep-dives wherever the portfolio lacks a dedicated tutorial, and links wherever it does.',
+        'category': 'Machine Learning',
+        'difficulty': 'intermediate',
+        'duration': '900 min',
+        'author': 'Alireza Barzin Zanganeh',
+        'has_dedicated_template': True,
+        'template_path': 'tutorials/ml-swe-interview-prep/index.html',
+        'published': True,
+        'excerpt': 'Interview-ready concept review spanning Python tooling, data work, classical ML, deep learning themes, retrieval, agents, and product ML — anchored to fuller tutorials across the portfolio.',
+        'tags': 'interview,machine-learning,ml-engineering,supervised-learning,unsupervised-learning,deep-learning,rag,agents'
     }
+
 
     
 ]

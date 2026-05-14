@@ -1,0 +1,53 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('trees')">Tree narrative</button>
+<button type="button" onclick="showSection('bias')">Bias–variance</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="trees" class="content-section active">
+<h2>Stories trees tell in interviews</h2>
+<p>Decision trees greedy-split features to reduce impurity—they expose nonlinear interactions but crave pruning or ensembles to tame variance.</p>
+<p>You should trace how depth ↑ reduces training error yet risks overfitting monotone smooth regions irrelevant to noisy labels.</p>
+</div>
+
+<div id="bias" class="content-section">
+<p>Contrast <strong>high bias shallow tree</strong> vs <strong>high variance deep tree memorizing noise</strong>. Pair with ensembles next chapter logically.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/decision-trees/">Decision Trees Tutorial</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Unpruned maximal depth explosion mostly increases:</p>
+<label><input type="radio" name="q1" value="a"> Label noise memorization risk.</label><br>
+<label><input type="radio" name="q1" value="b"> Training loss but harms generalization when data scarce.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

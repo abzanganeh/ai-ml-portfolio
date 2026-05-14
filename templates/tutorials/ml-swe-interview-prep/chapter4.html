@@ -1,0 +1,55 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('frame')">Frame &amp; baseline</button>
+<button type="button" onclick="showSection('iterate')">Iteration loop</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="frame" class="content-section active">
+<h2>Problem framing aloud</h2>
+<p>List goal metric (business-aligned), fairness constraints, acceptable latency, freshness, labeling budget.</p>
+<p><strong>Baselines?</strong> Start with logistic regression / shallow tree depending on modality; articulate why—they calibrate intuition before heavyweight stacks.</p>
+</div>
+
+<div id="iterate" class="content-section">
+<h2>Iterate like an engineer</h2>
+<p>Change one axis per experiment—data augmentation vs architecture vs LR—document hypothesis + observed delta + decision.</p>
+<p>Articulate rollback plan if production metric dips (shadow deployments later chapter).</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/ml-fundamentals/">Machine Learning Fundamentals</a> chapters cover regression/classification scaffolding.</p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Strongest justification for logistic regression baseline before boosted trees?</p>
+<label><input type="radio" name="q1" value="a"> Faster to train; interpret coefficients; establishes ceiling for complex models.</label><br>
+<label><input type="radio" name="q1" value="b"> Always bests XGBoost on sparse text.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

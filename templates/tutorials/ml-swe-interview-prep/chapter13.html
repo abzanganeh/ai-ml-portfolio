@@ -1,0 +1,69 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('mlp')">MLP recap</button>
+<button type="button" onclick="showSection('cnn')">CNN &amp; padding</button>
+<button type="button" onclick="showSection('det')">Detection &amp; generation survey</button>
+<button type="button" onclick="showSection('pitfalls')">Limitations honesty</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="mlp" class="content-section active">
+<h2>Fully-connected networks</h2>
+<p>Composable affine maps + nonlinearities approximate functions; universal approximation story—fine for intuition—but depth helps hierarchical features at cost of optimization difficulty.</p>
+<p><strong>Activations:</strong> ReLU cheap but dying units; leaky/Swish mitigate partially; interviewer may mention saturation of sigmoid/tanh historically.</p>
+<p><strong>Initialization:</strong> zero weights → symmetry lock; Xavier/He scales preserve forward variance early.</p>
+</div>
+
+<div id="cnn" class="content-section">
+<h3>Convolutional biases</h3>
+<p><strong>Local connectivity + parameter sharing</strong> encode translation equivariance. <strong>Valid vs same padding</strong>: maintain spatial size vs shrink—articulate interplay with stride and receptive field growth across layers.</p>
+<p><strong>Detection families</strong> (survey): two-stage propose-then-refine vs one-stage speed—accuracy/latency trade for video interviews.</p>
+</div>
+
+<div id="det" class="content-section">
+<h3>Autoencoders, VAE sketch, GAN positioning</h3>
+<p><strong>Autoencoder</strong>: bottleneck forces compression; reconstruction error flags anomalies.</p>
+<p><strong>VAE</strong>: latent regularized via KL to prior enabling generative sampling with crisp ELBO language optional.</p>
+<p><strong>GAN</strong>: adversarial minimax game yields sharp samples but unstable training.</p>
+</div>
+
+<div id="pitfalls" class="content-section mip-pitfalls">
+<p>DL limitations: sample complexity, brittle OOD behaviour, infra cost—pair with evaluation beyond aggregate accuracy slices.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/neural-networks/">Neural Networks Fundamentals</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Same padding primarily:</p>
+<label><input type="radio" name="q1" value="a"> Keeps feature map spatial size under stride 1 convolutions ignoring pooling.</label><br>
+<label><input type="radio" name="q1" value="b"> Deletes border pixels arbitrarily.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

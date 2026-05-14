@@ -1,0 +1,59 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('GD')">Gradient descent families</button>
+<button type="button" onclick="showSection('sched')">LR schedules &amp; curvature</button>
+<button type="button" onclick="showSection('second')">Momentum / adaptive quick takes</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="GD" class="content-section active">
+<h2>Noisy surrogates of the full gradient</h2>
+<p><strong>Batch GD</strong> uses entire dataset—accurate gradient, costly. <strong>Minibatch SGD</strong> introduces noise that often helps exploration + GPU throughput; minibatch sizing trades variance vs parallelism.</p>
+<p>Interviewers admire stating noise can escape sharp minima mildly but unstoppable if landscape pathological → stress architecture + data fixes.</p>
+</div>
+
+<div id="sched" class="content-section">
+<h3>Learning rate schedules</h3>
+<p>Step decay, cosine, warmup rationales: balance early progression vs fine late convergence. Mention gradient clipping relevance for RNN/transformer instability.</p>
+</div>
+
+<div id="second" class="content-section">
+<p>Momentum smooths zig-zag valleys; RMSprop/Adam adapt per-parameter steps—articulate adaptive methods can hurt generalization in some regimes (large-batch sharp minima folklore) honestly.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/neural-networks/chapter8">Neural Networks — Training Tips &amp; Best Practices</a> (<code>/tutorials/neural-networks/chapter8</code>)</p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Minibatch dominance in DL training largely because:</p>
+<label><input type="radio" name="q1" value="a"> Hardware-efficient noisy gradient estimates accelerating wall-clock convergence.</label><br>
+<label><input type="radio" name="q1" value="b"> Guarantees convexity.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

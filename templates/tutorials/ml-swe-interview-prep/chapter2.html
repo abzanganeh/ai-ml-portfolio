@@ -1,0 +1,72 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('stack')">Stack overview</button>
+<button type="button" onclick="showSection('env')">Environments</button>
+<button type="button" onclick="showSection('numpy')">NumPy mindset</button>
+<button type="button" onclick="showSection('pitfalls')">Pitfalls</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="stack" class="content-section active">
+<h2>Python stack recruiters expect</h2>
+<p>Interviewers rarely ask trivia about PEP8; they probe whether you can move from experimental notebook chaos to repeatable scripts answering “what changed?” and “does it regress?”.</p>
+<p><strong>Venv or conda?</strong> State one choice for isolation, pinning <code>requirements.txt</code> or conda env export, reproducible installs on CI—not both philosophically hedged.</p>
+<p><strong>Notebook vs modules.</strong> Notebooks accelerate EDA but hide state. Know how you migrate cells into parameterized Python modules callable from tests.</p>
+</div>
+
+<div id="env" class="content-section">
+<h2>Tooling narration</h2>
+<p>Use <strong>debugger / logging</strong> instead of scattering <code>print</code>; mention structuring logs with contexts (experiment id, data slice, git SHA).</p>
+<p>For performance curiosity, <strong><code>%timeit</code> equivalent</strong> mentality: differentiate micro-benchmarks from wall-clock pipelines; GPUs change story—keep IO + Python overhead honest.</p>
+<p><strong>Type hints</strong> optional yet signal collaboration maturity with mypy-lite discipline.</p>
+</div>
+
+<div id="numpy" class="content-section">
+<h2>NumPy broadcasting & shaping</h2>
+<p>Eight out of ten vectorization bugs hinge on unintended broadcasting. Practice describing shapes orally: weights <code>[d_out, d_in]</code>, batches <code>[B, …]</code>, attention <code>[B, heads, T, Tk]</code>.</p>
+<pre><code class="language-python">import numpy as np
+a = np.random.randn(64, 10)
+b = np.random.randn(10, 32)
+np.matmul(a, b).shape  # (64, 32)</code></pre>
+<p>Relate reshaping to memory layout (Fortran vs C) only if interviewer leads there; skip unless perf role.</p>
+</div>
+
+<div id="pitfalls" class="content-section mip-pitfalls">
+<h3>Common slips</h3>
+<ul>
+<li>Claiming reproducibility without seeding RNGs/data sharding strategy.</li>
+<li>Mutating globals across notebook cells unnoticed.</li>
+<li>Skipping mention of profiler when diagnosing slow training—I/O dominates more than softmax.</li>
+</ul>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> Best rationale for pinning dependency versions?</p>
+<label><input type="radio" name="q1" value="a"> Guarantees recruiter happiness.</label><br>
+<label><input type="radio" name="q1" value="b"> Replayable experiments across laptops/CI/cluster.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'b')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

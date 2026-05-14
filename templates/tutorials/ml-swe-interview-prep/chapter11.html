@@ -1,0 +1,80 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = true %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('PCA')">PCA / SVD intuition</button>
+<button type="button" onclick="showSection('manifold')">t-SNE / Isomap</button>
+<button type="button" onclick="showSection('cluster')">Clustering &amp; mixtures</button>
+<button type="button" onclick="showSection('fm')">Factorization machines (sketch)</button>
+<button type="button" onclick="showSection('questions')">Interview probes</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="PCA" class="content-section active">
+<h2>PCA as optimal linear compression (under variance lens)</h2>
+<p>Given centered data matrix <em>X</em>, PCA finds orthogonal directions maximizing variance. Leading eigenvectors of covariance <strong>Σ</strong> are principal axes; eigenvalues encode explained variance.</p>
+<p><strong>Eigenpairs story</strong>: eigenvectors point along stretch directions; repeating this aloud beats reciting SVD triple product unless linear algebra round deepens.</p>
+<p><strong>Relation to SVD</strong>: for centered <em>X</em>, SVD provides numerically stable PCA; singular values ↔ sqrt of eigenvalues.</p>
+</div>
+
+<div id="manifold" class="content-section">
+<h3>Nonlinear embeddings (interview caution)</h3>
+<p><strong>t-SNE</strong> preserves local neighborhoods for visualization—distances between clusters not globally meaningful; perplexity hyperparameter shifts cluster appearance.</p>
+<p><strong>Isomap</strong> approximates geodesics via kNN graph—better when data lie on manifold but costlier.</p>
+</div>
+
+<div id="cluster" class="content-section">
+<h2>K-means vs Gaussian mixture models</h2>
+<p><strong>k-means</strong> hard-assigns to nearest centroid; minimizes within-cluster dispersion assuming spherical-ish clusters equal variance—use elbow/silhouette cautiously.</p>
+<p><strong>GMM + EM</strong> soft-assigns posterior responsibilities; excels with overlapping elliptical clusters. EM alternates E-step (posterior assignment) vs M-step (update means/covariances/weights)— articulate local optima reliance + initialization via k-means.</p>
+</div>
+
+<div id="fm" class="content-section">
+<h3>Factorization machines (elevator)</h3>
+<p>FM models pairwise feature interactions via low-rank embeddings—hits CTR prediction with sparse categorical fields; contrasts with exploding explicit cross-products.</p>
+</div>
+
+<div id="questions" class="content-section">
+<h3>Interview prompts</h3>
+<ul>
+<li>Covariance matrix interpretation?</li>
+<li>Orthogonal principal components rationale?</li>
+<li>Choosing k pragmatically?</li>
+<li>k-means vs GMM failure modes?</li>
+</ul>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/clustering/">Comprehensive Clustering Analysis</a> · Linear geometry intuition → <a href="/tutorials/matrix-vector-multiplication/">Matrix–Vector Multiplication</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> PCA components orthogonal because:</p>
+<label><input type="radio" name="q1" value="a"> Eigenvectors of symmetric covariance uncorrelated across components—captures orthogonal variance directions sequentially.</label><br>
+<label><input type="radio" name="q1" value="b"> CSV files require perpendicular columns.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}

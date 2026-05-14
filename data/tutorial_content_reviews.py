@@ -200,6 +200,43 @@ TUTORIAL_CONTENT_REVIEWS: dict[str, TutorialContentReview] = {
         ),
         follow_ups=("Strengthen examples around tool permissions, retries, observability, and human review gates.",),
     ),
+    "building-agentic-ai": TutorialContentReview(
+        slug="building-agentic-ai",
+        conceptual_correctness="watch",
+        message_quality="watch",
+        explanation_depth="watch",
+        reviewed_scope=(
+            "agent architectures",
+            "tool orchestration",
+            "LangGraph",
+            "evaluation",
+            "production agents",
+            "safety chapters",
+        ),
+        findings=(
+            "The production handbook aligns advanced agent topics with deployment and observability narratives.",
+            "Chapter breadth is large; pacing benefits from anchoring examples to one consistent domain storyline.",
+        ),
+        follow_ups=(
+            "Tighten trajectory-test examples against concrete golden datasets.",
+            "Keep CI/CD snippets Jinja-safe when embedding malformed JSON literals in fenced code.",
+        ),
+    ),
+    "ml-swe-interview-prep": TutorialContentReview(
+        slug="ml-swe-interview-prep",
+        conceptual_correctness="watch",
+        message_quality="watch",
+        explanation_depth="watch",
+        reviewed_scope=("recap pacing", "interview framings", "supervised recap", "unsupervised recap", "deep learning summaries", "RAG/agent pointers"),
+        findings=(
+            "The course distinguishes recap depth versus links into existing deep tutorials.",
+            "Flagship recap chapters summarize broad weekly themes (supervised / unsupervised / deep learning); readers should corroborate with linked courses before claiming expert depth.",
+        ),
+        follow_ups=(
+            "Add more calibrated numeric examples worked end-to-end in supervised and unsupervised recaps.",
+            "Expand RL and modern CV detection summaries only if onsite scope demands it.",
+        ),
+    ),
 }
 
 

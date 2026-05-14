@@ -1,0 +1,61 @@
+{% extends "tutorials/shared/chapter.html" %}
+{% set legacy_chapter_needs_prism = false %}
+
+{% block legacy_chapter_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tutorials/ml-swe-interview-prep/ml-interview-prep.css') }}">
+{% endblock %}
+
+{% block legacy_chapter_js %}
+<script src="{{ url_for('static', filename='js/tutorials/ml-swe-interview-prep/shared-tutorial.js') }}"></script>
+{% endblock %}
+
+{% block legacy_chapter_content %}
+<div class="main-content mip-prep-root" style="padding-top: 100px;">
+<section class="azbn-section">
+<div class="azbn-container mip-chapter">
+<p><a href="{{ url_for('tutorial_dedicated', slug='ml-swe-interview-prep') }}" class="azbn-btn azbn-secondary" style="text-decoration: none;">← Back to course</a></p>
+
+<div class="section-nav">
+<button type="button" class="active" onclick="showSection('rag')">RAG chain</button>
+<button type="button" onclick="showSection('fail')">Failure inventory</button>
+<button type="button" onclick="showSection('prod')">Prod talking points</button>
+<button type="button" onclick="showSection('deepen')">Go deeper</button>
+<button type="button" onclick="showSection('quiz')">Quiz</button>
+</div>
+
+<div id="rag" class="content-section active">
+<h2>RAG conversational beats</h2>
+<p>Encode query → retrieve top-<em>k</em> evidences → feed LLM conditioned on citations. Mention chunking granularity, rerankers, hybrid sparse+dense retrieval when interviewer hints scale.</p>
+</div>
+
+<div id="fail" class="content-section">
+<ul>
+<li>Noisy ingestion → hallucinated bridging sentences.</li>
+<li>Stale index vs live DB.</li>
+<li>Retriever precision collapse on tail entities.</li>
+</ul>
+</div>
+
+<div id="prod" class="content-section">
+<p>Discuss observability beyond ROUGE analogs: grounding hit-rate, abstention thresholds, rollback to smaller model tiers under overload.</p>
+</div>
+
+<div id="deepen" class="content-section mip-deepen">
+<h3>Go deeper on this site</h3>
+<p><a href="/tutorials/rag/">RAG &amp; Retrieval Systems</a></p>
+</div>
+
+<div id="quiz" class="content-section quiz-container">
+<div class="quiz-question quiz-container">
+<p><strong>1.</strong> RAG layering mainly mitigates which LLM weakness?</p>
+<label><input type="radio" name="q1" value="a"> Parametric-only memory omissions by attaching external evidence conditioned into context.</label><br>
+<label><input type="radio" name="q1" value="b"> GPU thermal throttling narratives.</label><br>
+<button type="button" class="azbn-btn check-answer-btn" onclick="checkAnswer(1, 'a')">Check Answer</button>
+<div id="q1-result"></div>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+{% endblock %}
