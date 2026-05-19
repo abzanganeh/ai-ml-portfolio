@@ -151,13 +151,153 @@ data = response.json()</code></pre>
 
                         <div class="azbn-card">
                             <h3>2. Data Preprocessing</h3>
-                            <p>Cleaning and preparing data for modeling</p>
+                            <p>
+                                Raw data is rarely ready for modeling. <strong>Data preprocessing</strong> turns messy tables into
+                                consistent numeric inputs—without mistakes that only show up at test time.
+                            </p>
+                            <div class="preprocessing-callout">
+                                <strong>Professor's rule of thumb:</strong> Fit preprocessors on <strong>training data only</strong>, then apply the same transforms at inference.
+                            </div>
+                            <h4>What you are trying to fix</h4>
+                            <ul class="preprocessing-list">
+                                <li><strong>Missing values</strong> — optional fields, sensor gaps, export errors</li>
+                                <li><strong>Wrong types</strong> — numbers as strings, dates as text</li>
+                                <li><strong>Duplicates &amp; invalid rows</strong> — repeated IDs, negative prices</li>
+                                <li><strong>Outliers</strong> — extremes that dominate distance-based models</li>
+                                <li><strong>Scale mismatch</strong> — features on very different numeric ranges</li>
+                                <li><strong>Unencoded categories</strong> — models need numbers, not labels like <code>"Seattle"</code></li>
+                            </ul>
+
+                            <h4>Recommended pipeline (in order)</h4>
+                            <ol class="preprocessing-pipeline">
+                                <li><strong>Explore &amp; profile</strong> — <code>.info()</code>, missing counts, distributions</li>
+                                <li><strong>Clean structure</strong> — duplicates, parse dates, coerce types</li>
+                                <li><strong>Handle missingness</strong> — drop, median, mode, or model imputation per column</li>
+                                <li><strong>Treat outliers</strong> — IQR/z-score, cap, log transform, or keep with justification</li>
+                                <li><strong>Encode categoricals</strong> — one-hot (nominal) or ordinal mapping</li>
+                                <li><strong>Scale numerics</strong> — for k-NN, SVM, neural nets, regularized linear models</li>
+                                <li><strong>Train/test split</strong> — then fit transformers on <strong>train only</strong></li>
+                            </ol>
+
+                            <h4>1. Explore before you transform</h4>
+                            <div class="code-block">
+                                <pre><code>import pandas as pd
+
+df = pd.read_csv('house_prices.csv')
+print(df.shape)
+print(df.dtypes)
+print(df.isnull().sum().sort_values(ascending=False))
+print(df.describe(include='all'))</code></pre>
+                            </div>
+                            <p class="preprocessing-note">
+                                If a column is 40% missing, blind <code>fillna(mean)</code> can distort the signal—consider median fill, dropping, or model-based imputation.
+                            </p>
+
+                            <h4>2. Handle missing values</h4>
+                            <div class="preprocessing-grid">
+                                <div class="preprocessing-step-card">
+                                    <h5>Drop</h5>
+                                    <p>Tiny missingness or unusable columns.</p>
+                                    <code>df.dropna(subset=['price'])</code>
+                                </div>
+                                <div class="preprocessing-step-card">
+                                    <h5>Impute</h5>
+                                    <p>Median (numeric), mode (categorical).</p>
+                                    <code>df['bedrooms'].fillna(df['bedrooms'].median())</code>
+                                </div>
+                                <div class="preprocessing-step-card">
+                                    <h5>sklearn Imputer</h5>
+                                    <p>Reusable inside Pipelines.</p>
+                                    <code>SimpleImputer(strategy='median')</code>
+                                </div>
+                            </div>
+                            <div class="code-block">
+                                <pre><code>from sklearn.impute import SimpleImputer
+
+imputer = SimpleImputer(strategy='median')
+X_train_clean = imputer.fit_transform(X_train)
+X_test_clean = imputer.transform(X_test)</code></pre>
+                            </div>
+
+                            <h4>3. Types, duplicates, invalid values</h4>
+                            <div class="code-block">
+                                <pre><code>df['listed_date'] = pd.to_datetime(df['listed_date'], errors='coerce')
+df['price'] = pd.to_numeric(df['price'], errors='coerce')
+df = df.drop_duplicates(subset=['listing_id'])
+df = df[df['price'] &gt; 0]</code></pre>
+                            </div>
+
+                            <h4>4. Outliers</h4>
+                            <p>Not every extreme is wrong—luxury homes exist. Combine domain knowledge with IQR/z-score or <code>RobustScaler</code>.</p>
+                            <div class="code-block">
+                                <pre><code>Q1, Q3 = df['price'].quantile([0.25, 0.75])
+IQR = Q3 - Q1
+df = df[df['price'].between(Q1 - 1.5*IQR, Q3 + 1.5*IQR)]</code></pre>
+                            </div>
+
+                            <h4>5. Encode categoricals</h4>
+                            <p><strong>One-hot</strong> for nominal fields; <strong>ordinal</strong> when order matters (<code>low &lt; medium &lt; high</code>).</p>
+                            <div class="code-block">
+                                <pre><code>df = pd.get_dummies(df, columns=['neighborhood'], drop_first=True)
+
+from sklearn.preprocessing import OneHotEncoder
+encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)</code></pre>
+                            </div>
+
+                            <h4>6. Feature scaling</h4>
+                            <p>Tree models (Random Forest, XGBoost) often skip scaling. Distance- and gradient-based models usually need it.</p>
+                            <div class="preprocessing-grid">
+                                <div class="preprocessing-step-card">
+                                    <h5>StandardScaler</h5>
+                                    <p>Zero mean, unit variance.</p>
+                                    <code>from sklearn.preprocessing import StandardScaler</code>
+                                </div>
+                                <div class="preprocessing-step-card">
+                                    <h5>MinMaxScaler</h5>
+                                    <p>Bound features to [0, 1].</p>
+                                    <code>MinMaxScaler()</code>
+                                </div>
+                                <div class="preprocessing-step-card">
+                                    <h5>RobustScaler</h5>
+                                    <p>Median/IQR; resists outliers.</p>
+                                    <code>RobustScaler()</code>
+                                </div>
+                            </div>
+                            <div class="code-block">
+                                <pre><code>scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)</code></pre>
+                            </div>
+
+                            <h4>7. Avoid data leakage</h4>
+                            <div class="preprocessing-callout preprocessing-callout-warn">
+                                Never <code>fit</code> imputers, encoders, or scalers on the full dataset before <code>train_test_split</code>.
+                            </div>
+                            <div class="code-block">
+                                <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+pipe = Pipeline([('prep', preprocess), ('model', LinearRegression())])
+pipe.fit(X_train, y_train)</code></pre>
+                            </div>
+
+                            <h4>Common mistakes</h4>
+                            <ul class="preprocessing-list">
+                                <li>Imputing the target <code>y</code></li>
+                                <li>Encoding on train+test before split (column mismatch at inference)</li>
+                                <li>Mean imputation on skewed price/income without checking distribution</li>
+                                <li>Removing rare but valid cases as outliers</li>
+                            </ul>
+
                             <div class="interactive-demo">
-                                <h4>Data Cleaning Demo</h4>
-                                <p>Let's see how data preprocessing works:</p>
-                                <button onclick="demonstratePreprocessing()" class="azbn-btn">Show Preprocessing Steps</button>
+                                <h4>Interactive walkthrough: dirty → model-ready</h4>
+                                <p>Step through a miniature house-price table; each stage shows what changed and why.</p>
+                                <button type="button" onclick="demonstratePreprocessing()" class="azbn-btn">Show Preprocessing Walkthrough</button>
+                                <button type="button" onclick="demonstratePreprocessing(true)" class="azbn-btn azbn-secondary">Reset</button>
                                 <div id="preprocessing-demo" style="margin-top: 1rem;"></div>
                             </div>
+
                         </div>
 
                         <div class="azbn-card">
@@ -490,30 +630,139 @@ sns.regplot(x='feature', y='target', data=df)</code></pre>
             `;
         }
 
-        function demonstratePreprocessing() {
-            const demoDiv = document.getElementById('preprocessing-demo');
-            demoDiv.innerHTML = `
-                <h4>Data Preprocessing Steps</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1rem 0;">
-                    <div style="background: #f0f0f0; padding: 1rem; border-radius: 4px;">
-                        <h5>1. Handle Missing Values</h5>
-                        <p>Fill or remove missing data</p>
-                        <code>df.fillna(df.mean())</code>
-                    </div>
-                    <div style="background: #f0f0f0; padding: 1rem; border-radius: 4px;">
-                        <h5>2. Feature Scaling</h5>
-                        <p>Normalize numerical features</p>
-                        <code>from sklearn.preprocessing import StandardScaler</code>
-                    </div>
-                    <div style="background: #f0f0f0; padding: 1rem; border-radius: 4px;">
-                        <h5>3. Encode Categorical</h5>
-                        <p>Convert text to numbers</p>
-                        <code>pd.get_dummies(df)</code>
-                    </div>
-                </div>
-            `;
+const preprocessingWalkthrough = [
+            {
+                stage: 'Raw data (as collected)',
+                note: 'Mixed types, missing cells, and one duplicate listing.',
+                rows: [
+                    ['id', 'sqft', 'beds', 'baths', 'city', 'price'],
+                    ['101', '1500', '3', '2', 'Portland', ''],
+                    ['102', '900', '2', '', 'Seattle', '420000'],
+                    ['102', '900', '2', '1', 'Seattle', '420000'],
+                    ['103', '2200', '4', '3', 'Camas', '1.2M']
+                ]
+            },
+            {
+                stage: 'After cleaning structure',
+                note: 'Parsed price text, removed duplicate id 102, invalid rows filtered.',
+                rows: [
+                    ['id', 'sqft', 'beds', 'baths', 'city', 'price'],
+                    ['101', '1500', '3', '2', 'Portland', 'missing'],
+                    ['102', '900', '2', '1', 'Seattle', '420000'],
+                    ['103', '2200', '4', '3', 'Camas', '1200000']
+                ]
+            },
+            {
+                stage: 'After imputation',
+                note: 'Median fill for empty baths; price on row 101 still missing (drop row or model-impute in practice).',
+                rows: [
+                    ['id', 'sqft', 'beds', 'baths', 'city', 'price'],
+                    ['101', '1500', '3', '2', 'Portland', 'missing'],
+                    ['102', '900', '2', '2', 'Seattle', '420000'],
+                    ['103', '2200', '4', '3', 'Camas', '1200000']
+                ]
+            },
+            {
+                stage: 'After encoding city (one-hot)',
+                note: 'Nominal city → binary columns; drop_first avoids redundant dummy trap.',
+                rows: [
+                    ['id', 'sqft', 'beds', 'baths', 'city_Seattle', 'city_Camas', 'price'],
+                    ['101', '1500', '3', '2', '0', '0', 'missing'],
+                    ['102', '900', '2', '2', '1', '0', '420000'],
+                    ['103', '2200', '4', '3', '0', '1', '1200000']
+                ]
+            },
+            {
+                stage: 'After scaling numerics (train-fit)',
+                note: 'StandardScaler on sqft/beds/baths using train statistics only—typical before k-NN or linear models.',
+                rows: [
+                    ['id', 'sqft_z', 'beds_z', 'baths_z', 'city_Seattle', 'city_Camas', 'price'],
+                    ['101', '-0.2', '1.1', '0.8', '0', '0', 'missing'],
+                    ['102', '-1.0', '-0.5', '0.0', '1', '0', '420000'],
+                    ['103', '1.2', '0.1', '0.4', '0', '1', '1200000']
+                ]
+            }
+        ];
+
+        let preprocessingStepIndex = 0;
+
+        function renderPreprocessingTable(rows) {
+            const header = rows[0];
+            const body = rows.slice(1);
+            let html = '<table class="preprocessing-table"><thead><tr>';
+            header.forEach(function(cell) { html += '<th>' + cell + '</th>'; });
+            html += '</tr></thead><tbody>';
+            body.forEach(function(row) {
+                html += '<tr>';
+                row.forEach(function(cell) {
+                    const isMissing = (cell === '' || cell === 'missing');
+                    html += '<td' + (isMissing ? ' class="cell-missing"' : '') + '>' + cell + '</td>';
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            return html;
         }
 
+        function renderPreprocessingWalkthrough() {
+            const demoDiv = document.getElementById('preprocessing-demo');
+            if (!demoDiv) return;
+            const step = preprocessingWalkthrough[preprocessingStepIndex];
+            const hasNext = preprocessingStepIndex < preprocessingWalkthrough.length - 1;
+            const hasPrev = preprocessingStepIndex > 0;
+
+            let actions = '<div class="preprocessing-walkthrough-actions">';
+            if (hasPrev) {
+                actions += '<button type="button" class="azbn-btn azbn-secondary" onclick="preprocessingPrevStep()">Previous</button>';
+            }
+            if (hasNext) {
+                actions += '<button type="button" class="azbn-btn" onclick="preprocessingNextStep()">Next step</button>';
+            } else {
+                actions += '<button type="button" class="azbn-btn azbn-secondary" onclick="demonstratePreprocessing(true)">Start over</button>';
+            }
+            actions += '</div>';
+
+            let takeaway = '';
+            if (!hasNext) {
+                takeaway = '<div class="preprocessing-callout preprocessing-takeaway"><strong>Takeaway:</strong> Wrap these steps in a <code>sklearn Pipeline</code> fit on <code>X_train</code> so validation, test, and production data never leak statistics.</div>';
+            }
+
+            demoDiv.innerHTML =
+                '<div class="preprocessing-walkthrough">' +
+                '<p class="preprocessing-step-label">Step ' + (preprocessingStepIndex + 1) + ' of ' + preprocessingWalkthrough.length + '</p>' +
+                '<h4>' + step.stage + '</h4>' +
+                '<p class="preprocessing-note">' + step.note + '</p>' +
+                renderPreprocessingTable(step.rows) +
+                actions +
+                takeaway +
+                '</div>';
+        }
+
+        function preprocessingNextStep() {
+            if (preprocessingStepIndex < preprocessingWalkthrough.length - 1) {
+                preprocessingStepIndex++;
+                renderPreprocessingWalkthrough();
+            }
+        }
+
+        function preprocessingPrevStep() {
+            if (preprocessingStepIndex > 0) {
+                preprocessingStepIndex--;
+                renderPreprocessingWalkthrough();
+            }
+        }
+
+        function demonstratePreprocessing(reset) {
+            const demoDiv = document.getElementById('preprocessing-demo');
+            if (!demoDiv) return;
+            if (reset) {
+                preprocessingStepIndex = 0;
+                demoDiv.innerHTML = '<p class="preprocessing-note">Click “Show Preprocessing Walkthrough” to begin.</p>';
+                return;
+            }
+            preprocessingStepIndex = 0;
+            renderPreprocessingWalkthrough();
+        }
         function demonstrateEvaluation() {
             const demoDiv = document.getElementById('evaluation-demo');
             demoDiv.innerHTML = `
