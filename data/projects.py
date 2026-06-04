@@ -1,4 +1,39 @@
 # data/projects.py - Project Configuration Data
+#
+# HOW TO ADD A PROJECT
+# --------------------
+# 1. Copy PROJECT_TEMPLATE below, fill in the fields, append to PROJECTS_DATA.
+# 2. Drop a thumbnail at static/images/projects/<name>.png (or .svg).
+# 3. For a rich detail page: set has_dedicated_template=True, create
+#    templates/projects/<name>/index.html, and optionally
+#    static/css/projects/<name>.css.
+# 4. Restart Flask — populate_projects() reseeds the DB on every startup.
+
+PROJECT_TEMPLATE = {
+    # ---- identity --------------------------------------------------------
+    'name': '',            # URL slug  →  /projects/<name>/  (unique, kebab-case)
+    'title': '',           # Display name shown in cards and page headers
+    'description': '',     # 1-3 sentence summary used on the card and generic detail page
+    'category': '',        # One of: 'Machine Learning' | 'AI/LLM' | 'Web' | 'Systems' | ...
+    # ---- tech stack ------------------------------------------------------
+    'technology_stack': [],  # List of technology/library names (shown as tags)
+    # ---- content ---------------------------------------------------------
+    'challenges': [],      # List of challenge strings (shown on generic detail page)
+    'results': {},         # Dict of metric_name → value (shown as result grid)
+    # ---- links -----------------------------------------------------------
+    'github_url': None,    # Full GitHub URL or None
+    'demo_url': None,      # Live demo URL or None
+    # ---- media -----------------------------------------------------------
+    'image_url': None,     # Path like '/static/images/projects/<name>.png'; None = auto-derive
+    # ---- flags -----------------------------------------------------------
+    'featured': False,     # True → appears on homepage featured section
+    'published': True,     # False → hidden everywhere
+    'has_dedicated_template': False,  # True → renders templates/projects/<name>/index.html
+    'template_path': None,            # e.g. 'projects/<name>/index.html'
+    # ---- metadata --------------------------------------------------------
+    'duration_months': 1,
+    'team_size': 1,
+}
 
 PROJECTS_DATA = [
     {
@@ -219,5 +254,83 @@ PROJECTS_DATA = [
         'has_dedicated_template': True,
         'template_path': 'projects/titanic-survival/index.html',
         'published': True
-    }
+    },
+    {
+        'name': 'flint',
+        'title': 'Flint — Interview Co-Pilot',
+        'description': 'Real-time AI co-pilot desktop app for live conversations and job interviews. Captures system audio, transcribes locally with Whisper and RNNoise, and fires parallel LLM guidance threads in a stealth overlay that is invisible to screen-share capture. RAG over session context via sqlite-vec keeps answers grounded in your own experience.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Rust', 'Tokio', 'Tauri 2', 'React 18', 'TypeScript', 'Tailwind CSS',
+            'Whisper', 'RNNoise', 'VAD', 'RAG', 'sqlite-vec', 'fastembed',
+            'Groq', 'Ollama', 'Supabase',
+        ],
+        'challenges': [
+            'Capturing system audio without touching the microphone to isolate interviewer speech',
+            'Running Whisper transcription and RNNoise suppression in real time with sub-second latency',
+            'Firing parallel directional, depth, and clarifying LLM threads per detected question without blocking the UI',
+            'Building a stealth overlay with Tauri that stays on top, is transparent, and is excluded from screen-capture APIs',
+            'Local RAG over session context using sqlite-vec and bge-small-en-v1.5 embeddings fully on device',
+            'Graceful failover from Groq cloud inference to a local Ollama model when the network is unavailable',
+            'Storing API keys only in the OS keychain — never in config files or environment variables',
+        ],
+        'results': {
+            'transcription': 'Local Whisper — zero audio leaves the device',
+            'inference': 'Groq cloud with Ollama fallback; sub-second P95 response time',
+            'context_store': 'sqlite-vec + bge-small-en-v1.5 — fully on-device RAG',
+            'stealth': 'Overlay excluded from screen-share capture via Tauri OS compositor hints',
+            'parallel_threads': '3 LLM threads (directional, depth, clarifying) fired simultaneously per question',
+            'keychain': 'API keys stored in OS keychain only — never on disk or in env',
+        },
+        'github_url': 'https://github.com/abzanganeh/flint',
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'image_url': '/static/images/projects/flint-hero.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': 2,
+        'team_size': 1,
+    },
+    {
+        'name': 'smart-resume',
+        'title': 'Smart Resume Agent',
+        'description': 'AI-powered job-search platform. Build a persistent master resume by voice (Story Mode + coached interview) or upload, tailor it to any job description through a four-phase agent pipeline, generate cover letters, check job-fit scores, search for matching listings, and track every application — all in one place.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Python', 'FastAPI', 'Next.js 14', 'TypeScript', 'React',
+            'PostgreSQL', 'pgvector', 'LangChain', 'Pydantic',
+            'Whisper', 'Google OAuth', 'NextAuth.js',
+            'Docker', 'RAG', 'Semantic Search',
+        ],
+        'challenges': [
+            'Four-phase agentic pipeline: JD keyword extraction → gap audit → resume rewrite → QA checklist, each with structured Pydantic output',
+            'RAG over user-owned master resume chunks stored in pgvector to ground every rewrite in real experience',
+            'Story Mode: 30 × 60-second voice segments transcribed by Whisper and optionally coached by AI follow-up questions per segment',
+            'Coached Interview mode: AI asks up to 15 structured career questions with dynamic follow-ups, answered by voice or text',
+            'BYOK (bring-your-own-key) model tier switcher — Standard / Better / Best — with per-request API key routing',
+            'Session TTL management (24-hour tailoring sessions) with frontend warning banners and server-side cleanup',
+            'Semantic job-fit score before spending a credit, preventing wasted tailoring runs on poor-match listings',
+            'Export pipeline producing ATS-clean PDF and DOCX from structured resume data without visual templates',
+        ],
+        'results': {
+            'resume_inputs': '3 paths — upload (PDF/DOCX/text), Story Mode voice, Coached Interview',
+            'agent_phases': '4 sequential phases with Pydantic-validated structured output at each step',
+            'vector_store': 'pgvector chunks — every rewrite is evidence-sourced, no hallucinations',
+            'voice_segments': 'Up to 30 × 60-second segments; optional AI coaching per segment',
+            'export': 'ATS-clean PDF and DOCX download',
+            'application_tracker': 'Applied → Interview → Offer → Closed pipeline with notes',
+            'model_tiers': 'Standard / Better / Best + BYOK API key support',
+            'session_ttl': '24-hour tailoring sessions with persistent master resume across sessions',
+        },
+        'github_url': 'https://github.com/abzanganeh/smart-resume',
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'image_url': '/static/images/projects/smart-resume-photo-03.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': 3,
+        'team_size': 1,
+    },
 ]
