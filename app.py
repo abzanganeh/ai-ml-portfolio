@@ -156,6 +156,7 @@ def populate_projects():
                 demo_url=project_data.get('demo_url'),
                 featured=project_data.get('featured', False),
                 published=project_data.get('published', True),
+                status=project_data.get('status', 'Completed'),
                 image_url=project_data.get('image_url'),
                 has_dedicated_template=project_data.get('has_dedicated_template', False),
                 template_path=project_data.get('template_path'),

@@ -31,6 +31,7 @@ PROJECT_TEMPLATE = {
     'has_dedicated_template': False,  # True → renders templates/projects/<name>/index.html
     'template_path': None,            # e.g. 'projects/<name>/index.html'
     # ---- metadata --------------------------------------------------------
+    'status': 'Completed',  # 'Completed' | 'Ongoing'
     'duration_months': 1,
     'team_size': 1,
 }
@@ -70,6 +71,7 @@ PROJECTS_DATA = [
         'demo_url': None,
         'featured': True,
         'published': True,
+        'status': 'Ongoing',
         'image_url': '/static/images/projects/flint-hero.png',
         'has_dedicated_template': False,
         'template_path': None,
@@ -114,6 +116,7 @@ PROJECTS_DATA = [
         'demo_url': None,
         'featured': True,
         'published': True,
+        'status': 'Ongoing',
         'image_url': '/static/images/projects/smart-resume-photo-03.png',
         'has_dedicated_template': False,
         'template_path': None,
