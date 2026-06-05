@@ -20,13 +20,27 @@ class TestHomepage:
         
         # Check for hero section and title from your template
         expect(page.locator(".hero")).to_be_visible()
-        expect(page.locator("h1.hero-title")).to_contain_text("AI/ML Software Engineer – Building Real-World ML Systems")
-        expect(page.locator(".hero-subtitle")).to_contain_text("Building intelligent systems that solve real-world problems through data science and machine learning")
+        expect(page.locator("h1.hero-title")).to_contain_text("Hi, I'm Alireza")
+        expect(page.locator("h1.hero-title")).to_contain_text("I build AI systems that work in the real world")
+        expect(page.locator(".hero-subtitle")).to_contain_text("LLM applications, RAG pipelines, agentic AI")
+        expect(page.locator(".hero-description")).to_contain_text("production-grade ML systems, not prototypes")
         
         # Check hero action buttons
         expect(page.locator('.hero-actions a[href="/projects/"]')).to_be_visible()
         expect(page.locator('.hero-actions a[href="/about"]')).to_be_visible()
         
+    def test_about_and_expertise_sections(self, page: Page, base_url: str):
+        """Test About Me and What I Do sections on homepage"""
+        page.goto(base_url)
+
+        expect(page.locator(".home-about")).to_be_visible()
+        expect(page.locator('h2:has-text("About Me")')).to_be_visible()
+        expect(page.locator(".home-about-content")).to_contain_text("Acceptto and SecureAuth")
+
+        expect(page.locator(".home-expertise")).to_be_visible()
+        expect(page.locator('h2:has-text("What I Do")')).to_be_visible()
+        expect(page.locator(".home-expertise .expertise-item")).to_have_count(6)
+
     def test_featured_projects_section(self, page: Page, base_url: str):
         """Test featured projects section matches your structure"""
         page.goto(base_url)
