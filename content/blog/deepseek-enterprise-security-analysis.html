@@ -1,0 +1,251 @@
+<div class="blog-post-content">
+    <p>In June 2026, corporate spending data put <strong>DeepSeek</strong> at the top of Ramp&rsquo;s trending software vendors list &mdash; ahead of Fireworks AI and other inference platforms. That is not the same as market dominance: Anthropic and OpenAI still lead U.S. business adoption by a wide margin. But the signal is real. Some American companies are paying DeepSeek directly for hosted inference, routing prompts to China-based infrastructure because the token economics are impossible to ignore.</p>
+
+    <p>This post is a technical look at <em>why</em> that shift is happening, what security and compliance actually change when U.S. data hits a foreign-hosted API, and where the common fears are well-founded versus oversimplified. I am not arguing that every company should avoid DeepSeek, or that every company should use it. The goal is a decision framework grounded in architecture, law, and documented incidents &mdash; not hype in either direction.</p>
+
+    <h2>First: what people mean when they say &ldquo;using DeepSeek&rdquo;</h2>
+
+    <p>There are two materially different adoption paths. Conflating them is where most public debate goes wrong.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Path</th>
+                <th>What happens to your data</th>
+                <th>Typical buyer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Hosted API</strong> (DeepSeek cloud, chat apps, mobile clients)</td>
+                <td>Prompts, files, metadata, and often chat history are transmitted to DeepSeek-operated services. DeepSeek&rsquo;s privacy policy states storage on servers in the People&rsquo;s Republic of China.</td>
+                <td>Startups optimizing burn, teams running high-volume summarization or agent loops</td>
+            </tr>
+            <tr>
+                <td><strong>Self-hosted open weights</strong> (V4, R1, etc. on your VPC, on-prem GPU, or a Western inference provider)</td>
+                <td>Data stays inside infrastructure you control or contractually bound. No requirement to phone home to DeepSeek&rsquo;s Chinese cloud for inference.</td>
+                <td>Enterprises that want the model economics without cross-border data transfer</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Ramp&rsquo;s economist Ara Kharazian noted that <em>direct payments</em> to DeepSeek imply many firms are taking the first path &mdash; simpler and cheaper than operating GPUs, but a different compliance surface than downloading weights into AWS or GCP. VentureBeat and multiple security analyses make the same distinction: cross-border risk attaches to the <em>service</em>, not inherently to the <em>model weights</em>.</p>
+
+    <h2>Why U.S. companies are moving anyway</h2>
+
+    <h3>1. Token economics at agent scale</h3>
+
+    <p>Frontier U.S. APIs are priced for quality and trust, not for infinite autonomous loops. As of mid-2026, list pricing illustrates the gap:</p>
+
+    <ul>
+        <li><strong>DeepSeek V4 Pro:</strong> roughly $0.44 per million input tokens, $0.87 per million output tokens (with aggressive cache-hit discounts below that)</li>
+        <li><strong>GPT-5.5:</strong> roughly $5 input / $30 output per million tokens</li>
+        <li><strong>Claude Opus 4.7:</strong> roughly $5 input / $25 output per million tokens</li>
+    </ul>
+
+    <p>On output tokens alone, DeepSeek&rsquo;s hosted API can be on the order of <strong>30&ndash;35&times; cheaper</strong> than GPT-5.5. For a product like an AI agent platform that runs multi-step workflows &mdash; research, rewrite, tool calls, re-prompting &mdash; inference is not a line item. It is the business model.</p>
+
+    <p>Lindy&rsquo;s CEO Flo Crivello publicly reported switching 100% of production traffic from Anthropic to DeepSeek V4 in 2026, citing millions of dollars in savings and, in his account, equal or better performance on core agent tasks. Whether that generalizes depends on your workload, but the economic pressure is structural: when token volume is measured in billions per quarter, brand premium becomes a CFO problem.</p>
+
+    <h3>2. Volume without proportional spend</h3>
+
+    <p>Vercel&rsquo;s AI Gateway reported DeepSeek&rsquo;s share of <em>token volume</em> jumping from under 1% to about 17% in a single month in early 2026, while its share of <em>actual spend</em> stayed near 1%. That pattern &mdash; huge traffic, tiny bill &mdash; is exactly what you expect when a provider underprices inference to gain share.</p>
+
+    <h3>3. Capability caught up for many &ldquo;commodity&rdquo; tasks</h3>
+
+    <p>Legal-tech evaluations cited in industry press have placed DeepSeek V4 Pro close to Claude Opus 4.7 and GPT-5.5 on some document workflows. Not every enterprise task needs the most expensive reasoning tier. Classification, extraction, first-pass summarization, and code scaffolding are increasingly price-sensitive.</p>
+
+    <h3>4. Open weights create an escape hatch</h3>
+
+    <p>DeepSeek publishes open-weight models. A security-conscious team can route around the China-hosted API entirely and run the same family of models on U.S. or EU infrastructure. The tradeoff is operational cost: GPUs, MLOps, patching, and latency management. BayTech Consulting&rsquo;s 2026 analysis framed it cleanly: you do not self-host to beat the public DeepSeek API on price; you self-host for <strong>data sovereignty</strong>.</p>
+
+    <h2>The security question: what is technically true?</h2>
+
+    <p>If you are a U.S. company sending customer data, source code, financial records, or employee PII through DeepSeek&rsquo;s <em>hosted</em> products, these are the concrete risk factors &mdash; not speculation.</p>
+
+    <h3>Data residency and legal access</h3>
+
+    <p>DeepSeek&rsquo;s published privacy policy states that information collected through its services may be stored on servers in the People&rsquo;s Republic of China and disclosed to law enforcement, public authorities, or others to comply with applicable law or government requests.</p>
+
+    <p>Under China&rsquo;s <strong>Cybersecurity Law</strong>, <strong>Data Security Law</strong>, and <strong>Personal Information Protection Law (PIPL)</strong>, authorities can compel companies operating in China to cooperate with government access in ways that do not mirror the procedural constraints U.S. enterprises expect from GDPR-aligned or SOC 2&ndash;audited American vendors. This is the core of the jurisdictional argument: the issue is not &ldquo;no rules in China,&rdquo; but <strong>different rules with different threat models</strong>, including lawful government access that may conflict with U.S. contractual obligations to <em>your</em> customers.</p>
+
+    <p>A fair comparison: the U.S. <strong>CLOUD Act</strong> also allows U.S. law enforcement to reach data held by American providers. The difference for most U.S. enterprises is not &ldquo;zero government access vs. total access.&rdquo; It is:</p>
+
+    <ul>
+        <li>Which legal system governs disputes and breach notification</li>
+        <li>Whether your vendor signs enterprise DPAs, BAAs, and zero-retention / no-training addenda</li>
+        <li>Whether you have practical audit rights, SSO, VPC endpoints, and data processing agreements your customers already approved</li>
+        <li>Geopolitical exposure when classified, export-controlled, or federally funded data is involved</li>
+    </ul>
+
+    <p>On those dimensions, OpenAI and Anthropic&rsquo;s enterprise programs are not perfect &mdash; but they are designed for procurement. DeepSeek&rsquo;s hosted consumer-grade API is not, today, in the same category.</p>
+
+    <h3>Documented security failures (not theoretical)</h3>
+
+    <p>Separate from geopolitics, DeepSeek has a recorded incident history on hosted infrastructure:</p>
+
+    <ul>
+        <li><strong>January 2025 &mdash; Wiz Research:</strong> Two ClickHouse databases were exposed to the public internet without authentication, leaking on the order of one million log lines including chat content, API keys, and backend secrets.</li>
+        <li><strong>February 2025 &mdash; NowSecure:</strong> The DeepSeek iOS app was reported to disable Apple&rsquo;s App Transport Security globally and send sensitive data over unencrypted channels; traffic was tied to ByteDance-controlled infrastructure (Volcengine), with policy language confirming PRC storage.</li>
+        <li><strong>2025 &mdash; Feroot Security (reported widely):</strong> Researchers alleged undisclosed client-side data flows toward China Mobile&ndash;linked endpoints in DeepSeek&rsquo;s web/mobile clients &mdash; a supply-chain and disclosure problem if substantiated in your environment.</li>
+    </ul>
+
+    <p>These incidents do not prove intentional backdoors. They <em>do</em> prove that DeepSeek&rsquo;s operational security maturity, at least on consumer-facing paths, has not met the bar many enterprises require. A SOC 2 report you cannot obtain is not neutral; it is a gap.</p>
+
+    <h3>Regulatory and government response</h3>
+
+    <p>Multiple U.S. federal agencies &mdash; including NASA, the Department of Defense, Commerce, Energy, and Transportation &mdash; have blocked DeepSeek on government devices and networks. Texas, New York, Virginia, and others have enacted or expanded state-level restrictions. Bipartisan bills in Congress (e.g., &ldquo;No DeepSeek on Government Devices&rdquo;) would formalize a federal ban. Italy temporarily removed DeepSeek from app stores over GDPR concerns.</p>
+
+    <p>For private enterprises, these actions are signals, not direct law &mdash; unless you are a government contractor or handle federal data. They matter because they define the Overton window for your own risk committee: if NASA will not run it on a laptop, your CISO will ask why your customer support bot will.</p>
+
+    <h3>Shadow AI amplifies everything</h3>
+
+    <p>DeepSeek is free or cheap and available in a browser. Employees paste incident tickets, HR cases, and unreleased designs into chat UIs without DLP review. The enterprise risk is often <strong>unmanaged egress</strong>, not a signed vendor contract. Discovery, blocking at the proxy, and approved alternatives (including self-hosted open models) are table stakes.</p>
+
+    <h2>Pros and cons &mdash; honestly scored</h2>
+
+    <h3>Pros of using DeepSeek (hosted API)</h3>
+
+    <ul>
+        <li><strong>Cost:</strong> Step-change reduction in inference spend for high-volume, output-heavy workloads.</li>
+        <li><strong>Performance:</strong> Competitive with frontier models on many benchmarks and real agent tasks (vendor-reported and third-party evals vary by domain).</li>
+        <li><strong>API ergonomics:</strong> OpenAI- and Anthropic-compatible endpoints lower migration friction.</li>
+        <li><strong>Context:</strong> Million-token context windows at low price enable document-heavy pipelines that would be prohibitively expensive elsewhere.</li>
+    </ul>
+
+    <h3>Cons of using DeepSeek (hosted API)</h3>
+
+    <ul>
+        <li><strong>Cross-border data transfer:</strong> Prompts and uploads may be stored in China under PRC law.</li>
+        <li><strong>Weak enterprise assurances:</strong> Limited parity with U.S. vendors on DPAs, HIPAA BAA, FedRAMP, customer-managed encryption keys, and audit artifacts.</li>
+        <li><strong>Incident history:</strong> Demonstrated misconfigurations and mobile-client security issues on hosted surfaces.</li>
+        <li><strong>Reputational / contractual risk:</strong> Customers, insurers, and boards may treat China-routed AI as a material third-party risk.</li>
+        <li><strong>Sanctions and policy volatility:</strong> Export controls, tariffs, and sudden platform restrictions can break production overnight.</li>
+    </ul>
+
+    <h3>Pros of self-hosting DeepSeek weights</h3>
+
+    <ul>
+        <li><strong>Data sovereignty:</strong> Prompts never leave your region or VPC if architected correctly.</li>
+        <li><strong>Cost vs. U.S. frontier APIs:</strong> Still often cheaper than GPT-5.5 or Opus at scale, even after GPU overhead.</li>
+        <li><strong>Air-gap option:</strong> Feasible for classified or highly regulated environments that would never use any public API.</li>
+    </ul>
+
+    <h3>Cons of self-hosting</h3>
+
+    <ul>
+        <li><strong>Ops burden:</strong> GPU capacity, model serving, security patching, and on-call are yours.</li>
+        <li><strong>Not always cheaper than the DeepSeek API:</strong> For bursty or moderate volume, hosted Chinese API pricing can undercut self-hosted TCO.</li>
+        <li><strong>Weight provenance:</strong> You still trust the upstream artifact; supply-chain review is your job.</li>
+    </ul>
+
+    <h2>Evaluating the claim: &ldquo;Our data is not secure in China&rdquo;</h2>
+
+    <p>Stated bluntly for a U.S. security audience, here is what holds up and what needs nuance.</p>
+
+    <p><strong>What is largely correct:</strong></p>
+
+    <ul>
+        <li>Using DeepSeek&rsquo;s <em>hosted</em> chat, mobile apps, or public API sends user content to infrastructure governed by PRC law, with storage in China explicitly disclosed.</li>
+        <li>U.S. enterprises with GDPR, HIPAA, PCI, SOC 2, or customer DPAs that forbid unauthorized cross-border transfer cannot casually route regulated data through that API without a compliance failure.</li>
+        <li>Documented breaches and weak mobile transport security show operational risk is real, not hypothetical.</li>
+        <li>Federal and state governments have judged the risk unacceptable for official devices &mdash; a strong precedent for high-sensitivity workloads.</li>
+    </ul>
+
+    <p><strong>What is incomplete or misleading:</strong></p>
+
+    <ul>
+        <li><strong>&ldquo;China does not follow protocols&rdquo;</strong> &mdash; China has cybersecurity and privacy laws; the issue is that those laws include state access and differ from Western expectations, not that there is no legal framework at all.</li>
+        <li><strong>&ldquo;All DeepSeek use sends data to China&rdquo;</strong> &mdash; False for self-hosted deployments on U.S./EU cloud. Architecture determines jurisdiction, not the model logo.</li>
+        <li><strong>&ldquo;U.S. clouds are safe, Chinese clouds are not&rdquo;</strong> &mdash; Overbroad. U.S. providers also receive government legal demands, suffer breaches, and train on consumer tiers if you pick the wrong plan. The enterprise question is contractual controls and data flow design, not nationality alone.</li>
+        <li><strong>&ldquo;Everyone is switching&rdquo;</strong> &mdash; False. DeepSeek&rsquo;s measured U.S. business adoption remained a fraction of a percent in Ramp&rsquo;s 2026 data; the story is <em>growth and intent</em>, not replacement of Anthropic/OpenAI.</li>
+    </ul>
+
+    <h2>A practical decision matrix for U.S. companies</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Workload</th>
+                <th>Hosted DeepSeek API</th>
+                <th>Self-hosted weights</th>
+                <th>U.S. frontier API (OpenAI / Anthropic enterprise)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Public marketing copy, no PII</td>
+                <td>Low friction; cost win</td>
+                <td>Overkill unless volume is huge</td>
+                <td>Fine; pay premium for simplicity</td>
+            </tr>
+            <tr>
+                <td>Internal code assist on private repos</td>
+                <td>High IP leakage risk</td>
+                <td>Preferred if cost-sensitive</td>
+                <td>Preferred if you need vendor DPA + audit</td>
+            </tr>
+            <tr>
+                <td>Customer PII / PHI / payment data</td>
+                <td>Do not use hosted API</td>
+                <td>Only with full compliance review</td>
+                <td>Default choice with BAA/DPA</td>
+            </tr>
+            <tr>
+                <td>High-volume agent loops (billions of tokens)</td>
+                <td>Economically rational; governance hard</td>
+                <td>Common enterprise compromise</td>
+                <td>Often prohibitive on unit economics</td>
+            </tr>
+            <tr>
+                <td>Government / defense / critical infrastructure</td>
+                <td>Effectively banned or politically untenable</td>
+                <td>Case-by-case with air-gap</td>
+                <td>Usually required with FedRAMP / IL paths</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>What I would actually implement</h2>
+
+    <p>None of this is legal advice. As an engineering lens:</p>
+
+    <ol>
+        <li><strong>Classify data before you classify models.</strong> If it cannot leave the U.S. or cannot be logged, it does not go to any public API without review.</li>
+        <li><strong>Route by sensitivity, not globally.</strong> Cheap models for sanititized tiers; enterprise APIs or private deployments for regulated tiers. Gateways like LiteLLM, Vercel AI Gateway, or internal routers make this enforceable.</li>
+        <li><strong>Assume shadow AI is already happening.</strong> Block consumer DeepSeek endpoints on corporate networks where policy requires; offer an approved path.</li>
+        <li><strong>If cost forces foreign inference,</strong> strip, tokenize, or synthetic-ize inputs &mdash; and accept that residual re-identification risk may still violate contracts.</li>
+        <li><strong>If sovereignty is the real concern,</strong> self-host or use a U.S.-region inference partner running the same open weights. Pay the GPU bill as a compliance line item.</li>
+    </ol>
+
+    <h2>Bottom line</h2>
+
+    <p>American companies are experimenting with DeepSeek because frontier inference got expensive faster than budgets grew. The Ramp and Vercel data show real procurement interest, not a wholesale abandonment of U.S. AI labs. The security concern you hear in boardrooms &mdash; sending proprietary data to China-hosted inference &mdash; is <strong>technically valid for the hosted API path</strong>, supported by DeepSeek&rsquo;s own policies, PRC legal context, and independent security findings. It is <strong>not automatically valid</strong> for every deployment mode, and it is not the only risk vector (self-hosted ops, shadow AI, and U.S. vendor misconfiguration all still exist).</p>
+
+    <p>The mature posture is not moral panic or cost denial. It is architectural: match model provider to data classification, document data flows, and treat inference pricing as a security tradeoff you explicitly accept or explicitly engineer around.</p>
+
+    <div class="highlight-box">
+        <p><strong>Key takeaways</strong></p>
+        <ul>
+            <li><strong>Why the shift:</strong> 30&ndash;35&times; cheaper output tokens vs. GPT-5.5 class APIs; agent workloads magnify the gap.</li>
+            <li><strong>Hosted API risk:</strong> PRC storage, lawful government access, weak enterprise compliance tooling, documented security incidents.</li>
+            <li><strong>Self-hosted nuance:</strong> Same model family without cross-border prompt transfer &mdash; different cost profile.</li>
+            <li><strong>Scale of adoption:</strong> Trending vendor &ne; dominant vendor; U.S. share remains small but growing.</li>
+            <li><strong>Your call:</strong> Segmented routing beats a single yes/no on &ldquo;Chinese AI.&rdquo;</li>
+        </ul>
+    </div>
+
+    <h2>Sources and further reading</h2>
+
+    <ul>
+        <li><a href="https://startupfortune.com/deepseek-exposes-the-price-pressure-building-inside-enterprise-ai/" target="_blank" rel="noopener noreferrer">Ramp Economics Lab / Startup Fortune &mdash; DeepSeek trending vendors (June 2026)</a></li>
+        <li><a href="https://thenewstack.io/lindy-deepseek-anthropic-switch/" target="_blank" rel="noopener noreferrer">The New Stack &mdash; Lindy migration to DeepSeek V4</a></li>
+        <li><a href="https://the-decoder.com/deepseek-makes-its-75-percent-discount-permanent-pricing-output-tokens-at-least-34x-below-gpt-5-5/" target="_blank" rel="noopener noreferrer">The Decoder &mdash; DeepSeek V4 Pro permanent pricing</a></li>
+        <li><a href="https://venturebeat.com/business/is-deepseek-really-sending-data-to-china-lets-decode" target="_blank" rel="noopener noreferrer">VentureBeat &mdash; Hosted vs. self-hosted data flows</a></li>
+        <li><a href="https://arstechnica.com/security/2025/02/deepseek-ios-app-sends-data-unencrypted-to-bytedance-controlled-servers/" target="_blank" rel="noopener noreferrer">Ars Technica &mdash; DeepSeek iOS transport security (NowSecure)</a></li>
+        <li><a href="https://fedscoop.com/federal-workers-rarely-seek-deepseek-but-its-happened/" target="_blank" rel="noopener noreferrer">FedScoop &mdash; Federal agency DeepSeek blocks</a></li>
+        <li><a href="https://www.baytechconsulting.com/blog/enterprise-decision-framework-deepseek-v4" target="_blank" rel="noopener noreferrer">BayTech Consulting &mdash; Enterprise decision framework for DeepSeek V4</a></li>
+    </ul>
+
+    <p><em>#DeepSeek #AISecurity #DataPrivacy #EnterpriseAI #LLM #CloudSecurity #AIGovernance #Infosec</em></p>
+</div>

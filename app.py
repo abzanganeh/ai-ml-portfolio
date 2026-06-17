@@ -36,7 +36,7 @@ db.init_app(app)
 app.register_blueprint(api_bp)
 
 class BlogPost:
-    def __init__(self, id, title, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5, content=None, content_file=None, image_url=None):
+    def __init__(self, id, title, excerpt, category, tags, author="Alireza Barzin Zanganeh", published=True, featured=False, created_at=None, read_time=5, content=None, content_file=None, image_url=None, slug=None):
         self.id = id
         self.title = title
         self.content = content
@@ -48,7 +48,7 @@ class BlogPost:
         self.featured = featured
         self.created_at = created_at or datetime.now()
         self.read_time = read_time
-        self.slug = self._generate_slug()
+        self.slug = slug or self._generate_slug()
         self.meta_description = excerpt[:160]
         self.image_url = self._get_image_url(image_url)
         if content_file:
