@@ -10,7 +10,7 @@ BLOG_POSTS_DATA = [
         'tags': ['deepseek', 'ai security', 'data privacy', 'enterprise ai', 'llm', 'cloud security', 'ai governance'],
         'featured': True,
         'content_file': 'deepseek-enterprise-security-analysis.html',
-        'image_url': '/static/images/blog/default_image.png',
+        'image_url': '/static/images/blog/deepseek-enterprise-security-analysis.png',
         'read_time': 14,
         'created_at': datetime.now()
     },
