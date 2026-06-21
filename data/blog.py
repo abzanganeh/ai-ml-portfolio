@@ -2,6 +2,32 @@ from datetime import datetime, timedelta
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'asset-manager-security-reference-guide',
+        'slug': 'asset-manager-security-reference-guide',
+        'title': 'Asset Manager Security: Reference Architecture, IAM, Frameworks, and AI Risk',
+        'excerpt': 'Complete reference guide for security and engineering teams at registered investment advisers — hybrid IAM, Reg S-P, attack catalog, case studies, and AI/ML threat and defense patterns.',
+        'category': 'Artificial Intelligence',
+        'tags': ['asset management', 'iam', 'cybersecurity', 'financial services', 'identity management', 'ai security', 'reg s-p', 'architecture'],
+        'featured': False,
+        'content_file': 'asset-manager-security-reference-guide.html',
+        'image_url': '/static/images/blog/default_image.png',
+        'read_time': 20,
+        'created_at': datetime.now() - timedelta(days=1)
+    },
+    {
+        'id': 'asset-manager-security-architecture',
+        'slug': 'asset-manager-security-architecture',
+        'title': 'The Quiet War on Asset Managers: AI, Deepfakes, and the Coming Quantum Reckoning',
+        'excerpt': 'Asset managers are not just fighting yesterday\'s threats. AI has handed attackers capabilities that scale infinitely. Quantum computing is on the horizon. This is the story of what is actually changing, and what the financial industry needs to do before the window closes.',
+        'category': 'Artificial Intelligence',
+        'tags': ['asset management', 'cybersecurity', 'ai threats', 'quantum computing', 'deepfakes', 'financial security', 'identity', 'iam'],
+        'featured': True,
+        'content_file': 'asset-manager-security-architecture.html',
+        'image_url': '/static/images/blog/default_image.png',
+        'read_time': 18,
+        'created_at': datetime.now()
+    },
+    {
         'id': 'deepseek-enterprise-security-analysis',
         'slug': 'deepseek-enterprise-security-analysis',
         'title': 'DeepSeek and U.S. Enterprise AI: Why Companies Are Switching, and What the Security Tradeoffs Actually Are',

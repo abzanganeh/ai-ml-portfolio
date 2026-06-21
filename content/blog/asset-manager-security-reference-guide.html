@@ -1,0 +1,446 @@
+<div class="blog-post-content">
+    <p>Large registered investment advisers and asset managers do not share the same threat model as retail banks or pure fintech startups. Client trust is the product. Breaches hurt through wire fraud, portfolio data exposure, and regulatory notification &mdash; not primarily through card-present fraud or checkout abuse. At the same time, the stack has modernized: client portals on CRM experience clouds, hybrid identity spanning on-prem Active Directory and cloud IdPs, governance platforms for vendor risk, and growing use of ML for fraud detection and LLMs for client service and research.</p>
+
+    <p>This post is a reference architecture for security and engineering teams at asset managers. It maps common attacks to control layers, explains how IAM implements the frameworks auditors ask about, and covers where AI and ML both help and create new risk. No single vendor stack is mandatory; the patterns below reflect what many large RIAs run in practice.</p>
+
+    <h2>Why asset managers are a distinct target</h2>
+
+    <p>Asset managers hold concentrated value per client, long-lived relationships, and sensitive non-public information. Typical high-value assets include:</p>
+
+    <ul>
+        <li><strong>Client PII and financial profiles</strong> &mdash; names, addresses, account holdings, tax and estate context</li>
+        <li><strong>Wire and transfer instructions</strong> &mdash; high-dollar, irreversible movement of funds</li>
+        <li><strong>MNPI</strong> (material non-public information) in research and portfolio construction</li>
+        <li><strong>Credentials to custodians and fund administrators</strong> &mdash; integration accounts with broad blast radius</li>
+    </ul>
+
+    <p>Attackers optimize for <em>trust exploitation</em>: impersonating a client or executive to change a wire destination, taking over a client portal session, or abusing an employee&rsquo;s access to export holdings. Retail patterns like PCI card fraud and open-banking API abuse at consumer scale are secondary concerns for most discretionary advisers.</p>
+
+    <p>Regulatory pressure reinforces architecture choices. SEC <strong>Regulation S-P</strong> amendments (effective December 2025 for large covered institutions) require written incident response plans, service provider oversight, and customer notification when sensitive customer information is compromised. SOC 2 Type II reports remain the standard third-party assurance artifact institutional clients request. Frameworks such as <strong>NIST CSF</strong>, <strong>NIST 800-53</strong>, <strong>ISO 27001</strong>, and <strong>CIS Controls</strong> supply the control vocabulary; IAM is often how those controls are enforced day to day.</p>
+
+    <h2>Reference architecture</h2>
+
+    <p>Think in layers. Attacks land on a layer; defenses must match that layer, not a single security product.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Layer</th>
+                <th>Components (typical)</th>
+                <th>What breaks here</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Channels</strong></td>
+                <td>Client portal, mobile apps, employee workstations, partner APIs</td>
+                <td>Phishing, session hijack, malicious attachments</td>
+            </tr>
+            <tr>
+                <td><strong>Edge</strong></td>
+                <td>WAF, DDoS protection, API gateway, email security</td>
+                <td>Credential stuffing, API abuse, BEC payloads</td>
+            </tr>
+            <tr>
+                <td><strong>Identity</strong></td>
+                <td>Workforce IdP, client CIAM, IGA, PAM, MFA</td>
+                <td>ATO, excessive privilege, stale access, shadow AI credentials</td>
+            </tr>
+            <tr>
+                <td><strong>Applications</strong></td>
+                <td>CRM, portfolio reporting, document exchange, internal ops tools</td>
+                <td>Broken authZ, IDOR, bulk export without audit</td>
+            </tr>
+            <tr>
+                <td><strong>Data / ML</strong></td>
+                <td>Data lake, feature stores, fraud models, RAG corpora for LLMs</td>
+                <td>Training data leakage, model evasion, prompt injection over client docs</td>
+            </tr>
+            <tr>
+                <td><strong>Third parties</strong></td>
+                <td>Custodians, fund admins, SaaS IdP/IGA/CRM, cloud AI APIs</td>
+                <td>Vendor breach, misconfigured SaaS tenant, supply-chain compromise</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Large RIAs commonly operate a <strong>hybrid</strong> environment: on-prem Active Directory and legacy apps alongside cloud IdP (Okta or Microsoft Entra), Salesforce for CRM and client experience, Azure or AWS for custom services, and ServiceNow for ITSM and GRC workflows. Security architecture must treat identity as the control plane that connects these pieces.</p>
+
+    <h2>How frameworks map to IAM (not a compliance checklist)</h2>
+
+    <p>Asset managers rarely implement one framework in isolation. The useful question is: <em>which IAM control satisfies which framework expectation?</em></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Framework / rule</th>
+                <th>What it asks for</th>
+                <th>IAM implementation examples</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>NIST CSF (Protect)</strong></td>
+                <td>PR.AC access control, PR.IP protective technology</td>
+                <td>Role-based access, MFA, conditional access policies</td>
+            </tr>
+            <tr>
+                <td><strong>NIST 800-53</strong></td>
+                <td>AC-* access enforcement, IA-* identification/authentication, AU-* audit</td>
+                <td>SSO, step-up auth, auth decision logging</td>
+            </tr>
+            <tr>
+                <td><strong>NIST 800-63</strong></td>
+                <td>Identity assurance levels (IAL/AAL)</td>
+                <td>Stronger MFA for client portal vs internal read-only apps</td>
+            </tr>
+            <tr>
+                <td><strong>ISO 27001</strong></td>
+                <td>Access control, privileged access management</td>
+                <td>Joiner/mover/leaver, access reviews, PAM for admins</td>
+            </tr>
+            <tr>
+                <td><strong>SOC 2</strong></td>
+                <td>Security + confidentiality criteria</td>
+                <td>Change control on IAM rules, evidence from IGA audit trails</td>
+            </tr>
+            <tr>
+                <td><strong>CIS Controls</strong></td>
+                <td>Account management (CIS 5), access control (CIS 6)</td>
+                <td>Automated deprovisioning, MFA on external-facing systems</td>
+            </tr>
+            <tr>
+                <td><strong>SEC Reg S-P</strong></td>
+                <td>Safeguards, vendor oversight, incident response</td>
+                <td>Contractual IAM requirements for vendors; 72-hour breach notification clauses</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>SOC 2</strong> proves controls operated effectively over time. <strong>NIST/ISO/CIS</strong> tell you what to build. <strong>Reg S-P</strong> adds client-data-specific duties. GRC platforms (often ServiceNow IRM) track vendor risk and policy attestation; they do not replace IdP or IGA &mdash; they govern them.</p>
+
+    <h2>Identity and access architecture for asset managers</h2>
+
+    <p>IAM at scale for an asset manager is not one directory. It is two identity planes plus governance glue.</p>
+
+    <h3>Two identity planes</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Plane</th>
+                <th>Users</th>
+                <th>Typical stack</th>
+                <th>Primary risks</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Workforce identity</strong></td>
+                <td>Employees, contractors, advisors</td>
+                <td>Active Directory, Entra ID / Okta workforce, SailPoint IGA</td>
+                <td>Insider abuse, stale privileged access, MNPI segregation failures</td>
+            </tr>
+            <tr>
+                <td><strong>Client identity (CIAM)</strong></td>
+                <td>High-net-worth clients, institutional contacts</td>
+                <td>Okta Customer Identity Cloud or equivalent, SSO into Salesforce Experience Cloud</td>
+                <td>Portal ATO, session fixation, weak step-up on sensitive actions</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>A workforce breach and a client portal breach have different blast radii and different controls. Conflating them in one policy set is a common architectural mistake.</p>
+
+    <h3>Hybrid worker identity flow</h3>
+
+    <p>Many large RIAs still anchor on <strong>Active Directory</strong> for legacy apps and Group Policy, while <strong>Okta</strong> or <strong>Entra ID</strong> federates SSO to SaaS. <strong>SailPoint</strong> (or similar IGA) sits between HR and targets:</p>
+
+    <ol>
+        <li><strong>Workday</strong> (or HR system) records hire, transfer, termination.</li>
+        <li><strong>SailPoint</strong> receives lifecycle events and applies role-based entitlement rules.</li>
+        <li>Provisioning writes to <strong>AD groups</strong>, <strong>Okta app assignments</strong>, and SaaS profiles (Salesforce, ServiceNow, internal apps).</li>
+        <li><strong>ServiceNow</strong> handles exceptional access requests: manager approval, data-owner approval, SoD check.</li>
+        <li><strong>Access certifications</strong> (quarterly or annual) recertify entitlements; failures trigger remediation workflows.</li>
+    </ol>
+
+    <p><strong>PowerShell</strong> and SailPoint workflow scripts automate connectors to homegrown systems. The architecture goal is <em>no standing access by default</em> and <em>timely deprovisioning</em> &mdash; ex-employees with CRM export rights remain a recurring incident class across the industry.</p>
+
+    <h3>Client CIAM and the portal</h3>
+
+    <p>Client-facing servicing increasingly runs on <strong>Salesforce Experience Cloud</strong> (statements, documents, profile updates) with an external IdP front door. Standard integration pattern:</p>
+
+    <ul>
+        <li><strong>SAML 2.0 or OIDC</strong> from CIAM to Salesforce Community login URL (not the internal Salesforce employee login).</li>
+        <li><strong>SailPoint</strong> may provision portal users linked to Salesforce Contact records.</li>
+        <li><strong>Custom APIs</strong> on Azure or similar backends sit behind the portal for document generation, onboarding, and servicing workflows.</li>
+    </ul>
+
+    <p>Sensitive client actions &mdash; changing contact information, initiating transfers, downloading tax packages &mdash; should trigger <strong>step-up authentication</strong>. In OIDC terms, applications request elevated <code>acr_values</code> or enforce <code>max_age</code> so the IdP re-authenticates with MFA even when a session exists. Adaptive MFA uses risk signals (new device, new geography, credential-stuffing patterns) to add friction only when confidence is low.</p>
+
+    <h3>Privileged access and segregation</h3>
+
+    <ul>
+        <li><strong>PAM</strong> for domain admins, Salesforce admins, database operators, and break-glass accounts. No shared passwords; session recording where policy requires.</li>
+        <li><strong>MNPI segregation</strong> between research, portfolio management, and client service roles &mdash; enforced by AD/Okta groups, not informal team norms.</li>
+        <li><strong>Separation of duties on money movement</strong>: distinct roles for request, approve, and execute wire instructions; IAM must mirror that process in system permissions.</li>
+        <li><strong>Machine identity</strong>: custodian API keys, market-data feeds, and batch service accounts included in access reviews &mdash; often forgotten until an audit.</li>
+    </ul>
+
+    <h3>Audit and evidence</h3>
+
+    <p>SOC 2 and SEC exams ask for evidence, not intentions. Log authentication decisions, provisioning changes, privileged session starts, and failed MFA attempts. IGA tools retain who approved each entitlement grant. When an examiner or institutional client asks how access changed before an incident, the architecture must answer with timestamps and actor IDs.</p>
+
+    <h3>IAM for AI and ML systems</h3>
+
+    <p>ML pipelines and LLM services need the same rigor as CRM access:</p>
+
+    <ul>
+        <li><strong>Feature stores and training data</strong> containing client attributes require role boundaries; MNPI must not land in notebooks accessible to general engineering.</li>
+        <li><strong>RAG corpora</strong> for internal copilots must be scoped per team; a research assistant and a client-service bot should not share one retrieval index if data classes differ.</li>
+        <li><strong>Public LLM APIs</strong> must be blocked or policy-governed for pasting client data &mdash; shadow AI is an IAM and DLP failure, not only a model choice. (See also: <a href="/blog/deepseek-enterprise-security-analysis">third-party AI vendor risk</a>.)</li>
+        <li><strong>Agentic workflows</strong> that call tools on behalf of users need scoped credentials, step-up MFA before high-impact actions, and audit trails comparable to a privileged human operator.</li>
+    </ul>
+
+    <h2>Attack catalog</h2>
+
+    <p>Each entry: threat &rarr; asset-manager impact &rarr; architectural response.</p>
+
+    <h3>1. Business email compromise and wire fraud</h3>
+
+    <p><strong>Threat:</strong> Attacker impersonates client, executive, or vendor via email and redirects a wire or ACH.</p>
+    <p><strong>Impact:</strong> Direct financial loss; often no malware on network. SEC has brought enforcement actions against registered advisers that failed to adopt reasonable safeguards after email-compromise incidents.</p>
+    <p><strong>Response:</strong> DMARC/SPF/DKIM on firm domains; out-of-band callback verification for instruction changes; dual control on payment execution; employee training; email security gateways with impersonation detection. Technology alone is insufficient &mdash; process is the control.</p>
+
+    <h3>2. Client portal account takeover</h3>
+
+    <p><strong>Threat:</strong> Stolen password, credential stuffing, or session hijack on client CIAM.</p>
+    <p><strong>Impact:</strong> Exposure of holdings and documents; fraudulent profile or instruction changes.</p>
+    <p><strong>Response:</strong> MFA on all client accounts; adaptive risk scoring; step-up on sensitive flows; device binding where appropriate; rate limiting and bot detection at edge; short session TTL on high-value actions.</p>
+
+    <h3>3. Insider threat and MNPI abuse</h3>
+
+    <p><strong>Threat:</strong> Employee or contractor exports client lists, research, or holdings; or trades on MNPI.</p>
+    <p><strong>Impact:</strong> Regulatory action, client attrition, criminal liability in severe cases.</p>
+    <p><strong>Response:</strong> Role segregation; DLP on email and cloud storage; UEBA on anomalous download volume; PAM on systems with bulk export; background checks and contractor time-bound access.</p>
+
+    <h3>4. Third-party and supply chain</h3>
+
+    <p><strong>Threat:</strong> Compromise at custodian, SaaS vendor, or cloud provider propagates to firm data.</p>
+    <p><strong>Impact:</strong> Client data exposure without direct attack on firm perimeter.</p>
+    <p><strong>Response:</strong> Vendor tiering in GRC; SOC 2 review; contractual breach notification (Reg S-P aligns with 72-hour service-provider notice expectations); least-privilege integration accounts; network segmentation for vendor connectivity.</p>
+
+    <h3>5. Cloud misconfiguration and identity-to-cloud gaps</h3>
+
+    <p><strong>Threat:</strong> Public storage bucket, over-permissive cloud IAM role, SaaS tenant without MFA enforced on corporate IdP.</p>
+    <p><strong>Impact:</strong> Mass data exposure; 2024 Snowflake-related incidents showed corporate identity weakness enabling access to many customer tenants.</p>
+    <p><strong>Response:</strong> CSPM; enforce MFA and conditional access on IdP; no long-lived access keys where roles can substitute; regular entitlement reviews on cloud admin roles.</p>
+
+    <h3>6. Ransomware and extortion</h3>
+
+    <p><strong>Threat:</strong> Encrypt ops systems; exfiltrate data for double extortion.</p>
+    <p><strong>Impact:</strong> Reporting delays, client communication outage, regulatory notification triggers.</p>
+    <p><strong>Response:</strong> Network segmentation; immutable backups; EDR; tested IR plan per Reg S-P; crisis comms runbook for client-facing teams.</p>
+
+    <h3>7. AI and ML-specific abuse</h3>
+
+    <p><strong>Threat:</strong> Prompt injection in client-facing chatbots; RAG retrieval over wrong tenant&rsquo;s documents; deepfake voice/video approving transfers; evasion of fraud ML models.</p>
+    <p><strong>Impact:</strong> Data leakage via model output; fraudulent approvals; silent degradation of fraud detection.</p>
+    <p><strong>Response:</strong> Input/output guardrails; retrieval boundaries and metadata filters; human-in-the-loop for wire-grade actions; model monitoring and champion/challenger testing; policy blocking paste of client data into unapproved LLM services.</p>
+
+    <h2>AI and ML: defense and new offense</h2>
+
+    <h3>Defensive ML</h3>
+
+    <ul>
+        <li><strong>Login and session risk scoring</strong> &mdash; complements IdP adaptive MFA.</li>
+        <li><strong>Transaction and behavior anomaly</strong> &mdash; unusual download patterns, off-hours bulk export.</li>
+        <li><strong>UEBA</strong> on SIEM data &mdash; insider and compromised-account detection.</li>
+    </ul>
+
+    <p>Architecturally, fraud features must respect data classification: PII in feature pipelines needs access controls and audit equal to source systems.</p>
+
+    <h3>Offensive ML and gen-AI</h3>
+
+    <ul>
+        <li><strong>Gen-AI phishing</strong> at scale &mdash; personalized lures referencing public holdings or LinkedIn context.</li>
+        <li><strong>Deepfake voice/video</strong> in approval workflows &mdash; public 2024 case: finance staff wired funds after a fake video conference appearing to include CFO and others.</li>
+        <li><strong>LLM shadow use</strong> &mdash; employees paste client scenarios into consumer chatbots; data leaves controlled boundary.</li>
+    </ul>
+
+    <p>High-value transfers still require process controls that ML cannot replace: verified callback numbers on file, dual authorization, and thresholds that force human review regardless of channel.</p>
+
+    <h2>Public case studies</h2>
+
+    <p>Pattern template: incident &rarr; attack path &rarr; architectural gap &rarr; control &rarr; asset-manager relevance.</p>
+
+    <h3>Case 1: SEC enforcement on adviser email compromise</h3>
+
+    <p><strong>Incident:</strong> SEC has charged registered investment advisers where business email compromise led to fraudulent transfers or failure to implement reasonable policies after known email-risk incidents.</p>
+    <p><strong>Attack path:</strong> Spoofed or compromised email &rarr; fraudulent wire instruction &rarr; funds sent before detection.</p>
+    <p><strong>Gap:</strong> Over-reliance on email as authoritative channel; insufficient verification procedures.</p>
+    <p><strong>Control:</strong> Out-of-band verification, dual control, BEC-specific IR playbooks, Reg S-P-aligned incident response.</p>
+    <p><strong>Relevance:</strong> Wire fraud is P0 for asset managers; IAM and process intersect at who can approve system changes vs payment execution.</p>
+
+    <h3>Case 2: Snowflake tenant exposure (2024 pattern)</h3>
+
+    <p><strong>Incident:</strong> Widespread reports of Snowflake customer data exposure linked to weak or absent MFA on corporate identity accounts with access to SaaS tenants.</p>
+    <p><strong>Attack path:</strong> Stolen workforce credentials &rarr; access to cloud analytics tenant &rarr; bulk exfiltration.</p>
+    <p><strong>Gap:</strong> Identity-to-SaaS path not hardened; no conditional access on analytics platforms holding client aggregates.</p>
+    <p><strong>Control:</strong> MFA everywhere on IdP; SSO-only access to data platforms; monitor impossible travel; vendor MFA attestation in GRC.</p>
+    <p><strong>Relevance:</strong> Asset managers increasingly store reporting and analytics in cloud; workforce IAM failure becomes client data breach.</p>
+
+    <h3>Case 3: Capital One cloud misconfiguration (2019)</h3>
+
+    <p><strong>Incident:</strong> Misconfigured WAF/firewall permitted SSRF; attacker accessed cloud-hosted customer records.</p>
+    <p><strong>Attack path:</strong> Application vulnerability &rarr; cloud metadata/credential abuse &rarr; object storage access.</p>
+    <p><strong>Gap:</strong> Edge and cloud IAM not defense-in-depth; configuration drift undetected.</p>
+    <p><strong>Control:</strong> CSPM, least-privilege cloud roles, segmentation between app tier and data stores, regular penetration testing.</p>
+    <p><strong>Relevance:</strong> Custom portal backends on Azure/AWS inherit the same class of failure as large banks.</p>
+
+    <h3>Case 4: Deepfake video conference wire fraud (2024)</h3>
+
+    <p><strong>Incident:</strong> Publicly reported case in Hong Kong: employee paid millions after video call with deepfake impersonations of CFO and colleagues.</p>
+    <p><strong>Attack path:</strong> Social engineering + synthetic media &rarr; authorized payment outside normal dual-control channel.</p>
+    <p><strong>Gap:</strong> Visual and voice trust treated as authentication; no independent verification step.</p>
+    <p><strong>Control:</strong> Payment policy independent of real-time communications; verified callback numbers; amount thresholds; security awareness on synthetic media.</p>
+    <p><strong>Relevance:</strong> AI offense evolves faster than portal MFA; process remains the backstop for wire-grade actions.</p>
+
+    <h2>Prioritization matrix</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Attack</th>
+                <th>Likelihood</th>
+                <th>Impact</th>
+                <th>Typical priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>BEC / wire fraud</td>
+                <td>High</td>
+                <td>Critical</td>
+                <td>P0</td>
+            </tr>
+            <tr>
+                <td>Client portal ATO</td>
+                <td>High</td>
+                <td>High</td>
+                <td>P0</td>
+            </tr>
+            <tr>
+                <td>Third-party / SaaS identity</td>
+                <td>Medium&ndash;High</td>
+                <td>Critical</td>
+                <td>P0&ndash;P1</td>
+            </tr>
+            <tr>
+                <td>Insider / MNPI</td>
+                <td>Medium</td>
+                <td>Critical</td>
+                <td>P1</td>
+            </tr>
+            <tr>
+                <td>Cloud misconfiguration</td>
+                <td>Medium</td>
+                <td>High</td>
+                <td>P1</td>
+            </tr>
+            <tr>
+                <td>Ransomware</td>
+                <td>Medium</td>
+                <td>Critical</td>
+                <td>P1</td>
+            </tr>
+            <tr>
+                <td>AI prompt injection / shadow LLM</td>
+                <td>Rising</td>
+                <td>Context-dependent</td>
+                <td>P1&ndash;P2</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Decision matrix by workload</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Workload</th>
+                <th>Hosted external API</th>
+                <th>Self-hosted / private</th>
+                <th>Enterprise SaaS with DPA</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Public marketing content</td>
+                <td>Acceptable with review</td>
+                <td>Usually unnecessary</td>
+                <td>Preferred for simplicity</td>
+            </tr>
+            <tr>
+                <td>Client PII in LLM workflows</td>
+                <td>Do not use unapproved public APIs</td>
+                <td>Private deployment with guardrails</td>
+                <td>Vendor with BAA/DPA and zero retention</td>
+            </tr>
+            <tr>
+                <td>Fraud ML on login events</td>
+                <td>N/A</td>
+                <td>In-VPC scoring preferred</td>
+                <td>IdP-native adaptive MFA as complement</td>
+            </tr>
+            <tr>
+                <td>Research MNPI in copilots</td>
+                <td>Prohibited</td>
+                <td>Air-gapped or tenant-scoped RAG</td>
+                <td>Only with legal/compliance sign-off</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Architecture checklist</h2>
+
+    <p><strong>Identity:</strong> MFA on workforce and client; joiner/mover/leaver automation; quarterly access reviews; PAM for admins; step-up on sensitive client flows; machine identity in scope.</p>
+
+    <p><strong>Edge / API:</strong> WAF on client portal; rate limits; OAuth scope minimization for partner integrations; mTLS where custodians support it.</p>
+
+    <p><strong>Data:</strong> Classify client vs MNPI vs operational data; encryption at rest and in transit; tokenization where feasible; DLP on exfil paths.</p>
+
+    <p><strong>ML / AI:</strong> Scoped retrieval; no client data to unapproved LLMs; audit agent tool calls; monitor model drift and fraud-score distribution.</p>
+
+    <p><strong>Ops:</strong> Segmented networks; immutable backups; Reg S-P-aligned IR plan; tabletop exercises including BEC and portal ATO scenarios; vendor breach notification runbooks.</p>
+
+    <h2>Bottom line</h2>
+
+    <p>Asset manager security is layered architecture, not a product purchase. Identity is the control plane: workforce and client planes differ, hybrid IAM is the norm at scale, and frameworks (NIST, ISO, SOC 2, Reg S-P) converge on the same practical demands &mdash; know who has access, prove it, revoke it promptly, and detect abuse. AI and ML amplify both defense (adaptive MFA, UEBA, fraud scoring) and offense (deepfakes, shadow LLM use, prompt injection). The mature posture segments controls by data class and action sensitivity, documents data flows, and treats third-party IdP, IGA, CRM, and AI vendors as part of the attack surface.</p>
+
+    <div class="highlight-box">
+        <p><strong>Architecture principles</strong></p>
+        <ul>
+            <li><strong>Identity is the control plane</strong> &mdash; workforce and client identity are separate designs.</li>
+            <li><strong>Hybrid is the default</strong> &mdash; AD + cloud IdP + IGA, not rip-and-replace.</li>
+            <li><strong>Process backs technology on wires</strong> &mdash; BEC and deepfakes defeat MFA alone.</li>
+            <li><strong>Frameworks map to IAM controls</strong> &mdash; SOC 2 evidences what NIST/ISO require.</li>
+            <li><strong>AI inherits data classification</strong> &mdash; RAG scope and agent credentials follow MNPI rules.</li>
+            <li><strong>Vendors are in scope</strong> &mdash; Okta, Salesforce, SailPoint, cloud AI APIs are third-party risk.</li>
+        </ul>
+    </div>
+
+    <h2>Sources</h2>
+
+    <ul>
+        <li><a href="https://www.sec.gov/rules-regulations/2024/05/amendments-regulation-s-p" target="_blank" rel="noopener noreferrer">SEC &mdash; Amendments to Regulation S-P (May 2024)</a></li>
+        <li><a href="https://www.nist.gov/cyberframework" target="_blank" rel="noopener noreferrer">NIST Cybersecurity Framework</a></li>
+        <li><a href="https://csrc.nist.gov/publications/detail/sp/800-63/4/final" target="_blank" rel="noopener noreferrer">NIST SP 800-63-4 Digital Identity Guidelines</a></li>
+        <li><a href="https://www.cisecurity.org/controls" target="_blank" rel="noopener noreferrer">CIS Critical Security Controls</a></li>
+        <li><a href="https://developer.okta.com/docs/guides/step-up-authentication/main/" target="_blank" rel="noopener noreferrer">Okta &mdash; Step-up authentication (OIDC acr_values)</a></li>
+        <li><a href="https://www.sec.gov/enforcement-litigation" target="_blank" rel="noopener noreferrer">SEC enforcement actions (search: investment adviser cybersecurity)</a></li>
+        <li><a href="/blog/deepseek-enterprise-security-analysis">Prior post &mdash; Third-party AI vendor risk (DeepSeek enterprise analysis)</a></li>
+    </ul>
+
+    <p><em>#AssetManagement #CyberSecurity #IAM #IdentityManagement #FinancialServices #InfoSec #AIGovernance #RegTech #SOC2</em></p>
+</div>
