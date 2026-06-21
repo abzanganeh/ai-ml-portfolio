@@ -11,6 +11,11 @@ BLOG_POSTS_DATA = [
         'featured': False,
         'content_file': 'asset-manager-security-reference-guide.html',
         'image_url': '/static/images/blog/asset-manager-security-reference-guide.png',
+        'read_time': 20,
+        'created_at': datetime.now() - timedelta(days=1)
+    },
+    {
+        'id': 'asset-manager-security-architecture',
         'slug': 'asset-manager-security-architecture',
         'title': 'The Quiet War on Asset Managers: AI, Deepfakes, and the Coming Quantum Reckoning',
         'excerpt': 'Asset managers are not just fighting yesterday\'s threats. AI has handed attackers capabilities that scale infinitely. Quantum computing is on the horizon. This is the story of what is actually changing, and what the financial industry needs to do before the window closes.',
