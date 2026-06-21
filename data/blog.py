@@ -46,7 +46,7 @@ BLOG_POSTS_DATA = [
         'excerpt': 'When I first started learning machine learning, gradient descent was one of those concepts that seemed intimidating. Everyone talked about it like it was this magical thing that made models work, but nobody really explained what it actually does.',
         'category': 'Machine Learning',
         'tags': ['gradient descent', 'optimization', 'machine learning', 'algorithms', 'neural networks'],
-        'featured': True,
+        'featured': False,
         'content_file': 'gradient-descent-explained.html',
         'image_url': '/static/images/blog/gradient-descent.png',
         'read_time': 8,
