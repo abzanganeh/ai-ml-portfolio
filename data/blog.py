@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 BLOG_POSTS_DATA = [
     {
@@ -25,7 +25,7 @@ BLOG_POSTS_DATA = [
         'content_file': 'asset-manager-security-architecture.html',
         'image_url': '/static/images/blog/asset-manager-security-architecture.png',
         'read_time': 18,
-        'created_at': datetime.now()
+        'created_at': datetime(2026, 6, 20)
     },
     {
         'id': 'deepseek-enterprise-security-analysis',
@@ -38,7 +38,7 @@ BLOG_POSTS_DATA = [
         'content_file': 'deepseek-enterprise-security-analysis.html',
         'image_url': '/static/images/blog/deepseek-enterprise-security-analysis.png',
         'read_time': 14,
-        'created_at': datetime.now()
+        'created_at': datetime(2026, 6, 17)
     },
     {
         'id': 'gradient-descent-explained',
@@ -50,7 +50,7 @@ BLOG_POSTS_DATA = [
         'content_file': 'gradient-descent-explained.html',
         'image_url': '/static/images/blog/gradient-descent.png',
         'read_time': 8,
-        'created_at': datetime.now()
+        'created_at': datetime(2025, 10, 5)
     },
     {
         'id': 'transformer-architecture',
@@ -61,6 +61,7 @@ BLOG_POSTS_DATA = [
         'featured': False,
         'content_file': 'transformer-architecture.html',
         'image_url': '/static/images/blog/transformer-architecture.png',
-        'created_at': datetime.now() - timedelta(days=30)  # About a month ago
+        'read_time': 5,
+        'created_at': datetime(2025, 8, 26)
     }
 ]
