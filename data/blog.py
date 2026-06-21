@@ -12,7 +12,7 @@ BLOG_POSTS_DATA = [
         'content_file': 'asset-manager-security-reference-guide.html',
         'image_url': '/static/images/blog/asset-manager-security-reference-guide.png',
         'read_time': 20,
-        'created_at': datetime.now() - timedelta(days=1)
+        'created_at': datetime(2025, 11, 15)
     },
     {
         'id': 'asset-manager-security-architecture',
