@@ -23,7 +23,7 @@ BLOG_POSTS_DATA = [
         'tags': ['asset management', 'cybersecurity', 'ai threats', 'quantum computing', 'deepfakes', 'financial security', 'identity', 'iam'],
         'featured': True,
         'content_file': 'asset-manager-security-architecture.html',
-        'image_url': '/static/images/blog/default_image.png',
+        'image_url': '/static/images/blog/asset-manager-security-architecture.png',
         'read_time': 18,
         'created_at': datetime.now()
     },
