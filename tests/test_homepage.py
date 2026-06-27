@@ -9,7 +9,7 @@ class TestHomepage:
         page.goto(base_url)
         
         # Check page loads with the actual title from your app.py
-        expect(page).to_have_title("Alireza Barzin Zanganeh - ML/Data Science Portfolio")
+        expect(page).to_have_title("Ali Barzin — IAM Architect · AI/ML for Identity")
         
         # Check main navigation exists
         expect(page.locator("nav, .navbar, .navigation")).to_be_visible()
@@ -22,8 +22,9 @@ class TestHomepage:
         expect(page.locator(".hero")).to_be_visible()
         expect(page.locator("h1.hero-title")).to_contain_text("Hi, I'm Alireza")
         expect(page.locator("h1.hero-title")).to_contain_text("I build AI systems that work in the real world")
+        expect(page.locator(".hero-subtitle")).to_contain_text("IAM Architect")
         expect(page.locator(".hero-subtitle")).to_contain_text("LLM applications, RAG pipelines, agentic AI")
-        expect(page.locator(".hero-description")).to_contain_text("production-grade ML systems, not prototypes")
+        expect(page.locator(".hero-description")).to_contain_text("production-grade identity platforms and ML systems, not prototypes")
         
         # Check hero action buttons
         expect(page.locator('.hero-actions a[href="/projects/"]')).to_be_visible()

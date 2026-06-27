@@ -654,7 +654,7 @@ def internal_error(error):
 def inject_globals():
     """Inject global variables into all templates"""
     return {
-        'site_title': 'Alireza Barzin Zanganeh - ML/Data Science Portfolio',
+        'site_title': 'Ali Barzin — IAM Architect · AI/ML for Identity',
         'current_year': datetime.now().year,
         'social_links': {
             'linkedin': 'https://linkedin.com/in/alireza-barzin-zanganeh-2a9909126',
