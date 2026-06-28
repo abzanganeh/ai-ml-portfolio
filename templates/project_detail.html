@@ -18,7 +18,7 @@
                     {% if project.status %}
                     <span class="project-status">{{ project.status }}</span>
                     {% endif %}
-                    {% if project.duration_months %}
+                    {% if project.show_duration_in_meta %}
                     <span class="project-duration">{{ project.duration_months }} months</span>
                     {% endif %}
                 </div>
@@ -102,23 +102,25 @@
             {% endif %}
 
             <!-- Project Stats -->
+            {% if project.show_team_size_stat or project.show_duration_stat %}
             <div class="content-section">
-                <h3><i class="fas fa-users"></i> Project Stats</h3>
+                <h3><i class="fas fa-chart-bar"></i> Project Stats</h3>
                 <div class="stats-grid">
-                    {% if project.team_size %}
+                    {% if project.show_team_size_stat %}
                     <div class="stat-item">
-                        <div class="stat-value">{{ project.team_size }}</div>
-                        <div class="stat-label">Team {% if project.team_size == 1 %}Member{% else %}Members{% endif %}</div>
+                        <div class="stat-value">{{ project.team_size_display }}</div>
+                        <div class="stat-label">{{ project.team_size_label }}</div>
                     </div>
                     {% endif %}
-                    {% if project.duration_months %}
+                    {% if project.show_duration_stat %}
                     <div class="stat-item">
-                        <div class="stat-value">{{ project.duration_months }}</div>
-                        <div class="stat-label">{% if project.duration_months == 1 %}Month{% else %}Months{% endif %}</div>
+                        <div class="stat-value">{{ project.duration_display }}</div>
+                        <div class="stat-label">{{ project.duration_label }}</div>
                     </div>
                     {% endif %}
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 

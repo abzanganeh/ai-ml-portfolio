@@ -5,7 +5,19 @@ import json
 # Use the same db instance as tutorials
 from models.tutorial import db
 
-DISABLED_CODE_PROJECTS: set[str] = {"titanic-survival"}
+DISABLED_CODE_PROJECTS: set[str] = {
+    "titanic-survival",
+    "asar",
+    "rai",
+    "trust-mobile",
+}
+
+# Pre-commercial identity work — non-disclosing stats on the detail page.
+PRIVATE_PORTFOLIO_PROJECTS: set[str] = {
+    "asar",
+    "rai",
+    "trust-mobile",
+}
 
 class Project(db.Model):
     __tablename__ = 'projects'
@@ -85,7 +97,53 @@ class Project(db.Model):
     @property
     def has_code_repository(self) -> bool:
         return bool(self.github_url) and not self.code_repository_disabled
-    
+
+    @property
+    def show_team_size_stat(self) -> bool:
+        return self.name in PRIVATE_PORTFOLIO_PROJECTS or self.team_size is not None
+
+    @property
+    def team_size_display(self) -> str | None:
+        if self.name in PRIVATE_PORTFOLIO_PROJECTS:
+            return "N/A"
+        if self.team_size is None:
+            return None
+        return str(self.team_size)
+
+    @property
+    def team_size_label(self) -> str:
+        if self.name in PRIVATE_PORTFOLIO_PROJECTS:
+            return "Team"
+        if self.team_size == 1:
+            return "Team Member"
+        return "Team Members"
+
+    @property
+    def show_duration_in_meta(self) -> bool:
+        if self.name in PRIVATE_PORTFOLIO_PROJECTS:
+            return False
+        return bool(self.duration_months)
+
+    @property
+    def show_duration_stat(self) -> bool:
+        return self.duration_display is not None
+
+    @property
+    def duration_display(self) -> str | None:
+        if self.name in PRIVATE_PORTFOLIO_PROJECTS:
+            return "Ongoing"
+        if self.duration_months is None:
+            return None
+        return str(self.duration_months)
+
+    @property
+    def duration_label(self) -> str:
+        if self.name in PRIVATE_PORTFOLIO_PROJECTS:
+            return "Duration"
+        if self.duration_months == 1:
+            return "Month"
+        return "Months"
+
     def to_dict(self):
         """Convert project to dictionary"""
         return {

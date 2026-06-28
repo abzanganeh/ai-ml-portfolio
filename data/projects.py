@@ -32,18 +32,138 @@ PROJECT_TEMPLATE = {
     'template_path': None,            # e.g. 'projects/<name>/index.html'
     # ---- metadata --------------------------------------------------------
     'status': 'Completed',  # 'Completed' | 'Ongoing'
-    'duration_months': 1,
-    'team_size': 1,
+    'duration_months': 1,  # None on private pre-commercial projects → detail page shows Ongoing
+    'team_size': 1,  # None on private pre-commercial projects → detail page shows N/A (see PRIVATE_PORTFOLIO_PROJECTS)
 }
 
 PROJECTS_DATA = [
     # -----------------------------------------------------------------------
-    # 1. Flint
+    # 1. Asar — Identity Platform (private)
+    # -----------------------------------------------------------------------
+    {
+        'name': 'asar',
+        'title': 'Asar — Identity Platform',
+        'description': 'Go-based identity and access management platform for enterprise authentication flows. Provides OAuth2/OIDC/SAML protocol surfaces, MFA orchestration, device trust and fingerprinting, session and token lifecycle, and hardened credential handling — designed as a modular IdP foundation for workforce and client identity.',
+        'category': 'Identity & Security',
+        'technology_stack': [
+            'Go', 'TypeScript', 'React', 'OAuth2', 'OpenID Connect', 'SAML', 'JWT', 'JWKS',
+            'WebAuthn', 'MFA', 'RBAC', 'Microservices', 'REST/OpenAPI',
+            'Argon2id', 'Device Trust', 'Anomaly Scoring',
+        ],
+        'challenges': [
+            'Designing a multi-protocol IdP foundation (OAuth2/OIDC/SAML) with consistent token and session semantics',
+            'Integrating device fingerprinting and trust signals into authentication and step-up decisions',
+            'Shipping a TypeScript browser SDK and React admin surfaces alongside Go IdP services',
+            'Building secure credential storage with modern password hashing and account lockout policies',
+            'Orchestrating MFA routes across push, inline, and fallback factors without weakening assurance',
+            'Publishing discovery documents, JWKS rotation, and internal token issuance for service-to-service trust',
+            'Structuring microservices for fingerprint collection, matching, and risk scoring with clear API boundaries',
+        ],
+        'results': {
+            'protocols': 'OAuth2, OpenID Connect, SAML, JWKS',
+            'assurance': 'MFA orchestration, device trust, anomaly scoring',
+            'security': 'Argon2id credentials, RBAC, hardened login flows',
+            'architecture': 'Modular IdP microservices with OpenAPI contracts',
+            'release_stage': 'Pre-commercial (private)',
+        },
+        'github_url': None,
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'status': 'Ongoing',
+        'image_url': '/static/images/projects/asar-hero.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': None,
+        'team_size': None,
+    },
+    # -----------------------------------------------------------------------
+    # 2. Rai — Agentic AI for Identity (private)
+    # -----------------------------------------------------------------------
+    {
+        'name': 'rai',
+        'title': 'Rai — Agentic AI for Identity',
+        'description': 'Production-oriented agentic AI service for identity, assurance, and admin workflows. Combines domain-specialist agents, RBAC-scoped tools, retrieval-augmented generation, and fail-closed safety gates — including step-up authentication, citation enforcement, and versioned prompts — to augment identity platforms through HTTP adapters.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Python', 'FastAPI', 'LangChain', 'FAISS', 'RAG',
+            'OpenAI', 'Groq', 'Kubernetes', 'Helm',
+            'OAuth2', 'MFA', 'Eval Harnesses', 'CI/CD',
+        ],
+        'challenges': [
+            'Grounding agent responses in identity context without treating user content as system instructions',
+            'Enforcing fail-closed assurance: step-up MFA, tenant isolation, and audit trails on tool execution',
+            'Designing RBAC-scoped tools so agents can only act within the caller\'s authorized identity scope',
+            'Building eval harnesses and CI release gates for LLM behavior in security-critical workflows',
+            'Integrating with identity gateways via trusted headers and same-origin proxy patterns',
+            'Versioning prompts and measuring regression across golden eval cases before production release',
+        ],
+        'results': {
+            'architecture': 'Domain-specialist agents with tool-calling and structured action flows',
+            'safety': 'Fail-closed gates, step-up auth, citation enforcement',
+            'retrieval': 'RAG pipeline with versioned prompts',
+            'quality': 'Golden eval suites with CI-gated releases',
+            'integration': 'HTTP adapters for identity and admin platforms',
+            'release_stage': 'Pre-commercial (private)',
+        },
+        'github_url': None,
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'status': 'Ongoing',
+        'image_url': '/static/images/projects/rai-hero.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': None,
+        'team_size': None,
+    },
+    # -----------------------------------------------------------------------
+    # 3. TrustMobile — Mobile Authenticator (private)
+    # -----------------------------------------------------------------------
+    {
+        'name': 'trust-mobile',
+        'title': 'TrustMobile — Mobile Authenticator',
+        'description': 'Cross-platform Flutter mobile authenticator for enterprise MFA and device-bound identity. Supports EC P-256 device key generation, push and inline MFA approval flows, offline TOTP, secure pairing with backend identity services, and release hardening including TLS pinning — extending workforce authentication to mobile endpoints.',
+        'category': 'Identity & Security',
+        'technology_stack': [
+            'Flutter', 'Dart', 'EC P-256', 'TOTP', 'Push MFA',
+            'TLS Pinning', 'Mobile Crypto', 'REST APIs',
+            'OAuth2', 'Device Pairing', 'Offline MFA',
+        ],
+        'challenges': [
+            'Generating and protecting device-bound cryptographic keys on iOS and Android',
+            'Implementing secure device pairing and refresh flows with backend identity services',
+            'Delivering push and inline MFA experiences with clear user trust signals',
+            'Supporting offline TOTP when network connectivity is unavailable',
+            'Applying TLS pinning and release hardening for enterprise mobile deployment',
+            'Keeping mobile client behavior aligned with IdP token and session policies',
+        ],
+        'results': {
+            'platforms': 'Cross-platform Flutter (iOS & Android)',
+            'crypto': 'EC P-256 device keys, secure pairing',
+            'mfa_modes': 'Push, inline approval, offline TOTP',
+            'security': 'TLS pinning and mobile release hardening',
+            'integration': 'Pairs with enterprise IdP and workforce identity APIs',
+            'release_stage': 'Pre-commercial (private)',
+        },
+        'github_url': None,
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'status': 'Ongoing',
+        'image_url': '/static/images/projects/trust-mobile-hero.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': None,
+        'team_size': None,
+    },
+    # -----------------------------------------------------------------------
+    # 4. Flint
     # -----------------------------------------------------------------------
     {
         'name': 'flint',
-        'title': 'Flint — Interview Co-Pilot',
-        'description': 'Real-time AI co-pilot desktop app for live conversations and job interviews. Captures system audio, transcribes locally with Whisper and RNNoise, and fires parallel LLM guidance threads in a stealth overlay that is invisible to screen-share capture. RAG over session context via sqlite-vec keeps answers grounded in your own experience.',
+        'title': 'Flint — Live Meeting Co-Pilot',
+        'description': 'Real-time AI co-pilot desktop app for high-stakes live conversations — client consulting calls, discovery meetings, negotiations, and other professional dialogue where you need private, in-the-moment guidance. Captures remote participant audio from the call, transcribes locally with Whisper and RNNoise, and fires parallel directional, depth, and clarifying LLM threads in a stealth overlay invisible to screen-share. RAG over session context via sqlite-vec keeps guidance grounded in your brief, notes, and domain material. Phase 1 ships the job-interview domain (mock sessions, rehearsal, preferred answers) as the first vertical.',
         'category': 'AI/LLM',
         'technology_stack': [
             'Rust', 'Tokio', 'Tauri 2', 'React 18', 'TypeScript', 'Tailwind CSS',
@@ -51,15 +171,17 @@ PROJECTS_DATA = [
             'Groq', 'Ollama', 'Supabase',
         ],
         'challenges': [
-            'Capturing system audio without touching the microphone to isolate interviewer speech',
+            'Capturing system audio without touching the microphone to isolate the remote participant in live calls',
             'Running Whisper transcription and RNNoise suppression in real time with sub-second latency',
             'Firing parallel directional, depth, and clarifying LLM threads per detected question without blocking the UI',
             'Building a stealth overlay with Tauri that stays on top, is transparent, and is excluded from screen-capture APIs',
             'Local RAG over session context using sqlite-vec and bge-small-en-v1.5 embeddings fully on device',
+            'Designing a domain-agnostic conversation engine whose first shipped vertical is job interviews',
             'Graceful failover from Groq cloud inference to a local Ollama model when the network is unavailable',
             'Storing API keys only in the OS keychain — never in config files or environment variables',
         ],
         'results': {
+            'product_scope': 'Live meeting co-pilot for consulting and professional calls; Phase 1 = interview vertical',
             'transcription': 'Local Whisper — zero audio leaves the device',
             'inference': 'Groq cloud with Ollama fallback; sub-second P95 response time',
             'context_store': 'sqlite-vec + bge-small-en-v1.5 — fully on-device RAG',
@@ -72,7 +194,7 @@ PROJECTS_DATA = [
         'featured': True,
         'published': True,
         'status': 'Ongoing',
-        'image_url': '/static/images/projects/flint-hero.png',
+        'image_url': '/static/images/projects/flint-hero-meeting.png',
         'has_dedicated_template': False,
         'template_path': None,
         'duration_months': 2,
