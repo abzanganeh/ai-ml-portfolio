@@ -2,6 +2,19 @@ from datetime import datetime
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'wire-fraud-deepfake-controls',
+        'slug': 'wire-fraud-deepfake-controls',
+        'title': 'When the CFO on the Call Wasn\'t Real: Wire Fraud Controls That Survive Deepfakes',
+        'excerpt': 'After Hong Kong, the industry split: buy deepfake detection, or ask why a video call counted as authorization. Wire fraud after AI is an authorization design problem — dual control, out-of-band verification, step-up at the action, and custodian holds that hold when every channel is fake.',
+        'category': 'Artificial Intelligence',
+        'tags': ['wire fraud', 'deepfakes', 'bec', 'asset management', 'iam', 'cybersecurity', 'financial services', 'separation of duties'],
+        'featured': False,
+        'content_file': 'wire-fraud-deepfake-controls.html',
+        'image_url': '/static/images/blog/wire-fraud-deepfake-controls.png',
+        'read_time': 12,
+        'created_at': datetime(2026, 6, 21)
+    },
+    {
         'id': 'asset-manager-security-reference-guide',
         'slug': 'asset-manager-security-reference-guide',
         'title': 'Asset Manager Security: Reference Architecture, IAM, Frameworks, and AI Risk',
