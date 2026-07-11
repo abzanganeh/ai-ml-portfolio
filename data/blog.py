@@ -2,6 +2,19 @@ from datetime import datetime
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'api-action-boundaries',
+        'slug': 'api-action-boundaries',
+        'title': 'When the Caller Is an Agent: Action Boundaries for AI-Driven Backends',
+        'excerpt': 'A confident model output is not admission to mutate Tier‑1 state. How to design action boundaries when callers are humans or agents — proposal vs admission, risk gates, idempotency, sync vs async, and fail-closed assurance.',
+        'category': 'Artificial Intelligence',
+        'tags': ['agentic ai', 'system design', 'api design', 'backend', 'idempotency', 'risk gate', 'distributed systems', 'staff engineer', 'ml'],
+        'featured': False,
+        'content_file': 'api-action-boundaries.html',
+        'image_url': '/static/images/blog/api-action-boundaries.png',
+        'read_time': 13,
+        'created_at': datetime(2026, 7, 10)
+    },
+    {
         'id': 'wire-fraud-deepfake-controls',
         'slug': 'wire-fraud-deepfake-controls',
         'title': 'When the CFO on the Call Wasn\'t Real: Wire Fraud Controls That Survive Deepfakes',

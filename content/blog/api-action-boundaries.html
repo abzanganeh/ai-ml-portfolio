@@ -1,0 +1,208 @@
+<div class="blog-post-content">
+
+    <p>In the previous post I argued that wire fraud after deepfakes is not primarily a detection problem. It is an authorization design problem: the meeting was treated as the approval. The same failure is now showing up in a new place &mdash; not only in human workflows, but in systems where an AI agent can propose the next privileged action.</p>
+
+    <p>A model drafts a tool call. A workflow engine retries. A RAG agent chains three API mutations before a human notices. From the product&rsquo;s point of view it can look like &ldquo;AI assistance.&rdquo; From the backend&rsquo;s point of view it is a high-frequency caller that never gets tired, never feels urgency the way a person does, and will happily replay a side effect if your contract allows it.</p>
+
+    <p>This post is about that shift. Not another model-vendor risk survey &mdash; that is in <a href="/blog/deepseek-enterprise-security-analysis">DeepSeek and enterprise AI</a>. Not another threat landscape piece &mdash; that is in <a href="/blog/asset-manager-security-architecture">The Quiet War</a> and <a href="/blog/wire-fraud-deepfake-controls">wire fraud controls</a>. Here the focus is architecture: how to design <strong>action boundaries</strong> so that a valid session, a valid API key, or a confident model output is never mistaken for permission to mutate Tier‑1 state.</p>
+
+    <h2>AI did not invent unsafe writes &mdash; it scaled them</h2>
+
+    <p>Backend teams have always had dangerous endpoints: booking confirmation, listing publish, payout instruction change, admin override. Humans hit them through UIs. Integrations hit them through batch jobs. The control problem was already real.</p>
+
+    <p>What changed is the caller profile. An LLM-backed agent can:</p>
+
+    <ul>
+        <li>Propose mutations faster than a human operator can review them.</li>
+        <li>Retry aggressively when latency or timeouts look like failure.</li>
+        <li>Chain tools so one &ldquo;helpful&rdquo; plan becomes five writes across services.</li>
+        <li>Sound authoritative in logs and tickets even when the plan is wrong.</li>
+    </ul>
+
+    <p>That is the deepfake lesson in software form. Synthetic media broke the habit of treating a conversation as authorization. Agents break the habit of treating a successful model step as admission to change production state.</p>
+
+    <p>If your platform is adding copilots, auto-triage, or tool-calling workflows &mdash; and most serious SaaS platforms are &mdash; the write path has to assume the caller may be automated. Staff-level backend design is how you keep correctness when intelligence is no longer only on the human side of the request.</p>
+
+    <h2>The unit of safety is still the action, not the session</h2>
+
+    <p>Most API stacks authenticate at the edge and authorize with a coarse check: valid JWT, correct tenant, role includes <code>write</code>. Necessary. Not sufficient for customer-facing transaction systems &mdash; and especially not sufficient when the subject is an agent acting on behalf of a user.</p>
+
+    <p>A session answers: <em>who is calling?</em><br />
+    A role or scope answers: <em>are they generally allowed to touch this resource class?</em><br />
+    A model score answers: <em>how confident is the plan?</em><br />
+    An action boundary answers: <em>is this specific mutation allowed right now, with this payload, under these invariants, and what happens if we try it twice?</em></p>
+
+    <p>Those are different questions. Conflating them is how you get a session that authenticated cleanly at 9&nbsp;a.m. and mutated irreversible state at 2&nbsp;p.m. because a tool call &ldquo;looked right&rdquo; &mdash; the same way a finance employee authorized a transfer because the CFO &ldquo;looked right&rdquo; on video.</p>
+
+    <h2>Four layers that keep getting mixed up</h2>
+
+    <p>When teams say &ldquo;we secured the AI feature,&rdquo; they often mean only the first two layers:</p>
+
+    <ul>
+        <li><strong>Authentication</strong> &mdash; proof of identity for this request (user token, service identity, signed device JWT).</li>
+        <li><strong>Authorization</strong> &mdash; policy over resources and roles (RBAC, scopes, tenant isolation).</li>
+        <li><strong>Model / risk judgment</strong> &mdash; retrieval grounding, policy prompts, fraud or anomaly scores, allow/monitor/challenge/block.</li>
+        <li><strong>Action admission</strong> &mdash; whether this business command may proceed: schema validation, invariants, idempotency, step-up, rate limits, and side-effect contracts.</li>
+    </ul>
+
+    <p>Login MFA and gateway JWT checks sit in the first layer. Tenant middleware sits in the second. Guardrails and risk models sit in the third. Marketplace posting, booking, beneficiary changes, and privileged agent tools fail in production when the fourth layer is missing.</p>
+
+    <p>A strong model does not replace admission. A weak model does not excuse skipping it. The backend owns the write.</p>
+
+    <h2>A concrete flow: agent proposes, system admits</h2>
+
+    <p>Take a generic high-stakes write: something other parties will rely on &mdash; a listing, a booking request, a standing instruction update. Whether a human clicked Submit or an agent emitted a tool call, the HTTP shape can look the same:</p>
+
+    <pre><code>POST /v1/resources/{id}/mutations
+Idempotency-Key: &lt;client-or-agent-generated-uuid&gt;
+Authorization: Bearer &lt;access-token&gt;
+X-Actor-Type: agent   # or user / service
+
+{
+  "type": "UPDATE_DESTINATION",
+  "payload": { ... },
+  "proposed_by": "copilot",
+  "confidence": 0.81
+}</code></pre>
+
+    <p>What should happen before any durable side effect?</p>
+
+    <ol>
+        <li><strong>Authenticate</strong> the caller and bind the request to a tenant and subject.</li>
+        <li><strong>Authorize</strong> that this subject may propose this mutation type on this resource &mdash; including whether agents are allowed at all for this action class.</li>
+        <li><strong>Separate proposal from admission</strong> &mdash; treat model output as a <em>proposal</em>, never as a committed decision.</li>
+        <li><strong>Score risk</strong> if you have signals: device, velocity, amount, destination novelty, retrieval citations, historical abuse. Map to allow / monitor / challenge / block.</li>
+        <li><strong>Validate</strong> the payload against a versioned schema &mdash; reject unknown fields for sensitive commands. Tool schemas are API contracts.</li>
+        <li><strong>Check invariants</strong> in the system of record: resource state, ownership, cooling periods, dual-control requirements, velocity limits.</li>
+        <li><strong>Admit, reject, or challenge</strong> with a stable decision. Challenge may mean step-up MFA for the human principal behind the agent.</li>
+        <li><strong>Record the decision</strong> with an audit trail that includes actor type, proposal source, and reason codes &mdash; independent of the model&rsquo;s narrative.</li>
+        <li><strong>Emit work</strong> only after admission &mdash; sync response for the decision, async for fan-out.</li>
+    </ol>
+
+    <p>Steps 1&ndash;2 are identity. Step 4 is where AI/ML earns its keep on the write path. Steps 5&ndash;9 are classical backend architecture. Most &ldquo;AI incidents&rdquo; that look like model failures are actually missing steps 3 and 7: the system executed the proposal.</p>
+
+    <h2>Risk at the boundary, not vibes in the prompt</h2>
+
+    <p>Prompt instructions like &ldquo;do not call dangerous tools&rdquo; are useful. They are not a control plane.</p>
+
+    <p>Production systems need a gate that turns signals into a decision before mutation:</p>
+
+    <ul>
+        <li><strong>allow</strong> &mdash; proceed to invariant checks and admission.</li>
+        <li><strong>monitor</strong> &mdash; proceed, but elevate logging and review.</li>
+        <li><strong>challenge</strong> &mdash; require step-up or human confirmation before admission.</li>
+        <li><strong>block</strong> &mdash; reject; do not write.</li>
+    </ul>
+
+    <p>This is the same shape as adaptive authentication, applied to <em>actions</em> instead of only to login. It is also where ML belongs in a serious backend: not as a replacement for invariants, but as a ranked input to the gate. Rule floors catch obvious cases (blocked country, unknown payee, agent forbidden on this action class). Models catch subtler velocity and behavior patterns. Threshold changes should roll out report-only first &mdash; log what would have happened before blocking real users or agents.</p>
+
+    <p>I spend a lot of engineering time on this layer in identity and agentic systems: evaluate at the action boundary, step up before execution, scope any elevation to that operation alone, and fail closed when step-up cannot complete. The channel may be a human UI or a tool call. The design requirement does not change.</p>
+
+    <h2>Idempotency is mandatory when agents retry</h2>
+
+    <p>Humans double-click. Agents double-call. Orchestrators replay nodes. Load balancers retry after the server already committed. If your mutation endpoint is not idempotent, you do not have a Tier‑1 API &mdash; you have a raffle with a smarter player.</p>
+
+    <p>An action boundary should treat the <code>Idempotency-Key</code> (or a natural business key) as part of admission:</p>
+
+    <ul>
+        <li>Same key + same body &rarr; return the original decision.</li>
+        <li>Same key + different body &rarr; conflict, do not silently apply the second body.</li>
+        <li>New key &rarr; new admission attempt, subject to risk and invariants.</li>
+    </ul>
+
+    <p>Store the admission record before fan-out. If the process crashes after commit and before the response, the retry must find the same decision. That is how you keep correctness when both the network and the agent lie about what already happened.</p>
+
+    <p>This is also where event-driven systems start. Once you admit a mutation, downstream consumers will see the event at least once. If admission was not idempotent, every consumer inherits the bug &mdash; and an agent may have created the duplicate in the first place. That is the next article in this series.</p>
+
+    <h2>Sync decision, async consequences</h2>
+
+    <p>A common design mistake &mdash; worse with agents &mdash; is to do everything in the request thread: write primary state, call three tools, publish to Kafka, send email, update search, then return 200. Under load or partial failure, that path becomes a latency and consistency trap. Under agent load, it becomes a thundering herd.</p>
+
+    <p>A cleaner split:</p>
+
+    <ul>
+        <li><strong>Sync path</strong> &mdash; authenticate, authorize, risk-gate, validate, check invariants, admit, persist decision + primary state needed for user-visible truth, return a clear status (including <code>challenge</code>).</li>
+        <li><strong>Async path</strong> &mdash; notifications, projections, analytics, partner webhooks, search indexing, secondary agent follow-ups.</li>
+    </ul>
+
+    <p>The sync path owns <em>what is true for the product right now</em>. The async path owns <em>who else needs to know</em>. When those blur, on-call spends nights deciding whether a 500 means &ldquo;nothing happened&rdquo; or &ldquo;the agent half-finished a plan.&rdquo;</p>
+
+    <p>For Tier‑1 flows, prefer: admit durably, respond with the decision, process side effects with workers that can retry safely. That is not anti-AI. It is how you make AI features operable.</p>
+
+    <h2>Fail closed when assurance cannot complete</h2>
+
+    <p>When step-up is required and the MFA service is down, what should the mutation do? When the risk service times out? When the idempotency store is unreachable?</p>
+
+    <p>For read-mostly copilots, degraded answers may be acceptable. For money movement, booking confirmation, or irreversible marketplace state, fail-open is a product decision disguised as resilience &mdash; and agents will find it faster than humans will.</p>
+
+    <p>Default for sensitive mutations: <strong>fail closed</strong>. Return a challenge or a retryable 503. Log the reason code. Do not apply the write because &ldquo;the model was confident&rdquo; or &ldquo;auth usually works.&rdquo; Unavailable assurance means the privileged action does not execute.</p>
+
+    <h2>Tool schemas are API contracts</h2>
+
+    <p>At staff level, the action boundary is also how teams scale AI features without inventing a new unsafe write every sprint.</p>
+
+    <ul>
+        <li><strong>Version the command</strong>, not only the URL. <code>type: UPDATE_DESTINATION@v2</code> beats silent field meaning changes &mdash; models will invent fields if you let them.</li>
+        <li><strong>Constrain tool JSON schemas</strong> the same way you constrain public APIs. Extra properties on sensitive commands should fail closed.</li>
+        <li><strong>Document error classes</strong>: validation vs authz vs risk-block vs invariant vs conflict vs challenge.</li>
+        <li><strong>Publish examples</strong> of idempotent retries and challenge/resume flows for agent runtimes.</li>
+        <li><strong>Keep OpenAPI honest</strong> &mdash; if a handler accepts free-form model output that changes money movement, the contract is lying.</li>
+    </ul>
+
+    <p>Mentorship here is concrete: teach engineers to put new AI capabilities behind an existing admission pattern instead of a one-off <code>POST /agent-do-the-thing</code>.</p>
+
+    <h2>What this looks like in a design review</h2>
+
+    <p>When I review a Tier‑1 write path &mdash; especially one reachable from an agent &mdash; I ask:</p>
+
+    <ol>
+        <li>Is model output treated as proposal or as decision?</li>
+        <li>What is the exact command being admitted, and is the schema versioned?</li>
+        <li>Can agents call this action class at all? Under what scopes?</li>
+        <li>What risk signals feed allow / monitor / challenge / block?</li>
+        <li>What is the idempotency key, and where is it stored?</li>
+        <li>Which invariants are checked before commit?</li>
+        <li>What is sync vs async after admission?</li>
+        <li>What happens on duplicate delivery of the request and of the downstream event?</li>
+        <li>What do we do when a dependency required for assurance or risk is unavailable?</li>
+        <li>How does an operator reconstruct who/what proposed and who/what admitted, from logs alone?</li>
+    </ol>
+
+    <p>If those answers are vague, the system will eventually answer them in an incident channel &mdash; after an agent has already moved faster than your runbook.</p>
+
+    <h2>Back to the wire fraud lesson</h2>
+
+    <p>Deepfakes made one informal habit untenable: treating a conversation as authorization. Agents make another untenable: treating a fluent plan as admission to mutate.</p>
+
+    <p>The fix is the same shape. Put the control in the architecture. Separate who is calling from what may happen next. Use ML as a ranked input to the gate, not as a substitute for invariants. Make the decision durable, auditable, and safe under retry. Fail closed when assurance cannot complete.</p>
+
+    <p>That is how you move from &ldquo;we added a copilot&rdquo; to &ldquo;we can operate an AI-touched, customer-facing transaction system.&rdquo;</p>
+
+    <div class="highlight-box">
+        <p><strong>The core argument</strong></p>
+        <ul>
+            <li><strong>Agents scale unsafe writes</strong> &mdash; retries, tool chains, and speed make weak admission fail faster.</li>
+            <li><strong>Proposal &ne; admission</strong> &mdash; model output is an input to the gate, not a commit.</li>
+            <li><strong>Four layers</strong> &mdash; authn, authz, risk judgment, and action admission; AI lives in risk, backend owns admission.</li>
+            <li><strong>Idempotency is mandatory</strong> &mdash; agent retries make duplicate side effects a design issue, not an edge case.</li>
+            <li><strong>Sync decides, async fans out</strong> &mdash; keep user-visible truth on the durable admission path.</li>
+            <li><strong>Fail closed on sensitive writes</strong> &mdash; unavailable assurance or risk should block the mutation.</li>
+            <li><strong>Tool schemas are contracts</strong> &mdash; versioned commands beat free-form model writes.</li>
+        </ul>
+    </div>
+
+    <h2>What comes next</h2>
+
+    <p>Once a mutation is admitted &mdash; whether proposed by a human or an agent &mdash; the rest of the platform usually learns about it through events. At-least-once delivery is the default. The next post in this series will cover how to design consumers so duplicate events do not create duplicate bookings, duplicate wires, or duplicate marketplace state &mdash; especially when agents amplify retries.</p>
+
+    <h2>Further reading</h2>
+
+    <ul>
+        <li><a href="/blog/wire-fraud-deepfake-controls">Prior post &mdash; Wire fraud controls that survive deepfakes (authorization as design)</a></li>
+        <li><a href="/blog/asset-manager-security-architecture">The Quiet War on Asset Managers &mdash; AI offense and identity as control plane</a></li>
+        <li><a href="/blog/deepseek-enterprise-security-analysis">DeepSeek and U.S. enterprise AI &mdash; vendor path vs self-hosted risk</a></li>
+        <li><a href="/blog/asset-manager-security-reference-guide">Reference guide &mdash; IAM architecture and decision matrices</a></li>
+    </ul>
+
+    <p><em>#AIEngineering #SystemDesign #AgenticAI #BackendEngineering #APIDesign #DistributedSystems #Idempotency #StaffEngineer #IAM #MLOps</em></p>
+</div>
