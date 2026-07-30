@@ -1,0 +1,137 @@
+<div class="blog-post-content">
+
+    <p>Every post in this series comes back to the same idea: <strong>correctness and trust are architectural properties, enforced at boundaries and contracts &mdash; not by hoping the happy path holds.</strong> So far that idea has shown up as an authorization problem (a call is not consent) and an admission problem (a confident model output is not permission to mutate state). This post moves one layer downstream, to the point most teams stop paying attention: what happens after a mutation is admitted and turns into an event on a bus.</p>
+
+    <p>The last post ended with a promise: once a mutation is admitted &mdash; by a human or an agent &mdash; the rest of the platform learns about it through events, and events arrive <strong>at least once</strong>. This post is about what that guarantee actually costs you, and who is really responsible for paying it &mdash; the backend engineer who owns the consumer, and the quality function that has to prove it&rsquo;s correct before it ships.</p>
+
+    <p>The honest answer is uncomfortable for two different roles at once. Backend engineers want to believe the broker will sort it out. Quality engineering wants to believe duplicate-delivery is an infrastructure edge case, not something on the test plan. Neither is true. <strong>At-least-once is not a bug in your Kafka cluster. It is the default physics of any distributed system, and it is a correctness requirement that has to be verified, not assumed.</strong></p>
+
+    <h2>&ldquo;Exactly-once&rdquo; is a broker myth, not a system property</h2>
+
+    <p>Vendors advertise exactly-once semantics. What they actually deliver is exactly-once <em>delivery</em> between specific hops, under specific configuration, if nothing crashes at the wrong instant. The moment a consumer commits a database write and then crashes before committing its offset, the broker will redeliver &mdash; correctly, by design. The moment a producer retries after a timeout that was really just a slow acknowledgment, two copies of the same event exist &mdash; correctly, by design.</p>
+
+    <p>None of that is a defect in Kafka, MSK, SQS, or any other broker. It is what &ldquo;at least once&rdquo; means. The system did its job. The question is whether <strong>your consumer</strong> did its job when the same event showed up twice.</p>
+
+    <p>That is not an infrastructure question. It is a design question, and increasingly it is a <strong>quality gate</strong> question: can you prove, before release, that reprocessing a booking-confirmed event, a payout-updated event, or a claim-approved event does not create a second booking, a second payout, or a second claim?</p>
+
+    <h2>Where duplicates actually come from</h2>
+
+    <ul>
+        <li><strong>Producer retries.</strong> A publish call times out after the broker already accepted it; the client retries and the same logical event is written twice.</li>
+        <li><strong>Consumer crash between processing and committing.</strong> The side effect happened. The offset commit did not. Redelivery is now guaranteed.</li>
+        <li><strong>Rebalances.</strong> A partition moves between consumers mid-batch; both the old and new owner may process overlapping messages.</li>
+        <li><strong>Upstream admission retries.</strong> If the action boundary from the previous post is not idempotent, one client retry can itself emit two distinct admitted events, not just one event delivered twice.</li>
+        <li><strong>Agent-driven retries.</strong> An orchestrator or agent that treats a timeout as failure will resubmit the entire plan, fanning a single intended action into several duplicate downstream events.</li>
+    </ul>
+
+    <p>Four of these five sources are unrelated to your business logic. They will happen regardless of how careful your team is. That is exactly why the fix cannot live in &ldquo;be more careful&rdquo; &mdash; it has to live in the consumer contract, and it has to be something you can test on purpose.</p>
+
+    <h2>The pattern: dedupe key, durable decision, fail closed on ambiguity</h2>
+
+    <p>This is the same shape as the action-boundary pattern from the previous post, applied to consumption instead of admission.</p>
+
+    <pre><code>consumer.on('BookingConfirmed', async (event) => {
+  const seen = await store.getProcessedRecord(event.dedupeKey);
+  if (seen && seen.eventHash === hash(event)) {
+    return ack();               // already applied, safe no-op
+  }
+  if (seen && seen.eventHash !== hash(event)) {
+    await quarantine(event);    // same key, different payload — do not guess
+    return ack();
+  }
+
+  await db.transaction(async (tx) => {
+    await applySideEffect(tx, event);
+    await store.recordProcessed(tx, event.dedupeKey, hash(event));
+  });
+  ack();
+});</code></pre>
+
+    <ol>
+        <li><strong>Dedupe key first.</strong> Use the event&rsquo;s natural business key (booking ID, payout instruction ID) or an explicit event ID &mdash; never &ldquo;whatever arrived on the topic just now.&rdquo;</li>
+        <li><strong>Check before you act, record inside the same transaction you act in.</strong> If the side effect and the dedupe record are not committed together, a crash between them recreates the exact race you were trying to close.</li>
+        <li><strong>Same key, different payload is a conflict, not a coin flip.</strong> Quarantine it and alert. Silently picking one version is how audit trails stop matching reality.</li>
+        <li><strong>Ack only after the decision is durable.</strong> An early ack that later fails to persist is how &ldquo;processed&rdquo; and &ldquo;actually applied&rdquo; drift apart.</li>
+    </ol>
+
+    <p>The outbox pattern is the producer-side mirror of this: write the event to an outbox row in the same transaction as the state change, then have a separate relay publish it. That way the event you emit is never orphaned from the state it describes &mdash; you cannot commit the booking and lose the notification, or publish the notification and roll back the booking.</p>
+
+    <h2>Consumer lag versus event age &mdash; the metric teams get backwards</h2>
+
+    <p>Dashboards default to consumer lag: how many messages are sitting unread. That number is useful for capacity planning and nearly useless for correctness or customer impact. A healthy consumer processing 50,000 messages a minute can show &ldquo;high lag&rdquo; during a burst and be completely fine. A stalled consumer with only 40 messages of lag can be sitting on an event that is now six hours old and blocking a customer-visible confirmation.</p>
+
+    <p><strong>Event age</strong> &mdash; how old is the oldest unprocessed message &mdash; is the metric that maps to what a customer actually experiences. Alert on age crossing an SLO threshold (&ldquo;booking confirmations must reflect within 30 seconds&rdquo;), not on lag count crossing an arbitrary number. This distinction is exactly the kind of thing that separates a dashboard that looks healthy from a system that is healthy &mdash; the same gap that shows up in a defect density report that counts issues without weighting them by what a customer would actually notice.</p>
+
+    <h2>Why this is a quality engineering problem, not only an ops problem</h2>
+
+    <p>Here is the part that gets skipped in most system-design writeups: duplicate-event handling is discovered in production far more often than it is caught in a test suite, because most test suites verify the happy path &mdash; one event, once, correctly processed &mdash; and stop there.</p>
+
+    <p>That is a coverage gap with a name: <strong>the test plan is testing delivery, not the contract.</strong> &ldquo;This consumer processes a BookingConfirmed event correctly&rdquo; is not the requirement. The requirement is &ldquo;this consumer processes a BookingConfirmed event correctly <em>the first time, and produces the identical outcome every time after that.</em>&rdquo; If duplicate delivery is not a journey-level test case, you have not tested the actual contract &mdash; you have tested a convenient subset of it.</p>
+
+    <p>Concretely, a shift-left quality gate for an event-driven mutation should require, before merge:</p>
+
+    <ul>
+        <li><strong>Replay tests</strong> &mdash; deliver the same event twice (identical payload) and assert the side effect and downstream state are identical to a single delivery, not merely &ldquo;no error thrown.&rdquo;</li>
+        <li><strong>Conflict tests</strong> &mdash; deliver the same dedupe key with a different payload and assert it is quarantined, not silently overwritten.</li>
+        <li><strong>Out-of-order tests</strong> &mdash; deliver two related events in reverse order and assert the consumer does not assume ordering the broker never promised.</li>
+        <li><strong>Crash-window tests</strong> &mdash; kill the consumer between side effect and offset commit (or between side effect and dedupe record) and assert recovery reproduces the same outcome, not a partial one.</li>
+    </ul>
+
+    <p>None of these require exotic tooling. They require treating duplication as a first-class scenario in the same automation-first pipeline that already gates schema validation and contract tests &mdash; the same severity-weighted discipline that catches a P1 defect before it reaches ten releases, applied one layer earlier, to the event contract instead of only the API contract.</p>
+
+    <h2>Agentic pipelines inherit the same problem they are supposed to catch</h2>
+
+    <p>This gets sharper, not softer, once AI enters the test pipeline itself. Agentic test generation &mdash; a model proposing test cases, executing them, retrying on flaky failures, and reporting results &mdash; is subject to the exact same at-least-once physics as the production system it is testing. An orchestrator that retries a flaky test step can re-trigger a side effect (a seeded event, a test-environment mutation) without the human or the dashboard noticing that &ldquo;one test run&rdquo; actually fired the event twice.</p>
+
+    <p>If your quality engineering pipeline uses agentic generation or execution and it is not itself idempotent, you have built a system that is unreliable in exactly the dimension it exists to verify. The fix is the same pattern again: give every generated test run a dedupe key, make the environment-seeding step idempotent, and treat &ldquo;the agent retried&rdquo; as an expected event, not an anomaly to investigate case by case. Trustworthy AI-native quality engineering is not &ldquo;let the model run tests faster.&rdquo; It is applying the same architectural discipline &mdash; durable decisions, dedupe keys, fail-closed on ambiguity &mdash; to the thing generating and running the tests, not only to the thing being tested.</p>
+
+    <h2>Fail closed on ambiguity, here too</h2>
+
+    <p>The previous post argued that sensitive mutations should fail closed when assurance cannot complete. The consumer side has the same requirement in a quieter form: when the dedupe store is unreachable, do not guess. Do not process-and-hope. Nack and retry, or route to a dead-letter queue for manual review. An event silently applied twice because the dedupe check timed out is the same category of failure as a mutation admitted because the risk service timed out &mdash; convenient in the moment, expensive in the incident review.</p>
+
+    <p>A dead-letter queue is not a failure state to be embarrassed about. It is the honest alternative to guessing, and it is one of the clearest signals in a design review that a team has actually thought about what happens when the happy path does not hold.</p>
+
+    <h2>Design and quality review checklist</h2>
+
+    <p>For any consumer of a business-critical event stream, I want clear answers to:</p>
+
+    <ol>
+        <li>What is the dedupe key, and is it a natural business key or an invented one that can collide?</li>
+        <li>Is the dedupe check and the side effect committed in the same transaction?</li>
+        <li>What happens on same-key-different-payload &mdash; quarantine, or silent overwrite?</li>
+        <li>Is replay tested as a first-class scenario, or only implied by &ldquo;the code looks idempotent&rdquo;?</li>
+        <li>Does the alerting threshold use event age, or only raw consumer lag?</li>
+        <li>What does the consumer do when the dedupe store itself is unavailable?</li>
+        <li>If AI/agentic tooling generates or executes tests against this consumer, is that tooling&rsquo;s own retry behavior idempotent?</li>
+        <li>Can an operator reconstruct, from logs alone, whether a given customer-visible outcome came from a first delivery or a deduped replay?</li>
+    </ol>
+
+    <p>If the answer to more than one of these is &ldquo;we assume the broker handles it,&rdquo; the gap will surface as a support ticket about a duplicate charge or a double-booked slot, not as a finding in a code review.</p>
+
+    <div class="highlight-box">
+        <p><strong>The core argument</strong></p>
+        <ul>
+            <li><strong>At-least-once is the default, not a broker failure</strong> &mdash; producer retries, consumer crashes, rebalances, and agent retries all create duplicates by design.</li>
+            <li><strong>Idempotency is a consumer contract</strong> &mdash; dedupe key check and side effect must commit together, or the same race reappears after a crash.</li>
+            <li><strong>Same key, different payload is a conflict</strong> &mdash; quarantine it; never silently pick a version.</li>
+            <li><strong>Event age, not raw lag, maps to customer impact</strong> &mdash; alert on staleness against an SLO, not an arbitrary backlog count.</li>
+            <li><strong>Duplication is a test scenario, not an ops footnote</strong> &mdash; replay, conflict, out-of-order, and crash-window tests belong in the same gate as contract tests.</li>
+            <li><strong>Agentic test pipelines are not exempt</strong> &mdash; a retrying test agent needs the same dedupe discipline as the production system it verifies.</li>
+            <li><strong>Fail closed on ambiguity</strong> &mdash; an unreachable dedupe store should route to a DLQ, not to a guess.</li>
+        </ul>
+    </div>
+
+    <h2>What comes next</h2>
+
+    <p>Idempotent consumption keeps one event from becoming two side effects. It does not, by itself, tell you whether the <em>write path</em> that produced the event was designed correctly for a Tier‑1, customer-facing marketplace &mdash; sync versus async boundaries, partial-failure semantics, and what &ldquo;correct&rdquo; even means when three services disagree about the current state. That end-to-end design is the next post in this series.</p>
+
+    <h2>Further reading</h2>
+
+    <ul>
+        <li><a href="/blog/api-action-boundaries">Prior post &mdash; Action boundaries for AI-driven backends (proposal versus admission)</a></li>
+        <li><a href="/blog/wire-fraud-deepfake-controls">Wire fraud controls that survive deepfakes (authorization as design)</a></li>
+        <li><a href="/blog/asset-manager-security-architecture">The Quiet War on Asset Managers &mdash; identity as control plane</a></li>
+    </ul>
+
+    <p><em>#SystemDesign #EventDrivenArchitecture #Idempotency #QualityEngineering #AgenticAI #DistributedSystems #Kafka #StaffEngineer #TestAutomation #ShiftLeft</em></p>
+</div>

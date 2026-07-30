@@ -2,6 +2,32 @@ from datetime import datetime
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'quality-engineering-center-of-excellence',
+        'slug': 'quality-engineering-center-of-excellence',
+        'title': 'Quality Is an Architecture Decision, Not a Headcount Decision',
+        'excerpt': 'Unweighted defect counts are noise. Why severity-weighted defect density, automation-first CI/CD gates, and design-time SDET practice are the same discipline whether it runs inside one team or scales into an organization-wide Quality Engineering Center of Excellence.',
+        'category': 'Artificial Intelligence',
+        'tags': ['quality engineering', 'sdet', 'test automation', 'shift left', 'ci/cd', 'engineering leadership', 'agentic ai', 'staff engineer'],
+        'featured': False,
+        'content_file': 'quality-engineering-center-of-excellence.html',
+        'image_url': '/static/images/blog/quality-engineering-center-of-excellence.png',
+        'read_time': 12,
+        'created_at': datetime(2026, 7, 31)
+    },
+    {
+        'id': 'at-least-once-idempotent-consumers',
+        'slug': 'at-least-once-idempotent-consumers',
+        'title': 'At-Least-Once Is the Default: Designing for Duplicate Events Without Lying to Users',
+        'excerpt': 'Exactly-once delivery is a broker myth, not a system property. Why idempotent consumers, dedupe keys, and fail-closed handling are a design and quality-gate requirement — and why agentic test pipelines inherit the same duplicate-event risk they exist to catch.',
+        'category': 'Artificial Intelligence',
+        'tags': ['event-driven architecture', 'idempotency', 'kafka', 'quality engineering', 'agentic ai', 'distributed systems', 'staff engineer', 'test automation'],
+        'featured': False,
+        'content_file': 'at-least-once-idempotent-consumers.html',
+        'image_url': '/static/images/blog/at-least-once-idempotent-consumers.png',
+        'read_time': 12,
+        'created_at': datetime(2026, 7, 30)
+    },
+    {
         'id': 'api-action-boundaries',
         'slug': 'api-action-boundaries',
         'title': 'When the Caller Is an Agent: Action Boundaries for AI-Driven Backends',
