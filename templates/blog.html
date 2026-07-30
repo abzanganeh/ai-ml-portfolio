@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}ML Blog - {{ site_title }}{% endblock %}
+{% block title %}Engineering Blog - {{ site_title }}{% endblock %}
 
-{% block meta_description %}Explore the latest insights in Machine Learning and Data Science. In-depth articles, tutorials, and industry analysis by Alireza Barzin Zanganeh.{% endblock %}
+{% block meta_description %}Articles on software architecture, cybersecurity, identity, quality engineering, and AI — by Alireza Barzin Zanganeh.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/blog.css') }}">
@@ -13,9 +13,9 @@
 <section class="blog-hero">
     <div class="container">
         <div class="blog-hero-content">
-            <h1 class="hero-title">ML Blog</h1>
+            <h1 class="hero-title">Engineering Blog</h1>
             <p class="hero-subtitle">
-                Insights, tutorials, and deep dives into the world of Machine Learning and Data Science
+                Software architecture, security, quality engineering, and AI — design notes from production systems
             </p>
             
             <!-- Search Bar -->
@@ -86,9 +86,9 @@
         <div class="filter-controls">
             <h3>Browse by Category</h3>
             <div class="category-filters">
-                <button class="filter-btn active" data-category="all">All Articles</button>
+                <button class="filter-btn {% if not selected_category %}active{% endif %}" data-category="all">All Articles</button>
                 {% for category in categories %}
-                <button class="filter-btn" data-category="{{ category }}">{{ category }}</button>
+                <button class="filter-btn {% if selected_category == category %}active{% endif %}" data-category="{{ category }}">{{ category }}</button>
                 {% endfor %}
             </div>
         </div>

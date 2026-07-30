@@ -431,9 +431,11 @@ def ml_swe_interview_prep_chapter(chapter_num):
 @app.route('/blog')
 def blog():
     """Blog listing page"""
+    from data.blog import get_blog_categories
+
     blog_posts = load_blog_data()
     published_posts = [p for p in blog_posts if p.published]
-    categories = list(set(p.category for p in published_posts))
+    categories = get_blog_categories(blog_posts)
     featured_posts = [p for p in published_posts if p.featured]
     recent_posts = sorted(published_posts, key=lambda x: x.created_at, reverse=True)
     
@@ -458,9 +460,24 @@ def blog_post(slug):
 
 @app.route('/blog/category/<category>')
 def blog_category(category):
+    from data.blog import get_blog_categories
+
     blog_posts = load_blog_data()
-    filtered_posts = [p for p in blog_posts if p.category == category and p.published]
-    return render_template('blog.html', posts=filtered_posts, selected_category=category)
+    published_posts = [p for p in blog_posts if p.published]
+    filtered_posts = [p for p in published_posts if p.category == category]
+    if not filtered_posts:
+        return render_template('404.html'), 404
+
+    categories = get_blog_categories(blog_posts)
+    featured_posts = [p for p in published_posts if p.featured]
+
+    return render_template(
+        'blog.html',
+        posts=sorted(filtered_posts, key=lambda x: x.created_at, reverse=True),
+        featured_posts=featured_posts,
+        categories=categories,
+        selected_category=category,
+    )
 
 @app.route('/skills')
 def skills():
