@@ -45,7 +45,7 @@ BLOG_POSTS_DATA = [
         'content_file': 'at-least-once-idempotent-consumers.html',
         'image_url': '/static/images/blog/at-least-once-idempotent-consumers.png',
         'read_time': 12,
-        'created_at': datetime(2026, 7, 30)
+        'created_at': datetime(2026, 7, 23)
     },
     {
         'id': 'api-action-boundaries',
