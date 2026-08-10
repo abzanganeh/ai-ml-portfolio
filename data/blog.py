@@ -22,6 +22,19 @@ def get_blog_categories(posts):
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'tier-1-mutation-end-to-end-design',
+        'slug': 'tier-1-mutation-end-to-end-design',
+        'title': 'When Three Services Disagree: What Correct Means on a Tier-1 Write Path',
+        'excerpt': 'Two services were each individually correct, and the gap between them became the incident. Action boundaries and idempotent consumers keep single steps honest — not the whole journey. How to draw sync boundaries, model partial failure as state, and make a shared partial-failure vocabulary a Center of Excellence artifact instead of a per-team guess.',
+        'category': 'Software Architecture',
+        'tags': ['system design', 'distributed systems', 'microservices', 'marketplace', 'staff engineer', 'event-driven architecture', 'quality engineering', 'backend'],
+        'featured': False,
+        'content_file': 'tier-1-mutation-end-to-end-design.html',
+        'image_url': '/static/images/blog/tier-1-mutation-end-to-end-design.png',
+        'read_time': 15,
+        'created_at': datetime(2026, 8, 10)
+    },
+    {
         'id': 'quality-engineering-center-of-excellence',
         'slug': 'quality-engineering-center-of-excellence',
         'title': 'Quality Is an Architecture Decision, Not a Headcount Decision',

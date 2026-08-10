@@ -1,0 +1,205 @@
+<div class="blog-post-content">
+
+    <p>Every post in this series comes back to the same idea: <strong>correctness and trust are architectural properties, enforced at boundaries and contracts &mdash; not by hoping the happy path holds.</strong> The last three posts applied that at three specific points: action admission when the caller is human or agent; idempotent consumption when events arrive at least once; and a quality function that makes those patterns the default instead of one team&rsquo;s habit. This post asks what happens when all three are in place on individual steps, but the <em>write path itself</em> still crosses three services &mdash; and they disagree about what is true right now.</p>
+
+    <p>That is the shape of a Tier‑1, customer-facing mutation: a load booked on a freight marketplace, a claim approved on an insurance platform, a payout initiated on a payment rail. Not a CRUD update on one table. A coordinated change where inventory, payment, notification, audit, and search may each live in a different service, and the customer expects one answer when they refresh the screen.</p>
+
+    <p>The failure mode is not always &ldquo;the API returned 500.&rdquo; It is often: <strong>the customer saw success, two services agree, and a third never caught up &mdash; or caught up twice.</strong> That is a design problem. It is also the problem staff backend engineers and quality leaders share: define what &ldquo;correct&rdquo; means before on-call defines it in an incident channel.</p>
+
+    <p>Here is what that looks like at 2 a.m. A broker gets a text: <em>load booked, carrier assigned.</em> The booking service is telling the truth &mdash; it admitted the mutation, wrote the row, returned <code>confirmed</code>. Forty minutes later the carrier calls, confused, because they were never dispatched. The executor that assigns carriers crashed after the booking&rsquo;s outbox row was written but before the relay published it. Nobody lied. Nobody&rsquo;s code has a bug in the classic sense. Two systems were each, individually, correct &mdash; and the gap between them became the incident. That gap is what this post is about, and it does not show up in a single service&rsquo;s test suite, because no single service was wrong.</p>
+
+    <h2>Correct is not the same as done</h2>
+
+    <p>Teams conflate three different states:</p>
+
+    <ul>
+        <li><strong>Requested</strong> &mdash; the client or agent sent a mutation; admission may not have finished.</li>
+        <li><strong>Admitted</strong> &mdash; the system of record accepted the change; durable decision exists.</li>
+        <li><strong>Done (customer-visible)</strong> &mdash; every dependency the product promises is satisfied, or the product honestly shows a pending state.</li>
+    </ul>
+
+    <p>On a Tier‑1 path, &ldquo;done&rdquo; is a product contract, not a HTTP status code. Returning 200 before admission is lying. Returning 200 after admission but before async fan-out completes is fine &mdash; if the UI says <em>pending</em>. Returning 200 and showing <em>confirmed</em> while a downstream service is still unknown is how duplicate bookings and stranded payouts happen.</p>
+
+    <p>The design job is to name, per mutation type, which state the sync response represents and which work is explicitly async. That boundary was introduced in the action-boundaries post as &ldquo;sync decides, async fans out.&rdquo; Here the question is sharper: <strong>what is the single source of truth for customer-visible truth, and who is allowed to disagree with it temporarily?</strong></p>
+
+    <h2>When three services disagree</h2>
+
+    <p>Consider a simplified marketplace booking (freight load matched, slot reserved, broker notified) or an insurance payment path (claim approved, disbursement queued, policyholder notified). Three common participants:</p>
+
+    <ol>
+        <li><strong>System of record</strong> &mdash; owns the mutation decision (booking row, claim status).</li>
+        <li><strong>Downstream executor</strong> &mdash; payment capture, carrier assignment, print-and-mail check.</li>
+        <li><strong>Projection / notify</strong> &mdash; email, mobile push, search index, partner webhook.</li>
+    </ol>
+
+    <p>After a successful sync admission, any of these can fail independently:</p>
+
+    <ul>
+        <li>Record admitted; executor never invoked (crash between commit and outbox relay).</li>
+        <li>Record admitted; executor succeeded; notification failed (customer thinks nothing happened).</li>
+        <li>Executor succeeded twice (retry without idempotency); record shows one booking, ledger shows two holds.</li>
+        <li>Executor still running; UI polled too early and showed failure (customer retries, creating a second admission attempt).</li>
+    </ul>
+
+    <p>None of these are fixed by &ldquo;use Kafka&rdquo; or &ldquo;use sagas&rdquo; as labels. They are fixed by deciding, for each failure, whether the customer should see <strong>confirmed</strong>, <strong>pending</strong>, or <strong>failed</strong> &mdash; and whether operators can reconstruct which service is authoritative from logs alone.</p>
+
+    <h2>Draw the sync boundary first</h2>
+
+    <p>Before partitioning services, draw one line: <strong>what must be true before the sync response returns.</strong></p>
+
+    <p>For a Tier‑1 mutation, the sync path usually includes:</p>
+
+    <ul>
+        <li>Authentication, authorization, and action admission (proposal &ne; permission).</li>
+        <li>Invariant checks in the system of record (capacity, balance, policy state, cooling period).</li>
+        <li>Durable write of the decision and the primary state the product will show as truth.</li>
+        <li>Outbox row (or equivalent) for every async side effect that must eventually happen.</li>
+        <li>A response that matches the durable state: <code>confirmed</code>, <code>pending_review</code>, <code>challenge_required</code>, or <code>rejected</code> &mdash; never ambiguous success.</li>
+    </ul>
+
+    <p>Everything after that line is async by definition: notifications, analytics, search, partner feeds, secondary agent follow-ups. If the product needs the customer to see &ldquo;confirmed&rdquo; only after payment clears, then payment clearance belongs <em>above</em> the line &mdash; or the product must show &ldquo;pending payment&rdquo; until it does. Pretending payment is async while the UI says &ldquo;booked&rdquo; is a correctness bug dressed as latency optimization.</p>
+
+    <h2>Partial failure is a state, not an exception</h2>
+
+    <p>Most runbooks treat partial failure as rare. On distributed write paths it is normal. Design for explicit states:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>State</th>
+                <th>Meaning</th>
+                <th>Customer should see</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Admitted, fan-out pending</strong></td>
+                <td>Decision durable; outbox not yet delivered</td>
+                <td>Confirmed or pending (per product contract)</td>
+            </tr>
+            <tr>
+                <td><strong>Admitted, executor failed</strong></td>
+                <td>Truth in SoR; downstream stuck or dead-lettered</td>
+                <td>Pending with honest copy, or failed with support path</td>
+            </tr>
+            <tr>
+                <td><strong>Admitted, executor succeeded, notify failed</strong></td>
+                <td>Business outcome achieved; customer not informed</td>
+                <td>Confirmed on refresh; retry notify from DLQ</td>
+            </tr>
+            <tr>
+                <td><strong>Conflict</strong></td>
+                <td>Two services disagree on outcome</td>
+                <td>Never silent; quarantine and alert</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>A state machine in the system of record beats implicit hope. If booking can be <code>confirmed</code>, <code>pending_carrier</code>, or <code>failed_settlement</code>, operators and UIs share vocabulary. If those states live only in scattered logs, every partial failure becomes a forensic exercise.</p>
+
+    <h2>One writer, many readers</h2>
+
+    <p>The rule that scales: <strong>one service owns the mutation decision and its lifecycle state.</strong> Other services react; they do not co-decide.</p>
+
+    <ul>
+        <li>Payment service consumes <code>BookingAdmitted</code>; it does not also write booking status.</li>
+        <li>Notification service sends email; it does not flip claim status on SMTP success.</li>
+        <li>Search projection updates index; it is rebuildable from events, not a second source of truth.</li>
+    </ul>
+
+    <p>When two services both write &ldquo;the&rdquo; status field, you will eventually have split brain &mdash; and split brain is not only a networking term anymore. It also describes the moment two of your own services each hold a confident, internally consistent, mutually exclusive answer about the same customer, and nobody wrote the tie-breaker. Reconciliation meetings are not an architecture pattern. If a downstream service must reject work (insufficient funds, carrier unavailable), it emits a compensating or failure event; the system of record transitions state. The customer sees one narrative because one place owns the narrative.</p>
+
+    <h2>Availability, correctness, latency &mdash; pick per mutation</h2>
+
+    <p>You cannot maximize all three on the same path. Tier‑1 mutations should default <strong>correctness over availability</strong> on admission: fail closed when assurance cannot complete, return retryable errors instead of ambiguous success. Latency yields to honest pending states and async fan-out.</p>
+
+    <p>Where teams get hurt is applying marketplace peak-load instincts to money or booking paths: returning 200 with a best-effort side effect because the dependency timed out. That optimizes p95 latency and externalizes correctness to support. For load-board search or analytics, degraded mode may be acceptable. For &ldquo;this load is yours&rdquo; or &ldquo;this claim is paid,&rdquo; it is not.</p>
+
+    <p>Staff-level design is naming the tradeoff per mutation class in the design doc, not per incident.</p>
+
+    <h2>Orchestration vs choreography &mdash; without the buzzword bingo</h2>
+
+    <p>Both patterns work. The choice is operational:</p>
+
+    <ul>
+        <li><strong>Choreography (events only)</strong> &mdash; system of record emits facts; consumers react idempotently. Scales well when consumers are simple and conflicts are rare. Harder to answer &ldquo;where is this booking stuck?&rdquo; without a central state view.</li>
+        <li><strong>Orchestration (explicit workflow)</strong> &mdash; a workflow engine tracks steps. Easier visibility and compensation; another system to operate and version.</li>
+    </ul>
+
+    <p>Either way, the non-negotiables from earlier posts still apply: idempotent admission at the API, outbox tied to the SoR transaction, idempotent consumers on the bus, dedupe keys on conflicts, DLQ instead of guess. Orchestration does not remove at-least-once physics; it concentrates visibility.</p>
+
+    <p>For a small staff team on a revenue path, I usually prefer: <strong>SoR state machine + outbox + idempotent consumers</strong>, add orchestration when step count, human approval gates, or compensation logic make event-only tracing painful in postmortems.</p>
+
+    <h2>What the quality gate should prove</h2>
+
+    <p>A multi-service write path is not tested by a happy-path integration test alone. Before merge on a Tier‑1 mutation, I want evidence of:</p>
+
+    <ul>
+        <li><strong>Sync boundary tests</strong> &mdash; response status and body match durable SoR state; no 200 with uncommitted decision.</li>
+        <li><strong>Partial-failure tests</strong> &mdash; executor down, notify down, dedupe store down; customer-visible state stays honest.</li>
+        <li><strong>Replay tests</strong> &mdash; same admission key and same event twice (from the idempotent-consumer post).</li>
+        <li><strong>Stale-read tests</strong> &mdash; UI or API poll immediately after pending admission; no false failure that triggers duplicate client retries.</li>
+        <li><strong>Conflict tests</strong> &mdash; downstream reports failure after admission; SoR transitions to defined failure state, not silent drift.</li>
+    </ul>
+
+    <p>This is the same automation-first discipline as the quality-engineering post, applied to the journey instead of only the endpoint. A thousand unit tests do not substitute for one test that kills the notify worker mid-flight and asserts the customer still sees <code>pending</code>, not <code>confirmed</code>.</p>
+
+    <h2>Why this is a Center of Excellence problem, not a per-team one</h2>
+
+    <p>The partial-failure table earlier in this post &mdash; admitted/pending, executor failed, notify failed, conflict &mdash; is easy to write for one team&rsquo;s booking service. The hard part, and the part that actually belongs to a quality organization rather than any single backend team, is making that vocabulary <strong>canonical across every Tier‑1 mutation in the company</strong>, so &ldquo;pending&rdquo; means the same thing in claims as it does in payouts as it does in bookings, and every team&rsquo;s design review gets asked the same ten questions instead of whichever ones the reviewer happened to remember.</p>
+
+    <p>That is precisely the shape of the Center of Excellence argument from the previous post: not owning every test, but owning the standard that makes &ldquo;we&rsquo;ll figure it out in ops&rdquo; an answer that fails a design review instead of one that quietly ships. A severity-weighted defect metric tells you a release is risky. A shared partial-failure taxonomy and a required journey-test suite are what stop the risky release from shipping in the first place, on a write path where the customer-visible cost of guessing wrong is a support ticket, a chargeback, or a regulator&rsquo;s question about why a claim payment silently duplicated.</p>
+
+    <h2>Agents make stuck states worse, faster</h2>
+
+    <p>When the caller is an agent, partial failure patterns accelerate. An agent treats timeout as failure and resubmits admission. A tool chain invokes payment before booking admission durably exists. A copilot reads stale search projection and proposes a mutation against outdated capacity.</p>
+
+    <p>The fixes are the same architecture, tightened: proposal vs admission, idempotency keys on every tool call, sync boundary that returns explicit pending/challenge states, and projections labeled as non-authoritative in agent context. An agent should not be given tools that mutate Tier‑1 state without the same gates a human UI would enforce &mdash; and should not interpret async projection lag as &ldquo;available to book.&rdquo;</p>
+
+    <h2>Design review checklist</h2>
+
+    <p>For any Tier‑1 mutation that crosses services:</p>
+
+    <ol>
+        <li>What is the system of record, and what lifecycle states does it expose?</li>
+        <li>What exactly does the sync response mean &mdash; admitted, done, or pending?</li>
+        <li>Which side effects are above the sync line vs in the outbox?</li>
+        <li>What happens when executor succeeds but notify fails? When notify succeeds but executor failed?</li>
+        <li>Who is allowed to write status besides the SoR?</li>
+        <li>How does a client or agent retry without creating a second admission?</li>
+        <li>How does an operator answer &ldquo;where is this stuck?&rdquo; from logs and metrics alone?</li>
+        <li>What does the UI show during each partial-failure state &mdash; honestly?</li>
+        <li>Are replay, partial-failure, and stale-read scenarios in the merge gate?</li>
+        <li>If an agent calls this path, are tools scoped and schemas versioned like public APIs?</li>
+    </ol>
+
+    <p>If more than one answer is &ldquo;we&rsquo;ll figure it out in ops,&rdquo; the gap will surface as a customer who was told they booked a load, a carrier who was never assigned, and a broker dashboard that shows green.</p>
+
+    <div class="highlight-box">
+        <p><strong>The core argument</strong></p>
+        <ul>
+            <li><strong>Correct &ne; done</strong> &mdash; name requested, admitted, and customer-visible done as separate states.</li>
+            <li><strong>One system of record</strong> &mdash; one writer for mutation lifecycle; others react idempotently.</li>
+            <li><strong>Draw the sync boundary</strong> &mdash; everything the UI promises as true must be true above the line, or the UI must say pending.</li>
+            <li><strong>Partial failure is normal</strong> &mdash; model it as states, not surprises.</li>
+            <li><strong>Correctness over availability</strong> on Tier‑1 admission; latency yields to honest pending.</li>
+            <li><strong>Quality gates test journeys</strong> &mdash; partial failure, replay, and stale reads, not only happy path.</li>
+            <li><strong>Partial-failure vocabulary is a CoE artifact</strong> &mdash; canonical across teams, not reinvented per service.</li>
+            <li><strong>Agents amplify stuck and duplicate states</strong> &mdash; same boundaries, tighter tool contracts.</li>
+        </ul>
+    </div>
+
+    <h2>What comes next</h2>
+
+    <p>End-to-end design tells you what should be true. It does not, by itself, tell you whether the running system is meeting that contract under load &mdash; which SLOs to set, which dashboards distinguish healthy lag from customer-visible staleness, and which incidents should drive architectural change instead of runbook patches. That operational layer is the next post in this series.</p>
+
+    <h2>Further reading</h2>
+
+    <ul>
+        <li><a href="/blog/quality-engineering-center-of-excellence">Prior post &mdash; Quality as architecture, not headcount</a></li>
+        <li><a href="/blog/at-least-once-idempotent-consumers">At-least-once delivery and idempotent consumers</a></li>
+        <li><a href="/blog/api-action-boundaries">Action boundaries for AI-driven backends (proposal versus admission)</a></li>
+    </ul>
+
+    <p><em>#SystemDesign #DistributedSystems #BackendEngineering #Microservices #StaffEngineer #EventDrivenArchitecture #QualityEngineering #Marketplace #SRE</em></p>
+</div>
