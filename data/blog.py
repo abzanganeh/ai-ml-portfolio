@@ -22,6 +22,19 @@ def get_blog_categories(posts):
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'slo-stale-truth-write-path',
+        'slug': 'slo-stale-truth-write-path',
+        'title': 'When Lag Looks Healthy and the Booking Is Stale',
+        'excerpt': 'Consumer lag can look fine while one booking sits for hours. After you design a Tier-1 write path across multiple services, this is how to measure it in production: what to SLO, what to put on the dashboard, what should page, and when the fix is design instead of runbook.',
+        'category': 'Software Architecture',
+        'tags': ['slo', 'sre', 'observability', 'distributed systems', 'event-driven architecture', 'quality engineering', 'staff engineer', 'backend'],
+        'featured': False,
+        'content_file': 'slo-stale-truth-write-path.html',
+        'image_url': '/static/images/blog/lag-looks-healthy-and- booking-stale.jpeg',
+        'read_time': 14,
+        'created_at': datetime(2026, 8, 27)
+    },
+    {
         'id': 'tier-1-mutation-end-to-end-design',
         'slug': 'tier-1-mutation-end-to-end-design',
         'title': 'When Three Services Disagree: What Correct Means on a Tier-1 Write Path',

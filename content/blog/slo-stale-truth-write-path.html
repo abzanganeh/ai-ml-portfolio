@@ -1,0 +1,147 @@
+<div class="blog-post-content">
+
+    <p><strong>When Lag Looks Healthy and the Booking Is Stale</strong></p>
+
+    <p>A few posts back I wrote about Tier‑1 write paths where booking can show confirmed while carrier assignment is still pending and the notification never went out. Naming those states is design work. This piece is about running the system afterward: which metrics actually tell you something is wrong, and which ones just look fine until a customer calls.</p>
+
+    <p>Most teams find out the hard way. Consumer lag looks normal. The API keeps returning 200. Nothing is down. One booking has been stuck for six hours anyway.</p>
+
+    <h2>Where this showed up</h2>
+
+    <p>A broker books a load on a freight marketplace. The UI shows confirmed. The booking service wrote the row and returned success.</p>
+
+    <p>Six hours later the carrier calls. They were never dispatched. On-call opens the monitoring board. Kafka consumer lag is forty-two messages. The chart is green.</p>
+
+    <p>Nobody was watching how old the oldest assignment event was. That message had been sitting in the queue since before breakfast. Lag told you how many messages were waiting. It did not tell you that one confirmed booking was still waiting on work that should have finished in seconds.</p>
+
+    <h2>Lag and event age</h2>
+
+    <p>Consumer lag is a capacity metric. It helps you decide whether to add consumers or whether the group is keeping up during a burst. Event age is different: how long has the oldest unprocessed message been sitting there? That one is closer to what the customer experiences when something is overdue.</p>
+
+    <p>During heavy traffic, lag can jump into the thousands while every message is still fresh. During a stall, lag can stay at forty-two while a single six-hour-old message is blocking a booking the UI already called confirmed. We have all seen the second case look &ldquo;healthy&rdquo; on the wrong chart.</p>
+
+    <p>Tier‑1 paths make this worse because they have lifecycle states: admitted, pending, confirmed, failed. Queue depth alone will not catch the case where the database is honest and the screen is not.</p>
+
+    <p>On a booking or payout path, alert on something tied to the product promise. <em>No assignment event older than thirty seconds</em> is a real SLO. <em>Lag over ten thousand</em> is usually someone else&rsquo;s threshold pasted into Grafana.</p>
+
+    <h2>SLOs worth defining</h2>
+
+    <p>You do not need twenty of these. Pick a few that map to how the mutation actually moves:</p>
+
+    <ul>
+        <li>Requested: the client sent it.</li>
+        <li>Admitted: the system of record accepted it.</li>
+        <li>Done for the customer: the UI is telling the truth, or it says pending honestly.</li>
+    </ul>
+
+    <p>Each step can drift on its own. The SLO should say which drift is bad enough to wake someone up.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Measure</th>
+                <th scope="col">Why bother</th>
+                <th scope="col">Common substitute</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Time from admission to customer-visible truth</td>
+                <td>Tells you whether confirmed, pending, or failed on screen is allowed yet</td>
+                <td>API p99 latency</td>
+            </tr>
+            <tr>
+                <td>Oldest event age on the mutation stream</td>
+                <td>Catches one overdue promise even when the queue looks busy</td>
+                <td>Total consumer lag</td>
+            </tr>
+            <tr>
+                <td>How long the UI shows pending</td>
+                <td>Pending that sits too long becomes a support call</td>
+                <td>Ticket volume</td>
+            </tr>
+            <tr>
+                <td>Conflict or quarantine rate</td>
+                <td>Two versions of the same decision are showing up</td>
+                <td>HTTP 5xx rate</td>
+            </tr>
+            <tr>
+                <td>Oldest dead-letter message</td>
+                <td>Fail-closed is turning into a pile nobody owns</td>
+                <td>DLQ count alone</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Spend error budget here, not on uptime alone. An admission API can be available 99.99% of the time and still mislead customers if confirmed on the app and admitted in the database are not the same thing.</p>
+
+    <h2>Dashboards that help at 2 a.m.</h2>
+
+    <p>Most boards I see are built for whoever runs the broker: partition count, bytes in, consumer group lag, CPU. Fine for capacity. Less useful when the question is &ldquo;where is booking 88412?&rdquo;</p>
+
+    <p>Four things worth having on one screen:</p>
+
+    <ol>
+        <li>Lifecycle for a single ID. Admitted, fan-out pending, executor failed, notify failed, conflict. Same vocabulary as the design doc. If you need a custom log query to answer that, the states never made it into operations.</li>
+        <li>Whether you are busy or stuck. Lag climbing with flat age often means burst. Age climbing with flat lag often means something is hung.</li>
+        <li>Whether the customer already saw something the database does not support. That is not a yellow warning. That is the incident.</li>
+        <li>Whether you have seen this failure class before this week. Third time is usually a design hole with a runbook taped on top.</li>
+    </ol>
+
+    <h2>Runbooks vs redesign</h2>
+
+    <p>Notification failed, booking is correct in the system of record, dead-letter queue has the email: retry the notify. That is Tuesday.</p>
+
+    <p>Redesign territory looks more like: the customer saw confirmed and the database still says pending; the same failure happened again after the postmortem; recovery needs someone in Slack to pick which service is right; the fix is another retry on a non-idempotent path.</p>
+
+    <p>Postmortems that end with &ldquo;updated runbook&rdquo; sometimes mean two services still disagree and operators just got faster at choosing a winner by hand. That is design debt, not improved operations.</p>
+
+    <h2>Paging</h2>
+
+    <p>Page too much and people mute the channel. Page too little and support becomes the sensor.</p>
+
+    <p>Age SLO breach on Tier‑1 mutations is worth a page. So is a conflict or quarantine event before a second version of truth hits a payout. So is customer-visible state diverging from the system of record, if you can detect it.</p>
+
+    <p>Dead-letter growth while age is still inside the SLO, lag during a known burst, one notify failure when the booking is already correct in the database: ticket those. Annoying work, not a 2 a.m. fire.</p>
+
+    <p>Ship a service without an age SLO and without a way to look up one booking&rsquo;s lifecycle, and you are betting on on-call to find the gap. Design review is cheaper.</p>
+
+    <h2>Shared vocabulary</h2>
+
+    <p>One team&rsquo;s pending is another team&rsquo;s confirmed, notify later. One team pages on lag, another on 5xx. You cannot run a quality program or compare error budgets when every dashboard speaks a different dialect.</p>
+
+    <p>Pending, confirmed, and failed need to mean the same thing in claims, payouts, and bookings. Someone has to own that. Teams can pick their own Grafana colors. They should not each invent their own definition of done.</p>
+
+    <h2>Agents</h2>
+
+    <p>People who hit a timeout often wait or click once. Agents tend to resubmit the whole plan. Slow consumer becomes duplicate, then conflict, then burned budget.</p>
+
+    <p>If agents can hit Tier‑1 mutation APIs, give them the same SLOs as the human UI and return pending or challenge when the backend is not done yet. An agent that only knows success and failure will keep pushing.</p>
+
+    <h2>Design review</h2>
+
+    <p>Before calling a write path done, I still ask:</p>
+
+    <ol>
+        <li>What is the age SLO in seconds from admission to customer-visible truth?</li>
+        <li>Can on-call find one booking&rsquo;s lifecycle from the dashboard?</li>
+        <li>Do we detect UI/database disagreement, or does support find it first?</li>
+        <li>Does the error budget cover silent wrong success?</li>
+        <li>How old is the oldest dead-letter message right now?</li>
+        <li>Did last month&rsquo;s incident change a contract or only a wiki page?</li>
+    </ol>
+
+    <p>Blank answers on the first two mean you have a document, not something you can operate.</p>
+
+    <p>Schema changes and cutovers on a path that already has pending states are a separate problem. SLOs tell you the live system is drifting. They do not tell you how to migrate without lying to the next customer in line.</p>
+
+    <h2>Further reading</h2>
+
+    <ul>
+        <li><a href="/blog/tier-1-mutation-end-to-end-design">When three services disagree</a></li>
+        <li><a href="/blog/at-least-once-idempotent-consumers">At-least-once delivery and idempotent consumers</a></li>
+        <li><a href="/blog/quality-engineering-center-of-excellence">Quality as architecture, not headcount</a></li>
+    </ul>
+
+    <p><em>#SystemDesign #SRE #SLOs #DistributedSystems #BackendEngineering #EventDrivenArchitecture #QualityEngineering #Observability #StaffEngineer</em></p>
+</div>
