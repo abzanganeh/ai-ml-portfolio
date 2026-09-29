@@ -1,0 +1,126 @@
+<div class="blog-post-content">
+
+    <p>The previous post ended here: schema changes and cutovers on a path that already has pending states are a separate problem. SLOs tell you the live system is drifting. They do not tell you how to migrate without lying to the next customer in line.</p>
+
+    <p>That line is about the same freight booking path as the rest of this series. You already named lifecycle states: requested, admitted, fan-out pending, confirmed, failed. You already watch event age when lag looks fine. Then engineering schedules a deploy that adds a column, splits a status enum, moves the admission check behind a new gateway rule, or starts reading permissions from a second store. Rows sit in <code>admitted</code> or <code>fan-out pending</code> while the code on the wire changes underneath them. That is when customers see confirmed on a screen the new schema does not know how to finish.</p>
+
+    <h2>A deploy window is a partial-failure window</h2>
+
+    <p>Runtime partial failure is one booking stuck for six hours. Migration partial failure is every booking that was mid-lifecycle when version N and version N+1 disagreed about what <code>confirmed</code> means.</p>
+
+    <p>Common cutover mistakes on Tier‑1 paths:</p>
+
+    <ul>
+        <li>Ship a stricter admission rule while old rows still expect the loose rule to complete fan-out.</li>
+        <li>Rename or split a status value without teaching the executor and the UI the same mapping.</li>
+        <li>Backfill a new table and flip a feature flag so reads come from the new store before writes have dual-written long enough.</li>
+        <li>Drain consumers, deploy, resume, and assume at-least-once replay will sort out mixed payload versions without an explicit version field.</li>
+    </ul>
+
+    <p>None of these show up as red on a lag chart. They show up as the next broker who refreshed after deploy and got a different answer than the one before them.</p>
+
+    <h2>Schema change while work is still in flight</h2>
+
+    <p>Relational migrations on the booking system of record are the obvious case. You add <code>assignment_correlation_id</code>, or you split <code>status</code> into <code>lifecycle_phase</code> plus <code>customer_visible_state</code>. The dangerous window is not the milliseconds of DDL. It is the hours where application instances, event consumers, and the mobile app run different assumptions about the same row.</p>
+
+    <p>Expand-contract still applies on hot paths:</p>
+
+    <ol>
+        <li><strong>Expand</strong> &mdash; add new column or enum value; writers populate both old and new; readers accept both.</li>
+        <li><strong>Migrate</strong> &mdash; backfill in-flight and historical rows; replay or reconcile events that carry only the old shape.</li>
+        <li><strong>Contract</strong> &mdash; stop writing the old shape; only then tighten readers and drop the legacy field.</li>
+    </ol>
+
+    <p>Skip the migrate step while thousands of rows are <code>fan-out pending</code> and you will strand them: admitted in the database, invisible to the new executor query, still showing confirmed in a client that cached the old response.</p>
+
+    <h2>Events need a version, not hope</h2>
+
+    <p>If assignment and notification consume booking events, a schema change is really a contract change on the stream. Every message should carry a <code>schema_version</code> or a discriminant the consumer can branch on. Idempotent handlers from the earlier post are necessary but not sufficient; the handler must know which fields are authoritative for which version.</p>
+
+    <p>During cutover, prefer explicit dual consumption: v1 handler completes stragglers, v2 handler owns new admissions, with a documented handoff when the oldest v1 pending event is older than your age SLO. Turning off v1 because deploy finished is how you recreate the six-hour-old assignment event, except now it is undeployable logic instead of a stuck consumer.</p>
+
+    <h2>Cutover without splitting customer-visible truth</h2>
+
+    <p>Pick one writer for lifecycle transitions per booking ID for the duration of the change. If the system of record moves behind a new service, or the outbox relay swaps implementation, say which component may emit <code>confirmed</code> and which may only emit <code>pending</code> until parity checks pass.</p>
+
+    <p>Dual-read is acceptable for internal reconciliation. Dual-write without a single authority for what the customer sees is not. The UI should read from the same decision function the admission API used, or it should show pending until that function says otherwise. Mixing read models during deploy is the same bug as mixing services at steady state, just compressed into a maintenance window someone called low risk.</p>
+
+    <h2>IAM shows up on the write path, not only at login</h2>
+
+    <p>Identity work is easy to bucket as login screens and token issuers. On a Tier‑1 mutation, authentication is only the first gate. Admission is authorization: scopes on the token, policy at the API gateway, service-to-service claims, sometimes an impersonation or delegated-admin context. When those checks change during deploy, you get IAM-flavored partial failure without touching the booking row at all.</p>
+
+    <p>Examples in the same booking story:</p>
+
+    <ul>
+        <li>Gateway starts requiring <code>loads:book</code> while brokers still hold access tokens minted before that scope existed. AuthN succeeds; admission fails or falls through to a default deny. The client may still show the old booking form as if nothing changed.</li>
+        <li>You move from embedded role checks in the booking service to a centralized policy engine. Old instances evaluate role tables; new instances call the engine. Same user, same load, different admission outcome on retry.</li>
+        <li>Token exchange or custom claims add an org context field. Events emitted before the claim was populated fan out without it; downstream assignment rules skip the message as malformed instead of quarantining with a visible pending state.</li>
+        <li>Service accounts used by automation gain a stricter audience restriction. Night batch replays stall; morning humans see confirmed bookings with no carrier because the executor never received a valid call.</li>
+    </ul>
+
+    <p>The design move is the same as for database schema: version the policy, expand before you contract, and never let the sync response promise <code>confirmed</code> when the authorization context that admitted the mutation cannot be reproduced by the async path.</p>
+
+    <p>Fail-closed admission is correct for security. During cutover it must be paired with honest pending UX and operator tooling that shows <em>authorized but not yet propagated</em> as distinct from <em>denied</em>. Otherwise support resets passwords when the problem was a policy version skew.</p>
+
+    <h2>What to add to the dashboard for a cutover</h2>
+
+    <p>Keep the age SLOs from the last post. Add deploy-aware signals for the window:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Measure</th>
+                <th scope="col">Why bother</th>
+                <th scope="col">Common substitute</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Count of bookings per lifecycle phase, split by app version or schema version</td>
+                <td>Stragglers on old code show up before customers do</td>
+                <td>Deploy succeeded boolean</td>
+            </tr>
+            <tr>
+                <td>Admission denials above baseline, tagged by scope or policy version</td>
+                <td>Catches IAM skew separate from 5xx</td>
+                <td>Login success rate</td>
+            </tr>
+            <tr>
+                <td>Oldest pending event still on payload v1</td>
+                <td>Same as event age, scoped to contract version</td>
+                <td>Consumer lag only</td>
+            </tr>
+            <tr>
+                <td>Reconciliation diffs between UI read model and system of record</td>
+                <td>Detects silent wrong success during dual-read</td>
+                <td>Manual spot checks</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Freeze autoscaling tricks that mix old and new pods without version-aware routing if your admission rules changed. Rolling deploys are fine when contracts are backward compatible. They are painful when authorization and lifecycle enums move in the same release.</p>
+
+    <h2>Design review before you merge the migration</h2>
+
+    <ol>
+        <li>Which lifecycle states can exist across the whole cutover, and what may the customer see for each?</li>
+        <li>What is the single writer for admitting and for marking customer-visible done?</li>
+        <li>How do v1 and v2 events and API payloads coexist, and when do you turn v1 off?</li>
+        <li>Did authorization change in the same release as schema? If yes, how do in-flight tokens and service credentials behave?</li>
+        <li>What replay or backfill job runs before you contract the old shape?</li>
+        <li>What would rollback do to rows that are fan-out pending right now?</li>
+    </ol>
+
+    <p>If rollback is we restore the database and hope, you are not ready. Rollback on a Tier‑1 path is a defined behavior for in-flight bookings, not a paragraph in the runbook.</p>
+
+    <h2>Further reading</h2>
+
+    <ul>
+        <li><a href="/blog/slo-stale-truth-write-path">When lag looks healthy and the booking is stale</a></li>
+        <li><a href="/blog/tier-1-mutation-end-to-end-design">When three services disagree</a></li>
+        <li><a href="/blog/api-action-boundaries">Action boundaries for AI-driven backends</a></li>
+        <li><a href="/blog/at-least-once-idempotent-consumers">At-least-once delivery and idempotent consumers</a></li>
+    </ul>
+
+    <p><em>#SystemDesign #DistributedSystems #BackendEngineering #IAM #OAuth #EventDrivenArchitecture #SRE #QualityEngineering #StaffEngineer</em></p>
+</div>

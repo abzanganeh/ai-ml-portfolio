@@ -22,6 +22,19 @@ def get_blog_categories(posts):
 
 BLOG_POSTS_DATA = [
     {
+        'id': 'migration-without-lying-to-the-user',
+        'slug': 'migration-without-lying-to-the-user',
+        'title': 'Schema Changes and Cutovers When the Booking Is Still Pending',
+        'excerpt': 'SLOs catch drift in the system you are running. They do not tell you how to deploy schema changes, swap admission rules, or move authorization checks while bookings sit in fan-out pending — without lying to the next customer in line.',
+        'category': 'Software Architecture',
+        'tags': ['system design', 'distributed systems', 'iam', 'oauth', 'event-driven architecture', 'sre', 'quality engineering', 'staff engineer', 'backend'],
+        'featured': False,
+        'content_file': 'migration-without-lying-to-the-user.html',
+        'image_url': '/static/images/blog/tier-1-mutation-end-to-end-design.png',
+        'read_time': 13,
+        'created_at': datetime(2026, 9, 29)
+    },
+    {
         'id': 'slo-stale-truth-write-path',
         'slug': 'slo-stale-truth-write-path',
         'title': 'When Lag Looks Healthy and the Booking Is Stale',
