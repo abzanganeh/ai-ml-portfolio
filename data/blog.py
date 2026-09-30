@@ -30,7 +30,7 @@ BLOG_POSTS_DATA = [
         'tags': ['system design', 'distributed systems', 'iam', 'oauth', 'event-driven architecture', 'sre', 'quality engineering', 'staff engineer', 'backend'],
         'featured': False,
         'content_file': 'migration-without-lying-to-the-user.html',
-        'image_url': '/static/images/blog/tier-1-mutation-end-to-end-design.png',
+        'image_url': '/static/images/blog/migration-without-lying-to-the-user.png',
         'read_time': 13,
         'created_at': datetime(2026, 9, 29)
     },
