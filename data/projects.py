@@ -43,7 +43,7 @@ PROJECTS_DATA = [
     {
         'name': 'asar',
         'title': 'Asar — Identity Platform',
-        'description': 'Go-based identity and access management platform for enterprise authentication flows. Provides OAuth2/OIDC/SAML protocol surfaces, MFA orchestration, device trust and fingerprinting, session and token lifecycle, and hardened credential handling — designed as a modular IdP foundation for workforce and client identity.',
+        'description': 'Identity platform I am building for enterprise authentication: device identity, fingerprinting, risk scoring, and MFA orchestration alongside OAuth2/OIDC/SAML protocol surfaces, session and token lifecycle, and hardened credential handling — a modular IdP foundation for workforce and client identity.',
         'category': 'Identity & Security',
         'technology_stack': [
             'Go', 'TypeScript', 'React', 'OAuth2', 'OpenID Connect', 'SAML', 'JWT', 'JWKS',
@@ -158,12 +158,12 @@ PROJECTS_DATA = [
         'team_size': None,
     },
     # -----------------------------------------------------------------------
-    # 4. Flint
+    # 4. Flint Guide
     # -----------------------------------------------------------------------
     {
         'name': 'flint',
-        'title': 'Flint — Live Meeting Co-Pilot',
-        'description': 'Real-time AI co-pilot desktop app for high-stakes live conversations — client consulting calls, discovery meetings, negotiations, and other professional dialogue where you need private, in-the-moment guidance. Captures remote participant audio from the call, transcribes locally with Whisper and RNNoise, and fires parallel directional, depth, and clarifying LLM threads in a stealth overlay invisible to screen-share. RAG over session context via sqlite-vec keeps guidance grounded in your brief, notes, and domain material. Phase 1 ships the job-interview domain (mock sessions, rehearsal, preferred answers) as the first vertical.',
+        'title': 'Flint Guide',
+        'description': 'Flint Guide is a real-time AI co-pilot desktop app for high-stakes live session meetings — client consulting calls, discovery meetings, negotiations, and other professional dialogue where you need private, in-the-moment guidance. Captures remote participant audio from the call, transcribes locally with Whisper and RNNoise, and fires parallel directional, depth, and clarifying LLM threads in a stealth overlay invisible to screen-share. RAG over session context via sqlite-vec keeps guidance grounded in your brief, notes, and domain material. Phase 1 ships the job-interview domain (mock sessions, rehearsal, preferred answers) as the first vertical.',
         'category': 'AI/LLM',
         'technology_stack': [
             'Rust', 'Tokio', 'Tauri 2', 'React 18', 'TypeScript', 'Tailwind CSS',
@@ -181,7 +181,7 @@ PROJECTS_DATA = [
             'Storing API keys only in the OS keychain — never in config files or environment variables',
         ],
         'results': {
-            'product_scope': 'Live meeting co-pilot for consulting and professional calls; Phase 1 = interview vertical',
+            'product_scope': 'Flint Guide — live session co-pilot for consulting and professional calls; Phase 1 = interview vertical',
             'transcription': 'Local Whisper — zero audio leaves the device',
             'inference': 'Groq cloud with Ollama fallback; sub-second P95 response time',
             'context_store': 'sqlite-vec + bge-small-en-v1.5 — fully on-device RAG',
@@ -201,12 +201,45 @@ PROJECTS_DATA = [
         'team_size': 1,
     },
     # -----------------------------------------------------------------------
-    # 2. Smart Resume Agent
+    # 5. Flint Strike
+    # -----------------------------------------------------------------------
+    {
+        'name': 'flint-strike',
+        'title': 'Flint Strike',
+        'description': 'Unified AI/LLM research product with four public research surfaces: FlintFacts for claim research, FlintOdds for prediction-market research, FlintCast for earnings and SEC filings analysis, and FlintPulse for on-chain and listings research.',
+        'category': 'AI/LLM',
+        'technology_stack': [
+            'Python', 'FastAPI', 'LLM', 'RAG', 'Structured Research Pipelines',
+        ],
+        'challenges': [
+            'Designing distinct research workflows for claims, prediction markets, filings, and on-chain data under one product umbrella',
+            'Grounding LLM outputs in verifiable sources across heterogeneous public datasets',
+            'Keeping each research surface scoped to public data and shippable product boundaries',
+        ],
+        'results': {
+            'FlintFacts': 'Claim research',
+            'FlintOdds': 'Prediction-market research',
+            'FlintCast': 'Earnings and SEC filings research',
+            'FlintPulse': 'On-chain and listings research',
+        },
+        'github_url': None,
+        'demo_url': None,
+        'featured': True,
+        'published': True,
+        'status': 'Ongoing',
+        'image_url': '/static/images/projects/flint-hero-meeting.png',
+        'has_dedicated_template': False,
+        'template_path': None,
+        'duration_months': 1,
+        'team_size': 1,
+    },
+    # -----------------------------------------------------------------------
+    # 6. Flint Apply
     # -----------------------------------------------------------------------
     {
         'name': 'smart-resume',
-        'title': 'Smart Resume Agent',
-        'description': 'AI-powered job-search platform. Build a persistent master resume by voice (Story Mode + coached interview) or upload, tailor it to any job description through a four-phase agent pipeline, generate cover letters, check job-fit scores, search for matching listings, and track every application — all in one place.',
+        'title': 'Flint Apply',
+        'description': 'Flint Apply is an AI-powered job-search platform. Build a persistent master resume by voice (Story Mode + coached interview) or upload, tailor it to any job description through a four-phase agent pipeline, generate cover letters, check job-fit scores, search for matching listings, and track every application — all in one place. Live product at https://flintapply.com; company site at https://theflintai.com. The Flint Apply browser extension (https://github.com/FlintAI-LLC/flint-extension) captures a job description and opens it in Flint Apply.',
         'category': 'AI/LLM',
         'technology_stack': [
             'Python', 'FastAPI', 'Next.js 14', 'TypeScript', 'React',
@@ -235,7 +268,7 @@ PROJECTS_DATA = [
             'session_ttl': '24-hour tailoring sessions with persistent master resume across sessions',
         },
         'github_url': 'https://github.com/FlintAI-LLC/FLintApply',
-        'demo_url': None,
+        'demo_url': 'https://flintapply.com',
         'featured': True,
         'published': True,
         'status': 'Ongoing',

@@ -2,6 +2,54 @@ import re
 import pytest
 from playwright.sync_api import Page, expect
 
+from data.projects import PROJECTS_DATA
+
+
+def _project_by_slug(slug: str) -> dict:
+    matches = [p for p in PROJECTS_DATA if p["name"] == slug]
+    assert len(matches) == 1, f"Expected one project with slug {slug!r}, found {len(matches)}"
+    return matches[0]
+
+
+class TestProjectsData:
+    """Project seed data from data/projects.py (DB reseeds on startup)."""
+
+    def test_flint_apply_title_slug_and_links(self) -> None:
+        project = _project_by_slug("smart-resume")
+        assert project["title"] == "Flint Apply"
+        assert project["demo_url"] == "https://flintapply.com"
+        assert project["github_url"] == "https://github.com/FlintAI-LLC/FLintApply"
+        assert "flintapply.com" in project["description"]
+        assert "theflintai.com" in project["description"]
+        assert "flint-extension" in project["description"]
+
+    def test_flint_guide_title_and_no_demo(self) -> None:
+        project = _project_by_slug("flint")
+        assert project["title"] == "Flint Guide"
+        assert project["demo_url"] is None
+        assert project["github_url"] == "https://github.com/FlintAI-LLC/FlintGuide"
+        assert "Flint Guide" in project["description"]
+
+    def test_flint_strike_card(self) -> None:
+        project = _project_by_slug("flint-strike")
+        assert project["title"] == "Flint Strike"
+        assert project["featured"] is True
+        assert project["published"] is True
+        assert project["status"] == "Ongoing"
+        assert project["github_url"] is None
+        assert project["demo_url"] is None
+        for key in ("FlintFacts", "FlintOdds", "FlintCast", "FlintPulse"):
+            assert key in project["results"]
+
+    def test_asar_identity_platform(self) -> None:
+        project = _project_by_slug("asar")
+        assert project["title"] == "Asar — Identity Platform"
+        assert project["featured"] is True
+        assert project["github_url"] is None
+        assert "fingerprinting" in project["description"].lower()
+        assert "trustmobile" not in project["description"].lower()
+
+
 class TestProjects:
     """Test suite for projects functionality based on your actual structure"""
     
